@@ -16,3 +16,4 @@ Route::post('/empleados', [EmpleadoController::class, 'store'])->name('empleados
 Route::get('puestos/{puesto}', [PuestoController::class, 'show'])->name('puestos.show');
 
 
+//walter estubo aqui
