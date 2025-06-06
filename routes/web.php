@@ -30,3 +30,7 @@ Route::post('/medicos', [MedicoController::class, 'store'])->name('medicos.store
 Route::get('/medicos', [MedicoController::class, 'index'])->name('medicos.index');
 
 Route::resource('medicos', MedicoController::class);
+
+
+
+
