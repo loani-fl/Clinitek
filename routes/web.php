@@ -29,4 +29,14 @@ Route::post('/medicos', [MedicoController::class, 'store'])->name('medicos.store
 
 Route::get('/medicos', [MedicoController::class, 'index'])->name('medicos.index');
 
+Route::get('/medicos/ver', [MedicoController::class, 'show'])->name('medicos.show');
+
+// Mostrar el formulario de edición
+Route::get('/medicos/{id}/edit', [MedicoController::class, 'edit'])->name('medicos.edit');
+
+// Actualizar el médico
+Route::put('/medicos/{id}', [MedicoController::class, 'update'])->name('medicos.update');
+
+
+
 Route::resource('medicos', MedicoController::class);

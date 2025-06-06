@@ -33,6 +33,7 @@
                         <th class="text-center">Fecha de Ingreso</th>
                         <th class="text-center">Género</th>
                         <th class="text-center">Observaciones</th>
+                        <th class="text-center">Acciones</th> {{-- Nueva columna --}}
                     </tr>
                 </thead>
                 <tbody>
@@ -52,6 +53,22 @@
                                 @endif
                             </td>
                             <td>{{ $medico->observaciones ?: 'N/A' }}</td>
+                            <td class="text-center">
+                                <a href="{{ route('medicos.show', $medico->id) }}" class="btn btn-sm btn-info" title="Ver">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ route('medicos.edit', $medico->id) }}" class="btn btn-sm btn-warning" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form action="{{ route('medicos.destroy', $medico->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Seguro que deseas borrar este médico?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Borrar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+
                         </tr>
                     @empty
                         <tr>
@@ -66,7 +83,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         {{-- Información adicional --}}
         @if($medicos->count() > 0)
             <div class="mt-3 text-muted small">

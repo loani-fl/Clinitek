@@ -76,6 +76,13 @@ class MedicoController extends Controller
         return view('medicos.index', compact('medicos'));
     }
 
+    public function show($id)
+    {
+        $medico = Medico::findOrFail($id);
+        return view('medicos.show', compact('medico'));
+    }
+
+
     /**
      * Mostrar formulario para editar médico existente
      */
@@ -122,4 +129,13 @@ class MedicoController extends Controller
 
         return redirect()->route('medicos.index')->with('success', 'Médico actualizado exitosamente');
     }
+    public function destroy($id)
+    {
+        $medico = Medico::findOrFail($id); // Busca el médico o lanza 404 si no existe
+        $medico->delete(); // Elimina el médico
+
+        return redirect()->route('medicos.index')
+            ->with('success', 'Médico eliminado correctamente.');
+    }
+
 }
