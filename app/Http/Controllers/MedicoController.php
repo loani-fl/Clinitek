@@ -31,7 +31,9 @@ class MedicoController extends Controller
             'fecha_ingreso' => 'required|date',
             'genero' => 'required',
             'observaciones' => 'nullable|string',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ], [
+
             'telefono.unique' => 'Este número de teléfono ya está registrado por otro médico.',
             'correo.unique' => 'Este correo electrónico ya está registrado por otro médico.',
             'nombre.required' => 'El nombre es obligatorio.',
@@ -49,19 +51,27 @@ class MedicoController extends Controller
             'fecha_ingreso.date' => 'La fecha de ingreso debe ser una fecha válida.',
             'genero.required' => 'El género es obligatorio.',
         ]);
+        $datosMedico = $request->only([
+            'nombre',
+            'apellidos',
+            'especialidad',
+            'telefono',
+            'correo',
+            'fecha_nacimiento',
+            'fecha_ingreso',
+            'genero',
+            'observaciones',
+        ]);
+
+        if ($request->hasFile('foto')) {
+            $foto = $request->file('foto')->store('fotos_medicos', 'public');
+            $datosMedico['foto'] = $foto;
+        }
 
         // Crear y guardar el médico
-        Medico::create([
-            'nombre' => $request->nombre,
-            'apellidos' => $request->apellidos,
-            'especialidad' => $request->especialidad,
-            'telefono' => $request->telefono,
-            'correo' => $request->correo,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-            'fecha_ingreso' => $request->fecha_ingreso,
-            'genero' => $request->genero,
-            'observaciones' => $request->observaciones,
-        ]);
+        Medico::create($datosMedico);
+
+
 
         // ✅ Redirigir a la lista de médicos (NO al formulario)
         return redirect()->route('medicos.index')->with('success', 'Médico registrado exitosamente');
@@ -120,6 +130,7 @@ class MedicoController extends Controller
             'fecha_ingreso' => 'required|date',
             'genero' => 'required',
             'observaciones' => 'nullable|string',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ], [
             'telefono.unique' => 'Este número de teléfono ya está registrado por otro médico.',
             'correo.unique' => 'Este correo electrónico ya está registrado por otro médico.',
@@ -127,6 +138,19 @@ class MedicoController extends Controller
 
         // Actualizar el médico
         $medico = Medico::findOrFail($id);
+
+        // Verificar si se cargó una nueva foto
+        if ($request->hasFile('foto')) {
+            // Eliminar la foto anterior si existe
+            if ($medico->foto && \Storage::disk('public')->exists($medico->foto)) {
+                \Storage::disk('public')->delete($medico->foto);
+            }
+
+            $rutaFoto = $request->file('foto')->store('fotos_medicos', 'public');
+            $medico->foto = $rutaFoto;
+        }
+
+
         $medico->update([
             'nombre' => $request->nombre,
             'apellidos' => $request->apellidos,
@@ -137,10 +161,12 @@ class MedicoController extends Controller
             'fecha_ingreso' => $request->fecha_ingreso,
             'genero' => $request->genero,
             'observaciones' => $request->observaciones,
+            'foto' => $medico->foto,
         ]);
 
         return redirect()->route('medicos.index')->with('success', 'Médico actualizado exitosamente');
     }
+
     public function destroy($id)
     {
         $medico = Medico::findOrFail($id); // Busca el médico o lanza 404 si no existe

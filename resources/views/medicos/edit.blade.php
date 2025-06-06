@@ -24,7 +24,7 @@
                 @endif
 
                 {{-- Formulario de edición --}}
-                <form action="{{ route('medicos.update', $medico->id) }}" method="POST">
+                <form action="{{ route('medicos.update', $medico->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -79,6 +79,24 @@
                             <textarea name="observaciones" class="form-control" rows="3">{{ old('observaciones', $medico->observaciones) }}</textarea>
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label for="foto" class="form-label">Foto actual</label><br>
+                        @if ($medico->foto)
+                            <img src="{{ asset('storage/' . $medico->foto) }}" alt="Foto actual"
+                                 class="img-thumbnail mb-2" style="width: 120px; height: 120px; object-fit: cover;">
+                        @else
+                            <p class="text-muted">No hay foto disponible</p>
+                        @endif
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="foto" class="form-label">Cambiar Foto</label>
+                        <input type="file" name="foto" id="foto" class="form-control @error('foto') is-invalid @enderror">
+                        @error('foto')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
 
                     <div class="mt-4 d-flex justify-content-end">
                         <button type="submit" class="btn btn-success">

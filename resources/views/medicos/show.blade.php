@@ -14,6 +14,15 @@
                     </a>
                 </div>
             </div>
+            @if ($medico->foto)
+                <div class="text-center mb-4">
+                    <img src="{{ asset('storage/' . $medico->foto) }}"
+                         alt="Foto del médico"
+                         class="img-thumbnail rounded-circle"
+                         style="width: 150px; height: 150px; object-fit: cover;">
+                    <p class="mt-2 text-muted">Foto del médico</p>
+                </div>
+            @endif
 
             <table class="table table-bordered table-hover align-middle">
                 <tbody>
@@ -28,6 +37,10 @@
                 <tr>
                     <th class="text-center">Teléfono</th>
                     <td class="text-center">{{ $medico->telefono }}</td>
+                </tr>
+                <tr>
+                    <th class="text-center">Especialidad</th>
+                    <td>{{ $medico->especialidad }}</td>
                 </tr>
                 <tr>
                     <th class="text-center">Correo</th>
@@ -55,6 +68,7 @@
                     <th class="text-center">Observaciones</th>
                     <td>{{ $medico->observaciones ?: 'N/A' }}</td>
                 </tr>
+
                 </tbody>
             </table>
         </div>
