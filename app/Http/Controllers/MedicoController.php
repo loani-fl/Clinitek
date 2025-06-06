@@ -70,11 +70,23 @@ class MedicoController extends Controller
     /**
      * Mostrar lista de médicos
      */
-    public function index()
+
+    public function index(Request $request)
     {
-        $medicos = Medico::all();
+        $query = Medico::query();
+
+        if ($request->has('buscar') && $request->buscar != '') {
+            $buscar = $request->buscar;
+            $query->where('nombre', 'like', "%{$buscar}%")
+                ->orWhere('especialidad', 'like', "%{$buscar}%");
+        }
+
+        $medicos = $query->paginate(10);
+        $medicos->appends($request->only('buscar'));
+
         return view('medicos.index', compact('medicos'));
     }
+
 
     public function show($id)
     {

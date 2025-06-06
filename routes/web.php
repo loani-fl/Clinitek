@@ -29,6 +29,8 @@ Route::post('/medicos', [MedicoController::class, 'store'])->name('medicos.store
 
 Route::get('/medicos', [MedicoController::class, 'index'])->name('medicos.index');
 
+
+
 Route::get('/medicos/ver', [MedicoController::class, 'show'])->name('medicos.show');
 
 // Mostrar el formulario de edición

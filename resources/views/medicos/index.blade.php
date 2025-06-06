@@ -19,6 +19,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
+        <form action="{{ route('medicos.index') }}" method="GET" class="mb-3 d-flex">
+            <input type="text" name="buscar" class="form-control me-2" placeholder="Buscar por nombre o especialidad" value="{{ request('buscar') }}">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
 
         {{-- Tabla completamente responsiva --}}
         <div class="table-responsive">
@@ -28,7 +32,8 @@
                         <th class="text-center">Nombre</th>
                         <th class="text-center">Apellidos</th>
                         <th class="text-center">Teléfono</th>
-                        <th class="text-center">Correo</th>
+                        <th class="text-center">Correo</th>}
+                        <th class="text-center">Especialidad</th>}
                         <th class="text-center">Fecha de Nacimiento</th>
                         <th class="text-center">Fecha de Ingreso</th>
                         <th class="text-center">Género</th>
@@ -43,6 +48,7 @@
                             <td>{{ $medico->apellidos }}</td>
                             <td class="text-center">{{ $medico->telefono }}</td>
                             <td>{{ $medico->correo }}</td>
+                            <td class="text-center">{{ $medico->especialidad }}</td>
                             <td class="text-center">{{ $medico->fecha_nacimiento }}</td>
                             <td class="text-center">{{ $medico->fecha_ingreso }}</td>
                             <td class="text-center">
@@ -79,9 +85,15 @@
                                 </div>
                             </td>
                         </tr>
+
                     @endforelse
                 </tbody>
             </table>
+            <div class="d-flex justify-content-center">
+                {{ $medicos->links('pagination::bootstrap-5') }}
+            </div>
+
+
         </div>
 
         {{-- Información adicional --}}
