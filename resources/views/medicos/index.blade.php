@@ -59,17 +59,17 @@
                                 @endif
                             </td>
                             <td>{{ $medico->observaciones ?: 'N/A' }}</td>
-                            <td class="text-center">
-                                <a href="{{ route('medicos.show', $medico->id) }}" class="btn btn-sm btn-info" title="Ver">
+                            <td>
+                                <a href="{{ route('medicos.show', $medico->id) }}" class="btn btn-sm btn-outline-info me-2" title="Ver Detalles">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <a href="{{ route('medicos.edit', $medico->id) }}" class="btn btn-sm btn-warning" title="Editar">
-                                    <i class="bi bi-pencil"></i>
+                                <a href="{{ route('medicos.edit', $medico->id) }}" class="btn btn-sm btn-outline-warning me-2" title="Editar Medico">
+                                    <i class="bi bi-pencil-square"></i>
                                 </a>
-                                <form action="{{ route('medicos.destroy', $medico->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Seguro que deseas borrar este médico?');">
+                                <form action="{{ route('medicos.destroy', $medico->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Seguro que quieres eliminar este medico?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" title="Borrar">
+                                    <button class="btn btn-sm btn-outline-danger" title="Eliminar Medico">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>

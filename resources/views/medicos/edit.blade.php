@@ -96,16 +96,29 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-
-
                     <div class="mt-4 d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary" onclick="confirmarCancelacion()">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </button>
+
                         <button type="submit" class="btn btn-success">
                             <i class="bi bi-save"></i> Guardar cambios
                         </button>
                     </div>
+
                 </form>
             </div>
         </div>
     </div>
 @endsection
+@push('scripts')
+    <script>
+        function confirmarCancelacion() {
+            if (confirm('¿Deseas cancelar la actualización del médico?')) {
+                window.location.href = "{{ route('medicos.index') }}";
+            }
+        }
+    </script>
+@endpush
+
 
