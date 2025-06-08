@@ -5,101 +5,148 @@ namespace App\Http\Controllers;
 use App\Models\Puesto;
 use App\Models\Empleado;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EmpleadoController extends Controller
 {
-    // Mostrar la lista de empleados con búsqueda y paginación
     public function index(Request $request)
     {
         $busqueda = $request->input('buscar');
 
-        $empleados = Empleado::when($busqueda, function ($query, $busqueda) {
-            return $query->where('nombre', 'like', "%$busqueda%")
-                         ->orWhere('puesto', 'like', "%$busqueda%");
-        })->orderBy('nombre')->paginate(10);
+        $empleados = Empleado::with('puesto')
+            ->when($busqueda, function ($query, $busqueda) {
+                return $query->where(function ($q) use ($busqueda) {
+                    $q->where('nombres', 'like', "%$busqueda%")
+                      ->orWhere('apellidos', 'like', "%$busqueda%")
+                      ->orWhereHas('puesto', function ($q2) use ($busqueda) {
+                          $q2->where('nombre', 'like', "%$busqueda%");
+                      });
+                });
+            })
+            ->orderBy('nombres')
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('empleados.index', compact('empleados', 'busqueda'));
+        return view('empleados.index', [
+            'empleados' => $empleados,
+            'busqueda' => $busqueda,
+            'usuarioActual' => session('usuario_nombre')
+        ]);
     }
 
-    // Mostrar formulario para crear nuevo empleado
     public function create()
     {
         $puestos = Puesto::all();
-        return view('empleados.create', compact('puestos'));
+        return view('empleados.create', [
+            'puestos' => $puestos,
+            'usuarioActual' => session('usuario_nombre')
+        ]);
     }
 
-    // Guardar un nuevo empleado
     public function store(Request $request)
     {
         $request->validate([
             'nombres'           => 'required|string|max:255',
             'apellidos'         => 'required|string|max:255',
-            'identidad'         => 'required|unique:empleados,identidad',
-            'direccion'         => 'required|string',
+            'identidad'         => 'required|string|max:25|unique:empleados',
+            'direccion'         => 'required|string|max:255',
             'telefono'          => 'required|string|max:15',
-            'correo'            => 'required|email|unique:empleados,correo',
+            'correo'            => 'required|email|unique:empleados',
             'fecha_ingreso'     => 'required|date',
             'fecha_nacimiento'  => 'required|date',
-            'genero'            => 'required',
-            'estado_civil'      => 'required',
+            'genero'            => 'required|in:Masculino,Femenino,Otro',
+            'estado_civil'      => 'required|string|max:50',
             'puesto_id'         => 'required|exists:puestos,id',
             'salario'           => 'required|numeric|min:0',
             'observaciones'     => 'nullable|string',
         ]);
 
-        Empleado::create($request->all());
+        Empleado::create($request->except('area'));
 
-        return redirect()->route('empleados.create')->with('success', 'Empleado registrado exitosamente.');
+        return redirect()->route('empleados.index')->with('success', 'Empleado registrado exitosamente.');
     }
 
-    // Mostrar detalles de un empleado
     public function show($id)
     {
-        $empleado = Empleado::findOrFail($id);
-        return view('empleados.show', compact('empleado'));
+        $empleado = Empleado::with('puesto')->findOrFail($id);
+        return view('empleados.show', [
+            'empleado' => $empleado,
+            'usuarioActual' => session('usuario_nombre')
+        ]);
     }
 
-    // Mostrar formulario para editar empleado
     public function edit($id)
     {
         $empleado = Empleado::findOrFail($id);
         $puestos = Puesto::all();
-        return view('empleados.edit', compact('empleado', 'puestos'));
+        return view('empleados.edit', [
+            'empleado' => $empleado,
+            'puestos' => $puestos,
+            'usuarioActual' => session('usuario_nombre')
+        ]);
     }
 
-    // Actualizar los datos del empleado
     public function update(Request $request, $id)
     {
         $empleado = Empleado::findOrFail($id);
 
         $request->validate([
-            'nombres'           => 'required|string|max:255',
-            'apellidos'         => 'required|string|max:255',
-            'identidad'         => 'required|unique:empleados,identidad,' . $empleado->id,
-            'direccion'         => 'required|string',
-            'telefono'          => 'required|string|max:15',
-            'correo'            => 'required|email|unique:empleados,correo,' . $empleado->id,
-            'fecha_ingreso'     => 'required|date',
-            'fecha_nacimiento'  => 'required|date',
-            'genero'            => 'required',
-            'estado_civil'      => 'required',
-            'puesto_id'         => 'required|exists:puestos,id',
-            'salario'           => 'required|numeric|min:0',
-            'observaciones'     => 'nullable|string',
+            'nombres'       => 'required|string|max:255',
+            'apellidos'     => 'required|string|max:255',
+            'identidad'     => ['required', 'string', 'max:25', Rule::unique('empleados')->ignore($empleado->id)],
+            'direccion'     => 'required|string|max:255',
+            'correo'        => ['required', 'email', Rule::unique('empleados')->ignore($empleado->id)],
+            'telefono'      => 'required|string|max:15',
+            'estado_civil'  => 'required|string|max:50',
+            'genero'        => 'required|in:Masculino,Femenino,Otro',
+            'fecha_ingreso' => 'required|date',
+            'salario'       => 'required|numeric|min:0',
+            'puesto_id'     => 'required|exists:puestos,id',
         ]);
 
         $empleado->update($request->all());
 
-        return redirect()->route('empleados.index')->with('success', 'Empleado actualizado correctamente.');
+        return redirect()->route('empleados.visualizacion')->with('success', 'Empleado actualizado correctamente.');
     }
 
-    // Eliminar un empleado
     public function destroy($id)
     {
         $empleado = Empleado::findOrFail($id);
         $empleado->delete();
 
-        return redirect()->route('empleados.index')->with('success', 'Empleado eliminado correctamente.');
+        return redirect()->route('empleados.visualizacion')->with('success', 'Empleado eliminado correctamente.');
+    }
+
+    public function visualizacion(Request $request)
+    {
+        if (!session('autenticado')) {
+            return redirect()->route('login')->withErrors(['clave' => 'Debes iniciar sesión.']);
+        }
+
+        if (!in_array('ver_empleados', session('permisos', []))) {
+            abort(403, 'No tienes permiso para acceder a esta página.');
+        }
+
+        $query = Empleado::with('puesto');
+
+        if ($request->has('buscar')) {
+            $buscar = $request->input('buscar');
+            $query->where(function ($q) use ($buscar) {
+                $q->where('nombres', 'like', "%$buscar%")
+                  ->orWhere('apellidos', 'like', "%$buscar%")
+                  ->orWhere('identidad', 'like', "%$buscar%");
+            });
+        }
+
+        if ($request->has('ordenar_por') && $request->has('direccion')) {
+            $query->orderBy($request->ordenar_por, $request->direccion);
+        }
+
+        $empleados = $query->paginate(10);
+
+        return view('empleados.visualizacion', [
+            'empleados' => $empleados,
+            'usuarioActual' => session('usuario_nombre')
+        ]);
     }
 }
-
