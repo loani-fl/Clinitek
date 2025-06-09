@@ -24,8 +24,8 @@ class MedicoFactory extends Factory
             'especialidad' => $this->faker->randomElement(['Cardiología', 'Pediatría', 'Dermatología', 'Neurología', 'Oncología']),
             'telefono' => $this->faker->phoneNumber(),
             'correo' => $this->faker->unique()->safeEmail(),
-            'fecha_nacimiento' => $this->faker->date('Y-m-d', '1980-01-01'), // hasta 1980-01-01
-            'fecha_ingreso' => $this->faker->date('Y-m-d', 'now'), // fecha hasta hoy
+            'fecha_nacimiento' => $this->faker->dateTimeBetween('1950-01-01', '2025-12-31')->format('Y-m-d'),
+            'fecha_ingreso' => $this->faker->dateTimeBetween('2000-01-01', 'now')->format('Y-m-d'),
             'genero' => $this->faker->randomElement(['Masculino', 'Femenino', 'Otro']),
             'observaciones' => $this->faker->optional()->text(100),
         ];

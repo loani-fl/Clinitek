@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid mt-4">
     @if(session('success'))
-        <div class="alert alert-success">
+        <div class="alert alert-success show">
             {{ session('success') }}
         </div>
     @endif
@@ -19,14 +19,14 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="nombre" class="form-label">Nombre: <span class="text-danger">*</span></label>
-                    <input type="text" name="nombre" class="form-control @error('nombre') is-invalid @enderror" value="{{ old('nombre') }}" required>
+                    <input type="text" name="nombre" maxlength="50" class="form-control @error('nombre') is-invalid @enderror" value="{{ old('nombre') }}" required>
                     @error('nombre')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 <div class="col-md-6">
                     <label for="apellidos" class="form-label">Apellidos: <span class="text-danger">*</span></label>
-                    <input type="text" name="apellidos" class="form-control @error('apellidos') is-invalid @enderror" value="{{ old('apellidos') }}" required>
+                    <input type="text" name="apellidos" maxlength="50" class="form-control @error('apellidos') is-invalid @enderror" value="{{ old('apellidos') }}" required>
                     @error('apellidos')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -35,7 +35,7 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento: <span class="text-danger">*</span></label>
-                    <input type="date" name="fecha_nacimiento" class="form-control @error('fecha_nacimiento') is-invalid @enderror" value="{{ old('fecha_nacimiento') }}" required>
+                    <input type="date" name="fecha_nacimiento"  class="form-control @error('fecha_nacimiento') is-invalid @enderror" value="{{ old('fecha_nacimiento') }}" required>
                     @error('fecha_nacimiento')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -59,7 +59,7 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="especialidad" class="form-label">Especialidad: <span class="text-danger">*</span></label>
-                    <input type="text" name="especialidad" class="form-control @error('especialidad') is-invalid @enderror" value="{{ old('especialidad') }}" required>
+                    <input type="text" name="especialidad" maxlength="80" class="form-control @error('especialidad') is-invalid @enderror" value="{{ old('especialidad') }}" required>
                     @error('especialidad')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -78,14 +78,14 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="telefono" class="form-label">Teléfono: <span class="text-danger">*</span></label>
-                    <input type="text" name="telefono" class="form-control @error('telefono') is-invalid @enderror" value="{{ old('telefono') }}" required>
+                    <input type="text" name="telefono" maxlength="8" class="form-control @error('telefono') is-invalid @enderror" value="{{ old('telefono') }}" required>
                     @error('telefono')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 <div class="col-md-6">
                     <label for="correo" class="form-label">Correo Electrónico: <span class="text-danger">*</span></label>
-                    <input type="email" name="correo" class="form-control @error('correo') is-invalid @enderror" value="{{ old('correo') }}" required>
+                    <input type="email" name="correo" maxlength="100" class="form-control @error('correo') is-invalid @enderror" value="{{ old('correo') }}" required>
                     @error('correo')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -97,7 +97,7 @@
                 <div class="row g-3">
                     <div class="col-12">
                         <label class="form-label">Observaciones:</label>
-                        <textarea name="observaciones" class="form-control @error('observaciones') is-invalid @enderror" rows="4" placeholder="Información adicional sobre el médico (opcional)">{{ old('observaciones') }}</textarea>
+                        <textarea name="observaciones" maxlength="100" class="form-control @error('observaciones') is-invalid @enderror" rows="4" placeholder="Información adicional sobre el médico (opcional)">{{ old('observaciones') }}</textarea>
                         @error('observaciones')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -131,4 +131,7 @@
         </form>
     </div>
 </div>
+
+
+
 @endsection

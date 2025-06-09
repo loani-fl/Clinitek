@@ -31,27 +31,27 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Nombre</label>
-                            <input type="text" name="nombre" class="form-control" value="{{ old('nombre', $medico->nombre) }}" required>
+                            <input type="text" name="nombre" maxlength="50" class="form-control" value="{{ old('nombre', $medico->nombre) }}" required>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Apellidos</label>
-                            <input type="text" name="apellidos" class="form-control" value="{{ old('apellidos', $medico->apellidos) }}" required>
+                            <input type="text" name="apellidos" maxlength="50" class="form-control" value="{{ old('apellidos', $medico->apellidos) }}" required>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Especialidad</label>
-                            <input type="text" name="especialidad" class="form-control" value="{{ old('especialidad', $medico->especialidad) }}" required>
+                            <input type="text" name="especialidad" maxlength="80" class="form-control" value="{{ old('especialidad', $medico->especialidad) }}" required>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Teléfono</label>
-                            <input type="text" name="telefono" class="form-control" value="{{ old('telefono', $medico->telefono) }}" required>
+                            <input type="text" name="telefono" maxlength="8" class="form-control" value="{{ old('telefono', $medico->telefono) }}" required>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Correo</label>
-                            <input type="email" name="correo" class="form-control" value="{{ old('correo', $medico->correo) }}" required>
+                            <input type="email" name="correo" maxlength="100" class="form-control" value="{{ old('correo', $medico->correo) }}" required>
                         </div>
 
                         <div class="col-md-6">
@@ -76,7 +76,7 @@
 
                         <div class="col-md-12">
                             <label class="form-label">Observaciones</label>
-                            <textarea name="observaciones" class="form-control" rows="3">{{ old('observaciones', $medico->observaciones) }}</textarea>
+                            <textarea name="observaciones"  maxlength="100" class="form-control" rows="3">{{ old('observaciones', $medico->observaciones) }}</textarea>
                         </div>
                     </div>
                     <div class="mb-3">

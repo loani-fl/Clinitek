@@ -22,15 +22,15 @@ class MedicoController extends Controller
     {
         // Validar datos
         $request->validate([
-            'nombre' => 'required|regex:/^[\pL\s\-]+$/u',
-            'apellidos' => 'required|regex:/^[\pL\s\-]+$/u',
-            'especialidad' => 'required|string',
-            'telefono' => 'required|numeric|unique:medicos,telefono',
-            'correo' => 'required|email|unique:medicos,correo',
-            'fecha_nacimiento' => 'required|date',
-            'fecha_ingreso' => 'required|date',
+            'nombre' => 'required|regex:/^[\pL\s\-]+$/u|max:50',
+            'apellidos' => 'required|regex:/^[\pL\s\-]+$/u|max:50',
+            'especialidad' => 'required|string|max:80',
+            'telefono' => 'required|numeric|unique:medicos,telefono|digits:8',
+            'correo' => 'required|email|unique:medicos,correo|max:100',
+            'fecha_nacimiento' => 'required|date|after_or_equal:1950-01-01|before_or_equal:today',
+            'fecha_ingreso' => 'required|date|after_or_equal:2000-01-01|before_or_equal:today',
             'genero' => 'required',
-            'observaciones' => 'nullable|string',
+            'observaciones' => 'nullable|string|max:100',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ], [
 
@@ -121,15 +121,15 @@ class MedicoController extends Controller
     {
         // Validar datos
         $request->validate([
-            'nombre' => 'required|regex:/^[\pL\s\-]+$/u',
-            'apellidos' => 'required|regex:/^[\pL\s\-]+$/u',
-            'especialidad' => 'required|string',
-            'telefono' => 'required|numeric|unique:medicos,telefono,' . $id,
-            'correo' => 'required|email|unique:medicos,correo,' . $id,
-            'fecha_nacimiento' => 'required|date',
-            'fecha_ingreso' => 'required|date',
+            'nombre' => 'required|regex:/^[\pL\s\-]+$/u|max:50',
+            'apellidos' => 'required|regex:/^[\pL\s\-]+$/u|max:50',
+            'especialidad' => 'required|string|max:80',
+            'telefono' => 'required|numeric|unique:medicos,telefono,|digits:8' . $id,
+            'correo' => 'required|email|unique:medicos,correo,|max:100' . $id,
+            'fecha_nacimiento' => 'required|date|after_or_equal:1950-01-01|before_or_equal:today',
+            'fecha_ingreso' => 'required|date|after_or_equal:2000-01-01|before_or_equal:today',
             'genero' => 'required',
-            'observaciones' => 'nullable|string',
+            'observaciones' => 'nullable|string|max:100',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ], [
             'telefono.unique' => 'Este número de teléfono ya está registrado por otro médico.',
