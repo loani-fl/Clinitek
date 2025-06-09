@@ -21,5 +21,6 @@ class Medico extends Model
         'fecha_ingreso',
         'genero',
         'observaciones',
+        'foto',
     ];
 }

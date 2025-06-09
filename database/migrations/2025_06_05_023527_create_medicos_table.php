@@ -16,12 +16,13 @@ return new class extends Migration
             $table->string('nombre');
             $table->string('apellidos');
             $table->string('especialidad');
-            $table->string('telefono', 15);
+            $table->string('telefono', 20);
             $table->string('correo')->unique();
             $table->date('fecha_nacimiento');
             $table->date('fecha_ingreso');
             $table->enum('genero', ['Masculino', 'Femenino', 'Otro']);
             $table->text('observaciones')->nullable();
+            $table->string('foto')->nullable();
             $table->timestamps();
         });
     }

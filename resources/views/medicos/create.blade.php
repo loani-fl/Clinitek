@@ -10,8 +10,9 @@
 
     <div class="card p-4 w-100">
         <h2 class="mb-4">Registrar Nuevo Médico</h2>
-        <form method="POST" action="{{ route('medicos.store') }}">
-            @csrf
+        <form method="POST" action="{{ route('medicos.store') }}" enctype="multipart/form-data">
+
+        @csrf
 
             {{-- Información Personal --}}
             <h5 class="mb-3 border-bottom pb-1">Información Personal</h5>
@@ -104,6 +105,17 @@
                     </div>
                 </div>
             </div>
+            {{-- Subida de Foto --}}
+            <h5 class="mb-3 border-bottom pb-1">Foto del Médico</h5>
+            <div class="mb-3">
+                <label for="foto" class="form-label">Foto:</label>
+                <input type="file" name="foto" id="foto" class="form-control @error('foto') is-invalid @enderror" accept="image/*">
+                @error('foto')
+                <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <div class="form-text">Puedes arrastrar o seleccionar una imagen en formato JPG, PNG o GIF (máx. 2MB).</div>
+            </div>
+
 
             {{-- Botones --}}
             <div class="d-flex justify-content-between">
