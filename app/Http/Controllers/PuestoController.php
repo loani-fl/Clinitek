@@ -60,18 +60,29 @@ Puesto::create([
     }
 
     // Actualizar un puesto existente
-    public function update(Request $request, Puesto $puesto)
-    {
-        $request->validate([
-            'nombre' => 'required|string|max:255|unique:puestos,nombre,' . $puesto->id,
-        ]);
+   public function update(Request $request, Puesto $puesto)
+{
+    $request->validate([
+        'nombre' => 'required|string|max:255|unique:puestos,nombre,' . $puesto->id,
+        'codigo' => 'required|string|max:255|unique:puestos,codigo,' . $puesto->id,
+        'area' => 'required|string',
+        'sueldo' => 'required|numeric',
+        'funcion' => 'required|string',
+    ], [
+        'nombre.unique' => 'El nombre del puesto ya existe. Por favor elige otro.',
+        'codigo.unique' => 'Este código ya está en uso.',
+    ]);
 
-        $puesto->update([
-            'nombre' => $request->nombre,
-        ]);
+    $puesto->update([
+        'nombre' => $request->nombre,
+        'codigo' => $request->codigo,
+        'area' => $request->area,
+        'sueldo' => $request->sueldo,
+        'funcion' => $request->funcion,
+    ]);
 
-        return redirect()->route('puestos.index')->with('success', 'Puesto actualizado correctamente.');
-    }
+    return redirect()->route('puestos.index')->with('success', 'Puesto actualizado correctamente.');
+}
 
     // Eliminar un puesto
     public function destroy(Puesto $puesto)
