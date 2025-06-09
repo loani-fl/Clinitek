@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title', 'Clinitek')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@yield('title', 'Clinitek')</title>
 
     <!-- Token CSRF para formularios -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -14,16 +14,53 @@
 
     <style>
         html, body {
-            margin: 0; padding: 0;
-            height: 100%; width: 100%;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
             background-color: #f8f9fa;
-            font-family: sans-serif;
+            font-family: 'Segoe UI', sans-serif;
         }
+
         .contenido {
-            min-height: 100vh; /* altura completa */
+            min-height: 100vh;
             padding: 20px;
             box-sizing: border-box;
         }
+
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table {
+            width: 100%;
+            min-width: 800px;
+            margin-bottom: 0;
+        }
+
+        .table th, .table td {
+            padding: 8px 6px;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        .table td:nth-child(4) {
+            word-break: break-word;
+            white-space: normal;
+            max-width: 200px;
+        }
+
         footer {
             margin-top: 3rem;
             padding-top: 1rem;
@@ -31,6 +68,27 @@
             text-align: center;
             color: #6c757d;
             font-size: 0.875rem;
+        }
+
+        @media (max-width: 576px) {
+            .contenido {
+                padding: 10px 5px;
+            }
+
+            .table-container {
+                padding: 10px;
+                border-radius: 4px;
+            }
+
+            .table th, .table td {
+                padding: 6px 4px;
+                font-size: 0.8rem;
+            }
+
+            .btn {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
         }
     </style>
 </head>
@@ -63,7 +121,6 @@
         <h2 class="text-primary">@yield('title', '')</h2>
     </header>
 
-    {{-- Aquí se inyecta el contenido de cada vista --}}
     @yield('content')
 
     <footer>
@@ -74,7 +131,6 @@
 <!-- Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Script para ocultar mensajes de éxito tras unos segundos -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const alert = document.querySelector('.alert-success');
