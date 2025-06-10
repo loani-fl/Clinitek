@@ -34,10 +34,8 @@
                         <th class="text-center">Teléfono</th>
                         <th class="text-center">Correo</th>}
                         <th class="text-center">Especialidad</th>}
-                        <th class="text-center">Fecha de Nacimiento</th>
-                        <th class="text-center">Fecha de Ingreso</th>
                         <th class="text-center">Género</th>
-                        <th class="text-center">Observaciones</th>
+
                         <th class="text-center">Acciones</th> {{-- Nueva columna --}}
                     </tr>
                 </thead>
@@ -49,8 +47,7 @@
                             <td class="text-center">{{ $medico->telefono }}</td>
                             <td>{{ $medico->correo }}</td>
                             <td class="text-center">{{ $medico->especialidad }}</td>
-                            <td class="text-center">{{ $medico->fecha_nacimiento }}</td>
-                            <td class="text-center">{{ $medico->fecha_ingreso }}</td>
+
                             <td class="text-center">
                                 @if($medico->genero == 'Masculino')
                                     <span class="badge bg-primary">{{ $medico->genero }}</span>
@@ -58,7 +55,7 @@
                                     <span class="badge bg-info">{{ $medico->genero }}</span>
                                 @endif
                             </td>
-                            <td>{{ $medico->observaciones ?: 'N/A' }}</td>
+
                             <td>
                                 <a href="{{ route('medicos.show', $medico->id) }}" class="btn btn-sm btn-outline-info me-2" title="Ver Detalles">
                                     <i class="bi bi-eye"></i>
