@@ -53,11 +53,11 @@
                                     <!-- Número que considera la página actual y el índice en el loop -->
                                     <td>{{ ($medicos->currentPage() - 1) * $medicos->perPage() + $loop->iteration }}</td>
 
-                                    <td>
+                                    <td class="text-center">
                                         @if($medico->estado)
-                                            <span class="badge bg-success">Activo</span>
+                                            <i class="bi bi-circle-fill text-success" title="Activo"></i>
                                         @else
-                                            <span class="badge bg-danger">Inactivo</span>
+                                            <i class="bi bi-circle-fill text-danger" title="Inactivo"></i>
                                         @endif
                                     </td>
 

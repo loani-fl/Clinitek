@@ -4,7 +4,7 @@
     <div class="container mt-4" style="max-width: 720px;">
         <div class="card shadow-sm rounded mx-auto">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h4 class="mb-0" style="font-size: 1.25rem;"><i class="bi bi-person-vcard-fill me-2"></i> Detalles del Médico</h4>
+                <h4 class="mb-0" style="font-size: 1.25rem;"><i class="bi bi-person-vcard-fill me-2"></i> Información del Médico</h4>
                 <div>
                     <a href="{{ route('medicos.index') }}" class="btn btn-light btn-sm me-2" style="font-size: 0.85rem;">
                         <i class="bi bi-arrow-left"></i> Volver
@@ -22,6 +22,14 @@
                              alt="Foto del médico"
                              class="img-thumbnail rounded-circle shadow"
                              style="width: 120px; height: 120px; object-fit: cover;">
+
+                        <div class="mt-2">
+                            @if ($medico->estado)
+                                <span class="badge bg-success">Activo</span>
+                            @else
+                                <span class="badge bg-danger">Inactivo</span>
+                            @endif
+                        </div>
                     </div>
                 @endif
 

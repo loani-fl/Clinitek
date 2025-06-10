@@ -34,7 +34,7 @@
                             @method('PUT')
 
                             <div class="row g-3">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label">Nombre</label>
                                     <input type="text" name="nombre" maxlength="50"
                                            class="form-control @error('nombre') is-invalid @enderror"
@@ -45,7 +45,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label">Apellidos</label>
                                     <input type="text" name="apellidos" maxlength="50"
                                            class="form-control @error('apellidos') is-invalid @enderror"
@@ -56,7 +56,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label">Especialidad</label>
                                     <select name="especialidad" class="form-select @error('especialidad') is-invalid @enderror" required value="{{ old('nombre', $medico->nombre) }}">
                                         <div class="invalid-feedback">Completa este dato</div>
@@ -82,7 +82,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label">Teléfono</label>
                                     <input type="text" name="telefono" maxlength="8"
                                            class="form-control @error('telefono') is-invalid @enderror"
@@ -93,7 +93,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label">Correo</label>
                                     <input type="email" name="correo" maxlength="100"
                                            class="form-control @error('correo') is-invalid @enderror"
@@ -103,7 +103,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label">Identidad</label>
                                     <input type="text" name="identidad" maxlength="13"
                                            class="form-control @error('identidad') is-invalid @enderror"
@@ -114,7 +114,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label">Salario</label>
                                     <input type="number" name="salario" step="0.01" min="0" max="99999.99"
                                            class="form-control @error('salario') is-invalid @enderror"
@@ -124,7 +124,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label">Fecha de Nacimiento</label>
                                     <input type="date" name="fecha_nacimiento"
                                            class="form-control @error('fecha_nacimiento') is-invalid @enderror"
@@ -135,7 +135,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label">Fecha de Ingreso</label>
                                     <input type="date" name="fecha_ingreso"
                                            class="form-control @error('fecha_ingreso') is-invalid @enderror"
@@ -146,7 +146,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label">Género</label>
                                     <select name="genero" class="form-select @error('genero') is-invalid @enderror" required  value="{{ old('nombre', $medico->nombre) }}">
                                         <div class="invalid-feedback">Completa este dato</div>
@@ -160,7 +160,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <label class="form-label">Observaciones</label>
                                     <textarea name="observaciones" maxlength="100" rows="3"
                                               class="form-control @error('observaciones') is-invalid @enderror">{{ old('observaciones', $medico->observaciones) }}</textarea>
@@ -169,24 +169,22 @@
                                     @enderror
                                 </div>
                             </div>
-
-                            <div class="mb-3 mt-3">
-                                <label for="foto" class="form-label">Foto actual</label><br>
+                            <div class="col-md-5">
+                                <label for="foto" class="form-label form-label-sm mb-1">Foto actual</label><br>
                                 @if ($medico->foto)
                                     <img src="{{ asset('storage/' . $medico->foto) }}" alt="Foto actual"
-                                         class="img-thumbnail mb-2" style="width: 120px; height: 120px; object-fit: cover;">
+                                         class="img-thumbnail mb-1" style="width: 100px; height: 100px; object-fit: cover;">
                                 @else
-                                    <p class="text-muted">No hay foto
-                        @endif
-                    </div>
+                                    <p class="text-muted mb-1">No hay foto</p>
+                                @endif
 
-                    <div class="mb-3">
-                        <label for="foto" class="form-label">Cambiar Foto</label>
-                        <input type="file" name="foto" id="foto" class="form-control @error('foto') is-invalid @enderror">
-                        @error('foto')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                                <label for="foto" class="form-label form-label-sm mt-1">Cambiar foto</label>
+                                <input type="file" name="foto" id="foto"
+                                       class="form-control form-control-sm @error('foto') is-invalid @enderror">
+                                @error('foto')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
 
                         <button type="submit" class="btn btn-success">
