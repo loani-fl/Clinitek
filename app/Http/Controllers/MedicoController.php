@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Medico;
+use Illuminate\Validation\Rule;
+use Carbon\Carbon;
+
+
 
 class MedicoController extends Controller
 {
@@ -119,6 +123,11 @@ class MedicoController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        $hoy = Carbon::today();
+        $fechaMin = $hoy->copy()->subMonth()->format('Y-m-d');
+        $fechaMax = $hoy->copy()->addMonth()->format('Y-m-d');
+
         // Validar datos
         $request->validate([
             'nombre' => 'required|regex:/^[\pL\s\-]+$/u|max:50',
@@ -129,11 +138,22 @@ class MedicoController extends Controller
                 'regex:/^[983]\d{7}$/',
                 'unique:medicos,telefono,' . $id,
             ],
-            'correo' => 'nullable|email|max:100|unique:medicos,correo,' . $id,
-            'salario' => 'nullable|numeric|min:0|max:99999.99',
+
+            'correo' => [
+                'required',
+                'regex:/^[\w\.\-]+@([\w\-]+\.)+[a-zA-Z]{2,}$/',
+                'max:100',
+                Rule::unique('medicos', 'correo')->ignore($id),
+            ],
+            'salario' => ['nullable', 'regex:/^\d{1,5}(\.\d{1,2})?$/'],
             'identidad' => 'required|digits:13|unique:medicos,identidad,' . $id . ',id',
-            'fecha_nacimiento' => 'required|date|after_or_equal:1950-01-01|before_or_equal:today',
-            'fecha_ingreso' => 'required|date|after_or_equal:2000-01-01|before_or_equal:today',
+            'fecha_nacimiento' => 'required|date|after_or_equal:1950-01-01|before_or_equal:2005-12-31',
+            'fecha_ingreso' => [
+                'required',
+                'date',
+                'after_or_equal:' . $fechaMin,
+                'before_or_equal:' . $fechaMax,
+            ],
             'genero' => 'required|in:Masculino,Femenino,Otro',
             'observaciones' => 'nullable|string|max:100',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
@@ -141,12 +161,20 @@ class MedicoController extends Controller
 
 
         ], [
+            'fecha_nacimiento.before_or_equal' => 'La fecha de nacimiento debe ser igual o anterior al 31 de diciembre de 2005.',
+            'fecha_ingreso.after_or_equal' => 'La fecha de ingreso no puede ser anterior a un mes antes de hoy.',
+            'fecha_ingreso.before_or_equal' => 'La fecha de ingreso no puede ser posterior a un mes después de hoy.',
             'telefono.regex' => 'El teléfono debe iniciar con 9, 8 o 3 y contener 8 dígitos.',
             'telefono.unique' => 'Este número de teléfono ya está registrado por otro médico.',
             'correo.unique' => 'Este correo electrónico ya está registrado por otro médico.',
-            'correo.email' => 'El correo debe tener un formato válido, incluyendo "@" y "."',
+            'correo.regex' => 'El correo debe incluir un dominio válido, por ejemplo .com, .net, .es',
+            'correo.regex' => 'El correo debe contener un @ y un dominio válido como .com, .net, .org, etc.',
             'identidad.unique' => 'Este número de identidad ya está registrado por otro médico.',
             'identidad.digits' => 'El campo identidad debe tener exactamente 13 dígitos.',
+
+
+
+
         ]);
 
 

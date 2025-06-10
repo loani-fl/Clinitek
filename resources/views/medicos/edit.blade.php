@@ -81,21 +81,26 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-
                                 <div class="col-md-4">
                                     <label class="form-label">Teléfono</label>
-                                    <input type="text" name="telefono" maxlength="8"
+                                    <input type="text"
+                                           name="telefono"
+                                           maxlength="8"
+                                           pattern="[983][0-9]{7}"
+                                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                            class="form-control @error('telefono') is-invalid @enderror"
-                                           value="{{ old('telefono', $medico->telefono) }}" required value="{{ old('nombre', $medico->nombre) }}">
-                                    <div class="invalid-feedback">Completa este dato</div>
+                                           value="{{ old('telefono', $medico->telefono) }}"
+                                           required>
+                                    <div class="invalid-feedback">Ingresa un número válido que comience con 9, 8 o 3</div>
                                     @error('telefono')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
+
                                 <div class="col-md-4">
                                     <label class="form-label">Correo</label>
-                                    <input type="email" name="correo" maxlength="100"
+                                    <input type="email" name="correo" maxlength="50"
                                            class="form-control @error('correo') is-invalid @enderror"
                                            value="{{ old('correo', $medico->correo) }}" required >
                                     @error('correo')
@@ -118,7 +123,8 @@
                                     <label class="form-label">Salario</label>
                                     <input type="number" name="salario" step="0.01" min="0" max="99999.99"
                                            class="form-control @error('salario') is-invalid @enderror"
-                                           value="{{ old('salario', $medico->salario) }}">
+                                           value="{{ old('salario', $medico->salario) }}"
+                                           id="salario" oninput="validarSalario(this)">
                                     @error('salario')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -193,7 +199,8 @@
 
                             <button type="reset" class="btn btn-secondary">Restablecer</button>
 
-                </form>
+
+                        </form>
             </div>
         </div>
     </div>
@@ -312,6 +319,34 @@
                         }
                     });
                 </script>
+                <script>
+                    function validarSalario(input) {
+                        let valor = input.value;
+
+                        // Forzamos a máximo 5 dígitos enteros y 2 decimales
+                        const regex = /^(\d{0,5})(\.\d{0,2})?$/;
+
+                        if (!regex.test(valor)) {
+                            valor = valor.slice(0, -1); // elimina último caracter si no cumple
+                        }
+
+                        input.value = valor;
+                    }
+                </script>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        const correoInput = document.querySelector('input[name="correo"]');
+                        correoInput.addEventListener("invalid", function(event) {
+                            event.target.setCustomValidity("Completa este dato");
+                        });
+
+                        correoInput.addEventListener("input", function(event) {
+                            event.target.setCustomValidity(""); // Quita el mensaje cuando empieza a escribir
+                        });
+                    });
+                </script>
+
 
     @endpush
 
