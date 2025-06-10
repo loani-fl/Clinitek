@@ -18,11 +18,14 @@ return new class extends Migration
             $table->string('especialidad');
             $table->string('telefono', 20);
             $table->string('correo')->unique();
+            $table->decimal('salario', 7, 2)->nullable();
+            $table->string('identidad', 13)->unique()->nullable();
             $table->date('fecha_nacimiento');
             $table->date('fecha_ingreso');
             $table->enum('genero', ['Masculino', 'Femenino', 'Otro']);
             $table->text('observaciones')->nullable();
             $table->string('foto')->nullable();
+            $table->boolean('estado')->default(true);
             $table->timestamps();
         });
     }

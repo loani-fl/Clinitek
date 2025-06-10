@@ -39,6 +39,8 @@ Route::get('/medicos/{id}/edit', [MedicoController::class, 'edit'])->name('medic
 // Actualizar el médico
 Route::put('/medicos/{id}', [MedicoController::class, 'update'])->name('medicos.update');
 
+Route::patch('/medicos/{medico}/estado', [MedicoController::class, 'toggleEstado'])->name('medicos.toggleEstado');
+
 
 
 Route::resource('medicos', MedicoController::class);

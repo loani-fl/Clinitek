@@ -22,8 +22,8 @@ class MedicoController extends Controller
     {
         // Validar datos
         $request->validate([
-            'nombre' => 'required|regex:/^[\pL\s\-]+$/u|max:50',
-            'apellidos' => 'required|regex:/^[\pL\s\-]+$/u|max:50',
+            'nombre' => 'required|regex:/^[\pL]+$/u|max:50',
+            'apellidos' => 'required|regex:/^[\pL]+$/u|max:50',
             'especialidad' => 'required|string|max:80',
             'telefono' => 'required|numeric|unique:medicos,telefono|digits:8',
             'correo' => 'required|email|unique:medicos,correo|max:100',
@@ -124,17 +124,32 @@ class MedicoController extends Controller
             'nombre' => 'required|regex:/^[\pL\s\-]+$/u|max:50',
             'apellidos' => 'required|regex:/^[\pL\s\-]+$/u|max:50',
             'especialidad' => 'required|string|max:80',
-            'telefono' => 'required|numeric|unique:medicos,telefono,|digits:8' . $id,
-            'correo' => 'required|email|unique:medicos,correo,|max:100' . $id,
+            'telefono' => [
+                'required',
+                'regex:/^[983]\d{7}$/',
+                'unique:medicos,telefono,' . $id,
+            ],
+            'correo' => 'nullable|email|max:100|unique:medicos,correo,' . $id,
+            'salario' => 'nullable|numeric|min:0|max:99999.99',
+            'identidad' => 'required|digits:13|unique:medicos,identidad,' . $id . ',id',
             'fecha_nacimiento' => 'required|date|after_or_equal:1950-01-01|before_or_equal:today',
             'fecha_ingreso' => 'required|date|after_or_equal:2000-01-01|before_or_equal:today',
-            'genero' => 'required',
+            'genero' => 'required|in:Masculino,Femenino,Otro',
             'observaciones' => 'nullable|string|max:100',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+            'estado' => 'nullable|boolean',
+
+
         ], [
+            'telefono.regex' => 'El teléfono debe iniciar con 9, 8 o 3 y contener 8 dígitos.',
             'telefono.unique' => 'Este número de teléfono ya está registrado por otro médico.',
             'correo.unique' => 'Este correo electrónico ya está registrado por otro médico.',
+            'correo.email' => 'El correo debe tener un formato válido, incluyendo "@" y "."',
+            'identidad.unique' => 'Este número de identidad ya está registrado por otro médico.',
+            'identidad.digits' => 'El campo identidad debe tener exactamente 13 dígitos.',
         ]);
+
+
 
         // Actualizar el médico
         $medico = Medico::findOrFail($id);
@@ -157,11 +172,16 @@ class MedicoController extends Controller
             'especialidad' => $request->especialidad,
             'telefono' => $request->telefono,
             'correo' => $request->correo,
+            'salario' => $request->salario,
+            'identidad' => $request->identidad,
             'fecha_nacimiento' => $request->fecha_nacimiento,
             'fecha_ingreso' => $request->fecha_ingreso,
             'genero' => $request->genero,
             'observaciones' => $request->observaciones,
+            'estado' => $request->estado,
             'foto' => $medico->foto,
+
+
         ]);
 
         return redirect()->route('medicos.index')->with('success', 'Médico actualizado exitosamente');
@@ -175,5 +195,13 @@ class MedicoController extends Controller
         return redirect()->route('medicos.index')
             ->with('success', 'Médico eliminado correctamente.');
     }
+    public function toggleEstado(Medico $medico)
+    {
+        $medico->estado = !$medico->estado;
+        $medico->save();
+
+        return response()->json(['estado' => $medico->estado]);
+    }
+
 
 }
