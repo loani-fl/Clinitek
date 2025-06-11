@@ -26,6 +26,9 @@ return new class extends Migration
     $table->foreignId('puesto_id')->constrained()->onDelete('cascade');
     $table->decimal('salario', 10, 2)->nullable();
     $table->text('observaciones')->nullable();
+ 
+
+
     $table->timestamps();
 });
 

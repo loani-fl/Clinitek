@@ -122,14 +122,17 @@
 
                 {{-- Tercera fila: Funciones --}}
                 <div class="row g-4 mt-1">
-                    <div class="col-md-5">
-                        <label for="funcion" class="form-label">Funciones <span class="text-danger">*</span></label>
-                        <textarea name="funcion" id="funcion"
-                            class="form-control form-control-sm @error('funcion') is-invalid @enderror"
-                            rows="3" required maxlength="50"
-                            title="Máximo 50 caracteres.">{{ old('funcion', $puesto->funcion ?? '') }}</textarea>
-                        @error('funcion') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
+                  <div class="col-md-5 mb-3">
+    <label for="funcion" class="form-label">Funciones <span class="text-danger">*</span></label>
+    <textarea name="funcion" id="funcion"
+        class="form-control form-control-sm @error('funcion') is-invalid @enderror"
+        rows="3" required maxlength="50"
+        title="Máximo 50 caracteres.">{{ old('funcion', $puesto->funcion ?? '') }}</textarea>
+    @error('funcion')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>
+
                 </div>
 {{-- Botones --}}
 <div class="d-flex justify-content-center mt-4 gap-4">

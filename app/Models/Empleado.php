@@ -23,6 +23,7 @@ class Empleado extends Model
         'puesto_id',
         'salario',
         'observaciones',
+      
     ];
 
     public function puesto()

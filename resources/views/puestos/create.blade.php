@@ -58,7 +58,7 @@
                 @csrf
 
                 <div class="row g-4 mt-3 px-4">
-                    <div class="col-md-4 position-relative">
+                    <div class="col-md-3 position-relative">
                         <label for="codigo" class="form-label fw-semibold text-muted">Código <span class="text-danger">*</span></label>
                         <input type="text" name="codigo" id="codigo" class="form-control form-control-sm @error('codigo') is-invalid @enderror" required
                             maxlength="10"

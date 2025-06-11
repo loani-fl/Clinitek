@@ -34,12 +34,14 @@ public function store(Request $request)
             'regex:/^[A-Za-z0-9\-]+$/',
             'unique:puestos,codigo',
         ],
-        'nombre' => [
-            'required',
-            'string',
-            'max:50',
-            'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$/', // ✅ Permite letras y espacios
-        ],
+       'nombre' => [
+    'required',
+    'string',
+    'max:50',
+    'regex:/^[\pL\s]+$/u',
+],
+
+        
         'area' => [
             'required',
             'in:Administración,Recepción,Laboratorio,Farmacia,Enfermería,Mantenimiento',
@@ -48,13 +50,16 @@ public function store(Request $request)
             'required',
             'regex:/^\d{1,5}(\.\d{1,2})?$/',
         ],
-        'funcion' => [
-            'required',
-            'string',
-            'max:50',
-            'regex:/^[A-Za-z0-9., ]{1,50}$/',
+   'funcion' => [
+    'required',
+    'string',
+    'max:50',
+    'regex:/^[\pL\pN\s.,áéíóúÁÉÍÓÚñÑ\r\n]+$/u',
+],
+
+ // Acepta letras con tildes, números, espacios, comas y puntos
         ],
-    ], [
+     [
         'codigo.required' => 'El código es obligatorio.',
         'codigo.max' => 'El código no debe exceder 10 caracteres.',
         'codigo.regex' => 'Solo se permiten letras, números y guiones.',
@@ -62,7 +67,7 @@ public function store(Request $request)
 
         'nombre.required' => 'El nombre del puesto es obligatorio.',
         'nombre.max' => 'El nombre no debe exceder 50 caracteres.',
-        'nombre.regex' => 'El nombre solo debe contener letras y espacios.', // ✅ Mensaje actualizado
+        'nombre.regex' => 'El nombre solo debe contener letras y espacios.',
 
         'area.required' => 'Debe seleccionar un área.',
         'area.in' => 'El área seleccionada no es válida.',
@@ -70,19 +75,17 @@ public function store(Request $request)
         'sueldo.required' => 'El sueldo es obligatorio.',
         'sueldo.regex' => 'El sueldo debe tener máximo 5 dígitos enteros y 2 decimales.',
 
-        'funcion.required' => 'La función del puesto es obligatoria.',
-        'funcion.max' => 'La función no debe exceder 50 caracteres.',
+        'funcion.required' => 'La función es obligatoria.',
+        'funcion.max' => 'La función no debe tener más de 50 caracteres.',
         'funcion.regex' => 'La función solo puede contener letras, números, comas, puntos y espacios.',
+
     ]);
 
     Puesto::create($validatedData);
 
-  
-
-
-   return back()->withInput()->with('success', '¡Puesto registrado exitosamente!');
-
+    return back()->withInput()->with('success', '¡Puesto registrado exitosamente!');
 }
+
 
 // Mostrar el formulario de edición
 public function edit(Puesto $puesto)
@@ -95,10 +98,14 @@ public function update(Request $request, Puesto $puesto)
 {
     $validated = $request->validate([
         'codigo' => ['required', 'string', 'max:10', 'regex:/^[A-Za-z0-9\-]+$/', "unique:puestos,codigo,{$puesto->id}"],
-        'nombre' => ['required', 'string', 'max:50', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$/'],
+         'nombre' => ['required', 'string', 'max:50', 'regex:/^[\pL\s]+$/u',
+],
         'area' => ['required', 'in:Administración,Recepción,Laboratorio,Farmacia,Enfermería,Mantenimiento'],
         'sueldo' => ['required', 'regex:/^\d{1,5}(\.\d{1,2})?$/'],
-        'funcion' => ['required', 'string', 'max:50', 'regex:/^[A-Za-z0-9., ]{1,50}$/'],
+        'funcion' => ['required', 'string', 'max:50', 'regex:/^[\pL\pN\s.,áéíóúÁÉÍÓÚñÑ\r\n]+$/u'
+],
+        
+
     ], [
         'codigo.regex' => 'El código solo puede contener letras, números y guiones.',
         'nombre.regex' => 'El nombre solo debe contener letras y espacios.',

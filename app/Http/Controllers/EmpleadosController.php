@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
-class EmpleadoController extends Controller
+class EmpleadosController extends Controller
 {
     
     public function create()
@@ -91,6 +91,10 @@ public function store(Request $request)
         'puesto_id' => 'required|exists:puestos,id',
         'salario' => 'required|numeric|between:0,99999.99',
         'observaciones' => 'nullable|string|max:40',
+        
+
+
+
     ];
 
     $messages = [
@@ -153,6 +157,8 @@ public function store(Request $request)
     return redirect()->back()
         ->withInput()
         ->with('success', 'Empleado registrado correctamente.');
+
+             //Empleado::create($validatedData); // se usará 'estado' => 'Activo' por defecto
 }
 
 
