@@ -1,15 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use App\Http\Controllers\PuestoController;
+use App\Http\Controllers\EmpleadoController;
+use App\Http\Controllers\MedicoController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
+| Aquí registras las rutas web de tu aplicación.
 |
 */
 
@@ -17,30 +19,37 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-use App\Http\Controllers\MedicoController;
-
-
-// Ruta para mostrar el formulario
-Route::get('/medicos/crear', [MedicoController::class, 'create'])->name('medicos.create');
-
-// Ruta para guardar los datos del médico
-Route::post('/medicos', [MedicoController::class, 'store'])->name('medicos.store');
-
-
-Route::get('/medicos', [MedicoController::class, 'index'])->name('medicos.index');
-
-
-
-Route::get('/medicos/ver', [MedicoController::class, 'show'])->name('medicos.show');
-
-// Mostrar el formulario de edición
-Route::get('/medicos/{id}/edit', [MedicoController::class, 'edit'])->name('medicos.edit');
-
-// Actualizar el médico
-Route::put('/medicos/{id}', [MedicoController::class, 'update'])->name('medicos.update');
-
-Route::patch('/medicos/{medico}/estado', [MedicoController::class, 'toggleEstado'])->name('medicos.toggleEstado');
-
-
-
+// Rutas para médicos: usamos solo Route::resource para CRUD completo
 Route::resource('medicos', MedicoController::class);
+
+// Login
+Route::get('/login', function () {
+    return view('login');
+})->name('login');
+
+Route::post('/login', function (Request $request) {
+    if ($request->input('clave') === '1234') {
+        session([
+            'autenticado' => true,
+            'usuario_nombre' => 'Administrador',
+            'permisos' => ['ver_empleados', 'crear_empleados', 'editar_empleados', 'eliminar_empleados']
+        ]);
+        return redirect()->route('empleados.visualizacion');
+    }
+
+    return back()->withErrors(['clave' => 'Clave incorrecta.']);
+})->name('login.submit');
+
+Route::post('/logout', function () {
+    session()->flush();
+    return redirect()->route('login');
+})->name('logout');
+
+// Ruta protegida por sesión
+Route::middleware('check.sesion')->get('/empleados/visualizacion', [EmpleadoController::class, 'visualizacion'])->name('empleados.visualizacion');
+
+// Rutas públicas de empleados
+Route::resource('empleados', EmpleadoController::class);
+
+// Rutas públicas de puestos
+Route::resource('puestos', PuestoController::class);

@@ -8,7 +8,7 @@
     <!-- Token CSRF para formularios -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <!-- Bootstrap 5 y Bootstrap Icons -->
+    <!-- Bootstrap 5 CSS y Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
@@ -19,13 +19,46 @@
             height: 100%;
             width: 100%;
             background-color: #f8f9fa;
-            font-family: sans-serif;
+            font-family: 'Segoe UI', sans-serif;
         }
 
         .contenido {
             min-height: 100vh;
             padding: 20px;
             box-sizing: border-box;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table {
+            width: 100%;
+            min-width: 800px;
+            margin-bottom: 0;
+        }
+
+        .table th, .table td {
+            padding: 8px 6px;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        .table td:nth-child(4) {
+            word-break: break-word;
+            white-space: normal;
+            max-width: 200px;
         }
 
         footer {
@@ -35,6 +68,27 @@
             text-align: center;
             color: #6c757d;
             font-size: 0.875rem;
+        }
+
+        @media (max-width: 576px) {
+            .contenido {
+                padding: 10px 5px;
+            }
+
+            .table-container {
+                padding: 10px;
+                border-radius: 4px;
+            }
+
+            .table th, .table td {
+                padding: 6px 4px;
+                font-size: 0.8rem;
+            }
+
+            .btn {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
         }
     </style>
 </head>
@@ -84,8 +138,6 @@
         const alert = document.querySelector('.alert-success');
         if (alert) {
             setTimeout(() => {
-                alert.classList.add('fade');
-                alert.classList.add('show');
                 alert.style.transition = 'opacity 0.5s ease';
                 alert.style.opacity = 0;
                 setTimeout(() => alert.remove(), 500);
