@@ -30,6 +30,7 @@ class Empleado extends Model
         'estado',
         'salario',
         'observaciones',
+      
     ];
 
     // Relación: un empleado pertenece a un puesto
