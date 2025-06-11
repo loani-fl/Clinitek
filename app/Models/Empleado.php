@@ -10,6 +10,9 @@ class Empleado extends Model
 {
     use HasFactory;
 
+    // Nueva tabla personalizada
+    protected $table = 'listaempleados';
+
     protected $fillable = [
         'nombres',
         'apellidos',
@@ -22,9 +25,9 @@ class Empleado extends Model
         'genero',
         'estado_civil',
         'puesto_id',
-        'area',              // agregado
-        'turno_asignado',    // agregado
-        'estado',            // agregado
+        'area',
+        'turno_asignado',
+        'estado',
         'salario',
         'observaciones',
     ];
