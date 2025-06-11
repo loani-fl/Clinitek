@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <title>@yield('title', 'Clinitek - Médicos')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Clinitek')</title>
 
     <!-- Token CSRF para formularios -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -104,11 +104,12 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <div class="d-flex gap-2">
-                    <a href="{{ route('puestos.index') }}" class="btn btn-light">
-                        <i class="bi bi-briefcase-fill"></i> Crear puesto
+                    <a href="{{ route('medicos.index') }}" class="btn btn-light">
+                        <i class="bi bi-person-badge-fill"></i> Lista de Médicos
                     </a>
-                    <a href="{{ route('empleados.create') }}" class="btn btn-light">
-                        <i class="bi bi-person-plus-fill"></i> Registrar empleado
+
+                    <a href="{{ route('medicos.create') }}" class="btn btn-light">
+                        <i class="bi bi-person-plus-fill"></i> Registrar Médico
                     </a>
                 </div>
             </ul>
@@ -131,6 +132,7 @@
 <!-- Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- Script para ocultar mensaje de éxito -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const alert = document.querySelector('.alert-success');
@@ -145,6 +147,5 @@
 </script>
 
 @stack('scripts')
-
 </body>
 </html>

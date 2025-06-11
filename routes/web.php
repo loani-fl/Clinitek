@@ -53,4 +53,3 @@ Route::resource('empleados', EmpleadoController::class);
 
 // Rutas públicas de puestos
 Route::resource('puestos', PuestoController::class);
-
