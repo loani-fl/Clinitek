@@ -21,6 +21,8 @@ Route::get('/', function () {
 
 // Rutas para médicos: usamos solo Route::resource para CRUD completo
 Route::resource('medicos', MedicoController::class);
+Route::patch('/medicos/{medico}/estado', [MedicoController::class, 'toggleEstado'])->name('medicos.toggleEstado');
+
 
 // Login
 Route::get('/login', function () {
