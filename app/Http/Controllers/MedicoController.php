@@ -95,10 +95,17 @@ class MedicoController extends Controller
                 ->orWhere('especialidad', 'like', "%{$buscar}%");
         }
 
+
+        if ($request->has('estado') && $request->estado !== '') {
+            $query->where('estado', $request->estado);
+        }
+
         $medicos = $query->paginate(10);
         $medicos->appends($request->only('buscar'));
 
+
         return view('medicos.index', compact('medicos'));
+
     }
 
 

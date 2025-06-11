@@ -132,25 +132,37 @@
 
                                 <div class="col-md-4">
                                     <label class="form-label">Fecha de Nacimiento</label>
-                                    <input type="date" name="fecha_nacimiento"
+                                    <input type="date"
+                                           name="fecha_nacimiento"
                                            class="form-control @error('fecha_nacimiento') is-invalid @enderror"
-                                           value="{{ old('fecha_nacimiento', $medico->fecha_nacimiento) }}" required value="{{ old('nombre', $medico->nombre) }}">
+                                           value="{{ old('fecha_nacimiento', $medico->fecha_nacimiento) }}"
+                                           required
+                                           min="1950-01-01"
+                                           max="2005-12-31">
                                     <div class="invalid-feedback">Completa este dato</div>
                                     @error('fecha_nacimiento')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
+
+                                @php
+                                    $minFecha = \Carbon\Carbon::now()->subMonth()->format('Y-m-d');
+                                    $maxFecha = \Carbon\Carbon::now()->addMonth()->format('Y-m-d');
+                                @endphp
+
                                 <div class="col-md-4">
                                     <label class="form-label">Fecha de Ingreso</label>
-                                    <input type="date" name="fecha_ingreso"
+                                    <input type="date" name="fecha_ingreso" id="fecha_ingreso"
                                            class="form-control @error('fecha_ingreso') is-invalid @enderror"
-                                           value="{{ old('fecha_ingreso', $medico->fecha_ingreso) }}" required value="{{ old('nombre', $medico->nombre) }}">
+                                           value="{{ old('fecha_ingreso', $medico->fecha_ingreso) }}"
+                                           min="{{ $minFecha }}" max="{{ $maxFecha }}" required>
                                     <div class="invalid-feedback">Completa este dato</div>
                                     @error('fecha_ingreso')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+
 
                                 <div class="col-md-4">
                                     <label class="form-label">Género</label>
@@ -346,6 +358,25 @@
                         });
                     });
                 </script>
+
+                @push('scripts')
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const fechaIngreso = document.getElementById('fecha_ingreso');
+
+                            fechaIngreso.addEventListener('blur', function () {
+                                const valor = fechaIngreso.value;
+                                const anio = valor.split('-')[0];
+
+                                if (anio.length !== 4 || isNaN(anio)) {
+                                    alert('El año debe tener exactamente 4 dígitos.');
+                                    fechaIngreso.value = '';
+                                    fechaIngreso.focus();
+                                }
+                            });
+                        });
+                    </script>
+    @endpush
 
 
     @endpush
