@@ -20,7 +20,8 @@
                 <dd class="col-sm-9">{{ $puesto->area }}</dd>
 
                 <dt class="col-sm-3 fw-semibold">Sueldo:</dt>
-                <dd class="col-sm-9">${{ number_format($puesto->sueldo, 2) }}</dd>
+                <dd class="col-sm-9">Lps. {{ number_format($puesto->sueldo, 2) }}</dd>
+
 
         
                 <dt class="col-sm-3 fw-semibold">Función del Puesto:</dt>

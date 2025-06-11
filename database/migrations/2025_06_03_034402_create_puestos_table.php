@@ -14,7 +14,7 @@ return new class extends Migration
     Schema::create('puestos', function (Blueprint $table) {
     $table->id();
 
-    $table->string('nombre')->unique();       // Nombre del puesto
+  $table->string('nombre');       // Nombre del puesto
     $table->string('codigo')->unique();       // Código del puesto
    $table->string('area')->nullable();
 

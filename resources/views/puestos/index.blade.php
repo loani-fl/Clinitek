@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', '')
+@section('title', '') {{-- ¡Asegúrate de que el título sea descriptivo! --}}
 
 @section('content')
 <style>
@@ -44,7 +44,7 @@
     }
 </style>
 
-<div class="container-fluid vh-100 d-flex justify-content-center align-items-center">
+<div class="container-fluid mt-4">
     <div class="card custom-card shadow rounded-4 border-0 w-100">
         <div class="card-header bg-primary text-white rounded-top-4 d-flex justify-content-between align-items-center px-4 py-3">
             <h4 class="mb-0">Lista de Puestos</h4>
@@ -71,7 +71,9 @@
                         <thead class="text-uppercase small">
                             <tr>
                                 <th style="width: 60px;">ID</th>
+                                <th>Código</th> {{-- Nueva columna para Código --}}
                                 <th>Nombre</th>
+                                <th>Departamento</th> {{-- Nueva columna para Departamento (Área) --}}
                                 <th style="width: 220px;">Acciones</th>
                             </tr>
                         </thead>
@@ -79,7 +81,9 @@
                             @foreach ($puestos as $puesto)
                                 <tr>
                                     <td class="fw-semibold text-secondary">{{ $puesto->id }}</td>
+                                    <td>{{ $puesto->codigo }}</td> {{-- Mostrar el Código --}}
                                     <td class="fw-medium">{{ $puesto->nombre }}</td>
+                                    <td>{{ $puesto->area }}</td> {{-- Mostrar el Área (Departamento) --}}
                                     <td>
                                         <a href="{{ route('puestos.show', $puesto->id) }}" class="btn btn-sm btn-outline-info me-2" title="Ver Detalles">
                                             <i class="bi bi-eye"></i>
@@ -87,7 +91,7 @@
                                         <a href="{{ route('puestos.edit', $puesto) }}" class="btn btn-sm btn-outline-warning me-2" title="Editar Puesto">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <form action="{{ route('puestos.destroy', $puesto) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Seguro que quieres eliminar este puesto?');">
+                                        <form action="{{ route('puestos.destroy', $puesto) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button class="btn btn-sm btn-outline-danger" title="Eliminar Puesto">
@@ -99,10 +103,6 @@
                             @endforeach
                         </tbody>
                     </table>
-                </div>
-
-                <div class="d-flex justify-content-center mt-4">
-                    {{ $puestos->links() }}
                 </div>
             @endif
         </div>
