@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Puesto;
 use App\Models\Empleado;
+use App\Models\Medico;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -12,25 +13,41 @@ class EmpleadoController extends Controller
     public function index(Request $request)
     {
         $busqueda = $request->input('buscar');
+        $tipo = $request->input('tipo', 'empleados'); // Por defecto empleados
 
-        $empleados = Empleado::with('puesto')
-            ->when($busqueda, function ($query, $busqueda) {
-                return $query->where(function ($q) use ($busqueda) {
-                    $q->where('nombres', 'like', "%$busqueda%")
-                      ->orWhere('apellidos', 'like', "%$busqueda%")
-                      ->orWhereHas('puesto', function ($q2) use ($busqueda) {
-                          $q2->where('nombre', 'like', "%$busqueda%");
-                      });
-                });
-            })
-            ->orderBy('nombres')
-            ->paginate(10)
-            ->withQueryString();
+        if ($tipo === 'medicos') {
+            // Consultar médicos
+            $empleados = Medico::when($busqueda, function ($query, $busqueda) {
+                    return $query->where(function ($q) use ($busqueda) {
+                        $q->where('nombre', 'like', "%$busqueda%")
+                          ->orWhere('apellidos', 'like', "%$busqueda%");
+                    });
+                })
+                ->orderBy('nombre')
+                ->paginate(10)
+                ->withQueryString();
+
+        } else {
+            // Por defecto empleados
+            $empleados = Empleado::with('puesto')
+                ->when($busqueda, function ($query, $busqueda) {
+                    return $query->where(function ($q) use ($busqueda) {
+                        $q->where('nombres', 'like', "%$busqueda%")
+                          ->orWhere('apellidos', 'like', "%$busqueda%")
+                          ->orWhereHas('puesto', function ($q2) use ($busqueda) {
+                              $q2->where('nombre', 'like', "%$busqueda%");
+                          });
+                    });
+                })
+                ->orderBy('nombres')
+                ->paginate(10)
+                ->withQueryString();
+        }
 
         return view('empleados.index', [
             'empleados' => $empleados,
             'busqueda' => $busqueda,
-            'usuarioActual' => session('usuario_nombre')
+            'usuarioActual' => session('usuario_nombre'),
         ]);
     }
 

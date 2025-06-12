@@ -45,7 +45,7 @@ Route::post('/logout', function () {
     return redirect()->route('login');
 })->name('logout');
 
-// Ruta protegida por sesión
+// Ruta protegida por middleware personalizado 'check.sesion'
 Route::middleware('check.sesion')->get('/empleados/visualizacion', [EmpleadoController::class, 'visualizacion'])->name('empleados.visualizacion');
 
 // Rutas públicas de empleados
