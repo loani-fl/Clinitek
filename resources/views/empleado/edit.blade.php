@@ -122,6 +122,22 @@
                     </div>
 
                     <div class="col-md-4">
+                        <label for="area" class="form-label">Área</label>
+                        <input type="text" id="area" class="{{ $inputClass }}" value="{{ $empleado->puesto->area }}" readonly>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="turno_asignado" class="form-label">Turno Asignado <span class="text-danger">*</span></label>
+                        <select name="turno_asignado" class="{{ $selectClass }} @error('turno_asignado') is-invalid @enderror">
+                            <option value="">Seleccione</option>
+                            <option value="mañana" {{ old('turno_asignado', $empleado->turno_asignado) == 'mañana' ? 'selected' : '' }}>Mañana</option>
+                            <option value="tarde" {{ old('turno_asignado', $empleado->turno_asignado) == 'tarde' ? 'selected' : '' }}>Tarde</option>
+                            <option value="noche" {{ old('turno_asignado', $empleado->turno_asignado) == 'noche' ? 'selected' : '' }}>Noche</option>
+                        </select>
+                        @error('turno_asignado') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div class="col-md-4">
                         <label for="estado" class="form-label">Estado <span class="text-danger">*</span></label>
                         <select name="estado" class="{{ $selectClass }} @error('estado') is-invalid @enderror">
                             <option value="Activo" {{ old('estado', $empleado->estado) == 'Activo' ? 'selected' : '' }}>Activo</option>
@@ -159,6 +175,8 @@
 
 @push('scripts')
 <script>
+    const puestos = @json($puestos);
+
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll('textarea').forEach(function (el) {
             el.style.overflow = 'hidden';
@@ -168,6 +186,18 @@
             });
             el.dispatchEvent(new Event('input'));
         });
+
+        const puestoSelect = document.querySelector('select[name="puesto_id"]');
+        const areaInput = document.getElementById('area');
+
+        function actualizarArea() {
+            const puestoId = puestoSelect.value;
+            const puesto = puestos.find(p => p.id == puestoId);
+            areaInput.value = puesto ? puesto.area : '';
+        }
+
+        actualizarArea();
+        puestoSelect.addEventListener('change', actualizarArea);
     });
 </script>
 @endpush

@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
-use App\Http\Controllers\PuestoController;
 use App\Http\Controllers\EmpleadoController;
+use App\Http\Controllers\PuestoController;
+use App\Http\Controllers\EmpleadosController;
 
 // Rutas públicas de empleados
 Route::get('/empleados', [EmpleadoController::class, 'index'])->name('empleados.index');
@@ -14,7 +14,18 @@ Route::get('/empleados/{empleado}/edit', [EmpleadoController::class, 'edit'])->n
 Route::put('/empleados/{empleado}', [EmpleadoController::class, 'update'])->name('empleados.update');
 Route::delete('/empleados/{empleado}', [EmpleadoController::class, 'destroy'])->name('empleados.destroy');
 
-// Rutas públicas de puestos
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// Puestos
+Route::resource('puestos', PuestoController::class);
+//Rutas para Registrar empleados
+Route::get('/empleados', [EmpleadosController::class, 'create'])->name('empleados.create');
+Route::post('/empleados', [EmpleadosController::class, 'store'])->name('empleados.store');
+Route::get('puestos/{puesto}', [PuestoController::class, 'show'])->name('puestos.show');
+
+// Rutas públicas de puestos 
 Route::get('/puestos', [PuestoController::class, 'index'])->name('puestos.index');
 Route::get('/puestos/create', [PuestoController::class, 'create'])->name('puestos.create');
 Route::post('/puestos', [PuestoController::class, 'store'])->name('puestos.store');
