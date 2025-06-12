@@ -3,8 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\PuestoController;
-
-use App\Http\Controllers\EmpleadosController;
+use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\MedicoController;
 
 /*
@@ -16,16 +15,12 @@ use App\Http\Controllers\MedicoController;
 |
 */
 
-
-
 Route::get('/', function () {
     return view('welcome');
 });
 
 // Rutas para médicos: usamos solo Route::resource para CRUD completo
 Route::resource('medicos', MedicoController::class);
-Route::patch('/medicos/{medico}/estado', [MedicoController::class, 'toggleEstado'])->name('medicos.toggleEstado');
-
 
 // Login
 Route::get('/login', function () {
@@ -50,23 +45,11 @@ Route::post('/logout', function () {
     return redirect()->route('login');
 })->name('logout');
 
-// Ruta protegida por sesión
+// Ruta protegida por middleware personalizado 'check.sesion'
 Route::middleware('check.sesion')->get('/empleados/visualizacion', [EmpleadoController::class, 'visualizacion'])->name('empleados.visualizacion');
 
-
+// Rutas públicas de empleados
+Route::resource('empleados', EmpleadoController::class);
 
 // Rutas públicas de puestos
 Route::resource('puestos', PuestoController::class);
-
-// Rutas públicas de empleados
-Route::resource('empleados', EmpleadosController::class);
-
-//Rutas para Registrar empleados
-
-Route::get('/empleados/create', [EmpleadosController::class, 'create'])->name('empleados.create');
-Route::post('/empleados', [EmpleadosController::class, 'store'])->name('empleados.store');
-
-Route::get('puestos/{puesto}', [PuestoController::class, 'show'])->name('puestos.show');
-
-
-

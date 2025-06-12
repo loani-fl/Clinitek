@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->string('apellidos');
+            $table->string('numero_identidad', 13)->unique(); // Agregado número de identidad
             $table->string('especialidad');
+            $table->decimal('sueldo', 10, 2); // <-- Campo agregado
             $table->string('telefono', 20);
             $table->string('correo')->unique();
             $table->decimal('salario', 7, 2)->nullable();
