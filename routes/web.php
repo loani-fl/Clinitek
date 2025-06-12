@@ -1,35 +1,24 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EmpleadoController;
-use App\Http\Controllers\PuestoController;
-use App\Http\Controllers\EmpleadosController;
+use Illuminate\Http\Request;
+;
+use App\Http\Controllers\MedicoController;
 
-// Rutas públicas de empleados
-Route::get('/empleados', [EmpleadoController::class, 'index'])->name('empleados.index');
-Route::get('/empleados/create', [EmpleadoController::class, 'create'])->name('empleados.create');
-Route::post('/empleados', [EmpleadoController::class, 'store'])->name('empleados.store');
-Route::get('/empleados/{empleado}', [EmpleadoController::class, 'show'])->name('empleados.show');
-Route::get('/empleados/{empleado}/edit', [EmpleadoController::class, 'edit'])->name('empleados.edit');
-Route::put('/empleados/{empleado}', [EmpleadoController::class, 'update'])->name('empleados.update');
-Route::delete('/empleados/{empleado}', [EmpleadoController::class, 'destroy'])->name('empleados.destroy');
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Aquí registras las rutas web de tu aplicación.
+|
+*/
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Puestos
-Route::resource('puestos', PuestoController::class);
-//Rutas para Registrar empleados
-Route::get('/empleados', [EmpleadosController::class, 'create'])->name('empleados.create');
-Route::post('/empleados', [EmpleadosController::class, 'store'])->name('empleados.store');
-Route::get('puestos/{puesto}', [PuestoController::class, 'show'])->name('puestos.show');
+// Rutas para médicos: usamos solo Route::resource para CRUD completo
+Route::resource('medicos', MedicoController::class);
+Route::patch('/medicos/{medico}/estado', [MedicoController::class, 'toggleEstado'])->name('medicos.toggleEstado');
 
-// Rutas públicas de puestos 
-Route::get('/puestos', [PuestoController::class, 'index'])->name('puestos.index');
-Route::get('/puestos/create', [PuestoController::class, 'create'])->name('puestos.create');
-Route::post('/puestos', [PuestoController::class, 'store'])->name('puestos.store');
-Route::get('/puestos/{puesto}', [PuestoController::class, 'show'])->name('puestos.show');
-Route::get('/puestos/{puesto}/edit', [PuestoController::class, 'edit'])->name('puestos.edit');
-Route::put('/puestos/{puesto}', [PuestoController::class, 'update'])->name('puestos.update');
-Route::delete('/puestos/{puesto}', [PuestoController::class, 'destroy'])->name('puestos.destroy');

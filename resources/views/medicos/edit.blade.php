@@ -100,7 +100,7 @@
 
                                 <div class="col-md-4">
                                     <label class="form-label">Correo</label>
-                                    <input type="email" name="correo" maxlength="50"
+                                    <input type="email" name="correo" maxlength="30"
                                            class="form-control @error('correo') is-invalid @enderror"
                                            value="{{ old('correo', $medico->correo) }}" required >
                                     @error('correo')
