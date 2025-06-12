@@ -149,7 +149,7 @@ class MedicoController extends Controller
             'correo' => [
                 'required',
                 'regex:/^[\w\.\-]+@([\w\-]+\.)+[a-zA-Z]{2,}$/',
-                'max:30',
+                'max:100',
                 Rule::unique('medicos', 'correo')->ignore($id),
             ],
             'salario' => ['nullable', 'regex:/^\d{1,5}(\.\d{1,2})?$/'],

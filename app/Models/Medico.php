@@ -17,12 +17,9 @@ class Medico extends Model
         'especialidad',
         'telefono',
         'correo',
-        'salario',
-        'identidad',
         'fecha_nacimiento',
         'fecha_ingreso',
         'genero',
         'observaciones',
-        'foto',
     ];
 }
