@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('listaempleados', function (Blueprint $table) {
+
+        Schema::create('empleados', function (Blueprint $table) {
             $table->id();
             $table->string('nombres');
             $table->string('apellidos');
@@ -24,8 +25,9 @@ return new class extends Migration
             $table->enum('genero', ['Masculino', 'Femenino', 'Otro']);
             $table->enum('estado_civil', ['Soltero', 'Casado', 'Divorciado', 'Viudo'])->nullable();
             $table->foreignId('puesto_id')->constrained()->onDelete('cascade');
-            $table->string('turno_asignado');
-            $table->enum('estado', ['Activo', 'Inactivo'])->default('Activo');
+            $table->string('area'); // Nueva columna
+            $table->string('turno_asignado'); // Nueva columna
+            $table->enum('estado', ['Activo', 'Inactivo'])->default('Activo'); // Nueva columna
             $table->decimal('salario', 10, 2)->nullable();
             $table->text('observaciones')->nullable();
             $table->timestamps();

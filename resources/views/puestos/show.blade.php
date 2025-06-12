@@ -1,4 +1,3 @@
-@extends('layouts.app')
 
 @section('content')
 <div class="container-fluid">
@@ -56,4 +55,3 @@
         border-radius: 6px;
     }
 </style>
-

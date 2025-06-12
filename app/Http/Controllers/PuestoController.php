@@ -152,3 +152,4 @@ class PuestoController extends Controller
         return view('puestos.show', compact('puesto'));
     }
 }
+
