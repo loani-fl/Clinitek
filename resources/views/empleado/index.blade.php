@@ -70,6 +70,12 @@
             <a href="{{ route('empleados.create') }}" class="btn btn-dark">
                 <i class="bi bi-person-plus"></i> Registrar empleado
             </a>
+
+            <a href="{{ route('medicos.create') }}" 
+                     class="btn btn-dark"> <i class="bi bi-person-plus"></i> Registrar Médico
+                    
+                    
+                    </a>
         </div>
     </div>
 
@@ -91,13 +97,13 @@
                 <input type="text" name="buscar" value="{{ request('buscar') }}" class="form-control" placeholder="Buscar por nombre o puesto" />
             </div>
             <div class="col-md-3">
-                <select id="filtro-estado" class="form-select">
+                <select id="filtro-estado" name="estado" class="form-select">
                     <option value="">Todos los estados</option>
-                    <option value="Activo">Activo</option>
-                    <option value="Inactivo">Inactivo</option>
+                    <option value="Activo" {{ request('estado') == 'Activo' ? 'selected' : '' }}>Activo</option>
+                    <option value="Inactivo" {{ request('estado') == 'Inactivo' ? 'selected' : '' }}>Inactivo</option>
                 </select>
             </div>
-        </div>
+        </form>
 
         <table class="table table-bordered table-striped mb-0">
             <thead>
@@ -109,36 +115,36 @@
                 </tr>
             </thead>
             <tbody>
-            @forelse($empleados as $empleado)
-                <tr>
-                    <td>{{ $empleado->nombres }} {{ $empleado->apellidos }}</td>
-                    <td>{{ $empleado->puesto->nombre ?? 'Sin puesto' }}</td>
-                    <td>{{ \Carbon\Carbon::parse($empleado->fecha_ingreso)->format('d/m/Y') }}</td>
-                    <td>
-                        <div class="d-flex gap-2 justify-content-center">
-                            <button class="btn btn-info btn-sm" title="Ver">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <button class="btn btn-warning btn-sm" title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-danger btn-sm" title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="4">No hay empleados registrados.</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+                @forelse($empleados as $empleado)
+                    <tr>
+                        <td>{{ $empleado->nombres }} {{ $empleado->apellidos }}</td>
+                        <td>{{ $empleado->puesto->nombre ?? 'Sin puesto' }}</td>
+                        <td>{{ \Carbon\Carbon::parse($empleado->fecha_ingreso)->format('d/m/Y') }}</td>
+                        <td>
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button class="btn btn-info btn-sm" title="Ver">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-warning btn-sm" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4">No hay empleados registrados.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 
-        <div class="px-3 pb-3">
-            {{ $empleados->links() }}
-        </div>
+    <div class="px-3 pb-3">
+        {{ $empleados->links() }}
     </div>
 </div>
 

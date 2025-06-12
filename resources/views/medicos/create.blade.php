@@ -55,7 +55,7 @@
                                 class="form-control @error('apellidos') is-invalid @enderror {{ old('apellidos') && !$errors->has('apellidos') ? 'is-valid' : '' }}"
                                 value="{{ old('apellidos') }}" required>
                             @error('apellidos')
-                                <div class="invalid-feedback">{{ $message ?: 'Solo se permiten letras. Ingrese este dato.' }}</div>
+                                <div class="invalid-feedback">{{ $message ?: 'Solo se permiten letras.' }}</div>
                             @enderror
                         </div>
 
@@ -65,7 +65,7 @@
                                 class="form-control @error('numero_identidad') is-invalid @enderror {{ old('numero_identidad') && !$errors->has('numero_identidad') ? 'is-valid' : '' }}"
                                 value="{{ old('numero_identidad') }}" required>
                             @error('numero_identidad')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message ?: 'Ingrese este dato.'}}</div>
                             @enderror
                         </div>
 
@@ -177,10 +177,12 @@
 
                     <div class="d-flex justify-content-between mt-4">
                         <div>
-                            <button type="submit" class="btn btn-primary">Guardar</button>
-                            <button type="button" id="btnLimpiar" class="btn btn-secondary ms-2">Limpiar</button>
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i>Guardar</button>
+                            <button type="button" id="btnLimpiar" class="btn btn-secondary ms-2">
+                           <i class="bi bi-trash"></i> Limpiar</button>
                         </div>
-                        <a href="{{ route('medicos.index') }}" class="btn btn-outline-dark">← Regresar</a>
+                        <a href="{{ route('medicos.index') }}" class="btn btn-outline-dark">
+                            <i class="bi bi-arrow-left-circle"></i> Volver</a>
                     </div>
                 </form>
             </div>

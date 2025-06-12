@@ -4,14 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Puesto;
 use App\Models\Empleado;
-use App\Models\Medico;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
 class EmpleadoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $busqueda = $request->input('buscar');
 
@@ -29,7 +27,7 @@ class EmpleadoController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('empleados.index', [
+        return view('empleado.index', [
             'empleados' => $empleados,
             'busqueda' => $busqueda,
             'usuarioActual' => session('usuario_nombre')
@@ -57,7 +55,7 @@ class EmpleadoController extends Controller
             'identidad' => [
                 'required',
                 'digits:13',
-                'unique:listaempleados,identidad',
+                'unique:empleados,identidad',
                 function ($attribute, $value, $fail) use ($departamentosValidos) {
                     $codigoDepartamento = substr($value, 0, 2);
                     if (!in_array($codigoDepartamento, $departamentosValidos)) {
@@ -69,9 +67,9 @@ class EmpleadoController extends Controller
                 'required',
                 'digits:8',
                 'regex:/^[2389][0-9]{7}$/',
-                'unique:listaempleados,telefono'
+                'unique:empleados,telefono'
             ],
-            'correo' => ['required', 'string', 'max:30', 'email', 'unique:listaempleados,correo'],
+            'correo' => ['required', 'string', 'max:30', 'email', 'unique:empleados,correo'],
             'fecha_ingreso' => [
                 'required',
                 'date',
@@ -153,7 +151,6 @@ class EmpleadoController extends Controller
     
         $validated = $request->validate($rules);
     
-        // Obtener área del puesto seleccionado
         $puesto = Puesto::findOrFail($validated['puesto_id']);
         $validated['area'] = $puesto->area;
     
@@ -161,10 +158,9 @@ class EmpleadoController extends Controller
     
         return redirect()->route('empleados.index')->with('success', 'Empleado actualizado correctamente.');
     }
-    
 
     public function destroy(string $id)
     {
-        //
+        // Por implementar
     }
 }
