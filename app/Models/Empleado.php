@@ -31,4 +31,16 @@ class Empleado extends Model
     {
         return $this->belongsTo(Puesto::class);
     }
+
+    // Accesor para obtener el nombre completo del empleado
+    public function getNombreCompletoAttribute()
+    {
+        return "{$this->nombres} {$this->apellidos}";
+    }
+
+    // Accesor para obtener la edad del empleado
+    public function getEdadAttribute()
+    {
+        return Carbon::parse($this->fecha_nacimiento)->age;
+    }
 }
