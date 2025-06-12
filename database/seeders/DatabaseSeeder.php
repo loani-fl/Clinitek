@@ -11,10 +11,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            PuestoSeeder::class,
-            EmpleadoSeeder::class,
-        ]);
+        // No hay seeders registrados
     }
 }
-

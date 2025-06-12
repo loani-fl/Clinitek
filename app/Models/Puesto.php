@@ -10,15 +10,18 @@ class Puesto extends Model
     use HasFactory;
 
     protected $fillable = [
-    'nombre', 'codigo', 'area', 'sueldo', 'funcion',
-];
+        'nombre',
+        'codigo',
+        'area',
+        'sueldo',
+        'funcion',
+    ];
 
-
-
-     public function empleados()
+    /**
+     * Relación con el modelo Empleado
+     */
+    public function empleados()
     {
         return $this->hasMany(Empleado::class);
     }
-
-
 }

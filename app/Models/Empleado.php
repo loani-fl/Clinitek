@@ -2,27 +2,29 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Empleado extends Model
 {
-    use HasFactory;
+    protected $table = 'listaempleados';
 
     protected $fillable = [
         'nombres',
         'apellidos',
         'identidad',
-        'direccion',
         'telefono',
         'correo',
         'fecha_ingreso',
         'fecha_nacimiento',
         'genero',
         'estado_civil',
+        'direccion',
         'puesto_id',
+        'area',
         'salario',
+        'turno_asignado',
         'observaciones',
+        'estado',
     ];
 
     public function puesto()
