@@ -10,6 +10,7 @@
         body {
             background-color: #e8f4fc;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-bottom: 60px; /* espacio para el footer fijo */
         }
         .custom-card {
             max-width: 97%;
@@ -43,6 +44,18 @@
         .estado-inactivo i {
             color: #ff3547 !important;
         }
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #f8f9fa;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #6c757d;
+            z-index: 999;
+            border-top: 1px solid #dee2e6;
+        }
     </style>
 </head>
 <body>
@@ -69,6 +82,7 @@
             </div>
         </div>
 
+        <!-- Alerta de éxito -->
         @if(session('success'))
             <div id="mensaje-exito" class="alert alert-success m-3 alert-dismissible fade show">
                 {{ session('success') }}
@@ -151,7 +165,12 @@
     </div>
 </div>
 
-<!-- Bootstrap Bundle (necesario para alert-dismissible) -->
+<!-- Footer fijo -->
+<footer>
+    © 2025 Clínitek. Todos los derechos reservados.
+</footer>
+
+<!-- Bootstrap Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Script de filtros y mensaje -->

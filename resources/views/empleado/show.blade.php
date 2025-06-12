@@ -84,8 +84,9 @@
 
                 <div class="col-md-4">
                     <label class="form-label">Área</label>
-                    <input type="text" value="{{ $empleado->area }}" class="{{ $inputClass }}" readonly>
+                    <input type="text" value="{{ $empleado->puesto->area }}" class="{{ $inputClass }}" readonly>
                 </div>
+
 
                 <div class="col-md-4">
                     <label class="form-label">Turno Asignado</label>

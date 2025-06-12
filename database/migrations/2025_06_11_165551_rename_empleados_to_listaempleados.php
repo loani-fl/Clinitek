@@ -24,7 +24,6 @@ return new class extends Migration
             $table->enum('genero', ['Masculino', 'Femenino', 'Otro']);
             $table->enum('estado_civil', ['Soltero', 'Casado', 'Divorciado', 'Viudo'])->nullable();
             $table->foreignId('puesto_id')->constrained()->onDelete('cascade');
-            $table->string('area');
             $table->string('turno_asignado');
             $table->enum('estado', ['Activo', 'Inactivo'])->default('Activo');
             $table->decimal('salario', 10, 2)->nullable();

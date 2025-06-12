@@ -12,7 +12,7 @@ class Puesto extends Model
     protected $fillable = [
         'nombre',
         'codigo',
-        'area_id',
+        'area',
         'sueldo',
         'funcion',
     ];

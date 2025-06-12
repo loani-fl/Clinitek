@@ -44,6 +44,17 @@ label.is-invalid {
 
 </style>
 
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+
 <div class="card custom-card shadow-sm border rounded-4 w-100">
     <div class="card-header bg-primary text-white py-2">
         <h5 class="mb-0">Registro de un nuevo empleado</h5>
@@ -56,6 +67,7 @@ label.is-invalid {
                 {{ session('success') }}
             </div>
         @endif
+
 
         <form action="{{ route('empleados.store') }}" method="POST" novalidate>
             @csrf
@@ -208,25 +220,41 @@ label.is-invalid {
                    <input type="text" id="sueldo_label" class="form-control form-control-sm" readonly>
                </div>
 
-               {{-- Dirección y Observaciones --}}
-               <div class="row mt-4">
-                   {{-- Dirección --}}
-                   <div class="col-md-4">
-                       <label for="direccion" class="form-label fw-semibold text-muted">Dirección <span class="text-danger">*</span></label>
-                       <textarea name="direccion" id="direccion" class="form-control form-control-sm" rows="3" required>{{ old('direccion') }}</textarea>
-                       @error('direccion')
-                           <div class="text-danger small">{{ $message }}</div>
-                       @enderror
-                   </div>
+               {{-- Dirección, Turno y Observaciones --}}
+<div class="row mt-4">
+    {{-- Turno Asignado --}}
+    <div class="col-md-4">
+        <label for="turno_asignado" class="form-label fw-semibold text-muted">Turno Asignado <span class="text-danger">*</span></label>
+        <select name="turno_asignado" id="turno_asignado" class="form-select form-select-sm" required>
+            <option value="">-- Selecciona --</option>
+            <option value="mañana" {{ old('turno_asignado') == 'mañana' ? 'selected' : '' }}>Mañana</option>
+            <option value="tarde" {{ old('turno_asignado') == 'tarde' ? 'selected' : '' }}>Tarde</option>
+            <option value="noche" {{ old('turno_asignado') == 'noche' ? 'selected' : '' }}>Noche</option>
+        </select>
+        @error('turno_asignado')
+            <div class="text-danger small">{{ $message }}</div>
+        @enderror
+    </div>
 
-                  {{-- Observaciones --}}
-<div class="col-md-4">
-    <label for="observaciones" class="form-label fw-semibold text-muted">Observaciones <span class="text-danger">*</span></label>
-    <textarea name="observaciones" id="observaciones" class="form-control form-control-sm" rows="3" required>{{ old('observaciones') }}</textarea>
-    @error('observaciones')
-        <div class="text-danger small">{{ $message }}</div>
-    @enderror
+    {{-- Dirección --}}
+    <div class="col-md-4">
+        <label for="direccion" class="form-label fw-semibold text-muted">Dirección <span class="text-danger">*</span></label>
+        <textarea name="direccion" id="direccion" class="form-control form-control-sm" rows="3" required>{{ old('direccion') }}</textarea>
+        @error('direccion')
+            <div class="text-danger small">{{ $message }}</div>
+        @enderror
+    </div>
+
+    {{-- Observaciones --}}
+    <div class="col-md-4">
+        <label for="observaciones" class="form-label fw-semibold text-muted">Observaciones <span class="text-danger">*</span></label>
+        <textarea name="observaciones" id="observaciones" class="form-control form-control-sm" rows="3" required>{{ old('observaciones') }}</textarea>
+        @error('observaciones')
+            <div class="text-danger small">{{ $message }}</div>
+        @enderror
+    </div>
 </div>
+
 
             </div>
 
@@ -372,10 +400,6 @@ label.is-invalid {
             }
         }
     });
-
-
-    
-
 
 </script>
 
