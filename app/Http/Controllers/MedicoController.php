@@ -24,6 +24,7 @@ class MedicoController extends Controller
         $request->validate([
             'nombre' => 'required|regex:/^[\pL\s\-]+$/u',
             'apellidos' => 'required|regex:/^[\pL\s\-]+$/u',
+            'numero_identidad' => 'required|digits:13|numeric|unique:medicos,numero_identidad',
             'especialidad' => 'required|string',
             'telefono' => 'required|numeric|unique:medicos,telefono',
             'correo' => 'required|email|unique:medicos,correo',
@@ -34,6 +35,10 @@ class MedicoController extends Controller
         ], [
             'telefono.unique' => 'Este número de teléfono ya está registrado por otro médico.',
             'correo.unique' => 'Este correo electrónico ya está registrado por otro médico.',
+            'numero_identidad.required' => 'Por favor ingrese el número de identidad.',
+            'numero_identidad.digits' => 'El número de identidad debe contener exactamente 13 números.',
+            'numero_identidad.numeric' => 'El número de identidad debe contener solo números.',
+            'numero_identidad.unique' => 'Este número de identidad ya está registrado por otro médico.',
             'nombre.required' => 'El nombre es obligatorio.',
             'nombre.regex' => 'El nombre solo puede contener letras, espacios y guiones.',
             'apellidos.required' => 'Los apellidos son obligatorios.',
@@ -54,6 +59,7 @@ class MedicoController extends Controller
         Medico::create([
             'nombre' => $request->nombre,
             'apellidos' => $request->apellidos,
+            'numero_identidad' => $request->numero_identidad,
             'especialidad' => $request->especialidad,
             'telefono' => $request->telefono,
             'correo' => $request->correo,
@@ -63,7 +69,6 @@ class MedicoController extends Controller
             'observaciones' => $request->observaciones,
         ]);
 
-        // ✅ Redirigir a la lista de médicos (NO al formulario)
         return redirect()->route('medicos.index')->with('success', 'Médico registrado exitosamente');
     }
 
@@ -74,6 +79,15 @@ class MedicoController extends Controller
     {
         $medicos = Medico::all();
         return view('medicos.index', compact('medicos'));
+    }
+
+    /**
+     * Mostrar detalle de un médico
+     */
+    public function show($id)
+    {
+        $medico = Medico::findOrFail($id);
+        return view('medicos.show', compact('medico'));
     }
 
     /**
@@ -90,10 +104,10 @@ class MedicoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // Validar datos
         $request->validate([
             'nombre' => 'required|regex:/^[\pL\s\-]+$/u',
             'apellidos' => 'required|regex:/^[\pL\s\-]+$/u',
+            'numero_identidad' => 'required|digits:13|numeric|unique:medicos,numero_identidad,' . $id,
             'especialidad' => 'required|string',
             'telefono' => 'required|numeric|unique:medicos,telefono,' . $id,
             'correo' => 'required|email|unique:medicos,correo,' . $id,
@@ -104,13 +118,31 @@ class MedicoController extends Controller
         ], [
             'telefono.unique' => 'Este número de teléfono ya está registrado por otro médico.',
             'correo.unique' => 'Este correo electrónico ya está registrado por otro médico.',
+            'numero_identidad.required' => 'Por favor ingrese el número de identidad.',
+            'numero_identidad.digits' => 'El número de identidad debe contener exactamente 13 números.',
+            'numero_identidad.numeric' => 'El número de identidad debe contener solo números.',
+            'numero_identidad.unique' => 'Este número de identidad ya está registrado por otro médico.',
+            'nombre.required' => 'El nombre es obligatorio.',
+            'nombre.regex' => 'El nombre solo puede contener letras, espacios y guiones.',
+            'apellidos.required' => 'Los apellidos son obligatorios.',
+            'apellidos.regex' => 'Los apellidos solo pueden contener letras, espacios y guiones.',
+            'especialidad.required' => 'La especialidad es obligatoria.',
+            'telefono.required' => 'El teléfono es obligatorio.',
+            'telefono.numeric' => 'El teléfono debe contener solo números.',
+            'correo.required' => 'El correo electrónico es obligatorio.',
+            'correo.email' => 'El correo electrónico debe tener un formato válido.',
+            'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
+            'fecha_nacimiento.date' => 'La fecha de nacimiento debe ser una fecha válida.',
+            'fecha_ingreso.required' => 'La fecha de ingreso es obligatoria.',
+            'fecha_ingreso.date' => 'La fecha de ingreso debe ser una fecha válida.',
+            'genero.required' => 'El género es obligatorio.',
         ]);
 
-        // Actualizar el médico
         $medico = Medico::findOrFail($id);
         $medico->update([
             'nombre' => $request->nombre,
             'apellidos' => $request->apellidos,
+            'numero_identidad' => $request->numero_identidad,
             'especialidad' => $request->especialidad,
             'telefono' => $request->telefono,
             'correo' => $request->correo,
