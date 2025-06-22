@@ -23,7 +23,6 @@ class PuestoController extends Controller
     // Guardar un nuevo puesto
     public function store(Request $request)
     {
-
         $validatedData = $request->validate([
             'codigo' => [
                 'required',
@@ -49,7 +48,7 @@ class PuestoController extends Controller
             'funcion' => [
                 'required',
                 'string',
-                'max:50',
+                'max:300',
                 'regex:/^[\pL\pN\s.,áéíóúÁÉÍÓÚñÑ\r\n]+$/u',
             ],
         ], [
@@ -69,13 +68,13 @@ class PuestoController extends Controller
             'sueldo.regex' => 'El sueldo debe tener máximo 5 dígitos enteros y 2 decimales.',
 
             'funcion.required' => 'La función es obligatoria.',
-            'funcion.max' => 'La función no debe tener más de 50 caracteres.',
+            'funcion.max' => 'La función no debe tener más de 300 caracteres.',
             'funcion.regex' => 'La función solo puede contener letras, números, comas, puntos y espacios.',
         ]);
 
         Puesto::create($validatedData);
 
-        return back()->withInput()->with('success', '¡Puesto registrado exitosamente!');
+        return redirect()->route('puestos.index')->with('success', '¡Puesto registrado exitosamente!');
     }
 
     // Mostrar formulario de edición
@@ -112,14 +111,28 @@ class PuestoController extends Controller
             'funcion' => [
                 'required',
                 'string',
-                'max:50',
+                'max:300',
                 'regex:/^[\pL\pN\s.,áéíóúÁÉÍÓÚñÑ\r\n]+$/u',
             ],
         ], [
-            'codigo.regex' => 'El código solo puede contener letras, números y guiones.',
+            'codigo.required' => 'El código es obligatorio.',
+            'codigo.max' => 'El código no debe exceder 10 caracteres.',
+            'codigo.regex' => 'Solo se permiten letras, números y guiones.',
             'codigo.unique' => 'Este código ya existe.',
+
+            'nombre.required' => 'El nombre del puesto es obligatorio.',
+            'nombre.max' => 'El nombre no debe exceder 50 caracteres.',
             'nombre.regex' => 'El nombre solo debe contener letras y espacios.',
+
+            'area.required' => 'Debe seleccionar un área.',
+            'area.in' => 'El área seleccionada no es válida.',
+
+            'sueldo.required' => 'El sueldo es obligatorio.',
             'sueldo.regex' => 'El sueldo debe tener máximo 5 dígitos enteros y 2 decimales.',
+
+            'funcion.required' => 'La función es obligatoria.',
+            'funcion.max' => 'La función no debe tener más de 300 caracteres.',
+            'funcion.regex' => 'La función solo puede contener letras, números, comas, puntos y espacios.',
         ]);
 
         // Si no hay cambios, no hacer update

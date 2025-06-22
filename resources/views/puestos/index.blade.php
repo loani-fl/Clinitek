@@ -1,16 +1,20 @@
 @extends('layouts.app')
 
-@section('title', '') {{-- ¡Asegúrate de que el título sea descriptivo! --}}
+@section('title', 'Listado de Empleados')
 
 @section('content')
 <style>
-    body {
+    html, body {
+        height: 100%;
         background-color: #e8f4fc;
     }
 
     .custom-card {
         background-color: #f0faff;
-        border-color: #91cfff;
+        border: 1px solid #91cfff;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
     }
 
     .table thead th {
@@ -43,14 +47,22 @@
         color: #dc3545;
     }
 </style>
+       
+<!-- Barra de navegación (sin cambios) -->
+<div class="header d-flex justify-content-between align-items-center px-3 py-2" style="background-color: #007BFF;">
+    <div class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</div>
+    <div class="d-flex gap-3 flex-wrap">
+        <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
+        <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
+        <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
+    </div>
+</div>
 
 <div class="container-fluid mt-4">
     <div class="card custom-card shadow rounded-4 border-0 w-100">
         <div class="card-header bg-primary text-white rounded-top-4 d-flex justify-content-between align-items-center px-4 py-3">
             <h4 class="mb-0">Lista de Puestos</h4>
-            <a href="{{ route('puestos.create') }}" class="btn btn-light btn-sm shadow-sm">
-                <i class="bi bi-plus-circle me-1"></i> Nuevo Puesto
-            </a>
+        
         </div>
 
         <div class="card-body px-4 py-4">
@@ -91,13 +103,6 @@
                                         <a href="{{ route('puestos.edit', $puesto) }}" class="btn btn-sm btn-outline-warning me-2" title="Editar Puesto">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <form action="{{ route('puestos.destroy', $puesto) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-sm btn-outline-danger" title="Eliminar Puesto">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
                                     </td>
                                 </tr>
                             @endforeach
@@ -108,18 +113,3 @@
         </div>
     </div>
 </div>
-@endsection
-
-
-
-
-
-
-
-
-
-
-
-
-
-

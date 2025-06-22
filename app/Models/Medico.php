@@ -14,13 +14,19 @@ class Medico extends Model
     protected $fillable = [
         'nombre',
         'apellidos',
-        'numero_identidad',
-        'especialidad',
         'telefono',
+        'especialidad',
         'correo',
+        'numero_identidad',
+        'salario',
         'fecha_nacimiento',
         'fecha_ingreso',
         'genero',
         'observaciones',
+        'foto',
+       
+    ];
+    protected $casts = [
+        'estado' => 'boolean', // Para manejar como booleano y evitar problemas con 0/1 o '0'/'1'
     ];
 }

@@ -4,154 +4,256 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Medico;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class MedicoController extends Controller
 {
-    /**
-     * Mostrar formulario para crear nuevo médico
-     */
     public function create()
     {
         return view('medicos.create');
     }
-
-    /**
-     * Guardar nuevo médico en base de datos
-     */
     public function store(Request $request)
-    {
-        // Validar datos
-        $request->validate([
-            'nombre' => 'required|regex:/^[\pL\s\-]+$/u',
-            'apellidos' => 'required|regex:/^[\pL\s\-]+$/u',
-            'numero_identidad' => 'required|digits:13|numeric|unique:medicos,numero_identidad',
-            'especialidad' => 'required|string',
-            'telefono' => 'required|numeric|unique:medicos,telefono',
-            'correo' => 'required|email|unique:medicos,correo',
-            'fecha_nacimiento' => 'required|date',
-            'fecha_ingreso' => 'required|date',
-            'genero' => 'required',
-            'observaciones' => 'nullable|string',
-        ], [
-            'telefono.unique' => 'Este número de teléfono ya está registrado por otro médico.',
-            'correo.unique' => 'Este correo electrónico ya está registrado por otro médico.',
-            'numero_identidad.required' => 'Por favor ingrese el número de identidad.',
-            'numero_identidad.digits' => 'El número de identidad debe contener exactamente 13 números.',
-            'numero_identidad.numeric' => 'El número de identidad debe contener solo números.',
-            'numero_identidad.unique' => 'Este número de identidad ya está registrado por otro médico.',
-            'nombre.required' => 'El nombre es obligatorio.',
-            'nombre.regex' => 'El nombre solo puede contener letras, espacios y guiones.',
-            'apellidos.required' => 'Los apellidos son obligatorios.',
-            'apellidos.regex' => 'Los apellidos solo pueden contener letras, espacios y guiones.',
-            'especialidad.required' => 'La especialidad es obligatoria.',
-            'telefono.required' => 'El teléfono es obligatorio.',
-            'telefono.numeric' => 'El teléfono debe contener solo números.',
-            'correo.required' => 'El correo electrónico es obligatorio.',
-            'correo.email' => 'El correo electrónico debe tener un formato válido.',
-            'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
-            'fecha_nacimiento.date' => 'La fecha de nacimiento debe ser una fecha válida.',
-            'fecha_ingreso.required' => 'La fecha de ingreso es obligatoria.',
-            'fecha_ingreso.date' => 'La fecha de ingreso debe ser una fecha válida.',
-            'genero.required' => 'El género es obligatorio.',
-        ]);
+{
+    $hoy = Carbon::today();
+    $fecha18Anios = $hoy->copy()->subYears(18)->format('Y-m-d');
+    $fechaMinIngreso = $hoy->copy()->subMonth()->format('Y-m-d');
+    $fechaMaxIngreso = $hoy->copy()->addMonth()->format('Y-m-d');
 
-        // Crear y guardar el médico
-        Medico::create([
-            'nombre' => $request->nombre,
-            'apellidos' => $request->apellidos,
-            'numero_identidad' => $request->numero_identidad,
-            'especialidad' => $request->especialidad,
-            'telefono' => $request->telefono,
-            'correo' => $request->correo,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-            'fecha_ingreso' => $request->fecha_ingreso,
-            'genero' => $request->genero,
-            'observaciones' => $request->observaciones,
-        ]);
+    $request->validate([
+        'nombre' => ['required', 'regex:/^[\pL\s]+$/u'],
+        'apellidos' => ['required', 'regex:/^[\pL\s]+$/u'],
+        'numero_identidad' => [
+            'required',
+            'digits:13',
+            'regex:/^(0[1-9]|1[0-8])[0-9]{11}$/',
+            'unique:medicos,numero_identidad'
+        ],
+        'especialidad' => 'required|string',
+        'telefono' => [
+            'required',
+            'numeric',
+            'digits:8',
+            'regex:/^[9238][0-9]{7}$/',
+            'unique:medicos,telefono'
+        ],
+        'correo' => [
+            'required',
+            'email',
+            'unique:medicos,correo'
+        ],
+        'fecha_nacimiento' => ['required', 'date', 'before_or_equal:' . $fecha18Anios],
+        'fecha_ingreso' => ['required', 'date', 'after_or_equal:' . $fechaMinIngreso, 'before_or_equal:' . $fechaMaxIngreso],
+        'genero' => 'required',
+        'observaciones' => 'nullable|string',
+        'direccion' => ['required', 'string', 'max:300'],
+        'foto' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+    ], [
+        'nombre.required' => 'El nombre es obligatorio.',
+        'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
 
-        return redirect()->route('medicos.index')->with('success', 'Médico registrado exitosamente');
+        'apellidos.required' => 'Los apellidos son obligatorios.',
+        'apellidos.regex' => 'Los apellidos solo pueden contener letras y espacios.',
+
+        'numero_identidad.required' => 'El número de identidad es obligatorio.',
+        'numero_identidad.digits' => 'El número de identidad debe tener exactamente 13 dígitos.',
+        'numero_identidad.regex' => 'Solo se admiten números y debe iniciar con un código de departamento válido (01 al 18).',
+        'numero_identidad.unique' => 'El número de identidad ya está registrado.',
+
+        'especialidad.required' => 'La especialidad es obligatoria.',
+
+        'telefono.required' => 'El teléfono es obligatorio.',
+        'telefono.numeric' => 'El teléfono debe ser un número válido.',
+        'telefono.digits' => 'El teléfono debe tener 8 dígitos.',
+        'telefono.regex' => 'El teléfono debe iniciar con 9, 2, 3 o 8.',
+        'telefono.unique' => 'El teléfono ya está registrado.',
+
+        'correo.required' => 'El correo es obligatorio.',
+        'correo.email' => 'Debe ingresar un correo válido.',
+        'correo.unique' => 'El correo ya está registrado.',
+
+        'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
+        'fecha_nacimiento.date' => 'La fecha de nacimiento debe ser una fecha válida.',
+        'fecha_nacimiento.before_or_equal' => 'Debes tener al menos 18 años.',
+
+        'fecha_ingreso.required' => 'La fecha de ingreso es obligatoria.',
+        'fecha_ingreso.date' => 'La fecha de ingreso debe ser una fecha válida.',
+        'fecha_ingreso.after_or_equal' => 'La fecha de ingreso no puede ser anterior a :date.',
+        'fecha_ingreso.before_or_equal' => 'La fecha de ingreso no puede ser posterior a :date.',
+
+        'genero.required' => 'El género es obligatorio.',
+
+        'direccion.required' => 'La dirección es obligatoria.',
+        'direccion.max' => 'La dirección no puede superar los 300 caracteres.',
+
+        'foto.image' => 'La foto debe ser una imagen válida.',
+        'foto.mimes' => 'La foto debe ser un archivo jpg, jpeg, png o gif.',
+        'foto.max' => 'La foto no puede superar los 2MB.',
+    ]);
+
+    // Asignar salario según especialidad
+    $salarios = [
+        'Pediatría' => 25000,
+        'Cardiología' => 30000,
+        'Medicina General' => 18000,
+        'Dermatología' => 22000,
+        'Neurología' => 32000,
+        'Ginecología' => 27000,
+    ];
+
+    $especialidad = $request->input('especialidad');
+    $salario = $salarios[$especialidad] ?? 0;
+
+    $datosMedico = $request->only([
+        'nombre', 'apellidos', 'numero_identidad', 'especialidad', 'telefono',
+        'correo', 'fecha_nacimiento', 'fecha_ingreso', 'genero', 'observaciones', 'direccion'
+    ]);
+
+    $datosMedico['salario'] = $salario;
+
+    if ($request->hasFile('foto')) {
+        $datosMedico['foto'] = $request->file('foto')->store('fotos_medicos', 'public');
     }
 
-    /**
-     * Mostrar lista de médicos
-     */
-    public function index()
-    {
-        $medicos = Medico::all();
-        return view('medicos.index', compact('medicos'));
+    Medico::create($datosMedico);
+
+    return redirect()->route('medicos.index')->with('success', 'Médico registrado exitosamente');
+}
+
+
+    public function index(Request $request)
+{
+    $query = Medico::query();
+
+    if ($request->filled('buscar')) {
+        $buscar = $request->buscar;
+        $query->where(function ($q) use ($buscar) {
+            $q->where('nombre', 'like', "%{$buscar}%")
+              ->orWhere('apellidos', 'like', "%{$buscar}%")
+              ->orWhere('especialidad', 'like', "%{$buscar}%")
+              ->orWhere('numero_identidad', 'like', "%{$buscar}%")
+              ->orWhere('correo', 'like', "%{$buscar}%")
+              ->orWhere('telefono', 'like', "%{$buscar}%");
+        });
     }
 
-    /**
-     * Mostrar detalle de un médico
-     */
-    public function show($id)
-    {
-        $medico = Medico::findOrFail($id);
-        return view('medicos.show', compact('medico'));
+    if ($request->has('estado') && $request->estado !== '') {
+        $query->where('estado', $request->estado);
     }
 
-    /**
-     * Mostrar formulario para editar médico existente
-     */
+    $medicos = $query->orderBy('nombre')->paginate(10)->appends($request->all());
+
+    return view('medicos.index', compact('medicos'));
+}
+
+public function show($id)
+{
+    $medico = Medico::findOrFail($id);
+    return view('medicos.show', compact('medico'));
+}
+
     public function edit($id)
     {
         $medico = Medico::findOrFail($id);
         return view('medicos.edit', compact('medico'));
     }
 
-    /**
-     * Actualizar médico existente
-     */
     public function update(Request $request, $id)
     {
+        $hoy = Carbon::today();
+        $fechaMin = $hoy->copy()->subMonth()->format('Y-m-d');
+        $fechaMax = $hoy->copy()->addMonth()->format('Y-m-d');
+
         $request->validate([
-            'nombre' => 'required|regex:/^[\pL\s\-]+$/u',
-            'apellidos' => 'required|regex:/^[\pL\s\-]+$/u',
-            'numero_identidad' => 'required|digits:13|numeric|unique:medicos,numero_identidad,' . $id,
-            'especialidad' => 'required|string',
-            'telefono' => 'required|numeric|unique:medicos,telefono,' . $id,
-            'correo' => 'required|email|unique:medicos,correo,' . $id,
-            'fecha_nacimiento' => 'required|date',
-            'fecha_ingreso' => 'required|date',
-            'genero' => 'required',
-            'observaciones' => 'nullable|string',
-        ], [
-            'telefono.unique' => 'Este número de teléfono ya está registrado por otro médico.',
-            'correo.unique' => 'Este correo electrónico ya está registrado por otro médico.',
-            'numero_identidad.required' => 'Por favor ingrese el número de identidad.',
-            'numero_identidad.digits' => 'El número de identidad debe contener exactamente 13 números.',
-            'numero_identidad.numeric' => 'El número de identidad debe contener solo números.',
-            'numero_identidad.unique' => 'Este número de identidad ya está registrado por otro médico.',
-            'nombre.required' => 'El nombre es obligatorio.',
-            'nombre.regex' => 'El nombre solo puede contener letras, espacios y guiones.',
-            'apellidos.required' => 'Los apellidos son obligatorios.',
-            'apellidos.regex' => 'Los apellidos solo pueden contener letras, espacios y guiones.',
-            'especialidad.required' => 'La especialidad es obligatoria.',
-            'telefono.required' => 'El teléfono es obligatorio.',
-            'telefono.numeric' => 'El teléfono debe contener solo números.',
-            'correo.required' => 'El correo electrónico es obligatorio.',
-            'correo.email' => 'El correo electrónico debe tener un formato válido.',
-            'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
-            'fecha_nacimiento.date' => 'La fecha de nacimiento debe ser una fecha válida.',
-            'fecha_ingreso.required' => 'La fecha de ingreso es obligatoria.',
-            'fecha_ingreso.date' => 'La fecha de ingreso debe ser una fecha válida.',
-            'genero.required' => 'El género es obligatorio.',
+            'nombre' => 'required|regex:/^[\pL\s\-]+$/u|max:50',
+            'apellidos' => 'required|regex:/^[\pL\s\-]+$/u|max:50',
+            'especialidad' => 'required|string|max:80',
+            'telefono' => [
+                'required',
+                'regex:/^[983]\d{7}$/',
+                'unique:medicos,telefono,' . $id,
+            ],
+            'correo' => [
+                'required',
+                'regex:/^[\w\.\-]+@([\w\-]+\.)+[a-zA-Z]{2,}$/',
+                'max:30',
+                Rule::unique('medicos', 'correo')->ignore($id),
+            ],
+            'numero_identidad' => 'required|digits:13|unique:medicos,numero_identidad,' . $id,
+            'fecha_nacimiento' => 'required|date|after_or_equal:1950-01-01|before_or_equal:2005-12-31',
+            'fecha_ingreso' => [
+                'required',
+                'date',
+                'after_or_equal:' . $fechaMin,
+                'before_or_equal:' . $fechaMax,
+            ],
+            'genero' => 'required|in:Masculino,Femenino,Otro',
+            'observaciones' => 'nullable|string|max:100',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+            'estado' => 'nullable|boolean',
         ]);
 
         $medico = Medico::findOrFail($id);
+
+        $salarios = [
+            'Pediatría' => 27500,
+            'Cardiología' => 15000,
+            'Dermatología' => 14200,
+            'Neurología' => 24800,
+            'Psiquiatría' => 14700,
+            'Radiología' => 16300,
+        ];
+
+        $especialidad = $request->input('especialidad');
+        $salario = $salarios[$especialidad] ?? 0;
+
+        if ($request->hasFile('foto')) {
+            if ($medico->foto && Storage::disk('public')->exists($medico->foto)) {
+                Storage::disk('public')->delete($medico->foto);
+            }
+            $medico->foto = $request->file('foto')->store('fotos_medicos', 'public');
+        }
+
+        $estado = $request->has('estado') ? (bool)$request->estado : false;
+
         $medico->update([
             'nombre' => $request->nombre,
             'apellidos' => $request->apellidos,
-            'numero_identidad' => $request->numero_identidad,
-            'especialidad' => $request->especialidad,
+            'especialidad' => $especialidad,
             'telefono' => $request->telefono,
             'correo' => $request->correo,
+            'numero_identidad' => $request->numero_identidad,
+            'salario' => $salario,
             'fecha_nacimiento' => $request->fecha_nacimiento,
             'fecha_ingreso' => $request->fecha_ingreso,
             'genero' => $request->genero,
             'observaciones' => $request->observaciones,
+            'estado' => $estado,
+            'foto' => $medico->foto,
         ]);
 
         return redirect()->route('medicos.index')->with('success', 'Médico actualizado exitosamente');
+    }
+
+    public function toggleEstado(Medico $medico)
+    {
+        $medico->estado = !$medico->estado;
+        $medico->save();
+    
+        return back()->with('success', 'Estado del médico actualizado correctamente');
+    }
+    
+
+    public function buscar(Request $request)
+    {
+        $termino = $request->input('buscar');
+    
+        $medicos = Medico::where('nombre', 'like', "%{$termino}%")
+            ->orWhere('correo', 'like', "%{$termino}%")
+            ->orWhere('especialidad', 'like', "%{$termino}%")
+            ->get();
+    
+        return response()->json($medicos);
     }
 }

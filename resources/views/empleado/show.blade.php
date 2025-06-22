@@ -1,140 +1,64 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
-    body {
-        background-color: #e8f4fc;
-    }
-    .custom-card {
-        max-width: 97%;
-        background-color: #f0faff;
-        border-color: #91cfff;
-    }
-    label {
-        font-size: 0.85rem;
-    }
-    input, select, textarea {
-        font-size: 0.85rem !important;
-    }
-    .input-corto {
-        width: 100% !important;
-    }
-</style>
+<div class="container mt-4 mb-5" style="max-width: 800px;">
+    <div class="card shadow-sm rounded mx-auto">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0" style="font-size: 1.25rem;">
+                <i class="bi bi-person-badge-fill me-2"></i> Detalles del Empleado
+            </h4>
+            <a href="{{ route('empleado.index') }}" 
+   class="btn btn-success btn-sm px-4 shadow-sm d-flex align-items-center gap-2" 
+   style="font-size: 0.85rem;">
+    <i class="bi bi-arrow-left"></i> Regresar
+</a>
 
-<div class="d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 56px);">
-    <div class="card custom-card shadow-sm border rounded-4 w-100">
-        <div class="card-header bg-primary text-white py-2">
-            <h4 class="mb-0">Detalles del empleado</h4>
+
         </div>
-        <div class="card-body">
-            <div class="row g-3">
-                @php
-                    $inputClass = 'form-control form-control-sm input-corto';
-                @endphp
 
-                <div class="col-md-4">
-                    <label class="form-label">Nombres</label>
-                    <input type="text" value="{{ $empleado->nombres }}" class="{{ $inputClass }}" readonly>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Apellidos</label>
-                    <input type="text" value="{{ $empleado->apellidos }}" class="{{ $inputClass }}" readonly>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Identidad</label>
-                    <input type="text" value="{{ $empleado->identidad }}" class="{{ $inputClass }}" readonly>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Correo</label>
-                    <input type="email" value="{{ $empleado->correo }}" class="{{ $inputClass }}" readonly>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Teléfono</label>
-                    <input type="text" value="{{ $empleado->telefono }}" class="{{ $inputClass }}" readonly>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Estado Civil</label>
-                    <input type="text" value="{{ $empleado->estado_civil }}" class="{{ $inputClass }}" readonly>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Género</label>
-                    <input type="text" value="{{ $empleado->genero }}" class="{{ $inputClass }}" readonly>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Fecha de Ingreso</label>
-                    <input type="date" value="{{ $empleado->fecha_ingreso }}" class="{{ $inputClass }}" readonly>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Fecha de Nacimiento</label>
-                    <input type="date" value="{{ $empleado->fecha_nacimiento }}" class="{{ $inputClass }}" readonly>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Salario</label>
-                    <input type="text" value="{{ $empleado->salario }}" class="{{ $inputClass }}" readonly>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Área</label>
-                    <input type="text" value="{{ $empleado->puesto->area }}" class="{{ $inputClass }}" readonly>
-                </div>
-
-
-                <div class="col-md-4">
-                    <label class="form-label">Turno Asignado</label>
-                    <input type="text" value="{{ $empleado->turno_asignado }}" class="{{ $inputClass }}" readonly>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Puesto</label>
-                    <input type="text" value="{{ $empleado->puesto->nombre }}" class="{{ $inputClass }}" readonly>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Estado</label>
-                    <input type="text" value="{{ $empleado->estado }}" class="{{ $inputClass }}" readonly>
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Dirección</label>
-                    <textarea rows="3" class="{{ $inputClass }}" style="resize: vertical;" readonly>{{ $empleado->direccion }}</textarea>
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Observaciones</label>
-                    <textarea rows="3" class="{{ $inputClass }}" style="resize: vertical;" readonly>{{ $empleado->observaciones }}</textarea>
-                </div>
-            </div>
-
-            <div class="mt-4 d-flex justify-content-end">
-                <a href="{{ route('empleados.index') }}" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left-circle"></i> Volver
-                </a>
-            </div>
+        <div class="card-body p-3">
+            <table class="table table-bordered table-striped align-middle" style="font-size: 0.92rem;">
+                <tbody>
+                    <tr><th style="width: 30%;">Nombres</th><td>{{ $empleado->nombres }}</td></tr>
+                    <tr><th>Apellidos</th><td>{{ $empleado->apellidos }}</td></tr>
+                    <tr><th>Identidad</th><td>{{ $empleado->identidad }}</td></tr>
+                    <tr><th>Correo</th><td>{{ $empleado->correo }}</td></tr>
+                    <tr><th>Teléfono</th><td>{{ $empleado->telefono }}</td></tr>
+                    <tr><th>Estado Civil</th><td>{{ $empleado->estado_civil }}</td></tr>
+                    <tr>
+                        <th>Género</th>
+                        <td>
+                            <span class="badge 
+                                {{ $empleado->genero === 'Masculino' ? 'bg-primary' : 
+                                   ($empleado->genero === 'Femenino' ? 'bg-warning text-dark' : 'bg-info') }}">
+                                {{ $empleado->genero }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr><th>Fecha de Ingreso</th><td>{{ \Carbon\Carbon::parse($empleado->fecha_ingreso)->format('d/m/Y') }}</td></tr>
+                    <tr><th>Fecha de Nacimiento</th><td>{{ \Carbon\Carbon::parse($empleado->fecha_nacimiento)->format('d/m/Y') }}</td></tr>
+                    <tr><th>Salario</th><td>{{ $empleado->salario ? 'Lps. ' . number_format($empleado->salario, 2) : 'No especificado' }}</td></tr>
+                    <tr><th>Área</th><td>{{ $empleado->puesto->area ?? 'No especificada' }}</td></tr>
+                    <tr><th>Turno Asignado</th><td>{{ $empleado->turno_asignado }}</td></tr>
+                    <tr><th>Puesto</th><td>{{ $empleado->puesto->nombre ?? 'No especificado' }}</td></tr>
+                    <tr>
+                        <th>Estado</th>
+                        <td>
+                            @if($empleado->estado == 'Activo' || $empleado->estado == 1 || $empleado->estado === true)
+                                <span class="badge bg-success">Activo</span>
+                            @else
+                                <span class="badge bg-danger">Inactivo</span>
+                            @endif
+                        </td>
+                    </tr>
+                    <tr><th>Dirección</th><td style="white-space: pre-line;">{{ $empleado->direccion }}</td></tr>
+                    <tr><th>Observaciones</th><td style="white-space: pre-line;">{{ $empleado->observaciones ?: 'Sin observaciones.' }}</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+<footer class="bg-light text-center py-2 border-top" style="position: fixed; bottom: 0; left: 0; width: 100%; font-size: 0.85rem;">
+    © 2025 Clínitek. Todos los derechos reservados.
+</footer>
 @endsection
-
-@push('scripts')
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll('textarea').forEach(function (el) {
-            el.style.overflow = 'hidden';
-            el.addEventListener('input', function () {
-                this.style.height = 'auto';
-                this.style.height = (this.scrollHeight) + 'px';
-            });
-            el.dispatchEvent(new Event('input'));
-        });
-    });
-</script>
-@endpush

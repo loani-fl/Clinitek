@@ -36,8 +36,18 @@
         background-size: 1rem 1rem;
     }
 </style>
+<!-- Barra de navegación que abarca todo el ancho -->
+<div class="w-100" style="background-color: #007BFF;">
+    <div class="d-flex justify-content-between align-items-center px-3 py-2">
+        <div class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</div>
+        <div class="d-flex gap-3 flex-wrap">
+            <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
+            <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
+        </div>
+    </div>
+</div>
 
-<div class="d-flex justify-content-center">
+<div class="d-flex justify-content-center mt-4">
     <div class="card custom-card shadow-sm border rounded-4 w-100">
         <div class="card-header bg-primary text-white py-2">
             <h5 class="mb-0"><i class="bi bi-briefcase-fill me-2"></i>Registro de un nuevo puesto</h5>
@@ -57,6 +67,7 @@
                     <div class="col-md-3 position-relative">
                         <label for="codigo" class="form-label fw-semibold text-muted">Código <span class="text-danger">*</span></label>
                         <input type="text" name="codigo" id="codigo" autocomplete="off"
+                        
                             class="form-control form-control-sm @error('codigo') is-invalid @enderror"
                             maxlength="10"
                             pattern="[A-Za-z0-9\-]{1,10}"
@@ -86,14 +97,14 @@
                         <label for="area" class="form-label fw-semibold text-muted">Área / Departamento <span class="text-danger">*</span></label>
                         <select name="area" id="area"
                             class="form-select form-select-sm @error('area') is-invalid @enderror"
-                            required onchange="autoFillSueldo()">
+                            required>
                             <option value="">-- Selecciona un área --</option>
-                            <option value="Administración" {{ old('area') == 'Administración' ? 'selected' : '' }} data-sueldo="15000">Administración</option>
-                            <option value="Recepción" {{ old('area') == 'Recepción' ? 'selected' : '' }} data-sueldo="12000">Recepción</option>
-                            <option value="Laboratorio" {{ old('area') == 'Laboratorio' ? 'selected' : '' }} data-sueldo="18000">Laboratorio</option>
-                            <option value="Farmacia" {{ old('area') == 'Farmacia' ? 'selected' : '' }} data-sueldo="16000">Farmacia</option>
-                            <option value="Enfermería" {{ old('area') == 'Enfermería' ? 'selected' : '' }} data-sueldo="17000">Enfermería</option>
-                            <option value="Mantenimiento" {{ old('area') == 'Mantenimiento' ? 'selected' : '' }} data-sueldo="11000">Mantenimiento</option>
+                            <option value="Administración" data-sueldo="15000" {{ old('area') == 'Administración' ? 'selected' : '' }}>Administración</option>
+                            <option value="Recepción" data-sueldo="12000" {{ old('area') == 'Recepción' ? 'selected' : '' }}>Recepción</option>
+                            <option value="Laboratorio" data-sueldo="18000" {{ old('area') == 'Laboratorio' ? 'selected' : '' }}>Laboratorio</option>
+                            <option value="Farmacia" data-sueldo="16000" {{ old('area') == 'Farmacia' ? 'selected' : '' }}>Farmacia</option>
+                            <option value="Enfermería" data-sueldo="17000" {{ old('area') == 'Enfermería' ? 'selected' : '' }}>Enfermería</option>
+                            <option value="Mantenimiento" data-sueldo="11000" {{ old('area') == 'Mantenimiento' ? 'selected' : '' }}>Mantenimiento</option>
                         </select>
                         @error('area')
                             <div class="error-text">{{ $message }}</div>
@@ -102,7 +113,7 @@
 
                     <div class="col-md-2 position-relative">
                         <label for="sueldo" class="form-label fw-semibold text-muted">Sueldo (Lps.) <span class="text-danger">*</span></label>
-                        <input type="text" name="sueldo" id="sueldo" required readonly
+                        <input type="text" name="sueldo" id="sueldo" readonly required
                             class="form-control form-control-sm @error('sueldo') is-invalid @enderror"
                             pattern="^\d{1,5}(\.\d{1,2})?$"
                             title="Solo números. Hasta 5 dígitos y 2 decimales."
@@ -119,9 +130,9 @@
                         <label for="funcion" class="form-label fw-semibold text-muted">Función del Puesto <span class="text-danger">*</span></label>
                         <textarea name="funcion" id="funcion" rows="3"
                             class="form-control form-control-sm @error('funcion') is-invalid @enderror"
-                            required maxlength="50"
+                            required maxlength="300"
                             pattern="^[\pL\pN\s.,áéíóúÁÉÍÓÚñÑ\r\n]+$"
-                            title="Puede contener letras (incluye tildes y ñ), números, comas, puntos y espacios. Máximo 50 caracteres.">{{ old('funcion') }}</textarea>
+                            title="Puede contener letras (incluye tildes y ñ), números, comas, puntos y espacios. Máximo 300 caracteres.">{{ old('funcion') }}</textarea>
                         @error('funcion')
                             <div class="error-text">{{ $message }}</div>
                         @enderror
@@ -129,14 +140,28 @@
                 </div>
 
                 <div class="d-flex justify-content-center mt-4 gap-4 px-4">
-                    <button type="submit" class="btn btn-primary btn-sm shadow-sm px-4">
-                        <i class="bi bi-plus-circle"></i> Registrar
-                    </button>
+    <!-- Botón Registrar: azul -->
+<button type="submit" class="btn btn-primary btn-sm shadow-sm px-4">
+    <i class="bi bi-plus-circle"></i> Registrar
+</button>
 
-                    <button type="button" class="btn btn-secondary btn-sm shadow-sm px-4" onclick="limpiarFormulario()">
-                        <i class="bi bi-trash"></i> Limpiar
-                    </button>
-                </div>
+<!-- Botón Limpiar: amarillo -->
+<button type="button" class="btn btn-warning btn-sm shadow-sm px-4" onclick="limpiarFormulario()">
+    <i class="bi bi-trash"></i> Limpiar
+</button>
+
+<!-- Botón Regresar: verde -->
+<a href="{{ route('empleado.index') }}" class="btn btn-success btn-sm shadow-sm px-4">
+    <i class="bi bi-arrow-left"></i> Regresar
+</a>
+
+<!-- Botón Lista: negro con ícono de lista -->
+<a href="{{ route('puestos.index') }}" class="btn btn-dark btn-sm shadow-sm px-4">
+    <i class="bi bi-card-list"></i> Lista
+</a>
+
+</div>
+
             </form>
         </div>
     </div>
@@ -147,72 +172,30 @@
     function autoFillSueldo() {
         const select = document.getElementById('area');
         const sueldoInput = document.getElementById('sueldo');
-        const option = select.options[select.selectedIndex];
-        const sueldo = option.getAttribute('data-sueldo');
+        const sueldo = select.options[select.selectedIndex].getAttribute('data-sueldo');
 
-        if (sueldo && (sueldoInput.value === '' || sueldoInput.value === sueldoInput.dataset.prevValue)) {
-            sueldoInput.value = sueldo;
-            sueldoInput.dataset.prevValue = sueldo;
-            formatSueldo();
-        }
-    }
-
-    function formatSueldo() {
-        const sueldoInput = document.getElementById('sueldo');
-        let val = sueldoInput.value.replace(',', '.').trim();
-        if (val === '') return;
-        let num = parseFloat(val);
-        if (!isNaN(num)) {
-            sueldoInput.value = num.toFixed(2);
-            sueldoInput.dataset.prevValue = sueldoInput.value;
+        if (sueldo) {
+            sueldoInput.value = parseFloat(sueldo).toFixed(2);
         }
     }
 
     function limpiarFormulario() {
         const form = document.querySelector('form');
         form.reset();
-        form.querySelectorAll('input, select, textarea').forEach(input => {
-            if (input.tagName.toLowerCase() === 'select') {
-                input.selectedIndex = 0;
-            } else {
-                input.value = '';
-            }
-            input.classList.remove('is-invalid');
-            input.classList.remove('is-valid');
-            const errorDiv = input.nextElementSibling;
-            if (errorDiv && errorDiv.classList.contains('error-text')) {
-                errorDiv.style.display = 'none';
-                errorDiv.textContent = '';
-            }
+        document.querySelectorAll('.is-valid, .is-invalid').forEach(el => {
+            el.classList.remove('is-valid', 'is-invalid');
+        });
+        document.querySelectorAll('.error-text').forEach(div => {
+            div.textContent = '';
+            div.style.display = 'none';
         });
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        const form = document.querySelector('form');
-        const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
-
-        inputs.forEach(input => {
-            input.addEventListener('input', () => validateField(input));
-            input.addEventListener('change', () => validateField(input));
-        });
-
-        function validateField(field) {
-            if (field.checkValidity()) {
-                field.classList.remove('is-invalid');
-                field.classList.add('is-valid');
-                const errorDiv = field.nextElementSibling;
-                if (errorDiv && errorDiv.classList.contains('error-text')) {
-                    errorDiv.style.display = 'none';
-                    errorDiv.textContent = '';
-                }
-            } else {
-                field.classList.remove('is-valid');
-                if (!field.classList.contains('is-invalid')) {
-                    field.classList.add('is-invalid');
-                }
-            }
-        }
+        autoFillSueldo(); // por si viene seleccionado desde old()
+        document.getElementById('area').addEventListener('change', autoFillSueldo);
     });
 </script>
 @endpush
+
 @endsection

@@ -19,7 +19,7 @@ return new class extends Migration
    $table->string('area')->nullable();
 
     $table->decimal('sueldo', 10, 2);         // Sueldo del puesto
-    $table->text('funcion');                  // Función del puesto
+    $table->text('funcion');                 // Función del puesto
    
 
     $table->timestamps();
