@@ -45,12 +45,13 @@ class PuestoController extends Controller
                 'required',
                 'regex:/^\d{1,5}(\.\d{1,2})?$/',
             ],
-            'funcion' => [
-                'required',
-                'string',
-                'max:300',
-                'regex:/^[\pL\pN\s.,áéíóúÁÉÍÓÚñÑ\r\n]+$/u',
-            ],
+          'funcion' => [
+    'required',
+    'string',
+    'max:300',
+    'regex:/^[\pL\pN\s.,;:()\-\/%áéíóúÁÉÍÓÚñÑ\r\n]+$/u',
+],
+
         ], [
             'codigo.required' => 'El código es obligatorio.',
             'codigo.max' => 'El código no debe exceder 10 caracteres.',

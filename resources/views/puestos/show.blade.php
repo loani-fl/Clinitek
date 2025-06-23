@@ -23,15 +23,13 @@
         </div>
     </div>
 </div>
-<div class="container-fluid py-4 px-5 bg-light min-vh-100">
+<div class="container-fluid py-4 px-5 bg-light min-vh-120">
     <div class="card shadow rounded-4 border-0" style="background-color: #e3f2fd;">
         <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #64b5f6;">
             <h4 class="mb-0">
                 <i class="bi bi-briefcase-fill me-2"></i> Detalle del Puesto
             </h4>
-            <a href="{{ route('puestos.index') }}" class="btn btn-success btn-sm px-4 shadow-sm d-flex align-items-center gap-2">
-                    <i class="bi bi-arrow-left"></i> Regresar
-                </a>
+           
         </div>
 
         <div class="card-body">
@@ -56,10 +54,14 @@
                 </div>
             </div>
         </div>
+         <div class="d-flex justify-content-center">
+    <a href="{{ route('puestos.index') }}" class="btn btn-success btn-sm px-4 shadow-sm d-flex align-items-center gap-2">
+        <i class="bi bi-arrow-left"></i> Regresar
+    </a>
+</div>
+
     </div>
 </div>
 
-<footer class="bg-light text-center py-2 border-top mt-4" style="font-size: 0.85rem;">
-    © 2025 Clínitek. Todos los derechos reservados.
-</footer>
+
 @endsection
