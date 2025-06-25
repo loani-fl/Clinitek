@@ -20,7 +20,7 @@ Route::get('/', function () {
 
 
 
-//Rutas para puestos 
+//Rutas para puestos
 Route::get('/puestos/create', [PuestoController::class, 'create'])->name('puestos.create');
 Route::post('/puestos', [PuestoController::class, 'store'])->name('puestos.store');
 
@@ -37,7 +37,7 @@ Route::resource('medicos', MedicoController::class)->except(['destroy']);
 Route::patch('/medicos/{medico}/estado', [MedicoController::class, 'toggleEstado'])->name('medicos.toggleEstado');
 Route::get('/medicos/buscar', [MedicoController::class, 'buscar'])->name('medicos.buscar');
 
-// Solo deja esta línea para los puestos 
+// Solo deja esta línea para los puestos
 Route::resource('puestos', PuestoController::class);
 Route::get('/puestos/create', [PuestoController::class, 'create'])->name('puestos.create');
 
@@ -46,7 +46,7 @@ Route::get('/pacientes/create', [PacienteController::class, 'create'])->name('pa
 Route::get('/pacientes', [PacienteController::class, 'index'])->name('pacientes.index');
 Route::get('/pacientes/{id}', [PacienteController::class, 'show'])->name('pacientes.show');
 Route::get('pacientes/{paciente}/edit', [App\Http\Controllers\PacienteController::class, 'edit'])->name('pacientes.edit');
-
+Route::put('/pacientes/{paciente}', [PacienteController::class, 'update'])->name('pacientes.update');
 
 
 

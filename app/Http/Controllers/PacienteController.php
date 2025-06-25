@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Paciente;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PacienteController extends Controller
 {
@@ -117,11 +118,22 @@ public function update(Request $request, Paciente $paciente)
     $request->validate([
         'nombre' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
         'apellidos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
+        'genero' => ['nullable', 'in:Masculino,Femenino,Otro'],
         'identidad' => ['required', 'digits:13', 'regex:/^(0[1-9]|1[0-8])[0-9]{11}$/'],
         'fecha_nacimiento' => ['required', 'date', 'before_or_equal:today'],
-        'telefono' => ['required', 'digits:8', 'regex:/^[2389][0-9]{7}$/'],
+        'telefono' => [
+            'required',
+            'digits:8',
+            'regex:/^[0-9]{8}$/',
+            Rule::unique('pacientes', 'telefono')->ignore($paciente->id),
+        ],
         'direccion' => ['required', 'string', 'max:300'],
-        'correo' => ['nullable', 'email', 'max:50'],
+        'correo' => [
+            'nullable',
+            'email',
+            'max:50',
+            Rule::unique('pacientes', 'correo')->ignore($paciente->id),
+        ],
         'tipo_sangre' => ['nullable', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
         'padecimientos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
         'medicamentos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
@@ -149,12 +161,14 @@ public function update(Request $request, Paciente $paciente)
         'telefono.required' => 'El teléfono es obligatorio.',
         'telefono.digits' => 'El teléfono debe tener 8 dígitos.',
         'telefono.regex' => 'El teléfono debe comenzar con 2, 3, 8 o 9.',
+        'telefono.unique'   => 'Este número de teléfono ya existe.',
 
         'direccion.required' => 'La dirección es obligatoria.',
         'direccion.max' => 'La dirección no puede exceder 300 caracteres.',
 
         'correo.email' => 'Debe ingresar un correo válido.',
         'correo.max' => 'El correo no puede exceder 50 caracteres.',
+        'correo.unique' => 'Este correo electrónico ya está registrado.',
 
         'tipo_sangre.in' => 'Seleccione un tipo de sangre válido.',
 
@@ -187,6 +201,7 @@ public function update(Request $request, Paciente $paciente)
         'direccion',
         'correo',
         'tipo_sangre',
+        'genero',
         'padecimientos',
         'medicamentos',
         'historial_clinico',
