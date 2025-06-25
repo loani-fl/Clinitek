@@ -52,19 +52,17 @@
 
 .custom-card {
     flex-grow: 1;
-    background-color: #e8f4fc;
+    background-color: #ffffff;  /* fondo blanco */
     border-color: #91cfff;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
-    max-width: 85%; /* Reduce un poco más el ancho total */
+    max-width: 85%;
     width: 100%;
     padding: 1.5rem;
 }
 
-  
-        
 
         .card-header {
             background-color: transparent !important;
@@ -130,6 +128,23 @@
             z-index: 999;
             border-top: 1px solid #dee2e6;
         }
+
+        .custom-card::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 800px; /* tamaño más pequeño */
+    height: 800px; /* tamaño más pequeño */
+    background-image: url('/images/logo2.jpg');
+    background-size: contain;  /* ajusta sin recortar */
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.15;  /* transparencia baja para que no moleste */
+    transform: translate(-50%, -50%);
+    pointer-events: none; /* para que no interfiera con clicks */
+    z-index: 0;
+}
     </style>
 </head>
 <body>
@@ -142,30 +157,36 @@
     }
 </style>
 
-<!-- Barra de navegación (sin cambios) -->
-<div class="header d-flex justify-content-between align-items-center px-3 py-2" style="background-color: #007BFF;">
-    <div class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</div>
-    <div class="d-flex gap-3 flex-wrap">
-        <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
-        <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
-        <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
+<!-- Barra de navegación fija -->
+<div class="w-100 fixed-top" style="background-color: #007BFF; z-index: 1050;">
+    <div class="d-flex justify-content-between align-items-center px-3 py-2">
+        <div class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</div>
+        <div class="d-flex gap-3 flex-wrap">
+            <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
+            <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
+            <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
+        </div>
     </div>
 </div>
 
 
+<!-- Formulario más compacto -->
+<div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 90px;">
+    <div class="card-header position-relative py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
+        <!-- Botón a la derecha -->
+        <a href="{{ route('inicio') }}" class="btn btn-light position-absolute end-0 top-50 translate-middle-y me-2">
+            <i class="bi bi-house-door"></i> Inicio
+        </a>
+        <!-- Título centrado -->
+        <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Lista de empleados</h5>
+    </div>
 
 
-<!-- Contenedor principal -->
-<div class="container-fluid mt-4">
-    <div class="card shadow rounded-4 border-0">
-    <!-- Barra azul con solo los bordes superiores redondeados -->
-<div style="background-color: #007BFF; padding: 20px 40px; margin-top: 30px; border-top-left-radius: 10px; border-top-right-radius: 10px;">
-    <h5 class="mb-0 text-white">Lista de empleados</h5>
-</div>
 
-        
+    <form action="{{ route('empleado.store') }}" method="POST" novalidate>
+        @csrf
 
-
+    
         <!-- Alerta de éxito -->
         @if(session('success'))
             <div id="mensaje-exito" class="alert alert-success m-3 alert-dismissible fade show">
@@ -177,7 +198,7 @@
         <!-- FILTROS -->
         <div class="row px-3 py-2">
             <div class="col-md-4 mb-2 mb-md-0">
-                <input type="text" id="filtro-empleado" class="form-control" placeholder="Buscar por nombre, correo o puesto" />
+                <input type="text" id="filtro-empleado" class="form-control" placeholder="Buscar por nombre, identidad o puesto" />
             </div>
             <div class="col-md-3">
                 <select id="filtro-estado" class="form-select">
@@ -194,13 +215,11 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Nombre</th>
-                        <th>Identidad</th>
-                        <th>Correo</th>
-                        <th>Puesto</th>
+                        <th class="text-center">Nombre</th>
+                        <th class="text-center">Identidad</th>
+                        <th class="text-center">Puesto</th>
                         <th class="text-center">Estado</th>
-                        <th>Fecha de ingreso</th>
-                        <th>Acciones</th>
+                        <th class="text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="tabla-empleados">
@@ -209,7 +228,6 @@
                         <td>{{ $empleados->firstItem() + $index }}</td>
                         <td class="nombre">{{ $empleado->nombres }} {{ $empleado->apellidos }}</td>
                         <td>{{ $empleado->identidad }}</td>
-                        <td class="correo">{{ $empleado->correo }}</td>
                         <td class="puesto">{{ $empleado->puesto->nombre ?? 'Sin puesto' }}</td>
                         <td class="text-center">
                             @if($empleado->estado === 'Activo')
@@ -218,7 +236,6 @@
                                 <span class="estado-inactivo"><i class="bi bi-circle-fill"></i></span>
                             @endif
                         </td>
-                        <td>{{ \Carbon\Carbon::parse($empleado->fecha_ingreso)->format('d/m/Y') }}</td>
                         <td>
                             <div class="d-flex gap-2 justify-content-center">
                                 <a href="{{ route('empleado.show', $empleado->id) }}" class="btn btn-white-border btn-outline-info btn-sm" title="Ver">
@@ -262,27 +279,37 @@
 
 <!-- Script de filtros y mensaje -->
 <script>
-    function aplicarFiltros() {
-        const texto = $('#filtro-empleado').val().toLowerCase();
-        const estado = $('#filtro-estado').val();
-        let visibles = 0;
+   function aplicarFiltros() {
+    const texto = $('#filtro-empleado').val().toLowerCase();
+    const estado = $('#filtro-estado').val();
+    let visibles = 0;
 
-        $('#tabla-empleados tr').not('#sin-resultados').each(function () {
-            const nombre = $(this).find('.nombre').text().toLowerCase();
-            const puesto = $(this).find('.puesto').text().toLowerCase();
-            const correo = $(this).find('.correo').text().toLowerCase();
-            const estadoActual = $(this).data('estado');
+    $('#tabla-empleados tr').not('#sin-resultados').each(function () {
+        const nombre = $(this).find('.nombre').text().toLowerCase();
+        const puesto = $(this).find('.puesto').text().toLowerCase();
+        const identidad = $(this).find('td').eq(2).text().toLowerCase();
+        const estadoActual = $(this).data('estado');
 
-            const coincideTexto = nombre.includes(texto) || puesto.includes(texto) || correo.includes(texto);
-            const coincideEstado = !estado || estado === estadoActual;
+        const coincideTexto = 
+            nombre.startsWith(texto) || 
+            puesto.startsWith(texto) || 
+            identidad.startsWith(texto);
 
-            const visible = coincideTexto && coincideEstado;
-            $(this).toggle(visible);
-            if (visible) visibles++;
-        });
+        const coincideEstado = !estado || estado === estadoActual;
 
-        $('#sin-resultados').toggle(visibles === 0);
-    }
+        const visible = coincideTexto && coincideEstado;
+        $(this).toggle(visible);
+
+        if (visible) {
+            visibles++;
+            $(this).find('td').eq(0).text(visibles);
+        }
+    });
+
+    $('#sin-resultados').toggle(visibles === 0);
+}
+
+
 
     $(document).ready(function () {
         $('#filtro-empleado, #filtro-estado').on('input change', aplicarFiltros);

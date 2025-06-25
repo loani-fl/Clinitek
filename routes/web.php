@@ -6,6 +6,7 @@ use App\Http\Controllers\PuestoController;
 use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\EmpleadosController;
 use App\Http\Controllers\PacienteController;
+use App\Http\Controllers\ConsultaController;
 use App\Models\Puesto;
 
 // Página de bienvenida
@@ -46,6 +47,11 @@ Route::get('/pacientes/create', [PacienteController::class, 'create'])->name('pa
 Route::get('/pacientes', [PacienteController::class, 'index'])->name('pacientes.index');
 Route::get('/pacientes/{id}', [PacienteController::class, 'show'])->name('pacientes.show');
 Route::get('pacientes/{paciente}/edit', [App\Http\Controllers\PacienteController::class, 'edit'])->name('pacientes.edit');
+
+Route::resource('consultas', ConsultaController::class);
+Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupadas']);
+Route::get('/horas-ocupadas', [App\Http\Controllers\ConsultaController::class, 'horasOcupadas']);
+
 
 
 

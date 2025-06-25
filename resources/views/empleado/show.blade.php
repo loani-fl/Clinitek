@@ -1,64 +1,103 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-4 mb-5" style="max-width: 800px;">
-    <div class="card shadow-sm rounded mx-auto">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0" style="font-size: 1.25rem;">
-                <i class="bi bi-person-badge-fill me-2"></i> Detalles del Empleado
-            </h4>
-            <a href="{{ route('empleado.index') }}" 
-   class="btn btn-success btn-sm px-4 shadow-sm d-flex align-items-center gap-2" 
-   style="font-size: 0.85rem;">
-    <i class="bi bi-arrow-left"></i> Regresar
-</a>
 
+@section('content')
+<style>
+    .custom-card::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 800px;
+        height: 800px;
+        background-image: url('/images/logo2.jpg');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.15;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 0;
+    }
+    .custom-card {
+        max-width: 900px;
+        background-color: #fff;
+        border-color: #91cfff;
+        position: relative;
+        overflow: hidden;
+        margin: 2rem auto;
+        padding: 1rem;
+        border: 1px solid #91cfff;
+        border-radius: 12px;
+    }
+</style>
 
+<div class="container" style="max-width: 1200px; padding-bottom: 120px; padding-top: 70px;">
+    <!-- Barra de navegación fija -->
+    <div class="w-100 fixed-top" style="background-color: #007BFF; z-index: 1050; height: 56px;">
+        <div class="d-flex justify-content-between align-items-center px-3" style="height: 56px;">
+            <div class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</div>
+        </div>
+    </div>
+
+    <!-- Tarjeta con margen superior para bajarla -->
+    <div class="card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
+        <div class="card-header text-center py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
+             <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Detalles del empleado</h5>
         </div>
 
-        <div class="card-body p-3">
-            <table class="table table-bordered table-striped align-middle" style="font-size: 0.92rem;">
-                <tbody>
-                    <tr><th style="width: 30%;">Nombres</th><td>{{ $empleado->nombres }}</td></tr>
-                    <tr><th>Apellidos</th><td>{{ $empleado->apellidos }}</td></tr>
-                    <tr><th>Identidad</th><td>{{ $empleado->identidad }}</td></tr>
-                    <tr><th>Correo</th><td>{{ $empleado->correo }}</td></tr>
-                    <tr><th>Teléfono</th><td>{{ $empleado->telefono }}</td></tr>
-                    <tr><th>Estado Civil</th><td>{{ $empleado->estado_civil }}</td></tr>
-                    <tr>
-                        <th>Género</th>
-                        <td>
-                            <span class="badge 
-                                {{ $empleado->genero === 'Masculino' ? 'bg-primary' : 
-                                   ($empleado->genero === 'Femenino' ? 'bg-warning text-dark' : 'bg-info') }}">
-                                {{ $empleado->genero }}
-                            </span>
-                        </td>
-                    </tr>
-                    <tr><th>Fecha de Ingreso</th><td>{{ \Carbon\Carbon::parse($empleado->fecha_ingreso)->format('d/m/Y') }}</td></tr>
-                    <tr><th>Fecha de Nacimiento</th><td>{{ \Carbon\Carbon::parse($empleado->fecha_nacimiento)->format('d/m/Y') }}</td></tr>
-                    <tr><th>Salario</th><td>{{ $empleado->salario ? 'Lps. ' . number_format($empleado->salario, 2) : 'No especificado' }}</td></tr>
-                    <tr><th>Área</th><td>{{ $empleado->puesto->area ?? 'No especificada' }}</td></tr>
-                    <tr><th>Turno Asignado</th><td>{{ $empleado->turno_asignado }}</td></tr>
-                    <tr><th>Puesto</th><td>{{ $empleado->puesto->nombre ?? 'No especificado' }}</td></tr>
-                    <tr>
-                        <th>Estado</th>
-                        <td>
-                            @if($empleado->estado == 'Activo' || $empleado->estado == 1 || $empleado->estado === true)
-                                <span class="badge bg-success">Activo</span>
-                            @else
-                                <span class="badge bg-danger">Inactivo</span>
-                            @endif
-                        </td>
-                    </tr>
-                    <tr><th>Dirección</th><td style="white-space: pre-line;">{{ $empleado->direccion }}</td></tr>
-                    <tr><th>Observaciones</th><td style="white-space: pre-line;">{{ $empleado->observaciones ?: 'Sin observaciones.' }}</td></tr>
-                </tbody>
-            </table>
+        <form action="{{ route('empleado.store') }}" method="POST" novalidate class="p-4">
+            @csrf
+
+
+        <!-- Contenido -->
+        <div class="card-body px-4 py-3">
+            <div class="row gy-3">
+                <div class="col-md-3"><strong>Nombres:</strong><br>{{ $empleado->nombres }}</div>
+                <div class="col-md-3"><strong>Apellidos:</strong><br>{{ $empleado->apellidos }}</div>
+                <div class="col-md-3"><strong>Identidad:</strong><br>{{ $empleado->identidad }}</div>
+                <div class="col-md-3"><strong>Correo:</strong><br>{{ $empleado->correo }}</div>
+
+                <div class="col-md-3"><strong>Teléfono:</strong><br>{{ $empleado->telefono }}</div>
+                <div class="col-md-3"><strong>Estado Civil:</strong><br>{{ $empleado->estado_civil }}</div>
+                <div class="col-md-3">
+                    <strong>Género:</strong><br>
+                    <span class="badge 
+                        {{ $empleado->genero === 'Masculino' ? 'bg-primary' : 
+                           ($empleado->genero === 'Femenino' ? 'bg-warning text-dark' : 'bg-info') }}">
+                        {{ $empleado->genero }}
+                    </span>
+                </div>
+                <div class="col-md-3"><strong>Fecha de Ingreso:</strong><br>{{ \Carbon\Carbon::parse($empleado->fecha_ingreso)->format('d/m/Y') }}</div>
+
+                <div class="col-md-3"><strong>Fecha de Nacimiento:</strong><br>{{ \Carbon\Carbon::parse($empleado->fecha_nacimiento)->format('d/m/Y') }}</div>
+                <div class="col-md-3"><strong>Salario:</strong><br>{{ $empleado->salario ? 'Lps. ' . number_format($empleado->salario, 2) : 'No especificado' }}</div>
+                <div class="col-md-3"><strong>Área:</strong><br>{{ $empleado->puesto->area ?? 'No especificada' }}</div>
+                <div class="col-md-3"><strong>Turno Asignado:</strong><br>{{ $empleado->turno_asignado }}</div>
+
+                <div class="col-md-3"><strong>Puesto:</strong><br>{{ $empleado->puesto->nombre ?? 'No especificado' }}</div>
+                <div class="col-md-3">
+                    <strong>Estado:</strong><br>
+                    @if($empleado->estado == 'Activo' || $empleado->estado == 1 || $empleado->estado === true)
+                        <span class="badge bg-success">Activo</span>
+                    @else
+                        <span class="badge bg-danger">Inactivo</span>
+                    @endif
+                </div>
+                <div class="col-md-6"><strong>Dirección:</strong><br><span style="white-space: pre-line;">{{ $empleado->direccion }}</span></div>
+                <div class="col-md-6"><strong>Observaciones:</strong><br><span style="white-space: pre-line;">{{ $empleado->observaciones ?: 'Sin observaciones.' }}</span></div>
+            </div>
+        </div>
+
+        <!-- Botón Regresar centrado -->
+        <div class="text-center pb-4">
+            <a href="{{ route('empleado.index') }}" 
+               class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2" 
+               style="font-size: 0.85rem;">
+                <i class="bi bi-arrow-left"></i> Regresar
+            </a>
         </div>
     </div>
 </div>
-<footer class="bg-light text-center py-2 border-top" style="position: fixed; bottom: 0; left: 0; width: 100%; font-size: 0.85rem;">
-    © 2025 Clínitek. Todos los derechos reservados.
-</footer>
 @endsection
