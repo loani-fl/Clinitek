@@ -20,6 +20,7 @@ class Paciente extends Model
         'direccion',
         'correo',
         'tipo_sangre',
+        'genero',                // <--- agregado aquí
         'padecimientos',
         'medicamentos',
         'historial_clinico',
@@ -27,7 +28,6 @@ class Paciente extends Model
         'historial_quirurgico',
     ];
 
-    // Opcional: si quieres, puedes definir casts o fechas
     protected $casts = [
         'fecha_nacimiento' => 'date',
     ];

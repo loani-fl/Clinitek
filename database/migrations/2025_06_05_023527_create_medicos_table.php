@@ -9,28 +9,26 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up() 
-{
-    Schema::create('medicos', function (Blueprint $table) {
-        $table->id();
-        $table->string('nombre');
-        $table->string('apellidos');
-        $table->string('numero_identidad', 13)->unique();
-        $table->decimal('sueldo', 7, 2)->nullable();
-        $table->string('especialidad');
-        $table->string('telefono')->unique();
-        $table->string('correo')->unique();
-        $table->date('fecha_nacimiento');
-        $table->date('fecha_ingreso');
-        $table->string('genero');
-        $table->text('observaciones')->nullable();
-        $table->string('foto')->nullable();
-        $table->boolean('estado')->default(true);
-        $table->timestamps();
-
-    });
-}
-
+    public function up(): void
+    {
+        Schema::create('medicos', function (Blueprint $table) {
+            $table->id();
+            $table->string('nombre');
+            $table->string('apellidos');
+            $table->string('numero_identidad', 13)->unique();
+            $table->string('especialidad');
+            $table->decimal('salario', 7, 2)->nullable(); // Agregado: columna salario
+            $table->string('telefono')->unique();
+            $table->string('correo')->unique();
+            $table->date('fecha_nacimiento');
+            $table->date('fecha_ingreso');
+            $table->string('genero');
+            $table->text('observaciones')->nullable();
+            $table->string('foto')->nullable();
+            $table->boolean('estado')->default(true);
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

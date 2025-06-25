@@ -13,11 +13,15 @@
     </div>
 </div>
 
-<div class="container-fluid mt-3">
+<div class="container mt-3" style="max-width: 1000px;"> {{-- ancho más pequeño --}}
+
     <div class="card shadow rounded-4 border-0">
-        <div class="card-header bg-primary text-white rounded-top-4 d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Listado de Médicos</h4>
-        </div>
+
+        {{-- Título sin fondo azul, texto centrado, negro y en negrita --}}
+        <div class="card-header rounded-top-4 d-flex justify-content-center align-items-center" style="background-color: transparent; border-bottom: 3px solid #007BFF;">
+    <h4 class="mb-0 fw-bold text-black text-center">Listado de Médicos</h4>
+</div>
+
 
         <div class="card-body">
             {{-- Mensaje de éxito --}}
@@ -28,8 +32,8 @@
                 </div>
             @endif
 
-           {{-- Buscador --}}
-           <form action="{{ route('medicos.index') }}" method="GET" class="mb-3 row g-2 align-items-center">
+           {{-- Buscador con ancho más pequeño --}}
+           <form action="{{ route('medicos.index') }}" method="GET" class="mb-3 row g-2 align-items-center" style="max-width: 600px;">
                 <div class="col-auto">
                     <input
                         type="text"
