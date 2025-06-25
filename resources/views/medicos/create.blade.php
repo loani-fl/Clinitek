@@ -5,13 +5,35 @@
     body {
         background-color: #e8f4fc;
     }
-    .custom-card {
-        max-width: 97%;
-        background-color: #f0faff;
-        border-color: #91cfff;
-    }
+    .custom-card::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 800px; /* tamaño más pequeño */
+    height: 800px; /* tamaño más pequeño */
+    background-image: url('/images/logo2.jpg');
+    background-size: contain;  /* ajusta sin recortar */
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.15;  /* transparencia baja para que no moleste */
+    transform: translate(-50%, -50%);
+    pointer-events: none; /* para que no interfiera con clicks */
+    z-index: 0;
+}
+.custom-card {
+    max-width: 900px;  /* ancho fijo más pequeño */
+    background-color: #fff;
+    border-color: #91cfff;
+    position: relative;
+    overflow: hidden;
+    margin: 2rem auto; /* centrado horizontal con margen arriba y abajo */
+}
+
     label {
         font-size: 0.85rem;
+        font-weight: 600;
+        color: #003366;
     }
     input, select, textarea {
         font-size: 0.85rem !important;
@@ -27,9 +49,9 @@
 </div>
 <div class="d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 56px - 100px); margin-top: 2rem;">
     <div class="card custom-card shadow-sm border rounded-4 w-100 mt-0">
-        <div class="card-header bg-primary text-white py-2">
-            <h2 class="mb-0">Registrar nuevo médico</h2>
-        </div>
+    <div class="card-header text-center py-3" style="background-color: transparent; border-bottom: 3px solid #007BFF;">
+        <h2 class="mb-0 fw-bold text-black" style="font-size: 2.25rem;">Registrar nuevo médico</h2>
+    </div>
 
 
 
@@ -49,27 +71,30 @@
                     @csrf
 
                     <div class="row mb-3">
-    <div class="col-md-3">
-        {{-- Nombre --}}
-        <label for="nombre" class="form-label">Nombre: <span class="text-danger">*</span></label>
-        <input type="text" name="nombre" maxlength="50" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
-            class="form-control @error('nombre') is-invalid @enderror {{ old('nombre') && !$errors->has('nombre') ? 'is-valid' : '' }}"
-            value="{{ old('nombre') }}" required>
-        @error('nombre')
-            <div class="invalid-feedback">{{ $message ?: 'Solo se permiten letras. Ingrese este dato.' }}</div>
-        @enderror
-    </div>
+                        <div class="col-md-3">
+                            {{-- Nombre --}}
+                            <label for="nombre" class="form-label">Nombre: <span class="text-danger">*</span></label>
+                            <input type="text" name="nombre" maxlength="50" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+                                class="form-control @error('nombre') is-invalid @enderror {{ old('nombre') && !$errors->has('nombre') ? 'is-valid' : '' }}"
+                                value="{{ old('nombre') }}" required>
+                            @error('nombre')
+                                <div class="invalid-feedback">{{ $message ?: 'Solo se permiten letras. Ingrese este dato.' }}</div>
+                            @enderror
+                        </div>
 
-    <div class="col-md-3">
-        {{-- Apellidos --}}
-        <label for="apellidos" class="form-label">Apellidos: <span class="text-danger">*</span></label>
-        <input type="text" name="apellidos" maxlength="50" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
-            class="form-control @error('apellidos') is-invalid @enderror {{ old('apellidos') && !$errors->has('apellidos') ? 'is-valid' : '' }}"
-            value="{{ old('apellidos') }}" required>
-        @error('apellidos')
-            <div class="invalid-feedback">{{ $message ?: 'Solo se permiten letras.' }}</div>
-        @enderror
-    </div>
+                        <div class="col-md-3">
+                            {{-- Apellidos --}}
+                            <label for="apellidos" class="form-label">Apellidos: <span class="text-danger">*</span></label>
+                            <input type="text" name="apellidos" maxlength="50" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+                                class="form-control @error('apellidos') is-invalid @enderror {{ old('apellidos') && !$errors->has('apellidos') ? 'is-valid' : '' }}"
+                                value="{{ old('apellidos') }}" required>
+                            @error('apellidos')
+                                <div class="invalid-feedback">{{ $message ?: 'Solo se permiten letras.' }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Aquí sigue el resto del formulario igual -->
+
 
     <div class="col-md-3">
     {{-- Identidad --}}

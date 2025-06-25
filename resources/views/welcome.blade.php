@@ -114,7 +114,6 @@
             <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" href="{{ route('puestos.create') }}">Registrar Puesto</a></li>
                 <li><a class="dropdown-item" href="{{ route('empleado.create') }}">Registrar Empleado</a></li>
-                <li><a class="dropdown-item" href="{{ route('medicos.create') }}">Registrar Médico</a></li>
                 <li><a class="dropdown-item" href="{{ route('pacientes.create') }}">Registrar Paciente</a></li>
             </ul>
         </div>
@@ -146,11 +145,14 @@
                 <p class="feature-desc">Servicio de imágenes diagnósticas con equipos modernos para mayor precisión.</p>
             </article>
 
-            <article class="feature-card">
-                <i class="bi bi-heart-pulse feature-icon" title="Medicina Especializada"></i>
-                <h3 class="feature-title">Medicina con Especialidades</h3>
-                <p class="feature-desc">Diversas especialidades médicas para cubrir todas tus necesidades de salud.</p>
-            </article>
+            <a href="{{ route('medicos.create') }}" style="text-decoration: none; color: inherit;">
+    <article class="feature-card">
+        <i class="bi bi-heart-pulse feature-icon" title="Medicina Especializada"></i>
+        <h3 class="feature-title">Medicina con Especialidades</h3>
+        <p class="feature-desc">Diversas especialidades médicas para cubrir todas tus necesidades de salud.</p>
+    </article>
+</a>
+
 
             <article class="feature-card">
                 <i class="bi bi-journal-medical feature-icon" title="Consultas"></i>

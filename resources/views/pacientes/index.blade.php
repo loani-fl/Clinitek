@@ -15,14 +15,17 @@
     <div class="mx-auto rounded border shadow" style="max-width: 1100px; background-color: #fff;">
 
         <!-- Franja azul título pegada arriba -->
-        <div style="background-color: #007BFF; padding: 15px 30px; border-top-left-radius: 10px; border-top-right-radius: 10px;">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2 class="mb-0 text-white">Listado de Pacientes</h2>
-                <a href="{{ route('inicio') }}" class="btn btn-light">
-                    <i class="bi bi-house-door"></i> Inicio
-                </a>
-            </div>
-        </div>
+        <div style="padding: 15px 30px; border-top-left-radius: 10px; border-top-right-radius: 10px; background-color: transparent; border-bottom: 3px solid #007BFF;">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2 class="mb-0 fw-bold text-black text-center flex-grow-1">Listado de Pacientes</h2>
+        <a href="{{ route('inicio') }}" class="btn btn-success ms-3">
+            <i class="bi bi-house-door"></i> Inicio
+        </a>
+    </div>
+</div>
+
+
+
 
         <!-- Tabla con sombra y sin margen arriba para pegarse a la franja -->
         <table class="table table-bordered table-striped align-middle mb-0" style="box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);">

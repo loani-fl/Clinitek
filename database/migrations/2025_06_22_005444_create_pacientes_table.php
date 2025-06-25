@@ -18,6 +18,7 @@ class CreatePacientesTable extends Migration
             $table->string('direccion', 300);
             $table->string('correo', 50)->nullable();
             $table->string('tipo_sangre', 3)->nullable(); // Ejemplo: "A+", "O-", etc.
+            $table->string('genero', 10); // Femenino, Masculino, Otro
             $table->string('padecimientos', 200);
             $table->string('medicamentos', 200);
             $table->string('historial_clinico', 200);
