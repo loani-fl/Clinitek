@@ -110,7 +110,7 @@ class MedicoController extends Controller
         'correo', 'fecha_nacimiento', 'fecha_ingreso', 'genero', 'observaciones', 'direccion'
     ]);
 
-    $datosMedico['salario'] = $salario;
+    $datosMedico['sueldo'] = $salario;
 
     if ($request->hasFile('foto')) {
         $datosMedico['foto'] = $request->file('foto')->store('fotos_medicos', 'public');
@@ -224,7 +224,7 @@ public function show($id)
             'telefono' => $request->telefono,
             'correo' => $request->correo,
             'numero_identidad' => $request->numero_identidad,
-            'salario' => $salario,
+            'sueldo' => $salario,
             'fecha_nacimiento' => $request->fecha_nacimiento,
             'fecha_ingreso' => $request->fecha_ingreso,
             'genero' => $request->genero,

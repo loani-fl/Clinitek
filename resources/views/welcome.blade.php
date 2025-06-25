@@ -129,14 +129,14 @@
             </article>
 
             <article class="feature-card">
-                <i class="bi bi-flask feature-icon" title="Laboratorio"></i>
+            <i class="bi bi-eyedropper feature-icon" title="Laboratorio"></i>
                 <h3 class="feature-title">Laboratorio</h3>
                 <p class="feature-desc">Laboratorio clínico con tecnología avanzada para diagnósticos rápidos y confiables.</p>
             </article>
 
             <article class="feature-card">
                 <i class="bi bi-hospital feature-icon" title="Área de Emergencia"></i>
-                <h3 class="feature-title">Área de Emergencia</h3>
+                <h3 class="feature-title">Emergencia</h3>
                 <p class="feature-desc">Atención inmediata y profesional las 24 horas para situaciones críticas y urgentes.</p>
             </article>
 
@@ -152,16 +152,19 @@
                 <p class="feature-desc">Diversas especialidades médicas para cubrir todas tus necesidades de salud.</p>
             </article>
 
+            <a href="{{ route('consultas.create') }}" style="text-decoration: none; color: inherit;">
             <article class="feature-card">
                 <i class="bi bi-journal-medical feature-icon" title="Consultas"></i>
                 <h3 class="feature-title">Consultas</h3>
                 <p class="feature-desc">Consultas médicas personalizadas para un diagnóstico y tratamiento adecuados.</p>
             </article>
+            </a>
+
         </section>
     </main>
 
     <footer>
-        &copy; 2025 CLINITEK. Todos los derechos reservados.
+        &copy; 2025 Clinitek. Todos los derechos reservados.
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
