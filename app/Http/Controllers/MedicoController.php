@@ -162,36 +162,86 @@ public function show($id)
     public function update(Request $request, $id)
     {
         $hoy = Carbon::today();
-        $fechaMin = $hoy->copy()->subMonth()->format('Y-m-d');
-        $fechaMax = $hoy->copy()->addMonth()->format('Y-m-d');
+        $fecha18Anios = $hoy->copy()->subYears(18)->format('Y-m-d');
+        $fechaMinIngreso = $hoy->copy()->subMonth()->format('Y-m-d');
+        $fechaMaxIngreso = $hoy->copy()->addMonth()->format('Y-m-d');
 
         $request->validate([
-            'nombre' => 'required|regex:/^[\pL\s\-]+$/u|max:50',
-            'apellidos' => 'required|regex:/^[\pL\s\-]+$/u|max:50',
+            'nombre' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
+            'apellidos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
+            'numero_identidad' => [
+                'required',
+                'digits:13',
+                'regex:/^(0[1-9]|1[0-8])[0-9]{11}$/',
+                Rule::unique('medicos', 'numero_identidad')->ignore($id)
+            ],
+
             'especialidad' => 'required|string|max:80',
             'telefono' => [
                 'required',
-                'regex:/^[983]\d{7}$/',
-                'unique:medicos,telefono,' . $id,
+                'numeric',
+                'digits:8',
+                'regex:/^[9238][0-9]{7}$/',
+                Rule::unique('medicos', 'telefono')->ignore($id)
             ],
             'correo' => [
                 'required',
-                'regex:/^[\w\.\-]+@([\w\-]+\.)+[a-zA-Z]{2,}$/',
+                'email',
                 'max:30',
-                Rule::unique('medicos', 'correo')->ignore($id),
+                Rule::unique('medicos', 'correo')->ignore($id)
             ],
-            'numero_identidad' => 'required|digits:13|unique:medicos,numero_identidad,' . $id,
-            'fecha_nacimiento' => 'required|date|after_or_equal:1950-01-01|before_or_equal:2005-12-31',
-            'fecha_ingreso' => [
-                'required',
-                'date',
-                'after_or_equal:' . $fechaMin,
-                'before_or_equal:' . $fechaMax,
-            ],
+            'fecha_nacimiento' => ['required', 'date', 'before_or_equal:' . $fecha18Anios],
+            'fecha_ingreso' => ['required', 'date', 'after_or_equal:' . $fechaMinIngreso, 'before_or_equal:' . $fechaMaxIngreso],
             'genero' => 'required|in:Masculino,Femenino,Otro',
             'observaciones' => 'nullable|string|max:100',
+            'direccion' => ['required', 'string', 'max:300'],
             'foto' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
             'estado' => 'nullable|boolean',
+        ], [
+            'nombre.required' => 'El nombre es obligatorio.',
+            'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+            'nombre.max' => 'El nombre no debe superar los 50 caracteres.',
+
+            'apellidos.required' => 'Los apellidos son obligatorios.',
+            'apellidos.regex' => 'Los apellidos solo pueden contener letras y espacios.',
+            'apellidos.max' => 'Los apellidos no deben superar los 50 caracteres.',
+
+            'numero_identidad.required' => 'El número de identidad es obligatorio.',
+            'numero_identidad.digits' => 'Debe tener exactamente 13 dígitos.',
+            'numero_identidad.regex' => 'Debe comenzar con un código de departamento válido (01 al 18).',
+            'numero_identidad.unique' => 'Este número de identidad ya está registrado.',
+
+            'especialidad.required' => 'La especialidad es obligatoria.',
+            'especialidad.max' => 'La especialidad no debe superar los 80 caracteres.',
+
+            'telefono.required' => 'El teléfono es obligatorio.',
+            'telefono.digits' => 'Debe tener 8 dígitos.',
+            'telefono.regex' => 'El telefono debe iniciar con 2, 3 o 8, 9.',
+            'telefono.unique' => 'Este número ya está registrado.',
+
+            'correo.required' => 'El correo es obligatorio.',
+            'correo.email' => 'Formato de correo inválido.',
+            'correo.max' => 'El correo no debe superar los 30 caracteres.',
+            'correo.unique' => 'Este correo ya está registrado.',
+
+            'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
+            'fecha_nacimiento.before_or_equal' => 'Debes tener al menos 18 años.',
+
+            'fecha_ingreso.required' => 'La fecha de ingreso es obligatoria.',
+            'fecha_ingreso.after_or_equal' => 'No puede ser anterior a hace un mes.',
+            'fecha_ingreso.before_or_equal' => 'No puede ser posterior a un mes después de hoy.',
+
+            'genero.required' => 'El género es obligatorio.',
+            'genero.in' => 'El género no es válido.',
+
+            'observaciones.max' => 'Las observaciones no deben exceder 100 caracteres.',
+
+            'direccion.required' => 'La dirección es obligatoria.',
+            'direccion.max' => 'No debe superar los 300 caracteres.',
+
+            'foto.image' => 'Debe ser una imagen.',
+            'foto.mimes' => 'Formatos válidos: jpg, jpeg, png, gif.',
+            'foto.max' => 'No debe pesar más de 2MB.',
         ]);
 
         $medico = Medico::findOrFail($id);
@@ -208,6 +258,7 @@ public function show($id)
         $especialidad = $request->input('especialidad');
         $salario = $salarios[$especialidad] ?? 0;
 
+        // Actualizar foto
         if ($request->hasFile('foto')) {
             if ($medico->foto && Storage::disk('public')->exists($medico->foto)) {
                 Storage::disk('public')->delete($medico->foto);
@@ -220,40 +271,45 @@ public function show($id)
         $medico->update([
             'nombre' => $request->nombre,
             'apellidos' => $request->apellidos,
+            'numero_identidad' => $request->numero_identidad,
             'especialidad' => $especialidad,
             'telefono' => $request->telefono,
             'correo' => $request->correo,
-            'numero_identidad' => $request->numero_identidad,
-            'sueldo' => $salario,
             'fecha_nacimiento' => $request->fecha_nacimiento,
             'fecha_ingreso' => $request->fecha_ingreso,
             'genero' => $request->genero,
             'observaciones' => $request->observaciones,
-            'estado' => $estado,
+            'direccion' => $request->direccion,
+            'sueldo' => $salario,
             'foto' => $medico->foto,
+            'estado' => $estado,
         ]);
 
         return redirect()->route('medicos.index')->with('success', 'Médico actualizado exitosamente');
     }
-
     public function toggleEstado(Medico $medico)
     {
-        $medico->estado = !$medico->estado;
-        $medico->save();
-    
-        return back()->with('success', 'Estado del médico actualizado correctamente');
-    }
-    
+        $medico->update([
+            'estado' => !$medico->estado,
+        ]);
 
+        $mensaje = $medico->estado
+            ? 'El médico ha sido activado correctamente.'
+            : 'El médico ha sido desactivado correctamente.';
+
+        return back()->with('success', $mensaje);
+    }
     public function buscar(Request $request)
     {
         $termino = $request->input('buscar');
-    
+
         $medicos = Medico::where('nombre', 'like', "%{$termino}%")
             ->orWhere('correo', 'like', "%{$termino}%")
             ->orWhere('especialidad', 'like', "%{$termino}%")
             ->get();
-    
+
         return response()->json($medicos);
     }
+
+
 }
