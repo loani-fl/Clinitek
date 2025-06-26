@@ -140,7 +140,7 @@
                             <option value="{{ $p->id }}"
                                 data-nacimiento="{{ \Carbon\Carbon::parse($p->fecha_nacimiento)->format('Y-m-d') }}"
                                 data-identidad="{{ $p->identidad }}"
-                                data-sexo="{{ $p->sexo }}"
+                                data-genero="{{ $p->genero }}"
                                 data-telefono="{{ $p->telefono }}"
                                 data-correo="{{ $p->correo }}"
                                 data-direccion="{{ $p->direccion }}"
@@ -165,13 +165,13 @@
                 </div>
 
                 <div class="col-md-2">
-                    <label for="sexo">Genero <span class="text-danger">*</span></label>
-                    <select id="sexo" name="sexo" class="form-select form-select-sm @error('sexo') is-invalid @enderror" required>
+                    <label for="genero">Genero <span class="text-danger">*</span></label>
+                    <select id="genero" name="genero" class="form-select form-select-sm @error('genero') is-invalid @enderror" required>
                         <option value="">-- Selecciona --</option>
-                        <option value="Femenino" {{ old('sexo') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
-                        <option value="Masculino" {{ old('sexo') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
+                        <option value="Femenino" {{ old('genero') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
+                        <option value="Masculino" {{ old('genero') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
                     </select>
-                    @error('sexo')
+                    @error('genero')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
                 </div>
@@ -312,7 +312,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const pacienteSelect = document.getElementById('paciente_id');
-    const sexoSelect = document.getElementById('sexo');
+    const generoSelect = document.getElementById('genero');
     const medicoSelect = document.getElementById('medico');
     const especialidadInput = document.getElementById('especialidad');
     const fechaConsultaInput = document.getElementById('fecha_consulta');
@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!opt) return;
         document.getElementById('fecha_nacimiento').value = opt.getAttribute('data-nacimiento') || '';
         document.getElementById('identidad').value = opt.getAttribute('data-identidad') || '';
-        sexoSelect.value = opt.getAttribute('data-sexo') || '';
+        generoSelect.value = opt.getAttribute('data-genero') || '';
         document.getElementById('telefono').value = opt.getAttribute('data-telefono') || '';
         document.getElementById('correo').value = opt.getAttribute('data-correo') || '';
         document.getElementById('direccion').value = opt.getAttribute('data-direccion') || '';
@@ -471,39 +471,50 @@ document.addEventListener('DOMContentLoaded', function () {
             totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
         }
     }
-    btnLimpiar.addEventListener('click', function () {
+
+
+    btnLimpiar.addEventListener('click', function (e) {
+    e.preventDefault(); // Evita el comportamiento por defecto si el botón es de tipo submit
+
+    // 🔁 Reset del formulario
     form.reset();
 
-    // Limpiar selects manualmente
+    // 🔁 Limpiar manualmente valores (por si reset no afecta algunos campos)
     pacienteSelect.value = '';
     medicoSelect.value = '';
-    horaSelect.value = '';
-    sexoSelect.value = '';
-
-    // Limpiar campos de autocompletado
-    document.getElementById('fecha_nacimiento').value = '';
+    horaSelect.innerHTML = `
+        <option value="">-- Selecciona hora --</option>
+        <option value="inmediata">Inmediata</option>
+    `;
+    especialidadInput.value = '';
+    totalPagarInput.value = '';
+    
+    // 🔁 Limpiar campos autocompletados
     document.getElementById('identidad').value = '';
+    document.getElementById('fecha_nacimiento').value = '';
     document.getElementById('telefono').value = '';
     document.getElementById('correo').value = '';
     document.getElementById('direccion').value = '';
-    especialidadInput.value = '';
-    totalPagarInput.value = '';
+    document.getElementById('genero').value = ''; // ← importante: campo hidden de género
 
-    // Restablecer las opciones del select de hora
-    horaSelect.innerHTML = '<option value="">-- Selecciona hora --</option><option value="inmediata">Inmediata</option>';
-
-    // Ocultar el total a pagar
+    // 🔁 Ocultar campos dinámicos
     contenedorTotalPagar.style.display = 'none';
 
-    // Quitar validaciones visuales
-    const invalidElems = form.querySelectorAll('.is-invalid');
-    invalidElems.forEach(el => el.classList.remove('is-invalid'));
+    // 🔁 Quitar clases de validación (visual)
+    form.querySelectorAll('.is-invalid, .is-valid').forEach(el => {
+        el.classList.remove('is-invalid', 'is-valid');
+    });
 
-    const errorMessages = form.querySelectorAll('.invalid-feedback');
-    errorMessages.forEach(em => em.remove());
+    // 🔁 Eliminar todos los mensajes de error generados (invalid-feedback)
+    form.querySelectorAll('.invalid-feedback').forEach(feedback => {
+        feedback.remove();
+    });
+
+    // 🔁 También puedes limpiar los textos en .text-danger si usaste etiquetas <span>
+    form.querySelectorAll('.text-danger').forEach(span => {
+        span.textContent = '';
+    });
 });
-
-
     // Inicializa visibilidad al cargar la página
     actualizarVisibilidadTotalPagar();
 });
