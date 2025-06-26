@@ -58,7 +58,7 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
-    max-width: 85%;
+    max-width: 1000px;
     width: 100%;
     padding: 1.5rem;
 }
@@ -130,21 +130,21 @@
         }
 
         .custom-card::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 800px; /* tamaño más pequeño */
-    height: 800px; /* tamaño más pequeño */
-    background-image: url('/images/logo2.jpg');
-    background-size: contain;  /* ajusta sin recortar */
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.15;  /* transparencia baja para que no moleste */
-    transform: translate(-50%, -50%);
-    pointer-events: none; /* para que no interfiera con clicks */
-    z-index: 0;
-}
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 800px; /* tamaño más pequeño */
+            height: 800px; /* tamaño más pequeño */
+            background-image: url('/images/logo2.jpg');
+            background-size: contain;  /* ajusta sin recortar */
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.15;  /* transparencia baja para que no moleste */
+            transform: translate(-50%, -50%);
+            pointer-events: none; /* para que no interfiera con clicks */
+            z-index: 0;
+        }
     </style>
 </head>
 <body>
@@ -158,9 +158,14 @@
 </style>
 
 <!-- Barra de navegación fija -->
-<div class="w-100 fixed-top" style="background-color: #007BFF; z-index: 1050;">
-    <div class="d-flex justify-content-between align-items-center px-3 py-2">
-        <div class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</div>
+<div class="header d-flex justify-content-between align-items-center px-3 py-2" style="background-color: #007BFF; position: sticky; top: 0; z-index: 1030;">
+    <div class="d-flex align-items-center">
+        <!-- Logo con margen reducido para acercar el texto -->
+        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" 
+             style="height: 40px; width: auto; margin-right: 6px;">
+
+        <span class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</span>
+    </div>
         <div class="d-flex gap-3 flex-wrap">
             <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
             <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
@@ -171,7 +176,7 @@
 
 
 <!-- Formulario más compacto -->
-<div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 90px;">
+<div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
     <div class="card-header position-relative py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
         <!-- Botón a la derecha -->
         <a href="{{ route('inicio') }}" class="btn btn-light position-absolute end-0 top-50 translate-middle-y me-2">

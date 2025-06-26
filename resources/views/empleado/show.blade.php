@@ -1,8 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-
-@section('content')
 <style>
     .custom-card::before {
         content: "";
@@ -21,7 +19,7 @@
         z-index: 0;
     }
     .custom-card {
-        max-width: 900px;
+        max-width: 1000px;
         background-color: #fff;
         border-color: #91cfff;
         position: relative;
@@ -33,23 +31,30 @@
     }
 </style>
 
-<div class="container" style="max-width: 1200px; padding-bottom: 120px; padding-top: 70px;">
-    <!-- Barra de navegación fija -->
-    <div class="w-100 fixed-top" style="background-color: #007BFF; z-index: 1050; height: 56px;">
-        <div class="d-flex justify-content-between align-items-center px-3" style="height: 56px;">
-            <div class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</div>
+<!-- Barra de navegación fija -->
+<div class="w-100 fixed-top" style="background-color: #007BFF; z-index: 1050; height: 56px;">
+    <div class="d-flex justify-content-between align-items-center px-3" style="height: 56px;">
+        <div class="d-flex align-items-center">
+            <!-- Logo -->
+            <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" 
+                 style="height: 40px; width: auto; margin-right: 6px;">
+            <!-- Texto -->
+            <span class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</span>
         </div>
     </div>
+</div>
 
-    <!-- Tarjeta con margen superior para bajarla -->
-    <div class="card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
+<!-- Contenedor principal sin scroll innecesario -->
+<div class="container mt-5 pt-3" style="max-width: 1000px;">
+    
+    <!-- Tarjeta con margen superior reducido -->
+    <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100 mt-4">
         <div class="card-header text-center py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-             <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Detalles del empleado</h5>
+            <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Detalles del empleado</h5>
         </div>
 
         <form action="{{ route('empleado.store') }}" method="POST" novalidate class="p-4">
             @csrf
-
 
         <!-- Contenido -->
         <div class="card-body px-4 py-3">

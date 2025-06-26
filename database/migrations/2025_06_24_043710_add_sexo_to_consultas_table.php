@@ -12,14 +12,14 @@ return new class extends Migration
     public function up()
     {
         Schema::table('consultas', function (Blueprint $table) {
-            $table->string('sexo', 10)->after('paciente_id'); // Ajusta la longitud si quieres
+            $table->string('genero', 10)->after('paciente_id'); // Ajusta la longitud si quieres
         });
     }
     
     public function down()
     {
         Schema::table('consultas', function (Blueprint $table) {
-            $table->dropColumn('sexo');
+            $table->dropColumn('genero');
         });
     }
 };
