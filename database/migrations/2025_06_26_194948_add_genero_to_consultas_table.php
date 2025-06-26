@@ -6,20 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up()
+    public function up(): void
     {
         Schema::table('consultas', function (Blueprint $table) {
-            $table->string('genero', 10)->after('paciente_id'); // Ajusta la longitud si quieres
+            $table->string('genero')->nullable()->after('paciente_id');
         });
     }
     
-    public function down()
+    public function down(): void
     {
         Schema::table('consultas', function (Blueprint $table) {
             $table->dropColumn('genero');
         });
     }
+    
 };

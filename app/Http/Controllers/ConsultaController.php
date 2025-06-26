@@ -42,7 +42,7 @@ class ConsultaController extends Controller
 
     $rules = [
         'paciente_id' => ['required', 'exists:pacientes,id'],
-        'sexo' => ['required', 'in:Femenino,Masculino'],
+        'genero' => ['required', 'in:Femenino,Masculino'],
         'fecha' => ['required', 'date'],
         'hora' => [
             'required',
@@ -69,8 +69,8 @@ class ConsultaController extends Controller
     $messages = [
         'paciente_id.required' => 'Debe seleccionar un paciente.',
         'paciente_id.exists' => 'El paciente seleccionado no es válido.',
-        'sexo.required' => 'El género es obligatorio.',
-        'sexo.in' => 'Seleccione un sexo válido.',
+        'genero.required' => 'El género es obligatorio.',
+        'genero.in' => 'Seleccione un genero válido.',
         'fecha.required' => 'La fecha de la consulta es obligatoria.',
         'fecha.date' => 'La fecha debe ser válida.',
         'hora.required' => 'Debe seleccionar una hora o elegir "Inmediata".',
@@ -112,7 +112,7 @@ class ConsultaController extends Controller
 
     Consulta::create([
         'paciente_id' => $validated['paciente_id'],
-        'sexo' => $validated['sexo'],
+        'genero' => $validated['genero'],
         'fecha' => $validated['fecha'],
         'hora' => $esInmediata ? null : $hora24,
         'especialidad' => $especialidad,
