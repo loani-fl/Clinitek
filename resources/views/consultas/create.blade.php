@@ -471,25 +471,38 @@ document.addEventListener('DOMContentLoaded', function () {
             totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
         }
     }
-
     btnLimpiar.addEventListener('click', function () {
-        form.reset();
-        document.getElementById('fecha_nacimiento').value = '';
-        document.getElementById('identidad').value = '';
-        document.getElementById('telefono').value = '';
-        document.getElementById('correo').value = '';
-        document.getElementById('direccion').value = '';
-        especialidadInput.value = '';
-        totalPagarInput.value = '';
-        horaSelect.innerHTML = '<option value="">-- Selecciona hora --</option><option value="inmediata">Inmediata</option>';
-        contenedorTotalPagar.style.display = 'none';
+    form.reset();
 
-        const invalidElems = form.querySelectorAll('.is-invalid');
-        invalidElems.forEach(el => el.classList.remove('is-invalid'));
+    // Limpiar selects manualmente
+    pacienteSelect.value = '';
+    medicoSelect.value = '';
+    horaSelect.value = '';
+    sexoSelect.value = '';
 
-        const errorMessages = form.querySelectorAll('.invalid-feedback');
-        errorMessages.forEach(em => em.remove());
-    });
+    // Limpiar campos de autocompletado
+    document.getElementById('fecha_nacimiento').value = '';
+    document.getElementById('identidad').value = '';
+    document.getElementById('telefono').value = '';
+    document.getElementById('correo').value = '';
+    document.getElementById('direccion').value = '';
+    especialidadInput.value = '';
+    totalPagarInput.value = '';
+
+    // Restablecer las opciones del select de hora
+    horaSelect.innerHTML = '<option value="">-- Selecciona hora --</option><option value="inmediata">Inmediata</option>';
+
+    // Ocultar el total a pagar
+    contenedorTotalPagar.style.display = 'none';
+
+    // Quitar validaciones visuales
+    const invalidElems = form.querySelectorAll('.is-invalid');
+    invalidElems.forEach(el => el.classList.remove('is-invalid'));
+
+    const errorMessages = form.querySelectorAll('.invalid-feedback');
+    errorMessages.forEach(em => em.remove());
+});
+
 
     // Inicializa visibilidad al cargar la página
     actualizarVisibilidadTotalPagar();

@@ -37,19 +37,34 @@ class ConsultaController extends Controller
     }
     public function store(Request $request)
 {
-    $horaInput = $request->input('hora');
+    $horaInput = trim($request->input('hora'));
     $esInmediata = $horaInput === 'inmediata';
 
     $rules = [
         'paciente_id' => ['required', 'exists:pacientes,id'],
         'sexo' => ['required', 'in:Femenino,Masculino'],
         'fecha' => ['required', 'date'],
-        'hora' => ['required', 'string', 'max:20'],
-        'total_pagar' => ['required', 'numeric', 'min:0'],
+        'hora' => [
+            'required',
+            function ($attribute, $value, $fail) {
+                $value = trim($value);
+                if ($value !== 'inmediata') {
+                    $horaValida = \DateTime::createFromFormat('g:i A', $value);
+                    if (!($horaValida && $horaValida->format('g:i A') === $value)) {
+                        $fail('El formato de la hora no es válido. Usa por ejemplo: 9:00 AM.');
+                    }
+                }
+            },
+        ],
         'medico_id' => ['required', 'exists:medicos,id'],
-        'motivo' => ['required', 'string', 'max:300'],
-        'sintomas' => ['required', 'string', 'max:300'],
+        'motivo' => ['required', 'string', 'max:250'],
+        'sintomas' => ['required', 'string', 'max:250'],
     ];
+
+    // Agregar total_pagar solo si es inmediata
+    if ($esInmediata) {
+        $rules['total_pagar'] = ['required', 'numeric', 'min:0'];
+    }
 
     $messages = [
         'paciente_id.required' => 'Debe seleccionar un paciente.',
@@ -59,25 +74,29 @@ class ConsultaController extends Controller
         'fecha.required' => 'La fecha de la consulta es obligatoria.',
         'fecha.date' => 'La fecha debe ser válida.',
         'hora.required' => 'Debe seleccionar una hora o elegir "Inmediata".',
-        'hora.max' => 'La hora no puede exceder 20 caracteres.',
         'medico_id.required' => 'Debe seleccionar un médico.',
         'medico_id.exists' => 'El médico seleccionado no es válido.',
         'motivo.required' => 'El motivo de la consulta es obligatorio.',
-        'motivo.max' => 'El motivo no puede exceder 300 caracteres.',
+        'motivo.max' => 'El motivo no puede exceder 250 caracteres.',
         'sintomas.required' => 'Los síntomas son obligatorios.',
-        'sintomas.max' => 'Los síntomas no pueden exceder 300 caracteres.',
+        'sintomas.max' => 'Los síntomas no pueden exceder 250 caracteres.',
+        'total_pagar.required' => 'Debe indicar el total a pagar.',
+        'total_pagar.numeric' => 'El total debe ser un número.',
+        'total_pagar.min' => 'El total debe ser mayor o igual a 0.',
     ];
 
     $validated = $request->validate($rules, $messages);
 
+    // Convertir la hora si no es inmediata
     $hora24 = null;
     if (!$esInmediata) {
         try {
-            $hora24 = Carbon::createFromFormat('h:i A', $horaInput)->format('H:i:s');
+            $hora24 = Carbon::createFromFormat('g:i A', $horaInput)->format('H:i:s');
         } catch (\Exception $e) {
             return back()->withErrors(['hora' => 'El formato de la hora no es válido.'])->withInput();
         }
 
+        // Verificar si la hora ya está ocupada
         $existe = Consulta::where('medico_id', $validated['medico_id'])
             ->where('fecha', $validated['fecha'])
             ->where('hora', $hora24)
@@ -100,11 +119,12 @@ class ConsultaController extends Controller
         'medico_id' => $validated['medico_id'],
         'motivo' => $validated['motivo'],
         'sintomas' => $validated['sintomas'],
-        'total_pagar' => $validated['total_pagar'],
+        'total_pagar' => $esInmediata ? $validated['total_pagar'] : 0,
     ]);
 
     return redirect()->route('consultas.index')->with('success', 'Consulta registrada correctamente.');
 }
+
 
     public function horasOcupadas(Request $request)
     {
