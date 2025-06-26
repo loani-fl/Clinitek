@@ -154,7 +154,7 @@
 </a>
 
 
-            <a href="{{ route('consultas.create') }}" style="text-decoration: none; color: inherit;">
+          <a href="{{ route('consultas.create') }}" style="text-decoration: none; color: inherit;">
             <article class="feature-card">
                 <i class="bi bi-journal-medical feature-icon" title="Consultas"></i>
                 <h3 class="feature-title">Consultas</h3>
