@@ -5,47 +5,73 @@
     body {
         background-color: #e8f4fc;
     }
+
     .custom-card::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 800px; /* tamaño más pequeño */
-    height: 800px; /* tamaño más pequeño */
-    background-image: url('/images/logo2.jpg');
-    background-size: contain;  /* ajusta sin recortar */
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.15;  /* transparencia baja para que no moleste */
-    transform: translate(-50%, -50%);
-    pointer-events: none; /* para que no interfiera con clicks */
-    z-index: 0;
-}
-.custom-card {
-    max-width: 900px;  /* ancho fijo más pequeño */
-    background-color: #fff;
-    border-color: #91cfff;
-    position: relative;
-    overflow: hidden;
-    margin: 2rem auto; /* centrado horizontal con margen arriba y abajo */
-}
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 800px;
+        height: 800px;
+        background-image: url('/images/logo2.jpg');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.15;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .custom-card {
+        max-width: 900px;
+        background-color: #fff;
+        border-color: #91cfff;
+        position: relative;
+        overflow: hidden;
+        margin: 2rem auto;
+    }
 
     label {
         font-size: 0.85rem;
         font-weight: 600;
         color: #003366;
     }
+
     input, select, textarea {
         font-size: 0.85rem !important;
     }
+
+    .nav-link {
+        color: white;
+        font-weight: 500;
+        margin-left: 15px;
+        text-decoration: none;
+    }
+
+    .nav-link:hover {
+        text-decoration: underline;
+    }
 </style>
-<div class="header d-flex justify-content-between align-items-center px-3 py-2" style="background-color: #007BFF;">
-    <div class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</div>
-    <div class="d-flex gap-3 flex-wrap">
-        <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
-        <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
-        
+
+{{-- 🔵 Barra de navegación estática con botones --}}
+<div class="header d-flex justify-content-between align-items-center px-3 py-2"
+    style="background-color: #007BFF; position: sticky; top: 0; z-index: 1000;">
+    
+    {{-- 🔷 Logo y título --}}
+    <div class="d-flex align-items-center">
+        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" 
+        style="height: 40px; width: auto;">
+        <div class="fw-bold text-white" style="font-size: 1.5rem; margin-left: 8px;">Clinitek</div>
     </div>
+
+    {{-- 🔸 Botones --}}
+    <div class="d-flex gap-3 flex-wrap">
+        <a href="{{ route('puestos.create') }}" class="nav-link">Crear Puesto</a>
+        <a href="{{ route('empleado.create') }}" class="nav-link">Registro empleado</a>
+        <a href="{{ route('pacientes.index') }}" class="nav-link">Registro Pacientes</a>
+    </div>
+</div>
 </div>
 <div class="d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 56px - 100px); margin-top: 2rem;">
     <div class="card custom-card shadow-sm border rounded-4 w-100 mt-0">
