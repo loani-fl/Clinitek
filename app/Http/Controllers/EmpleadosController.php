@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class EmpleadosController extends Controller
 {
-    
+
 
 
     public function create()
@@ -108,13 +108,13 @@ $hace65 = $hoy->copy()->subYears(65);
         'estado_civil' => 'nullable|in:Soltero,Casado,Divorciado,Viudo',
         'puesto_id' => 'required|exists:puestos,id',
         'salario' => 'required|numeric|between:0,99999.99',
-      
+
         'area' => 'required|string|max:50',
 
         // Nuevos campos agregados:
         'turno_asignado' => 'required|string|max:50',  // Puedes cambiar reglas según necesites
         'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-  
+
     ];
 
     $messages = [
@@ -131,37 +131,37 @@ $hace65 = $hoy->copy()->subYears(65);
         'between' => ':attribute debe ser un número válido con hasta 2 decimales.',
 
         'nombres.required' => 'Los Nombres son obligatorios.',
-       
+
         'nombres.regex' => 'Nombres solo debe contener letras y espacios.',
 
         'apellidos.required' => 'Los Apellidos son obligatorios.',
-    
+
         'apellidos.regex' => 'Apellidos solo debe contener letras y espacios.',
 
         'identidad.required' => 'La identidad es obligatoria.',
-        
+
 
         'telefono.required' => 'El Teléfono es obligatorio.',
-     
+
         'telefono.regex' => 'El teléfono debe comenzar con 2, 3, 8 o 9 y contener exactamente 8 dígitos numéricos.',
 
         'correo.required' => 'El correo es obligatorio.',
-      
+
         'correo.email' => 'El correo debe ser un correo válido.',
         'correo.unique' => 'El correo ya está en uso.',
 
         'fecha_nacimiento.before_or_equal' => 'El empleado debe tener al menos 18 años.',
 
         'direccion.required' => 'La Dirección es obligatoria.',
-       
+
         'observaciones.required' => 'Las Observaciones son obligatorias.',
- 
+
 
         // Mensajes para nuevos campos
         'turno_asignado.required' => 'El turno asignado es obligatorio.',
-      
 
-       
+
+
     ];
 
     $attributes = [
@@ -180,7 +180,7 @@ $hace65 = $hoy->copy()->subYears(65);
         'observaciones' => 'Observaciones',
         'area' => 'Área',
         'turno_asignado' => 'Turno asignado',
-     
+
     ];
 
  // 1. Validar los datos
@@ -190,7 +190,7 @@ $hace65 = $hoy->copy()->subYears(65);
     $puesto = Puesto::findOrFail($validated['puesto_id']);
     $validated['area'] = $puesto->area;
 
-    \Log::info('Se validó correctamente. Intentando crear empleado...', $validated);
+   \Log::info('Se validó correctamente. Intentando crear empleado...', ['datos' => $validated]);
 
     // 3. Manejar foto si existe
 if ($request->hasFile('foto')) {
@@ -202,7 +202,7 @@ if ($request->hasFile('foto')) {
     $validated['foto'] = $nombreArchivo;
 }
 
-$validated['estado'] = 'activo'; 
+$validated['estado'] = 'activo';
 
 // 4. Crear el empleado con el arreglo que incluye el nombre de la foto si se envió
 $empleado = Empleado::create($validated);
@@ -216,7 +216,7 @@ if ($empleado) {
 
 
 
-   } 
+   }
 public function index()
 {
     $empleados = Empleado::with('puesto')->paginate(10);
