@@ -88,11 +88,13 @@ class PacienteController extends Controller
         return redirect()->route('pacientes.index')->with('success', 'Paciente registrado exitosamente.');
     }
 
-    public function index()
-    {
-        $pacientes = Paciente::orderBy('apellidos')->paginate(10);
-        return view('pacientes.index', compact('pacientes'));
-    }
+  public function index()
+{
+    // Obtener todos los pacientes paginados o sin paginar
+    $pacientes = Paciente::orderBy('nombre')->paginate(5);
+    return view('pacientes.index', compact('pacientes'));
+}
+
 
     public function show($id)
     {
