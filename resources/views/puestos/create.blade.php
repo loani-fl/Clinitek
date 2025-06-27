@@ -182,7 +182,7 @@
                 </button>
 
                 <!-- Botón Regresar: verde -->
-                <a href="{{ route('empleado.index') }}" class="btn btn-success btn-sm shadow-sm px-4">
+                <a href="{{ route('puestos.index') }}" class="btn btn-success btn-sm shadow-sm px-4">
                     <i class="bi bi-arrow-left"></i> Regresar
                 </a>
             </div>
