@@ -55,13 +55,14 @@ class EmpleadosController extends Controller
                 'regex:/^[2389][0-9]{7}$/',
                 'unique:listaempleados,telefono'
             ],
-            'correo' => [
-                'required',
-                'string',
-                'max:30',
-                'unique:listaempleados,correo',
-                'regex:/^[a-zA-Z]+@[a-zA-Z]+(\.[a-zA-Z]+){1,2}$/'
-            ],
+           'correo' => [
+    'required',
+    'string',
+    'max:30',
+    'email',
+    'unique:listaempleados,correo',
+],
+
             'fecha_ingreso' => [
                 'required',
                 'date',
@@ -105,7 +106,10 @@ class EmpleadosController extends Controller
             'salario' => 'required|numeric|between:0,99999.99',
             'area' => 'required|string|max:50',
             'turno_asignado' => 'required|string|max:50',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+           'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+
+
+
         ];
 
         $messages = [
@@ -127,13 +131,16 @@ class EmpleadosController extends Controller
             'identidad.required' => 'La identidad es obligatoria.',
             'telefono.required' => 'El Teléfono es obligatorio.',
             'telefono.regex' => 'El teléfono debe comenzar con 2, 3, 8 o 9 y contener exactamente 8 dígitos numéricos.',
-            'correo.required' => 'El correo es obligatorio.',
-            'correo.email' => 'El correo debe ser un correo válido.',
-            'correo.unique' => 'El correo ya está en uso.',
+           'correo.required' => 'El correo es obligatorio.',
+           'correo.email' => 'El correo debe ser un correo válido.',
+           'correo.unique' => 'El correo ya está en uso.',
             'fecha_nacimiento.before_or_equal' => 'El empleado debe tener al menos 18 años.',
             'direccion.required' => 'La Dirección es obligatoria.',
             'observaciones.required' => 'Las Observaciones son obligatorias.',
             'turno_asignado.required' => 'El turno asignado es obligatorio.',
+            'foto.image' => 'El archivo debe ser una imagen.',
+'foto.mimes' => 'La imagen debe ser en formato JPG, JPEG, PNG o GIF.',
+'foto.max' => 'La imagen no debe pesar más de 2 MB.',
         ];
 
         $attributes = [
@@ -178,7 +185,7 @@ class EmpleadosController extends Controller
 
         // 5. Redireccionar con mensaje
         if ($empleado) {
-            return redirect()->route('empleado.create')->with('success', 'Empleado registrado correctamente.');
+            return redirect()->route('empleado.index')->with('success', 'Empleado registrado correctamente.');
         } else {
             return back()->withErrors('No se pudo registrar el empleado.');
         }
@@ -292,6 +299,8 @@ class EmpleadosController extends Controller
             'correo.max' => 'El correo no debe tener más de 30 caracteres.',
             'correo.email' => 'El correo debe ser un correo válido.',
             'correo.unique' => 'El correo ya está en uso.',
+            'correo.regex' => 'El formato del correo no es válido.',
+
 
             'fecha_nacimiento.before_or_equal' => 'El empleado debe tener al menos 18 años.',
 

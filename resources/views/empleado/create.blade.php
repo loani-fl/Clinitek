@@ -5,11 +5,26 @@
     body {
         background-color: #e8f4fc;
     }
-
+ .custom-card::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 800px;
+        height: 800px;
+        background-image: url('/images/logo2.jpg');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.15;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 0;
+    }
     .custom-card {
         max-width: 1100px;
         background-color: #fff;
-        border: 2px solid #91cfff;
+        /*border: 2px solid #91cfff;*/
         border-radius: 1.5rem;
         margin: 2rem auto;
         padding: 1rem;
@@ -25,10 +40,13 @@
         font-size: 0.85rem !important;
     }
 
-    .card-header {
-        background-color: transparent;
-        border-bottom: 3px solid #007BFF;
-    }
+   .card-header {
+    background-color: transparent;
+    border-bottom: 3px solid #007BFF;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+}
+
 
     .card-header h3 {
         font-size: 2rem;
@@ -62,169 +80,195 @@
     }
 </style>
 
-<div class="header d-flex justify-content-between align-items-center px-3 py-2" style="background-color: #007BFF;">
-    <div class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</div>
+
+{{-- 🔵 Barra de navegación estática con botones --}}
+<div class="header d-flex justify-content-between align-items-center px-3 py-2"
+    style="background-color: #007BFF; position: sticky; top: 0; z-index: 1000;">
+    
+    {{-- 🔷 Logo y título --}}
+    <div class="d-flex align-items-center">
+        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" 
+        style="height: 40px; width: auto;">
+        <div class="fw-bold text-white" style="font-size: 1.5rem; margin-left: 8px;">Clinitek</div>
+    </div>
+
+    {{-- 🔸 Botones --}}
     <div class="d-flex gap-3 flex-wrap">
-        <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
-        <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
+        <a href="{{ route('puestos.create') }}" class="nav-link">Crear Puesto</a>
+        <a href="{{ route('medicos.create') }}" class="nav-link">Registro medicos</a>
+        <a href="{{ route('pacientes.index') }}" class="nav-link">Registro Pacientes</a>
     </div>
 </div>
+</div>
+
+
 
 <div class="card custom-card shadow-sm">
     <div class="card-header text-center py-3">
         <h3>Registrar nuevo empleado</h3>
     </div>
 
-    <form action="{{ route('empleado.store') }}" method="POST" novalidate class="card-body" id="formEmpleado">
+   <form action="{{ route('empleado.store') }}" method="POST" novalidate class="card-body" id="formEmpleado" enctype="multipart/form-data">
         @csrf
         <div class="row g-3 mt-2">
 
-            {{-- Fila 1 --}}
-            <div class="col-md-2">
-                <label for="nombres" class="form-label">Nombres <span class="text-danger">*</span></label>
-                <input type="text" name="nombres" id="nombres" class="form-control" 
-                    value="{{ old('nombres') }}" required maxlength="50" 
-                    pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+" title="Solo se permiten letras y espacios">
-                @error('nombres') <div class="text-danger small">{{ $message }}</div> @enderror
-          
-            </div>
+  
 
-            <div class="col-md-2">
-                <label for="apellidos" class="form-label">Apellidos <span class="text-danger">*</span></label>
-                <input type="text" name="apellidos" id="apellidos" class="form-control" 
-                    value="{{ old('apellidos') }}" required maxlength="50" 
-                    pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+" title="Solo se permiten letras y espacios">
-                @error('apellidos') <div class="text-danger small">{{ $message }}</div> @enderror
-             
-            </div>
+          <div class="row mb-3">
+    <div class="col-md-2">
+        <label for="nombres" class="form-label">Nombres <span class="text-danger">*</span></label>
+        <input type="text" name="nombres" id="nombres" class="form-control" 
+            value="{{ old('nombres') }}" required maxlength="50" 
+            pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+" title="Solo se permiten letras y espacios">
+        @error('nombres') <div class="text-danger small">{{ $message }}</div> @enderror
+    </div>
+    <div class="col-md-2">
+        <label for="apellidos" class="form-label">Apellidos <span class="text-danger">*</span></label>
+        <input type="text" name="apellidos" id="apellidos" class="form-control" 
+            value="{{ old('apellidos') }}" required maxlength="50" 
+            pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+" title="Solo se permiten letras y espacios">
+        @error('apellidos') <div class="text-danger small">{{ $message }}</div> @enderror
+    </div>
+    <div class="col-md-2">
+        <label for="identidad" class="form-label">Identidad <span class="text-danger">*</span></label>
+        <input type="text" name="identidad" id="identidad" class="form-control" 
+            value="{{ old('identidad') }}" maxlength="13" required pattern="\d{13}" 
+            title="Debe tener exactamente 13 números, sin letras ni símbolos">
+        @error('identidad') <div class="text-danger small">{{ $message }}</div> @enderror
+    </div>
+    <div class="col-md-2">
+        <label for="telefono" class="form-label">Teléfono <span class="text-danger">*</span></label>
+        <input type="text" name="telefono" id="telefono" class="form-control" 
+            value="{{ old('telefono') }}" maxlength="8" required pattern="\d{8}" 
+            title="Debe tener exactamente 8 números, sin letras ni símbolos">
+        @error('telefono') <div class="text-danger small">{{ $message }}</div> @enderror
+    </div>
+    <div class="col-md-3">
+        <label for="correo" class="form-label">Correo <span class="text-danger">*</span></label>
+        <input type="email" name="correo" id="correo" class="form-control" 
+            value="{{ old('correo') }}" maxlength="30" required>
+        @error('correo') <div class="text-danger small">{{ $message }}</div> @enderror
+    </div>
+</div>
 
-            <div class="col-md-2">
-                @php $fechaMax = now()->subYears(18)->format('Y-m-d'); @endphp
-                <label for="fecha_nacimiento" class="form-label">Fecha Nacimiento <span class="text-danger">*</span></label>
-                <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control" 
-                    value="{{ old('fecha_nacimiento') }}" max="{{ $fechaMax }}" required>
-                @error('fecha_nacimiento') <div class="text-danger small">{{ $message }}</div> @enderror
-           
-            </div>
+<div class="row mb-3">
+    <div class="col-md-2">
+        @php $fechaMax = now()->subYears(18)->format('Y-m-d'); @endphp
+        <label for="fecha_nacimiento" class="form-label">Fecha Nacimiento <span class="text-danger">*</span></label>
+        <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control" 
+            value="{{ old('fecha_nacimiento') }}" max="{{ $fechaMax }}" required>
+        @error('fecha_nacimiento') <div class="text-danger small">{{ $message }}</div> @enderror
+    </div>
+    <div class="col-md-2">
+        @php
+            $hoy = now();
+            $minIngreso = $hoy->copy()->subMonth()->format('Y-m-d');
+            $maxIngreso = $hoy->copy()->addMonth()->format('Y-m-d');
+        @endphp
+        <label for="fecha_ingreso" class="form-label">Fecha Ingreso <span class="text-danger">*</span></label>
+        <input type="date" name="fecha_ingreso" id="fecha_ingreso" class="form-control" 
+            value="{{ old('fecha_ingreso') }}" min="{{ $minIngreso }}" max="{{ $maxIngreso }}" required>
+        @error('fecha_ingreso') <div class="text-danger small">{{ $message }}</div> @enderror
+    </div>
+    <div class="col-md-2">
+        <label for="estado_civil" class="form-label">Estado Civil</label>
+        <select name="estado_civil" id="estado_civil" class="form-select">
+            <option value="">-- Selecciona --</option>
+            <option value="Soltero" {{ old('estado_civil') == 'Soltero' ? 'selected' : '' }}>Soltero</option>
+            <option value="Casado" {{ old('estado_civil') == 'Casado' ? 'selected' : '' }}>Casado</option>
+            <option value="Divorciado" {{ old('estado_civil') == 'Divorciado' ? 'selected' : '' }}>Divorciado</option>
+            <option value="Viudo" {{ old('estado_civil') == 'Viudo' ? 'selected' : '' }}>Viudo</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label for="genero" class="form-label">Género <span class="text-danger">*</span></label>
+        <select name="genero" id="genero" class="form-select" required>
+            <option value="">-- Selecciona --</option>
+            <option value="Masculino" {{ old('genero') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
+            <option value="Femenino" {{ old('genero') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
+            <option value="Otro" {{ old('genero') == 'Otro' ? 'selected' : '' }}>Otro</option>
+        </select>
+        @error('genero') <div class="text-danger small">{{ $message }}</div> @enderror
+    </div>
+    <div class="col-md-3">
+        <label for="area" class="form-label">Área <span class="text-danger">*</span></label>
+        <select name="area" id="area" class="form-select" required onchange="autoFillSalario()">
+            <option value="">-- Selecciona --</option>
+            <option value="Administración" data-sueldo="15000" {{ old('area') == 'Administración' ? 'selected' : '' }}>Administración</option>
+            <option value="Recepción" data-sueldo="12000" {{ old('area') == 'Recepción' ? 'selected' : '' }}>Recepción</option>
+            <option value="Laboratorio" data-sueldo="18000" {{ old('area') == 'Laboratorio' ? 'selected' : '' }}>Laboratorio</option>
+            <option value="Farmacia" data-sueldo="16000" {{ old('area') == 'Farmacia' ? 'selected' : '' }}>Farmacia</option>
+            <option value="Enfermería" data-sueldo="17000" {{ old('area') == 'Enfermería' ? 'selected' : '' }}>Enfermería</option>
+            <option value="Mantenimiento" data-sueldo="11000" {{ old('area') == 'Mantenimiento' ? 'selected' : '' }}>Mantenimiento</option>
+        </select>
+        @error('area') <div class="text-danger small">{{ $message }}</div> @enderror
+    </div>
+</div>
 
-            <div class="col-md-2">
-                @php
-                    $hoy = now();
-                    $minIngreso = $hoy->copy()->subMonth()->format('Y-m-d');
-                    $maxIngreso = $hoy->copy()->addMonth()->format('Y-m-d');
-                @endphp
-                <label for="fecha_ingreso" class="form-label">Fecha Ingreso <span class="text-danger">*</span></label>
-                <input type="date" name="fecha_ingreso" id="fecha_ingreso" class="form-control" 
-                    value="{{ old('fecha_ingreso') }}" min="{{ $minIngreso }}" max="{{ $maxIngreso }}" required>
-                @error('fecha_ingreso') <div class="text-danger small">{{ $message }}</div> @enderror
-              
-            </div>
+<div class="row mb-3">
+    <div class="col-md-2">
+        <label for="puesto_id" class="form-label">Puesto <span class="text-danger">*</span></label>
+        <select name="puesto_id" id="puesto_id" class="form-select" required onchange="autoFillSalario()">
+            <option value="">-- Selecciona --</option>
+            @foreach($puestos as $puesto)
+                <option value="{{ $puesto->id }}" data-sueldo="{{ $puesto->sueldo }}" {{ old('puesto_id') == $puesto->id ? 'selected' : '' }}>
+                    {{ $puesto->nombre }}
+                </option>
+            @endforeach
+        </select>
+        @error('puesto_id') <div class="text-danger small">{{ $message }}</div> @enderror
+    </div>
 
-            <div class="col-md-2">
-                <label for="identidad" class="form-label">Identidad <span class="text-danger">*</span></label>
-                <input type="text" name="identidad" id="identidad" class="form-control" 
-                    value="{{ old('identidad') }}" maxlength="13" required pattern="\d{13}" 
-                    title="Debe tener exactamente 13 números, sin letras ni símbolos">
-                @error('identidad') <div class="text-danger small">{{ $message }}</div> @enderror
-               
-            </div>
+    <div class="col-md-2">
+        <label for="turno_asignado" class="form-label">Turno <span class="text-danger">*</span></label>
+        <select name="turno_asignado" id="turno_asignado" class="form-select" required>
+            <option value="">-- Selecciona --</option>
+            <option value="Mañana" {{ old('turno_asignado') == 'Mañana' ? 'selected' : '' }}>Mañana</option>
+            <option value="Tarde" {{ old('turno_asignado') == 'Tarde' ? 'selected' : '' }}>Tarde</option>
+            <option value="Noche" {{ old('turno_asignado') == 'Noche' ? 'selected' : '' }}>Noche</option>
+        </select>
+        @error('turno_asignado') <div class="text-danger small">{{ $message }}</div> @enderror
+    </div>
 
-            <div class="col-md-2">
-                <label for="telefono" class="form-label">Teléfono <span class="text-danger">*</span></label>
-                <input type="text" name="telefono" id="telefono" class="form-control" 
-                    value="{{ old('telefono') }}" maxlength="8" required pattern="\d{8}" 
-                    title="Debe tener exactamente 8 números, sin letras ni símbolos">
-                @error('telefono') <div class="text-danger small">{{ $message }}</div> @enderror
-               
-            </div>
+    <div class="col-md-2">
+        <label for="salario" class="form-label">Salario (Lps.)</label>
+        <input type="text" name="salario" id="salario" class="form-control" readonly value="{{ old('salario') ?? '' }}">
+        @error('salario') <div class="text-danger small">{{ $message }}</div> @enderror
+    </div>
 
-            {{-- Fila 2 --}}
-            <div class="col-md-2">
-                <label for="correo" class="form-label">Correo <span class="text-danger">*</span></label>
-                <input type="email" name="correo" id="correo" class="form-control" 
-                    value="{{ old('correo') }}" maxlength="30" required>
-                @error('correo') <div class="text-danger small">{{ $message }}</div> @enderror
-             
+    <div class="col-md-4">
+        <label for="foto" class="form-label fw-semibold">Foto:</label>
+        <input 
+            type="file" 
+            name="foto" 
+            id="foto" 
+            class="form-control @error('foto') is-invalid @enderror"
+            accept=".jpg,.jpeg,.png,.gif">
+        <small class="form-text text-muted">
+            Opcional. Formato: JPG, JPEG, PNG o GIF. Máximo 2MB.
+        </small>
+        @error('foto')
+            <div class="invalid-feedback">
+                {{ $message }}
             </div>
+        @enderror
+    </div>
+</div>
 
-            <div class="col-md-2">
-                <label for="estado_civil" class="form-label">Estado Civil</label>
-                <select name="estado_civil" id="estado_civil" class="form-select">
-                    <option value="">-- Selecciona --</option>
-                    <option value="Soltero" {{ old('estado_civil') == 'Soltero' ? 'selected' : '' }}>Soltero</option>
-                    <option value="Casado" {{ old('estado_civil') == 'Casado' ? 'selected' : '' }}>Casado</option>
-                    <option value="Divorciado" {{ old('estado_civil') == 'Divorciado' ? 'selected' : '' }}>Divorciado</option>
-                    <option value="Viudo" {{ old('estado_civil') == 'Viudo' ? 'selected' : '' }}>Viudo</option>
-                </select>
-            </div>
 
-            <div class="col-md-2">
-                <label for="genero" class="form-label">Género <span class="text-danger">*</span></label>
-                <select name="genero" id="genero" class="form-select" required>
-                    <option value="">-- Selecciona --</option>
-                    <option value="Masculino" {{ old('genero') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
-                    <option value="Femenino" {{ old('genero') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
-                    <option value="Otro" {{ old('genero') == 'Otro' ? 'selected' : '' }}>Otro</option>
-                </select>
-                @error('genero') <div class="text-danger small">{{ $message }}</div> @enderror
-            </div>
 
-            <div class="col-md-2">
-                <label for="area" class="form-label">Área <span class="text-danger">*</span></label>
-                <select name="area" id="area" class="form-select" required onchange="autoFillSalario()">
-                    <option value="">-- Selecciona --</option>
-                    <option value="Administración" data-sueldo="15000" {{ old('area') == 'Administración' ? 'selected' : '' }}>Administración</option>
-                    <option value="Recepción" data-sueldo="12000" {{ old('area') == 'Recepción' ? 'selected' : '' }}>Recepción</option>
-                    <option value="Laboratorio" data-sueldo="18000" {{ old('area') == 'Laboratorio' ? 'selected' : '' }}>Laboratorio</option>
-                    <option value="Farmacia" data-sueldo="16000" {{ old('area') == 'Farmacia' ? 'selected' : '' }}>Farmacia</option>
-                    <option value="Enfermería" data-sueldo="17000" {{ old('area') == 'Enfermería' ? 'selected' : '' }}>Enfermería</option>
-                    <option value="Mantenimiento" data-sueldo="11000" {{ old('area') == 'Mantenimiento' ? 'selected' : '' }}>Mantenimiento</option>
-                </select>
-                @error('area') <div class="text-danger small">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="col-md-2">
-                <label for="puesto_id" class="form-label">Puesto <span class="text-danger">*</span></label>
-                <select name="puesto_id" id="puesto_id" class="form-select" required onchange="autoFillSalario()">
-                    <option value="">-- Selecciona --</option>
-                    @foreach($puestos as $puesto)
-                        <option value="{{ $puesto->id }}" data-sueldo="{{ $puesto->sueldo }}" {{ old('puesto_id') == $puesto->id ? 'selected' : '' }}>
-                            {{ $puesto->nombre }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('puesto_id') <div class="text-danger small">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="col-md-2">
-                <label for="turno_asignado" class="form-label">Turno <span class="text-danger">*</span></label>
-                <select name="turno_asignado" id="turno_asignado" class="form-select" required>
-                    <option value="">-- Selecciona --</option>
-                    <option value="Mañana" {{ old('turno_asignado') == 'Mañana' ? 'selected' : '' }}>Mañana</option>
-                    <option value="Tarde" {{ old('turno_asignado') == 'Tarde' ? 'selected' : '' }}>Tarde</option>
-                    <option value="Noche" {{ old('turno_asignado') == 'Noche' ? 'selected' : '' }}>Noche</option>
-                </select>
-                @error('turno_asignado') <div class="text-danger small">{{ $message }}</div> @enderror
-            </div>
-
-            {{-- Fila 3 --}}
-            <div class="col-md-2">
-                <label for="salario" class="form-label">Salario (Lps.)</label>
-                <input type="text" name="salario" id="salario" class="form-control" readonly value="{{ old('salario') ?? '' }}" >
-                @error('salario') <div class="text-danger small">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="col-md-4">
-                <label for="observaciones" class="form-label">Observaciones <span class="text-danger">*</span></label>
-                <textarea name="observaciones" id="observaciones" class="form-control" rows="3" required maxlength="200">{{ old('observaciones') }}</textarea>
-                @error('observaciones') <div class="text-danger small">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="col-md-4">
-                <label for="direccion" class="form-label">Dirección <span class="text-danger">*</span></label>
-                <textarea name="direccion" id="direccion" class="form-control" rows="3" required maxlength="350">{{ old('direccion') }}</textarea>
-                @error('direccion') <div class="text-danger small">{{ $message }}</div> @enderror
-            </div>
+<div class="row mb-3">
+    <div class="col-md-5">
+        <label for="observaciones" class="form-label">Observaciones <span class="text-danger">*</span></label>
+        <textarea name="observaciones" id="observaciones" class="form-control" rows="3" required maxlength="200">{{ old('observaciones') }}</textarea>
+        @error('observaciones') <div class="text-danger small">{{ $message }}</div> @enderror
+    </div>
+    <div class="col-md-5">
+        <label for="direccion" class="form-label">Dirección <span class="text-danger">*</span></label>
+        <textarea name="direccion" id="direccion" class="form-control" rows="3" required maxlength="350">{{ old('direccion') }}</textarea>
+        @error('direccion') <div class="text-danger small">{{ $message }}</div> @enderror
+    </div>
+</div>
 
             {{-- Botones centrados --}}
             <div class="d-flex justify-content-center gap-3 mt-4 w-100">

@@ -132,6 +132,11 @@
         
         @yield('content')
     </main>
+    <footer class="text-center py-3">
+
+    <small class="text-muted">© 2025 Clínitek. Todos los derechos reservados.</small>
+</footer>
+
 
     {{-- Footer blanco con texto oscuro --}}
     <footer>
