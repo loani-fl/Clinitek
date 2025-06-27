@@ -5,28 +5,49 @@
     body {
         background-color: #e8f4fc;
     }
+
     .custom-card {
-        max-width: 87vw;
-        background-color: #f0faff;
-        border-color: #91cfff;
+        max-width: 800px; /* card un poco más pequeña */
+        background-color: #fff;
+        border: 2px solid #91cfff;
+        border-radius: 1.5rem;
+        margin: 2rem auto;
+        padding: 1rem;
     }
+
     label {
-        font-size: 0.95rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #003366;
         margin-bottom: 0.25rem;
     }
+
     input, select, textarea {
         font-size: 0.85rem !important;
     }
-    .error-text {
-        font-size: 0.75rem;
-        color: #dc3545;
-        margin-top: 0.2rem;
+
+    .card-header {
+        background-color: transparent;
+        border-bottom: 3px solid #007BFF;
     }
+
+    .card-header h5 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #000;
+        margin: 0;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+    }
+
     .valid-feedback {
         display: block;
         font-size: 0.85rem;
         color: #198754;
     }
+
     .form-control.is-valid {
         border-color: #198754;
         padding-right: 2.5rem;
@@ -35,7 +56,19 @@
         background-position: right 0.75rem center;
         background-size: 1rem 1rem;
     }
+
+    label.is-invalid {
+        color: #dc3545;
+        font-weight: 600;
+    }
+
+    .error-text {
+        font-size: 0.75rem;
+        color: #dc3545;
+        margin-top: 0.2rem;
+    }
 </style>
+
 <!-- Barra de navegación que abarca todo el ancho -->
 <div class="w-100" style="background-color: #007BFF;">
     <div class="d-flex justify-content-between align-items-center px-3 py-2">
@@ -47,125 +80,117 @@
     </div>
 </div>
 
-<div class="d-flex justify-content-center mt-4">
-    <div class="card custom-card shadow-sm border rounded-4 w-100">
-        <div class="card-header bg-primary text-white py-2">
-            <h5 class="mb-0"><i class="bi bi-briefcase-fill me-2"></i>Registro de un nuevo puesto</h5>
-        </div>
+<div class="card custom-card shadow-sm">
+    <div class="card-header text-center py-2">
+        <h5 class="mb-0"><i class="bi bi-briefcase-fill me-2"></i>Registro de un nuevo puesto</h5>
+    </div>
 
-        <div class="card-body">
-            @if(session('success'))
-                <div class="alert alert-success border-0 shadow-sm rounded-3 p-3 mb-4 small">
-                    {{ session('success') }}
-                </div>
-            @endif
+    <div class="card-body">
+        @if(session('success'))
+            <div class="alert alert-success border-0 shadow-sm rounded-3 p-3 mb-4 small">
+                {{ session('success') }}
+            </div>
+        @endif
 
-            <form method="POST" action="{{ route('puestos.store') }}" novalidate>
-                @csrf
+        <form method="POST" action="{{ route('puestos.store') }}" novalidate>
+            @csrf
 
-                <div class="row g-4 mt-3 px-4">
-                    <div class="col-md-3 position-relative">
-                        <label for="codigo" class="form-label fw-semibold text-muted">Código <span class="text-danger">*</span></label>
-                        <input type="text" name="codigo" id="codigo" autocomplete="off"
-                        
-                            class="form-control form-control-sm @error('codigo') is-invalid @enderror"
-                            maxlength="10"
-                            pattern="[A-Za-z0-9\-]{1,10}"
-                            title="Máximo 10 caracteres. Solo letras, números y guiones."
-                            value="{{ old('codigo') }}" required>
-                        @error('codigo')
-                            <div class="error-text">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-4 position-relative">
-                        <label for="nombre" class="form-label fw-semibold text-muted">Nombre del Puesto <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre" id="nombre" autocomplete="off"
-                            class="form-control form-control-sm @error('nombre') is-invalid @enderror"
-                            maxlength="50"
-                            pattern="^[\pL\s]+$"
-                            title="Solo letras y espacios (puede incluir tildes)."
-                            value="{{ old('nombre') }}" required>
-                        @error('nombre')
-                            <div class="error-text">{{ $message }}</div>
-                        @enderror
-                    </div>
+            <div class="row g-4 mt-3 px-4">
+                <div class="col-md-3 position-relative">
+                    <label for="codigo" class="form-label fw-semibold text-muted">Código <span class="text-danger">*</span></label>
+                    <input type="text" name="codigo" id="codigo" autocomplete="off"
+                        class="form-control form-control-sm @error('codigo') is-invalid @enderror"
+                        maxlength="10"
+                        pattern="[A-Za-z0-9\-]{1,10}"
+                        title="Máximo 10 caracteres. Solo letras, números y guiones."
+                        value="{{ old('codigo') }}" required>
+                    @error('codigo')
+                        <div class="error-text">{{ $message }}</div>
+                    @enderror
                 </div>
 
-                <div class="row g-4 mt-3 px-4">
-                    <div class="col-md-4 position-relative">
-                        <label for="area" class="form-label fw-semibold text-muted">Área / Departamento <span class="text-danger">*</span></label>
-                        <select name="area" id="area"
-                            class="form-select form-select-sm @error('area') is-invalid @enderror"
-                            required>
-                            <option value="">-- Selecciona un área --</option>
-                            <option value="Administración" data-sueldo="15000" {{ old('area') == 'Administración' ? 'selected' : '' }}>Administración</option>
-                            <option value="Recepción" data-sueldo="12000" {{ old('area') == 'Recepción' ? 'selected' : '' }}>Recepción</option>
-                            <option value="Laboratorio" data-sueldo="18000" {{ old('area') == 'Laboratorio' ? 'selected' : '' }}>Laboratorio</option>
-                            <option value="Farmacia" data-sueldo="16000" {{ old('area') == 'Farmacia' ? 'selected' : '' }}>Farmacia</option>
-                            <option value="Enfermería" data-sueldo="17000" {{ old('area') == 'Enfermería' ? 'selected' : '' }}>Enfermería</option>
-                            <option value="Mantenimiento" data-sueldo="11000" {{ old('area') == 'Mantenimiento' ? 'selected' : '' }}>Mantenimiento</option>
-                        </select>
-                        @error('area')
-                            <div class="error-text">{{ $message }}</div>
-                        @enderror
-                    </div>
+                <div class="col-md-4 position-relative">
+                    <label for="nombre" class="form-label fw-semibold text-muted">Nombre del Puesto <span class="text-danger">*</span></label>
+                    <input type="text" name="nombre" id="nombre" autocomplete="off"
+                        class="form-control form-control-sm @error('nombre') is-invalid @enderror"
+                        maxlength="50"
+                        pattern="^[\pL\s]+$"
+                        title="Solo letras y espacios (puede incluir tildes)."
+                        value="{{ old('nombre') }}" required>
+                    @error('nombre')
+                        <div class="error-text">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
 
-                    <div class="col-md-2 position-relative">
-                        <label for="sueldo" class="form-label fw-semibold text-muted">Sueldo (Lps.) <span class="text-danger">*</span></label>
-                        <input type="text" name="sueldo" id="sueldo" readonly required
-                            class="form-control form-control-sm @error('sueldo') is-invalid @enderror"
-                            pattern="^\d{1,5}(\.\d{1,2})?$"
-                            title="Solo números. Hasta 5 dígitos y 2 decimales."
-                            inputmode="decimal"
-                            value="{{ old('sueldo') }}">
-                        @error('sueldo')
-                            <div class="error-text">{{ $message }}</div>
-                        @enderror
-                    </div>
+            <div class="row g-4 mt-3 px-4">
+                <div class="col-md-4 position-relative">
+                    <label for="area" class="form-label fw-semibold text-muted">Área / Departamento <span class="text-danger">*</span></label>
+                    <select name="area" id="area"
+                        class="form-select form-select-sm @error('area') is-invalid @enderror"
+                        required>
+                        <option value="">-- Selecciona un área --</option>
+                        <option value="Administración" data-sueldo="15000" {{ old('area') == 'Administración' ? 'selected' : '' }}>Administración</option>
+                        <option value="Recepción" data-sueldo="12000" {{ old('area') == 'Recepción' ? 'selected' : '' }}>Recepción</option>
+                        <option value="Laboratorio" data-sueldo="18000" {{ old('area') == 'Laboratorio' ? 'selected' : '' }}>Laboratorio</option>
+                        <option value="Farmacia" data-sueldo="16000" {{ old('area') == 'Farmacia' ? 'selected' : '' }}>Farmacia</option>
+                        <option value="Enfermería" data-sueldo="17000" {{ old('area') == 'Enfermería' ? 'selected' : '' }}>Enfermería</option>
+                        <option value="Mantenimiento" data-sueldo="11000" {{ old('area') == 'Mantenimiento' ? 'selected' : '' }}>Mantenimiento</option>
+                    </select>
+                    @error('area')
+                        <div class="error-text">{{ $message }}</div>
+                    @enderror
                 </div>
 
-                <div class="row g-4 mt-3 px-4">
-                    <div class="col-md-5 position-relative">
-                        <label for="funcion" class="form-label fw-semibold text-muted">Función del Puesto <span class="text-danger">*</span></label>
-                        <textarea name="funcion" id="funcion" rows="3"
-                            class="form-control form-control-sm @error('funcion') is-invalid @enderror"
-                            required maxlength="300"
-                            pattern="^[\pL\pN\s.,áéíóúÁÉÍÓÚñÑ\r\n]+$"
-                            title="Puede contener letras (incluye tildes y ñ), números, comas, puntos y espacios. Máximo 300 caracteres.">{{ old('funcion') }}</textarea>
-                        @error('funcion')
-                            <div class="error-text">{{ $message }}</div>
-                        @enderror
-                    </div>
+                <div class="col-md-2 position-relative">
+                    <label for="sueldo" class="form-label fw-semibold text-muted">Sueldo (Lps.) <span class="text-danger">*</span></label>
+                    <input type="text" name="sueldo" id="sueldo" readonly required
+                        class="form-control form-control-sm @error('sueldo') is-invalid @enderror"
+                        pattern="^\d{1,5}(\.\d{1,2})?$"
+                        title="Solo números. Hasta 5 dígitos y 2 decimales."
+                        inputmode="decimal"
+                        value="{{ old('sueldo') }}">
+                    @error('sueldo')
+                        <div class="error-text">{{ $message }}</div>
+                    @enderror
                 </div>
+            </div>
 
-                <div class="d-flex justify-content-center mt-4 gap-4 px-4">
-    <!-- Botón Registrar: azul -->
-<button type="submit" class="btn btn-primary btn-sm shadow-sm px-4">
-    <i class="bi bi-plus-circle"></i> Registrar
-</button>
+            <div class="row g-4 mt-3 px-4">
+                <div class="col-md-5 position-relative">
+                    <label for="funcion" class="form-label fw-semibold text-muted">Función del Puesto <span class="text-danger">*</span></label>
+                    <textarea name="funcion" id="funcion" rows="3"
+                        class="form-control form-control-sm @error('funcion') is-invalid @enderror"
+                        required maxlength="300"
+                        pattern="^[\pL\pN\s.,áéíóúÁÉÍÓÚñÑ\r\n]+$"
+                        title="Puede contener letras (incluye tildes y ñ), números, comas, puntos y espacios. Máximo 300 caracteres.">{{ old('funcion') }}</textarea>
+                    @error('funcion')
+                        <div class="error-text">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
 
-<!-- Botón Limpiar: amarillo -->
-<button type="button" class="btn btn-warning btn-sm shadow-sm px-4" onclick="limpiarFormulario()">
-    <i class="bi bi-trash"></i> Limpiar
-</button>
+            <div class="d-flex justify-content-center mt-4 gap-3 px-4">
+                <!-- Botón Registrar: azul -->
+                <button type="submit" class="btn btn-primary btn-sm shadow-sm px-4">
+                    <i class="bi bi-plus-circle"></i> Registrar
+                </button>
 
-<!-- Botón Regresar: verde -->
-<a href="{{ route('empleado.index') }}" class="btn btn-success btn-sm shadow-sm px-4">
-    <i class="bi bi-arrow-left"></i> Regresar
-</a>
+                <!-- Botón Limpiar: amarillo -->
+                <button type="button" class="btn btn-warning btn-sm shadow-sm px-4" onclick="limpiarFormulario()">
+                    <i class="bi bi-trash"></i> Limpiar
+                </button>
 
-<!-- Botón Lista: negro con ícono de lista -->
-<a href="{{ route('puestos.index') }}" class="btn btn-dark btn-sm shadow-sm px-4">
-    <i class="bi bi-card-list"></i> Lista
-</a>
+                <!-- Botón Regresar: verde -->
+                <a href="{{ route('puestos.index') }}" class="btn btn-success btn-sm shadow-sm px-4">
+                    <i class="bi bi-arrow-left"></i> Regresar
+                </a>
+            </div>
 
-</div>
-
-            </form>
-        </div>
+        </form>
     </div>
 </div>
+
 
 @push('scripts')
 <script>
