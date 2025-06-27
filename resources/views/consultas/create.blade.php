@@ -72,18 +72,17 @@
     }
 
     footer {
-        position: fixed;
-        bottom: 0;
-        width: 100vw;
-        height: 35px;
-        background-color: #f8f9fa;
-        padding: 10px 0;
-        text-align: center;
-        font-size: 0.9rem;
-        color: #6c757d;
-        z-index: 999;
-        border-top: 1px solid #dee2e6;
-    }
+    position: static; /* ← quitar fixed */
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #6c757d;
+    border-top: 1px solid #dee2e6;
+    margin-top: 40px; /* opcional: para separarlo del contenido anterior */
+}
+
 
     .custom-card::before {
         content: "";
@@ -298,11 +297,6 @@
         </div>
     </form>
 </div>
-
-<!-- Footer fijo -->
-<footer>
-    © 2025 Clínitek. Todos los derechos reservados.
-</footer>
 
 <!-- Flatpickr JS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
