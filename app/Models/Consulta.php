@@ -12,7 +12,7 @@ class Consulta extends Model
 
     protected $fillable = [
         'paciente_id',
-        'sexo',
+        'genero',
         'fecha',
         'hora',
         'especialidad',

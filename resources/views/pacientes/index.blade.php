@@ -245,5 +245,4 @@ $(document).ready(function () {
     $('#mensajeResultados').text('');
 });
 </script>
-@endsection
 

@@ -17,7 +17,7 @@
     }
 
     .custom-card {
-        max-width: 1100px;
+        max-width: 1000px;
         width: 100%;
         padding-left: 20px;
         padding-right: 20px;
@@ -62,7 +62,7 @@
     .custom-card {
         padding-left: 20px;
         padding-right: 20px;
-        max-width: 1100px;
+        max-width: 1000px;
         width: 100%;
     }
 
@@ -72,41 +72,46 @@
     }
 
     footer {
-            position: fixed;
-            bottom: 0;
-            width: 100vw;
-            height: 35px;
-            background-color: #f8f9fa;
-            padding: 10px 0;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #6c757d;
-            z-index: 999;
-            border-top: 1px solid #dee2e6;
-        }
+        position: fixed;
+        bottom: 0;
+        width: 100vw;
+        height: 35px;
+        background-color: #f8f9fa;
+        padding: 10px 0;
+        text-align: center;
+        font-size: 0.9rem;
+        color: #6c757d;
+        z-index: 999;
+        border-top: 1px solid #dee2e6;
+    }
 
     .custom-card::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 800px; /* tamaño más pequeño */
-    height: 800px; /* tamaño más pequeño */
-    background-image: url('/images/logo2.jpg');
-    background-size: contain;  /* ajusta sin recortar */
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.15;  /* transparencia baja para que no moleste */
-    transform: translate(-50%, -50%);
-    pointer-events: none; /* para que no interfiera con clicks */
-    z-index: 0;
-}
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 800px; /* tamaño más pequeño */
+        height: 800px; /* tamaño más pequeño */
+        background-image: url('/images/logo2.jpg');
+        background-size: contain;  /* ajusta sin recortar */
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.15;  /* transparencia baja para que no moleste */
+        transform: translate(-50%, -50%);
+        pointer-events: none; /* para que no interfiera con clicks */
+        z-index: 0;
+    }
 </style>
 
 <!-- Barra de navegación fija -->
-<div class="w-100 fixed-top" style="background-color: #007BFF; z-index: 1050;">
-    <div class="d-flex justify-content-between align-items-center px-3 py-2">
-        <div class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</div>
+<div class="header d-flex justify-content-between align-items-center px-3 py-2" style="background-color: #007BFF; position: sticky; top: 0; z-index: 1030;">
+    <div class="d-flex align-items-center">
+        <!-- Logo con margen reducido para acercar el texto -->
+        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" 
+             style="height: 40px; width: auto; margin-right: 6px;">
+
+        <span class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</span>
+    </div>
         <div class="d-flex gap-3 flex-wrap">
             <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
             <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
@@ -115,17 +120,17 @@
 </div>
 
 <!-- Formulario más compacto -->
-<div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 90px;">
+<div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
     <div class="card-header text-center py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-    <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Registro de consulta médica</h5>
+        <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Registro de consulta médica</h5>
     </div>
     <form action="{{ route('consultas.store') }}" method="POST" novalidate>
         @csrf
 
         <div class="row g-3 px-2 mt-3">
 
-            <!-- INFORMACIÓN DEL PACIENTE -->
-            <h5 class="text-dark fw-bold mt-4 mb-3">Información del paciente</h5>
+ <!-- INFORMACIÓN DEL PACIENTE -->
+ <h5 class="text-dark fw-bold mt-4 mb-3">Información del paciente</h5>
             <div class="row g-3">
                 <div class="col-md-4">
                     <label for="paciente_id">Paciente <span class="text-danger">*</span></label>
@@ -135,7 +140,7 @@
                             <option value="{{ $p->id }}"
                                 data-nacimiento="{{ \Carbon\Carbon::parse($p->fecha_nacimiento)->format('Y-m-d') }}"
                                 data-identidad="{{ $p->identidad }}"
-                                data-sexo="{{ $p->sexo }}"
+                                data-genero="{{ $p->genero }}"
                                 data-telefono="{{ $p->telefono }}"
                                 data-correo="{{ $p->correo }}"
                                 data-direccion="{{ $p->direccion }}"
@@ -149,24 +154,24 @@
                     @enderror
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label>Identidad</label>
                     <input type="text" id="identidad" class="form-control form-control-sm" readonly>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label>Fecha de nacimiento</label>
                     <input type="date" id="fecha_nacimiento" class="form-control form-control-sm" readonly>
                 </div>
 
                 <div class="col-md-2">
-                    <label for="sexo">Genero <span class="text-danger">*</span></label>
-                    <select id="sexo" name="sexo" class="form-select form-select-sm @error('sexo') is-invalid @enderror" required>
+                    <label for="genero">Genero <span class="text-danger">*</span></label>
+                    <select id="genero" name="genero" class="form-select form-select-sm @error('genero') is-invalid @enderror" required>
                         <option value="">-- Selecciona --</option>
-                        <option value="Femenino" {{ old('sexo') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
-                        <option value="Masculino" {{ old('sexo') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
+                        <option value="Femenino" {{ old('genero') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
+                        <option value="Masculino" {{ old('genero') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
                     </select>
-                    @error('sexo')
+                    @error('genero')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
                 </div>
@@ -253,27 +258,30 @@
                 @enderror
             </div>
 
-            <div class="col-md-2">
-            <label for="total_pagar">Total a pagar <span class="text-danger">*</span></label>
-            <div class="input-group input-group-sm">
-                <span class="input-group-text">L.</span>
-                <input 
-                    type="number" 
-                    step="0.01" 
-                    min="0" 
-                    id="total_pagar" 
-                    name="total_pagar" 
-                    class="form-control @error('total_pagar') is-invalid @enderror" 
-                    value="{{ old('total_pagar') }}" 
-                    readonly
-                    required
-                >
-            </div>
-            @error('total_pagar')
-                <div class="invalid-feedback d-block">{{ $message }}</div>
-            @enderror
+            <div id="contenedor_total_pagar" style="display:none;">
+    <div class="col-md-2">
+        <label for="total_pagar">Total a pagar <span id="total_asterisco" class="text-danger">*</span></label>
+        <div class="input-group input-group-sm">
+            <span class="input-group-text">L.</span>
+            <input 
+                type="number" 
+                step="0.01" 
+                min="0" 
+                id="total_pagar" 
+                name="total_pagar" 
+                class="form-control @error('total_pagar') is-invalid @enderror" 
+                value="{{ old('total_pagar') }}" 
+                readonly
+                required
+            >
+        </div>
+        @error('total_pagar')
+            <div class="invalid-feedback d-block">{{ $message }}</div>
+        @enderror
+    </div>
+</div>
 
-            </div>
+
 
             <!-- Botones centrados -->
             <div class="d-flex justify-content-center gap-3 mt-4">
@@ -301,19 +309,18 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 
-<script> 
+<script>
 document.addEventListener('DOMContentLoaded', function () {
     const pacienteSelect = document.getElementById('paciente_id');
-    const sexoSelect = document.getElementById('sexo');
+    const generoSelect = document.getElementById('genero');
     const medicoSelect = document.getElementById('medico');
     const especialidadInput = document.getElementById('especialidad');
     const fechaConsultaInput = document.getElementById('fecha_consulta');
     const horaSelect = document.getElementById('hora');
     const btnLimpiar = document.getElementById('btnLimpiar');
     const form = document.querySelector('form');
-    const checkInmediata = document.getElementById('consulta_inmediata');
-    const seccionConsulta = document.getElementById('seccion_consulta');
     const totalPagarInput = document.getElementById('total_pagar');
+    const contenedorTotalPagar = document.getElementById('contenedor_total_pagar');
 
     const preciosPorEspecialidad = {
         "Cardiología": 900.00,
@@ -330,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!opt) return;
         document.getElementById('fecha_nacimiento').value = opt.getAttribute('data-nacimiento') || '';
         document.getElementById('identidad').value = opt.getAttribute('data-identidad') || '';
-        sexoSelect.value = opt.getAttribute('data-sexo') || '';
+        generoSelect.value = opt.getAttribute('data-genero') || '';
         document.getElementById('telefono').value = opt.getAttribute('data-telefono') || '';
         document.getElementById('correo').value = opt.getAttribute('data-correo') || '';
         document.getElementById('direccion').value = opt.getAttribute('data-direccion') || '';
@@ -338,13 +345,36 @@ document.addEventListener('DOMContentLoaded', function () {
     pacienteSelect.addEventListener('change', autocompletarPaciente);
     if (pacienteSelect.value) autocompletarPaciente();
 
+    function actualizarVisibilidadTotalPagar() {
+        const horaSeleccionada = horaSelect.value;
+
+        if (horaSeleccionada === 'inmediata') {
+            contenedorTotalPagar.style.display = 'block';
+
+            const selectedMedico = medicoSelect.options[medicoSelect.selectedIndex];
+            const especialidad = selectedMedico ? selectedMedico.getAttribute('data-especialidad') : '';
+
+            if (especialidad && preciosPorEspecialidad.hasOwnProperty(especialidad)) {
+                totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
+            } else {
+                totalPagarInput.value = '';
+            }
+        } else {
+            contenedorTotalPagar.style.display = 'none';
+            totalPagarInput.value = '';
+        }
+    }
+
     medicoSelect.addEventListener('change', function () {
         const selected = this.options[this.selectedIndex];
         const especialidad = selected.getAttribute('data-especialidad') || '';
         especialidadInput.value = especialidad;
 
         if (especialidad && preciosPorEspecialidad.hasOwnProperty(especialidad)) {
-            totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
+            // Actualizar total sólo si la consulta es inmediata
+            if (horaSelect.value === 'inmediata') {
+                totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
+            }
         } else {
             totalPagarInput.value = '';
         }
@@ -353,6 +383,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     fechaConsultaInput.addEventListener('change', cargarHorasDisponibles);
+
+    horaSelect.addEventListener('change', actualizarVisibilidadTotalPagar);
 
     function hora12a24(hora12) {
         if (hora12 === 'inmediata') return null;
@@ -415,6 +447,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     const optMatch = Array.from(horaSelect.options).find(opt => opt.value === horaPrev);
                     if (optMatch && !optMatch.disabled) horaSelect.value = horaPrev;
                 }
+
+                actualizarVisibilidadTotalPagar(); // actualizar al cargar horas disponibles
             })
             .catch(err => {
                 console.error('Error cargando horas:', err);
@@ -424,6 +458,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     option.textContent = hora12;
                     horaSelect.appendChild(option);
                 });
+                actualizarVisibilidadTotalPagar(); // actualizar al cargar horas disponibles
             });
     }
 
@@ -437,22 +472,50 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    btnLimpiar.addEventListener('click', function () {
-        form.reset();
-        document.getElementById('fecha_nacimiento').value = '';
-        document.getElementById('identidad').value = '';
-        document.getElementById('telefono').value = '';
-        document.getElementById('correo').value = '';
-        document.getElementById('direccion').value = '';
-        especialidadInput.value = '';
-        totalPagarInput.value = '';
-        horaSelect.innerHTML = '<option value="">-- Selecciona hora --</option><option value="inmediata">Inmediata</option>';
 
-        const invalidElems = form.querySelectorAll('.is-invalid');
-        invalidElems.forEach(el => el.classList.remove('is-invalid'));
+    btnLimpiar.addEventListener('click', function (e) {
+    e.preventDefault(); // Evita el comportamiento por defecto si el botón es de tipo submit
 
-        const errorMessages = form.querySelectorAll('.invalid-feedback');
-        errorMessages.forEach(em => em.remove());
+    // 🔁 Reset del formulario
+    form.reset();
+
+    // 🔁 Limpiar manualmente valores (por si reset no afecta algunos campos)
+    pacienteSelect.value = '';
+    medicoSelect.value = '';
+    horaSelect.innerHTML = `
+        <option value="">-- Selecciona hora --</option>
+        <option value="inmediata">Inmediata</option>
+    `;
+    especialidadInput.value = '';
+    totalPagarInput.value = '';
+    
+    // 🔁 Limpiar campos autocompletados
+    document.getElementById('identidad').value = '';
+    document.getElementById('fecha_nacimiento').value = '';
+    document.getElementById('telefono').value = '';
+    document.getElementById('correo').value = '';
+    document.getElementById('direccion').value = '';
+    document.getElementById('genero').value = ''; // ← importante: campo hidden de género
+
+    // 🔁 Ocultar campos dinámicos
+    contenedorTotalPagar.style.display = 'none';
+
+    // 🔁 Quitar clases de validación (visual)
+    form.querySelectorAll('.is-invalid, .is-valid').forEach(el => {
+        el.classList.remove('is-invalid', 'is-valid');
     });
+
+    // 🔁 Eliminar todos los mensajes de error generados (invalid-feedback)
+    form.querySelectorAll('.invalid-feedback').forEach(feedback => {
+        feedback.remove();
+    });
+
+    // 🔁 También puedes limpiar los textos en .text-danger si usaste etiquetas <span>
+    form.querySelectorAll('.text-danger').forEach(span => {
+        span.textContent = '';
+    });
+});
+    // Inicializa visibilidad al cargar la página
+    actualizarVisibilidadTotalPagar();
 });
 </script>

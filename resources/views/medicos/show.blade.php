@@ -29,7 +29,7 @@
                         </div>
                     </div>
                 @endif
-             
+
 
 
                 <table class="table table-bordered table-hover table-striped align-middle mb-0" style="font-size: 0.9rem;">
@@ -46,6 +46,11 @@
                         <th>Teléfono</th>
                         <td>{{ $medico->telefono }}</td>
                     </tr>
+                    <tr>
+                        <th>Direccion</th>
+                        <td>{{ $medico->direccion }}</td>
+                    </tr>
+
                     <tr>
                         <th>Especialidad</th>
                         <td><span class="badge bg-secondary">{{ $medico->especialidad }}</span></td>

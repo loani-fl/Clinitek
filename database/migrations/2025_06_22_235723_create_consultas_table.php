@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('paciente_id')->constrained()->onDelete('cascade');
 
+
             // Información de la consulta
+            $table->string('genero')->nullable();
             $table->date('fecha');
             $table->time('hora')->nullable();
             $table->string('especialidad')->nullable();
