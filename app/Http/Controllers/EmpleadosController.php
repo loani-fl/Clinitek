@@ -196,7 +196,9 @@ class EmpleadosController extends Controller
         $puesto = Puesto::findOrFail($validated['puesto_id']);
         $validated['area'] = $puesto->area;
 
+
     Log::info('Se validó correctamente. Intentando crear empleado...', ['datos' => $validated]);
+
 
 
         // 3. Manejar foto si existe
