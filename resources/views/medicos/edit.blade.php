@@ -228,22 +228,32 @@
                     @enderror
                 </div>
 
-                <div class="col-md-5">
-                    <label for="foto" class="form-label form-label-sm mb-1">Foto actual</label><br>
-                    @if ($medico->foto)
-                        <img src="{{ asset('storage/' . $medico->foto) }}" alt="Foto actual"
-                             class="img-thumbnail mb-1" style="width: 150px; height: 150px; object-fit: cover;">
+                <div class="col-md-3">
+                    {{-- Foto actual --}}
+                    @if(!empty($medico->foto) && file_exists(storage_path('app/public/' . $medico->foto)))
+                        <img src="{{ asset('storage/' . $medico->foto) }}"
+                             alt="Foto actual del médico"
+                             class="shadow-sm"
+                             style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 2px solid #0d6efd; margin-bottom: 0.5rem;">
                     @else
-                        <p class="text-muted mb-1">No hay foto</p>
+                        <img src="{{ asset('images/default-user.png') }}"
+                             alt="Foto por defecto"
+                             class="shadow-sm"
+                             style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 2px solid #0d6efd; margin-bottom: 0.5rem;">
                     @endif
 
-                    <label for="foto" class="form-label form-label-sm mt-2">Cambiar foto</label>
+                    {{-- Input para subir nueva foto --}}
+                    <label for="foto" class="form-label">Foto:</label>
                     <input type="file" name="foto" id="foto"
-                           class="form-control form-control-sm @error('foto') is-invalid @enderror">
+                           class="form-control form-control-sm @error('foto') is-invalid @enderror"
+                           accept="image/*">
                     @error('foto')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">Suba una imagen válida. Opcional.</div>
                     @enderror
+                    <div class="form-text">Opcional. Formato: JPG, PNG.</div>
                 </div>
+
+
 
             </div>
 
