@@ -41,28 +41,28 @@
         }
 
         .contenedor-principal {
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: start;
-    padding: 0 3rem; /* MÁS margen lateral */
-    margin: 0;
-    width: 100vw;
-}
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: start;
+            padding: 0 3rem; /* MÁS margen lateral */
+            margin: 0;
+            width: 100vw;
+        }
 
-.custom-card {
-    flex-grow: 1;
-    background-color: #ffffff;  /* fondo blanco */
-    border-color: #91cfff;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
-    max-width: 1000px;
-    width: 100%;
-    padding: 1.5rem;
-}
-
+        .custom-card {
+            flex-grow: 1;
+            background-color: #ffffff;  /* fondo blanco */
+            border-color: #91cfff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            max-width: 1000px;
+            width: 100%;
+            padding: 1.5rem;
+            position: relative;
+        }
 
         .card-header {
             background-color: transparent !important;
@@ -145,6 +145,16 @@
             pointer-events: none; /* para que no interfiera con clicks */
             z-index: 0;
         }
+
+        #mensajeResultados {
+    font-weight: 600;
+    color: #000000;
+    margin-top: 0.5rem;
+    min-height: 1.2em;
+    text-align: center;
+
+}
+
     </style>
 </head>
 <body>
@@ -171,106 +181,105 @@
             <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
             <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
         </div>
-    </div>
 </div>
 
-
-<!-- Formulario más compacto -->
-<div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
-    <div class="card-header position-relative py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-        <!-- Botón a la derecha -->
-        <a href="{{ route('inicio') }}" class="btn btn-light position-absolute end-0 top-50 translate-middle-y me-2">
-            <i class="bi bi-house-door"></i> Inicio
-        </a>
-        <!-- Título centrado -->
-        <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Lista de empleados</h5>
-    </div>
-
-
-
-    <form action="{{ route('empleado.store') }}" method="POST" novalidate>
-        @csrf
-
-    
-        <!-- Alerta de éxito -->
-        @if(session('success'))
-            <div id="mensaje-exito" class="alert alert-success m-3 alert-dismissible fade show">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-            </div>
-        @endif
-
-        <!-- FILTROS -->
-        <div class="row px-3 py-2">
-            <div class="col-md-4 mb-2 mb-md-0">
-                <input type="text" id="filtro-empleado" class="form-control" placeholder="Buscar por nombre, identidad o puesto" />
-            </div>
-            <div class="col-md-3">
-                <select id="filtro-estado" class="form-select">
-                    <option value="">Todos los estados</option>
-                    <option value="Activo">Activo</option>
-                    <option value="Inactivo">Inactivo</option>
-                </select>
-            </div>
+<!-- Contenedor principal -->
+<div class="contenedor-principal">
+    <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
+        <div class="card-header position-relative py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
+            <!-- Botón a la derecha -->
+            <a href="{{ route('inicio') }}" class="btn btn-light position-absolute end-0 top-50 translate-middle-y me-2">
+                <i class="bi bi-house-door"></i> Inicio
+            </a>
+            <!-- Título centrado -->
+            <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Lista de empleados</h5>
         </div>
 
-        <!-- Tabla -->
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped mb-0">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th class="text-center">Nombre</th>
-                        <th class="text-center">Identidad</th>
-                        <th class="text-center">Puesto</th>
-                        <th class="text-center">Estado</th>
-                        <th class="text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tabla-empleados">
-                @forelse($empleados as $index => $empleado)
-                    <tr data-estado="{{ $empleado->estado }}">
-                        <td>{{ $empleados->firstItem() + $index }}</td>
-                        <td class="nombre">{{ $empleado->nombres }} {{ $empleado->apellidos }}</td>
-                        <td>{{ $empleado->identidad }}</td>
-                        <td class="puesto">{{ $empleado->puesto->nombre ?? 'Sin puesto' }}</td>
-                        <td class="text-center">
-                            @if($empleado->estado === 'Activo')
-                                <span class="estado-activo"><i class="bi bi-circle-fill"></i></span>
-                            @else
-                                <span class="estado-inactivo"><i class="bi bi-circle-fill"></i></span>
-                            @endif
-                        </td>
-                        <td>
-                            <div class="d-flex gap-2 justify-content-center">
-                                <a href="{{ route('empleado.show', $empleado->id) }}" class="btn btn-white-border btn-outline-info btn-sm" title="Ver">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <a href="{{ route('empleado.edit', $empleado->id) }}" class="btn btn-white-border btn-outline-warning btn-sm" title="Editar">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="8" class="text-center">No hay empleados registrados.</td>
-                    </tr>
-                @endforelse
+        <form action="{{ route('empleado.store') }}" method="POST" novalidate>
+            @csrf
 
-                <tr id="sin-resultados" style="display: none;">
-                    <td colspan="8" class="text-center text-muted">No hay empleados que coincidan con la búsqueda.</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+            <!-- Alerta de éxito -->
+            @if(session('success'))
+                <div id="mensaje-exito" class="alert alert-success m-3 alert-dismissible fade show">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            @endif
 
-        <div class="px-3 pb-3">
-            <div class="d-flex justify-content-center">
-                {{ $empleados->onEachSide(1)->links('pagination::bootstrap-5') }}
+            <!-- FILTROS -->
+            <div class="row px-3 py-2">
+                <div class="col-md-4 mb-2 mb-md-0">
+                    <input type="text" id="filtro-empleado" class="form-control" placeholder="Buscar por nombre, identidad o puesto" />
+                </div>
+                <div class="col-md-3">
+                    <select id="filtro-estado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="Activo">Activo</option>
+                        <option value="Inactivo">Inactivo</option>
+                    </select>
+                </div>
             </div>
-        </div>
 
+            <!-- Tabla -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th class="text-center">Nombre</th>
+                            <th class="text-center">Identidad</th>
+                            <th class="text-center">Puesto</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-empleados">
+                    @forelse($empleados as $index => $empleado)
+                        <tr data-estado="{{ $empleado->estado }}">
+                            <td>{{ $empleados->firstItem() + $index }}</td>
+                            <td class="nombre">{{ $empleado->nombres }} {{ $empleado->apellidos }}</td>
+                            <td>{{ $empleado->identidad }}</td>
+                            <td class="puesto">{{ $empleado->puesto->nombre ?? 'Sin puesto' }}</td>
+                            <td class="text-center">
+                                @if($empleado->estado === 'Activo')
+                                    <span class="estado-activo"><i class="bi bi-circle-fill"></i></span>
+                                @else
+                                    <span class="estado-inactivo"><i class="bi bi-circle-fill"></i></span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <a href="{{ route('empleado.show', $empleado->id) }}" class="btn btn-white-border btn-outline-info btn-sm" title="Ver">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ route('empleado.edit', $empleado->id) }}" class="btn btn-white-border btn-outline-warning btn-sm" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-center">No hay empleados registrados.</td>
+                        </tr>
+                    @endforelse
+
+                    <tr id="sin-resultados" style="display: none;">
+                        <td colspan="8" class="text-center text-muted">No hay empleados que coincidan con la búsqueda.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mensaje de resultados -->
+            <div id="mensajeResultados"></div>
+
+            <div class="px-3 pb-3">
+                <div class="d-flex justify-content-center">
+                    {{ $empleados->onEachSide(1)->links('pagination::bootstrap-5') }}
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -284,49 +293,62 @@
 
 <!-- Script de filtros y mensaje -->
 <script>
+   function actualizarMensajeResultados(totalVisibles, filtroVacio) {
+       if (totalVisibles === 0) {
+           $('#mensajeResultados').text('No hay empleados que coincidan con la búsqueda.');
+       } else if (filtroVacio) {
+           $('#mensajeResultados').text(''); // Sin mensaje si filtro vacío
+       } else {
+           $('#mensajeResultados').text(`Se encontraron ${totalVisibles} resultado${totalVisibles > 1 ? 's' : ''}.`);
+       }
+   }
+
    function aplicarFiltros() {
-    const texto = $('#filtro-empleado').val().toLowerCase();
-    const estado = $('#filtro-estado').val();
-    let visibles = 0;
+       const texto = $('#filtro-empleado').val().toLowerCase();
+       const estado = $('#filtro-estado').val();
+       let visibles = 0;
 
-    $('#tabla-empleados tr').not('#sin-resultados').each(function () {
-        const nombre = $(this).find('.nombre').text().toLowerCase();
-        const puesto = $(this).find('.puesto').text().toLowerCase();
-        const identidad = $(this).find('td').eq(2).text().toLowerCase();
-        const estadoActual = $(this).data('estado');
+       $('#tabla-empleados tr').not('#sin-resultados').each(function () {
+           const nombre = $(this).find('.nombre').text().toLowerCase();
+           const puesto = $(this).find('.puesto').text().toLowerCase();
+           const identidad = $(this).find('td').eq(2).text().toLowerCase();
+           const estadoActual = $(this).data('estado');
 
-        const coincideTexto = 
-            nombre.startsWith(texto) || 
-            puesto.startsWith(texto) || 
-            identidad.startsWith(texto);
+           const coincideTexto = 
+               nombre.startsWith(texto) || 
+               puesto.startsWith(texto) || 
+               identidad.startsWith(texto);
 
-        const coincideEstado = !estado || estado === estadoActual;
+           const coincideEstado = !estado || estado === estadoActual;
 
-        const visible = coincideTexto && coincideEstado;
-        $(this).toggle(visible);
+           const visible = coincideTexto && coincideEstado;
+           $(this).toggle(visible);
 
-        if (visible) {
-            visibles++;
-            $(this).find('td').eq(0).text(visibles);
-        }
-    });
+           if (visible) {
+               visibles++;
+               $(this).find('td').eq(0).text(visibles);
+           }
+       });
 
-    $('#sin-resultados').toggle(visibles === 0);
-}
+       $('#sin-resultados').toggle(visibles === 0);
 
+       actualizarMensajeResultados(visibles, texto === '');
+   }
 
+   $(document).ready(function () {
+       $('#filtro-empleado, #filtro-estado').on('input change', aplicarFiltros);
 
-    $(document).ready(function () {
-        $('#filtro-empleado, #filtro-estado').on('input change', aplicarFiltros);
+       // Ocultar mensaje de éxito tras 3 segundos
+       const mensaje = $('#mensaje-exito');
+       if (mensaje.length) {
+           setTimeout(() => {
+               mensaje.alert('close');
+           }, 3000);
+       }
 
-        // Ocultar mensaje de éxito tras 3 segundos
-        const mensaje = $('#mensaje-exito');
-        if (mensaje.length) {
-            setTimeout(() => {
-                mensaje.alert('close');
-            }, 3000);
-        }
-    });
+       // Ejecutar el filtro al cargar para mostrar el mensaje correctamente si hay texto
+       aplicarFiltros();
+   });
 </script>
 </body>
 </html>

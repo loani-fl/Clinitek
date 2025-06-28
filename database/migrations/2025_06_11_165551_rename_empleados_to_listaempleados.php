@@ -31,6 +31,7 @@ return new class extends Migration
             $table->decimal('salario', 10, 2)->nullable();
             $table->text('observaciones')->nullable();
             $table->timestamps();
+            $table->string('foto')->nullable();
         });
     }
 
