@@ -29,6 +29,10 @@
         border: 1px solid #91cfff;
         border-radius: 12px;
     }
+    /* Cursor pointer para imagen pequeña */
+    .clickable-img {
+        cursor: pointer;
+    }
 </style>
 
 <!-- Barra de navegación fija -->
@@ -53,8 +57,15 @@
             <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Detalles del empleado</h5>
         </div>
 
-        <form action="{{ route('empleado.store') }}" method="POST" novalidate class="p-4">
-            @csrf
+       <!-- FOTO DEL EMPLEADO -->
+       <div class="text-center my-4">
+           <img src="{{ asset($empleado->foto ? 'storage/' . $empleado->foto : 'images/default-user.png') }}"
+                alt="Foto del empleado"
+                class="rounded-circle shadow-sm clickable-img"
+                style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;"
+                data-bs-toggle="modal"
+                data-bs-target="#fotoModal">
+       </div>
 
         <!-- Contenido -->
         <div class="card-body px-4 py-3">
@@ -105,4 +116,33 @@
         </div>
     </div>
 </div>
+
+<!-- Modal para mostrar imagen grande -->
+<div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-transparent border-0 position-relative d-flex justify-content-center align-items-center" style="background: rgba(0,0,0,0.7);">
+      <div class="modal-body p-0" style="max-width: 90vw; max-height: 90vh;">
+        <img src="{{ asset($empleado->foto ? 'storage/' . $empleado->foto : 'images/default-user.png') }}"
+             alt="Foto del empleado"
+             style="max-width: 450px; max-height: 450px; object-fit: cover; cursor: pointer;"
+             id="imagenGrande">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS (si no está incluido en tu layout) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // Cerrar modal al hacer clic en la imagen grande
+  document.addEventListener('DOMContentLoaded', function() {
+    const imagenGrande = document.getElementById('imagenGrande');
+    imagenGrande.addEventListener('click', function() {
+      const modal = bootstrap.Modal.getInstance(document.getElementById('fotoModal'));
+      modal.hide();
+    });
+  });
+</script>
+
 @endsection
