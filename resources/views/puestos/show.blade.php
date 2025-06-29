@@ -8,27 +8,14 @@
         background-color: #e8f4fc;
     }
 
-    .custom-card {
-        max-width: 800px;
-        background-color: rgba(255, 255, 255, 0.95);
-        border: 1px solid #91cfff;
-        border-radius: 0.5rem;
-        position: relative;
-        overflow: hidden;
-        margin: 2rem auto 4rem auto;
-        padding: 2rem;
-        box-shadow: 0 0 15px rgba(0,123,255,0.25);
-        z-index: 1;
-    }
-
     .custom-card::before {
         content: "";
         position: absolute;
         top: 50%;
         left: 50%;
-        width: 700px;
-        height: 700px;
-        background-image: url('{{ asset('images/logo2.jpg') }}');
+        width: 800px;
+        height: 800px;
+        background-image: url('/images/logo2.jpg');
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
@@ -38,44 +25,70 @@
         z-index: 0;
     }
 
-    label, strong {
-        font-weight: 600;
-        color: #003f6b;
+    .custom-card {
+        max-width: 1000px;
+        background-color: #fff;
+        border-color: #91cfff;
+        position: relative;
+        overflow: hidden;
+        margin: 70px auto 2rem; /* margen superior aumentado para navbar fijo */
+        padding: 1.5rem 5rem 5rem 5rem; /* menos padding arriba para acercar el contenido */
+        border: 1px solid #91cfff;
+        border-radius: 12px;
     }
 
-    /* Barra superior */
+    .list-group-item strong {
+        color: #000;
+        font-weight: bold;
+    }
+
+    /* Estilos navbar */
     .header {
         background-color: #007BFF;
-        position: sticky;
+        position: fixed;
         top: 0;
+        left: 0;
+        right: 0;
+        width: 100vw;
         z-index: 1030;
         padding: 0.5rem 1rem;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
+
     .header .fw-bold {
         font-size: 1.5rem;
         color: white;
     }
-    .header a {
-        color: white;
+
+    .header .nav-buttons {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .header .nav-buttons a {
+        color: white !important;
         font-weight: 600;
         text-decoration: none;
     }
-    .header a:hover {
+
+    .header .nav-buttons a:hover {
         text-decoration: underline;
     }
 
-    /* Card header centrado y color negro */
     .custom-card-header {
         border-bottom: 3px solid #007BFF;
         padding-bottom: 0.75rem;
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.5rem; /* menos margen para pegar más al contenido */
         font-size: 1.5rem;
         color: #000;
         font-weight: 700;
         text-align: center;
     }
 
-    /* Botón regresar centrado abajo */
     .btn-regresar {
         font-size: 0.9rem;
         padding: 0.4rem 1.2rem;
@@ -85,14 +98,12 @@
         width: max-content;
     }
 
-    /* Centrar contenido de las columnas dentro de la card */
     .row.g-4 {
-        max-width: 600px; /* controla el ancho del contenido */
+        max-width: 600px;
         margin-left: auto;
         margin-right: auto;
     }
 
-    /* Lista grupos */
     .list-group-item {
         background-color: transparent;
         border: none;
@@ -102,11 +113,6 @@
         color: #222;
     }
 
-    .list-group-item strong {
-        color: #003f6b;
-    }
-
-    /* Footer */
     footer {
         font-size: 0.85rem;
         margin-top: 2rem;
@@ -117,13 +123,25 @@
             padding: 1rem;
             margin: 1rem;
         }
+
         .custom-card-header {
             font-size: 1.2rem;
         }
+
         .row.g-4 {
             max-width: 100%;
             margin-left: 0;
             margin-right: 0;
+        }
+
+        html, body, #app {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .container, .container-fluid, .row, .col {
+            margin: 0 !important;
+            padding: 0 !important;
         }
     }
 </style>
@@ -131,52 +149,50 @@
 
 @section('content')
 
-    <!-- Barra de navegación superior -->
-    <div class="header d-flex justify-content-between align-items-center px-3 py-2">
-        <div class="d-flex align-items-center">
-            <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto; margin-right: 6px;">
-            <span class="fw-bold">Clinitek</span>
+<!-- Barra de navegación superior -->
+<div class="header">
+    <div class="d-flex align-items-center">
+        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto; margin-right: 6px;">
+        <span class="fw-bold">Clinitek</span>
+    </div>
+
+    <div class="nav-buttons">
+        <a href="{{ route('puestos.create') }}">Crear puesto</a>
+        <a href="{{ route('empleado.create') }}">Registrar empleado</a>
+        <a href="{{ route('medicos.create') }}">Registrar médico</a>
+    </div>
+</div>
+
+<!-- Contenedor principal -->
+<div class="custom-card">
+    <div class="custom-card-header">
+        Detalle del Puesto
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Código:</strong> {{ $puesto->codigo }}</li>
+                <li class="list-group-item"><strong>Nombre del Puesto:</strong> {{ $puesto->nombre }}</li>
+                <li class="list-group-item"><strong>Área / Departamento:</strong> {{ $puesto->area }}</li>
+            </ul>
         </div>
-        <div class="d-flex gap-3 flex-wrap">
-            <a href="{{ route('puestos.create') }}">Crear puesto</a>
-            <a href="{{ route('empleado.create') }}">Registrar empleado</a>
-            <a href="{{ route('medicos.create') }}">Registrar médico</a>
+
+        <div class="col-md-6">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Sueldo:</strong> Lps. {{ number_format($puesto->sueldo, 2) }}</li>
+                <li class="list-group-item"><strong>Función del Puesto:</strong><br>
+                    <span style="white-space: pre-line;">{{ $puesto->funcion }}</span>
+                </li>
+            </ul>
         </div>
     </div>
 
-    <!-- Contenedor principal -->
-    <div class="custom-card">
-        <div class="custom-card-header">
-            Detalle del Puesto
-        </div>
-
-        <div class="row g-4">
-            <div class="col-md-6">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><strong>Código:</strong> {{ $puesto->codigo }}</li>
-                    <li class="list-group-item"><strong>Nombre del Puesto:</strong> {{ $puesto->nombre }}</li>
-                    <li class="list-group-item"><strong>Área / Departamento:</strong> {{ $puesto->area }}</li>
-                </ul>
-            </div>
-
-            <div class="col-md-6">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><strong>Sueldo:</strong> Lps. {{ number_format($puesto->sueldo, 2) }}</li>
-                    <li class="list-group-item"><strong>Función del Puesto:</strong><br>
-                        <span style="white-space: pre-line;">{{ $puesto->funcion }}</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <a href="{{ route('puestos.index') }}" class="btn btn-success btn-regresar">
-            <i class="bi bi-arrow-left"></i> Regresar
-        </a>
-    </div>
-
-    <footer class="bg-light text-center py-2 border-top">
-        © 2025 Clínitek. Todos los derechos reservados.
-    </footer>
+    <a href="{{ route('puestos.index') }}" class="btn btn-success btn-regresar">
+        <i class="bi bi-arrow-left"></i> Regresar
+    </a>
+</div>
 
 @endsection
+
 

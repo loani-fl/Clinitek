@@ -22,9 +22,11 @@
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
+            width: 100vw;
             align-items: center;
             flex-wrap: wrap;
             background-color: #007BFF;
+            box-sizing: border-box; /* para que padding no aumente el ancho */
         }
 
         .header .fw-bold {
@@ -174,11 +176,7 @@
     </div>
 
     <div class="p-3">
-        @if(session('success'))
-            <div class="alert alert-success border-0 shadow-sm rounded-3 p-3 mb-4 small">
-                {{ session('success') }}
-            </div>
-        @endif
+       
 
         @if($puestos->isEmpty())
             <div class="alert alert-info shadow-sm" role="alert">
@@ -205,12 +203,13 @@
                                 <td>{{ $puesto->area }}</td>
                                 <td>
                                     <div class="d-flex gap-2 justify-content-center">
-                                        <a href="{{ route('puestos.show', $puesto->id) }}" class="btn btn-white-border btn-outline-info btn-sm" title="Ver detalles">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="{{ route('puestos.edit', $puesto) }}" class="btn btn-white-border btn-outline-warning btn-sm" title="Editar">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
+                                       <a href="{{ route('puestos.show', $puesto->id) }}" class="btn btn-sm btn-outline-info me-2" title="Ver detalles">
+    <i class="bi bi-eye"></i>
+</a>
+<a href="{{ route('puestos.edit', $puesto) }}" class="btn btn-sm btn-outline-warning" title="Editar">
+    <i class="bi bi-pencil-square"></i>
+</a>
+
                                     </div>
                                 </td>
                             </tr>

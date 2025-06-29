@@ -138,4 +138,48 @@ class ConsultaController extends Controller
 
         return response()->json($ocupadas);
     }
+    public function edit($id)
+{
+    $consulta = Consulta::findOrFail($id);
+    $pacientes = Paciente::all();
+    $medicos = Medico::all();
+
+    return view('consultas.edit', compact('consulta', 'pacientes', 'medicos'));
+}
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'paciente_id' => 'required|exists:pacientes,id',
+        'fecha' => 'required|date|after_or_equal:today',
+        'hora' => 'required|string',
+        'medico_id' => 'required|exists:medicos,id',
+        'especialidad' => 'required|string|max:100',
+        'motivo' => 'required|string|max:255',
+        'sintomas' => 'required|string|max:255',
+        'total_pagar' => 'nullable|numeric|min:0',
+    ], [
+        'required' => 'Este campo es obligatorio.',
+        'exists' => 'La selección no es válida.',
+        'date' => 'Debe ser una fecha válida.',
+        'after_or_equal' => 'La fecha no puede ser anterior a hoy.',
+    ]);
+
+    $consulta = Consulta::findOrFail($id);
+
+    $consulta->paciente_id = $request->paciente_id;
+    $consulta->fecha = $request->fecha;
+    $consulta->hora = $request->hora;
+    $consulta->medico_id = $request->medico_id;
+    $consulta->especialidad = $request->especialidad;
+    $consulta->motivo = $request->motivo;
+    $consulta->sintomas = $request->sintomas;
+    $consulta->genero = $request->genero; // solo si lo guardas
+    $consulta->total_pagar = $request->hora === 'inmediata' ? $request->total_pagar : null;
+
+    $consulta->save();
+
+    return redirect()->route('consultas.index')->with('success', 'Consulta actualizada correctamente.');
+}
+
+
 }

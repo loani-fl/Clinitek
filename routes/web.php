@@ -55,7 +55,8 @@ Route::resource('consultas', ConsultaController::class);
 Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupadas']);
 Route::get('/horas-ocupadas', [App\Http\Controllers\ConsultaController::class, 'horasOcupadas']);
 
-
+Route::get('consultas/{id}/edit', [ConsultaController::class, 'edit'])->name('consultas.edit');
+Route::put('consultas/{id}', [ConsultaController::class, 'update'])->name('consultas.update');
 
 
 
