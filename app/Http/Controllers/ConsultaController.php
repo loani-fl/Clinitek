@@ -26,7 +26,8 @@ class ConsultaController extends Controller
             'fecha_nacimiento',
             'telefono',
             'correo',
-            'direccion'
+            'direccion',
+            'genero'
         )->orderBy('nombre')->get();
 
         $medicos = Medico::select('id', 'nombre', 'apellidos', 'especialidad')

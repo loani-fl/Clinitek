@@ -123,6 +123,8 @@
     <div class="card-header text-center py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
         <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Registro de consulta médica</h5>
     </div>
+
+
     <form action="{{ route('consultas.store') }}" method="POST" novalidate>
         @csrf
 
@@ -139,7 +141,7 @@
                             <option value="{{ $p->id }}"
                                 data-nacimiento="{{ \Carbon\Carbon::parse($p->fecha_nacimiento)->format('Y-m-d') }}"
                                 data-identidad="{{ $p->identidad }}"
-                                data-genero="{{ $p->genero }}"
+                                data-genero="{{ $p->genero }}"  
                                 data-telefono="{{ $p->telefono }}"
                                 data-correo="{{ $p->correo }}"
                                 data-direccion="{{ $p->direccion }}"
@@ -147,6 +149,7 @@
                                 {{ $p->nombre }} {{ $p->apellidos }}
                             </option>
                         @endforeach
+
                     </select>
                     @error('paciente_id')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -164,12 +167,8 @@
                 </div>
 
                 <div class="col-md-2">
-                    <label for="genero">Genero <span class="text-danger">*</span></label>
-                    <select id="genero" name="genero" class="form-select form-select-sm @error('genero') is-invalid @enderror" required>
-                        <option value="">-- Selecciona --</option>
-                        <option value="Femenino" {{ old('genero') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
-                        <option value="Masculino" {{ old('genero') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
-                    </select>
+                    <label for="genero">Género <span class="text-danger">*</span></label>
+                    <input type="text" id="genero" name="genero" class="form-control form-control-sm @error('genero') is-invalid @enderror" value="{{ old('genero') }}" readonly required>
                     @error('genero')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
@@ -306,7 +305,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const pacienteSelect = document.getElementById('paciente_id');
-    const generoSelect = document.getElementById('genero');
+    const generoInput = document.getElementById('genero');
     const medicoSelect = document.getElementById('medico');
     const especialidadInput = document.getElementById('especialidad');
     const fechaConsultaInput = document.getElementById('fecha_consulta');
@@ -315,6 +314,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('form');
     const totalPagarInput = document.getElementById('total_pagar');
     const contenedorTotalPagar = document.getElementById('contenedor_total_pagar');
+
+    const opt = document.querySelector('#paciente_id').selectedOptions[0];
+console.log(opt.getAttribute('data-genero'));
+
 
     const preciosPorEspecialidad = {
         "Cardiología": 900.00,
@@ -329,12 +332,18 @@ document.addEventListener('DOMContentLoaded', function () {
     function autocompletarPaciente() {
         const opt = pacienteSelect.options[pacienteSelect.selectedIndex];
         if (!opt) return;
+
+        console.log('Paciente seleccionado:', opt.textContent, 'Género:', opt.getAttribute('data-genero'));
+
+
         document.getElementById('fecha_nacimiento').value = opt.getAttribute('data-nacimiento') || '';
         document.getElementById('identidad').value = opt.getAttribute('data-identidad') || '';
-        generoSelect.value = opt.getAttribute('data-genero') || '';
         document.getElementById('telefono').value = opt.getAttribute('data-telefono') || '';
         document.getElementById('correo').value = opt.getAttribute('data-correo') || '';
         document.getElementById('direccion').value = opt.getAttribute('data-direccion') || '';
+        const generoInput = document.getElementById('genero');
+        generoInput.value = opt.getAttribute('data-genero') || '';
+
     }
 
     function actualizarVisibilidadTotalPagar() {
@@ -464,6 +473,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
         especialidadInput.value = '';
         totalPagarInput.value = '';
+        generoInput.value = '';
         document.getElementById('identidad').value = '';
         document.getElementById('fecha_nacimiento').value = '';
         document.getElementById('telefono').value = '';
