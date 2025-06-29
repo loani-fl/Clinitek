@@ -280,8 +280,6 @@
     </div>
 </div>
 
-
-
             <!-- Botones centrados -->
             <div class="d-flex justify-content-center gap-3 mt-4">
                 <button type="submit" class="btn btn-primary">
