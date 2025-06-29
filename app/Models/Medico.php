@@ -18,15 +18,16 @@ class Medico extends Model
         'especialidad',
         'correo',
         'numero_identidad',
-        'salario',
+        'salario',      // correcto: salario, no sueldo
         'fecha_nacimiento',
         'fecha_ingreso',
         'genero',
         'observaciones',
+        'direccion',    // agregado para que se guarde la dirección
         'foto',
-       
     ];
+
     protected $casts = [
-        'estado' => 'boolean', // Para manejar como booleano y evitar problemas con 0/1 o '0'/'1'
+        'estado' => 'boolean',
     ];
 }
