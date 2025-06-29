@@ -182,13 +182,15 @@ class EmpleadosController extends Controller
 
         // 4. Crear el empleado
         $empleado = Empleado::create($validated);
-
-        // 5. Redireccionar con mensaje
-        if ($empleado) {
-            return redirect()->route('empleado.index')->with('success', 'Empleado registrado correctamente.');
-        } else {
-            return back()->withErrors('No se pudo registrar el empleado.');
-        }
+       // Registrar empleado
+   if ($empleado) {
+        // Rediriges a la ruta de registro o donde quieras
+        return redirect()->route('empleado.index')
+            ->with('success', 'Empleado registrado correctamente.')
+            ->with('clearLocalStorage', true); // <- Esta línea es clave
+    } else {
+        return back()->withErrors('No se pudo registrar el empleado.');
+    }
     }
 
     public function index()

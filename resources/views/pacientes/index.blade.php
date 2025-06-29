@@ -112,93 +112,129 @@
         color: black;
     }
 </style>
-
 <div class="w-100 fixed-top" style="background-color: #007BFF; z-index: 1050;">
-    <div class="d-flex justify-content-between align-items-center px-3 py-2">
-        <div class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</div>
-        <div class="d-flex gap-3 flex-wrap">
-            <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
-            <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
-            <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
-        </div>
+  <div class="d-flex justify-content-between align-items-center px-3 py-2">
+    <div class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</div>
+    <div class="d-flex gap-3 flex-wrap">
+      <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
+      <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
+      <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
     </div>
+  </div>
 </div>
 
-<div class="card custom-card shadow-sm border rounded-4 mx-auto w-100">
-    <div class="card-header position-relative py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-        <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Listado de Pacientes</h5>
+<div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
+  <div class="card-header position-relative py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
+    <!-- Botón a la derecha -->
+    <a href="{{ route('inicio') }}" class="btn btn-light position-absolute end-0 top-50 translate-middle-y me-2">
+      <i class="bi bi-house-door"></i> Inicio
+    </a>
+    <!-- Título centrado -->
+    <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Listado de Pacientes</h5>
+  </div>
 
-        <div class="d-flex gap-2 position-absolute end-0 top-50 translate-middle-y me-3">
-            <a href="{{ route('inicio') }}" class="btn btn-sm btn-light">
-                <i class="bi bi-house-door"></i> Inicio
-            </a>
-            <a href="{{ route('pacientes.create') }}" class="btn btn-sm btn-primary">
-                <i class="bi bi-plus-circle"></i> Nuevo paciente
-            </a>
-        </div>
-    </div>
-<div class="p-3">
+  <div class="p-3">
     {{-- Filtro y botón centrados --}}
     <div class="d-flex justify-content-center align-items-center gap-2 mb-3 flex-wrap">
-        <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por nombre, apellido o identidad...">
-        <button id="btnLimpiar" class="btn btn-outline-primary btn-sm">Limpiar filtro</button>
+      <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por nombre, apellido o identidad...">
+      <button id="btnLimpiar" class="btn btn-outline-primary btn-sm">Limpiar filtro</button>
     </div>
 
     {{-- Tabla de resultados --}}
-<div class="table-responsive">
-    <table class="table table-bordered table-striped align-middle mb-0">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped align-middle mb-0">
         <thead>
-            <tr>
-                <th>#</th>
-                <th>Nombre(s)</th>
-                <th>Apellidos</th>
-                <th>Identidad</th>
-                <th>Género</th>
-                <th>Acciones</th>
-            </tr>
+          <tr>
+            <th>#</th>
+            <th>Nombre(s)</th>
+            <th>Apellidos</th>
+            <th>Identidad</th>
+            <th>Género</th>
+            <th>Acciones</th>
+          </tr>
         </thead>
         <tbody id="tablaPacientes">
-            @forelse ($pacientes as $index => $paciente)
-                <tr>
-                    <td>{{ $pacientes->firstItem() + $index }}</td>
-                    <td>{{ $paciente->nombre }}</td>
-                    <td>{{ $paciente->apellidos }}</td>
-                    <td>{{ $paciente->identidad }}</td>
-                    <td>
-                        <span class="badge
-                            {{ $paciente->genero === 'Masculino' ? 'bg-primary' :
-                               ($paciente->genero === 'Femenino' ? 'bg-warning text-dark' : 'bg-info') }}">
-                            {{ $paciente->genero ?? 'No especificado' }}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="d-flex gap-2 justify-content-center">
-                            <a href="{{ route('pacientes.show', $paciente->id) }}" class="btn btn-white-border btn-outline-info btn-sm" title="Ver">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="{{ route('pacientes.edit', $paciente->id) }}" class="btn btn-white-border btn-outline-warning btn-sm" title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6" class="text-center">No hay pacientes registrados.</td>
-                </tr>
-            @endforelse
+          @forelse ($pacientes as $index => $paciente)
+            <tr>
+              <td>{{ $pacientes->firstItem() + $index }}</td>
+              <td>{{ $paciente->nombre }}</td>
+              <td>{{ $paciente->apellidos }}</td>
+              <td>{{ $paciente->identidad }}</td>
+              <td>
+                <span class="badge
+                  {{ $paciente->genero === 'Masculino' ? 'bg-primary' :
+                     ($paciente->genero === 'Femenino' ? 'bg-warning text-dark' : 'bg-info') }}">
+                  {{ $paciente->genero ?? 'No especificado' }}
+                </span>
+              </td>
+              <td>
+                <div class="d-flex gap-2 justify-content-center">
+                  <a href="{{ route('pacientes.show', $paciente->id) }}" class="btn btn-sm btn-outline-info me-2" title="Ver detalles">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <a href="{{ route('pacientes.edit', $paciente->id) }}" class="btn btn-sm btn-outline-warning" title="Editar paciente">
+                    <i class="bi bi-pencil-square"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="6" class="text-center">No hay pacientes registrados.</td>
+            </tr>
+          @endforelse
         </tbody>
-    </table>
-</div>
+      </table>
+    </div>
 
-{{-- Mensaje debajo de los resultados --}}
-<div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
+    {{-- Mensaje debajo de los resultados --}}
+    <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
 
-{{-- Paginación al final --}}
-<div class="pagination-container d-flex justify-content-center mt-2">
-    {{ $pacientes->links() }}
-</div>
-</div>
+    {{-- Paginación al final --}}
+    @if($pacientes->hasPages())
+      <nav aria-label="Paginación de pacientes" class="pagination-container d-flex justify-content-center mt-2">
+        <ul class="pagination mb-0">
+          {{-- Anterior --}}
+          @if($pacientes->onFirstPage())
+            <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+          @else
+            <li class="page-item">
+              <a class="page-link" href="{{ $pacientes->previousPageUrl() }}" rel="prev">&laquo;</a>
+            </li>
+          @endif
+
+          {{-- Números --}}
+          @foreach($pacientes->elements() as $element)
+            @if(is_string($element))
+              <li class="page-item disabled"><span class="page-link">{{ $element }}</span></li>
+            @elseif(is_array($element))
+              @foreach($element as $page => $url)
+                <li class="page-item {{ $page == $pacientes->currentPage() ? 'active' : '' }}">
+                  @if($page == $pacientes->currentPage())
+                    <span class="page-link">{{ $page }}</span>
+                  @else
+                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                  @endif
+                </li>
+              @endforeach
+            @endif
+          @endforeach
+
+          {{-- Siguiente --}}
+          @if($pacientes->hasMorePages())
+            <li class="page-item">
+              <a class="page-link" href="{{ $pacientes->nextPageUrl() }}" rel="next">&raquo;</a>
+            </li>
+          @else
+            <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+          @endif
+        </ul>
+      </nav>
+    @endif
+
+  </div> {{-- Cierre de .p-3 --}}
+  
+</div> {{-- Cierre de .card --}}
 
 
 
