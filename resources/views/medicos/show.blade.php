@@ -29,6 +29,9 @@
             border: 1px solid #91cfff;
             border-radius: 12px;
         }
+        .clickable-img {
+            cursor: pointer;
+        }
     </style>
 
     <!-- Barra de navegación fija -->
@@ -49,30 +52,34 @@
                 <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Detalles del Médico</h5>
             </div>
 
-            @if (!empty($medico->foto) && file_exists(storage_path('app/public/' . $medico->foto)))
-                <img src="{{ asset('storage/' . $medico->foto) }}"
-                     alt="Foto del médico"
-                     class="shadow-sm"
-                     style="width: 140px; height: 140px; object-fit: cover; border-radius: 12px; border: 2px solid #0d6efd;">
-            @else
-                <img src="{{ asset('images/default-user.png') }}"
-                     alt="Sin foto"
-                     class="shadow-sm"
-                     style="width: 140px; height: 140px; object-fit: cover; border-radius: 12px; border: 2px solid #0d6efd;">
-            @endif
-            <div class="col-md-3">
-                <strong>Estado:</strong><br>
-                @if($medico->estado == 'Activo' || $medico->estado == 1 || $medico->estado === true)
-                    <span class="badge bg-success">Activo</span>
+            <!-- Foto del médico -->
+            <div class="text-center my-4">
+                @if (!empty($medico->foto) && file_exists(storage_path('app/public/' . $medico->foto)))
+                    <img src="{{ asset('storage/' . $medico->foto) }}"
+                         alt="Foto del médico"
+                         class="rounded-circle shadow-sm clickable-img"
+                         style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #0d6efd;"
+                         data-bs-toggle="modal" data-bs-target="#fotoModal">
                 @else
-                    <span class="badge bg-danger">Inactivo</span>
+                    <img src="{{ asset('images/default-user.png') }}"
+                         alt="Sin foto"
+                         class="rounded-circle shadow-sm clickable-img"
+                         style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #0d6efd;"
+                         data-bs-toggle="modal" data-bs-target="#fotoModal">
                 @endif
+                <div class="mt-3">
+                    <strong>Estado:</strong><br>
+                    @if($medico->estado == 'Activo' || $medico->estado == 1 || $medico->estado === true)
+                        <span class="badge bg-success">Activo</span>
+                    @else
+                        <span class="badge bg-danger">Inactivo</span>
+                    @endif
+                </div>
             </div>
 
-
+            <!-- Información del médico -->
             <div class="card-body px-4 py-3">
                 <div class="row gy-3">
-
                     <div class="col-md-3"><strong>Nombre:</strong><br>{{ $medico->nombre }}</div>
                     <div class="col-md-3"><strong>Apellidos:</strong><br>{{ $medico->apellidos }}</div>
                     <div class="col-md-3"><strong>Número de Identidad:</strong><br>{{ $medico->numero_identidad }}</div>
@@ -84,7 +91,7 @@
                         <strong>Género:</strong><br>
                         <span class="badge
                         {{ $medico->genero === 'Masculino' ? 'bg-primary' :
-                           ($medico->genero === 'Femenino' ? 'bg-warning text-dark' : 'bg-info') }}">
+                            ($medico->genero === 'Femenino' ? 'bg-warning text-dark' : 'bg-info') }}">
                         {{ $medico->genero }}
                     </span>
                     </div>
@@ -92,13 +99,13 @@
 
                     <div class="col-md-3"><strong>Fecha de Nacimiento:</strong><br>{{ \Carbon\Carbon::parse($medico->fecha_nacimiento)->format('d/m/Y') }}</div>
                     <div class="col-md-3"><strong>Salario:</strong><br>{{ $medico->salario ? 'Lps. ' . number_format($medico->salario, 2) : 'No especificado' }}</div>
-                    <div class="col-md-3"><strong>Turno Asignado:</strong><br>{{ $medico->turno_asignado ?? 'No especificado' }}</div>
 
                     <div class="col-md-6"><strong>Dirección:</strong><br><span style="white-space: pre-line;">{{ $medico->direccion }}</span></div>
                     <div class="col-md-6"><strong>Observaciones:</strong><br><span style="white-space: pre-line;">{{ $medico->observaciones ?: 'Sin observaciones.' }}</span></div>
                 </div>
             </div>
 
+            <!-- Botón Regresar -->
             <div class="text-center pb-4">
                 <a href="{{ route('medicos.index') }}"
                    class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2"
@@ -108,4 +115,30 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal para mostrar imagen grande -->
+    <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-transparent border-0 position-relative d-flex justify-content-center align-items-center" style="background: rgba(0,0,0,0.7);">
+                <div class="modal-body p-0" style="max-width: 90vw; max-height: 90vh;">
+                    <img src="{{ asset($medico->foto ? 'storage/' . $medico->foto : 'images/default-user.png') }}"
+                         alt="Foto del médico"
+                         style="max-width: 450px; max-height: 450px; object-fit: cover; cursor: pointer;"
+                         id="imagenGrande">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Cerrar modal al hacer clic en la imagen grande
+        document.addEventListener('DOMContentLoaded', function() {
+            const imagenGrande = document.getElementById('imagenGrande');
+            imagenGrande.addEventListener('click', function() {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('fotoModal'));
+                modal.hide();
+            });
+        });
+    </script>
 @endsection
