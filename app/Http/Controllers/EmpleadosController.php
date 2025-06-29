@@ -175,7 +175,7 @@ class EmpleadosController extends Controller
             $file = $request->file('foto');
             $nombreArchivo = time() . '_' . $file->getClientOriginalName();
             $file->storeAs('public/fotos', $nombreArchivo);
-            $validated['foto'] = $nombreArchivo;
+            $validated['foto'] = 'fotos/' . $nombreArchivo; // 🔥 aquí agregas la carpeta
         }
 
         $validated['estado'] = 'activo';
