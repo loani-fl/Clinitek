@@ -16,7 +16,7 @@ class Consulta extends Model
         'fecha',
         'hora',
         'especialidad',
-        'medico_id', // ✅ debe estar aquí
+        'medico_id', 
         'motivo',
         'sintomas',
     ];

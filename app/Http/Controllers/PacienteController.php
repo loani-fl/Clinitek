@@ -90,11 +90,11 @@ class PacienteController extends Controller
         return redirect()->route('pacientes.index')->with('success', 'Paciente registrado exitosamente.');
     }
 
-public function index()
-{
-    $pacientes = Paciente::paginate(10);  // 10 por página
+public function index() {
+    $pacientes = Paciente::paginate(10);
     return view('pacientes.index', compact('pacientes'));
 }
+
 
 
 
