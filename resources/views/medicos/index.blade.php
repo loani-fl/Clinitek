@@ -1,149 +1,259 @@
 @extends('layouts.app')
 
-@section('title', 'Listado de Médicos')
-
 @section('content')
+    <style>
+        body {
+            overflow-x: hidden;
+        }
 
-<div class="header d-flex justify-content-between align-items-center px-3 py-2" style="background-color: #007BFF;">
-    <div class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</div>
-    <div class="d-flex gap-3 flex-wrap">
-        <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
-        <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
-        <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
-    </div>
-</div>
+        .custom-card {
+            background-color: #ffffff;
+            border-color: #91cfff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            max-width: 90%;
+            width: 100%;
+            padding: 1rem;
+            margin-top: 60px;
+            min-height: calc(100vh - 80px);
+        }
 
-<div class="container mt-3" style="max-width: 1000px;"> {{-- ancho más pequeño --}}
+        thead tr {
+            background-color: #cce5ff;
+            color: #003e7e;
+        }
 
-    <div class="card shadow rounded-4 border-0">
+        tbody tr:hover {
+            background-color: #e9f2ff;
+        }
 
-        {{-- Título sin fondo azul, texto centrado, negro y en negrita --}}
-        <div class="card-header rounded-top-4 d-flex justify-content-center align-items-center" style="background-color: transparent; border-bottom: 3px solid #007BFF;">
-    <h4 class="mb-0 fw-bold text-black text-center">Listado de Médicos</h4>
-</div>
+        .filtro-input {
+            font-size: 0.85rem;
+            max-width: 300px;
+        }
 
+        #mensajeResultados {
+            font-weight: 600;
+            color: #0d6efd;
+            margin-top: 0.5rem;
+            min-height: 1.2em;
+        }
 
-        <div class="card-body">
-            {{-- Mensaje de éxito --}}
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-                    <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-                </div>
-            @endif
+        .table td, .table th {
+            padding: 0.3rem 0.5rem;
+            font-size: 0.85rem;
+            line-height: 1.2;
+            vertical-align: middle;
+        }
 
-           {{-- Buscador con ancho más pequeño --}}
-           <form action="{{ route('medicos.index') }}" method="GET" class="mb-3 row g-2 align-items-center" style="max-width: 600px;">
-                <div class="col-auto">
-                    <input
-                        type="text"
-                        name="buscar"
-                        class="form-control"
-                        placeholder="Buscar por nombre o especialidad"
-                        value="{{ request('buscar') }}"
-                        style="min-width: 250px;"
-                    >
-                </div>
+        table th:nth-child(1), table td:nth-child(1) {
+            width: 30px;
+            text-align: center;
+        }
 
-                <div class="col-auto">
-                    <select name="estado" class="form-select" style="min-width: 130px;">
-                        <option value="">-- Todos --</option>
-                        <option value="1" {{ request('estado') === '1' ? 'selected' : '' }}>Activo</option>
-                        <option value="0" {{ request('estado') === '0' ? 'selected' : '' }}>Inactivo</option>
-                    </select>
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-outline-primary">Buscar</button>
-                </div>
-            </form>
+        table th:nth-child(2), table td:nth-child(2) {
+            width: 120px;
+        }
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-primary text-primary text-uppercase small">
-                        <tr>
-                            <th>#</th>
-                            <th>Estado</th>
-                            <th>Nombre</th>
-                            <th>Apellidos</th>
-                            <th>Teléfono</th>
-                            <th>Correo</th>
-                            <th>Especialidad</th>
-                            <th>Género</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
+        table th:nth-child(3), table td:nth-child(3) {
+            width: 120px;
+        }
 
-                    <tbody id="tabla-medicos">
-                        @if($medicos->isEmpty())
-                            <tr>
-                                <td colspan="9">
-                                    <div class="alert alert-info shadow-sm text-center m-0" role="alert">
-                                        <i class="bi bi-info-circle me-2"></i> No hay médicos registrados aún.
-                                    </div>
-                                </td>
-                            </tr>
-                        @else
-                            @foreach ($medicos as $medico)
-                                <tr>
-                                    <td>{{ ($medicos->currentPage() - 1) * $medicos->perPage() + $loop->iteration }}</td>
-                                    <td class="text-center">
-                                        @if($medico->estado)
-                                            <i class="bi bi-circle-fill text-success" title="Activo"></i>
-                                        @else
-                                            <i class="bi bi-circle-fill text-danger" title="Inactivo"></i>
-                                        @endif
-                                    </td>
-                                    <td class="fw-medium">{{ $medico->nombre }}</td>
-                                    <td>{{ $medico->apellidos }}</td>
-                                    <td class="text-center">{{ $medico->telefono }}</td>
-                                    <td>{{ $medico->correo }}</td>
-                                    <td class="text-center">{{ $medico->especialidad }}</td>
-                                    <td class="text-center">
-                                        @if($medico->genero === 'Masculino')
-                                            <span class="badge bg-primary">{{ $medico->genero }}</span>
-                                        @else
-                                            <span class="badge bg-info">{{ $medico->genero }}</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('medicos.show', $medico->id) }}" class="btn btn-sm btn-outline-info me-2" title="Ver Detalles">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="{{ route('medicos.edit', $medico->id) }}" class="btn btn-sm btn-outline-warning" title="Editar Médico">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @endif
-                    </tbody>
-                </table>
+        table th:nth-child(4), table td:nth-child(4) {
+            width: 150px;
+        }
 
-                <div class="d-flex justify-content-center mt-3">
-                    {{ $medicos->links('pagination::bootstrap-5') }}
-                </div>
+        table th:nth-child(5), table td:nth-child(5) {
+            width: 90px;
+            text-align: center;
+        }
+
+        table th:nth-child(6), table td:nth-child(6) {
+            width: 110px;
+            text-align: center;
+        }
+
+        .pagination-container {
+            font-size: 0.9rem;
+        }
+
+        .btn-white-border {
+            border: 1px solid white !important;
+        }
+
+        .btn-outline-info {
+            color: #0dcaf0;
+            border-color: #0dcaf0;
+        }
+
+        .btn-outline-info:hover {
+            background-color: #0dcaf0;
+            color: white;
+        }
+
+        .btn-outline-warning {
+            color: #ffc107;
+            border-color: #ffc107;
+        }
+
+        .btn-outline-warning:hover {
+            background-color: #ffc107;
+            color: black;
+        }
+    </style>
+
+    <div class="w-100 fixed-top" style="background-color: #007BFF; z-index: 1050;">
+        <div class="d-flex justify-content-between align-items-center px-3 py-2">
+            <div class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</div>
+            <div class="d-flex gap-3 flex-wrap">
+                <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
+                <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
+                <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $('#buscador').on('keyup', function () {
-        let valor = $(this).val();
+    <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100">
+        <div class="card-header position-relative py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
+            <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Listado de Médicos</h5>
+            <div class="d-flex gap-2 position-absolute end-0 top-50 translate-middle-y me-3">
+                <a href="{{ route('inicio') }}" class="btn btn-sm btn-light">
+                    <i class="bi bi-house-door"></i> Inicio
+                </a>
+                <a href="{{ route('medicos.create') }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-circle"></i> Nuevo médico
+                </a>
+            </div>
+        </div>
 
-        $.ajax({
-            url: '/medicos/buscar/ajax',
-            type: 'GET',
-            data: { buscar: valor },
-            success: function (data) {
-                $('#tabla-medicos').html(data);
-            },
-            error: function () {
-                alert('Ocurrió un error al buscar médicos.');
+        <div class="p-3">
+            <div class="d-flex justify-content-center align-items-center gap-2 mb-3 flex-wrap">
+                <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por nombre, apellido o especialidad...">
+                <button id="btnLimpiar" class="btn btn-outline-primary btn-sm">Limpiar filtro</button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle mb-0">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Especialidad</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tablaMedicos">
+                    @forelse ($medicos as $index => $medico)
+                        <tr>
+                            <td>{{ $medicos->firstItem() + $index }}</td>
+                            <td>{{ $medico->nombre }}</td>
+                            <td>{{ $medico->apellidos }}</td>
+                            <td>{{ $medico->especialidad }}</td>
+                            <td class="text-center">
+                                @php
+                                    $estado = strtolower(trim($medico->estado ?? ''));
+                                @endphp
+
+                                @if ($estado === 'activo' || $estado === '1' || $estado === 'true')
+                                    <span class="d-inline-flex align-items-center gap-1">
+            <span class="rounded-circle" style="width: 10px; height: 10px; background-color: #28a745;"></span>
+            <span class="text-success"></span>
+        </span>
+                                @else
+                                    <span class="d-inline-flex align-items-center gap-1">
+            <span class="rounded-circle" style="width: 10px; height: 10px; background-color: #dc3545;"></span>
+            <span class="text-danger"></span>
+        </span>
+                                @endif
+                            </td>
+
+                            <td>
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <a href="{{ route('medicos.show', $medico->id) }}" class="btn btn-white-border btn-outline-info btn-sm" title="Ver">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ route('medicos.edit', $medico->id) }}" class="btn btn-white-border btn-outline-warning btn-sm" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center">No hay médicos registrados.</td>
+                        </tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="mensajeResultados" class="text-center mt-3"></div>
+
+            <div class="pagination-container d-flex justify-content-center mt-2">
+                {{ $medicos->links() }}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const noResultadosRow = $('<tr class="no-resultados"><td colspan="6" class="text-center">No hay médicos que coincidan con la búsqueda.</td></tr>');
+            noResultadosRow.hide();
+            $('#tablaMedicos').append(noResultadosRow);
+
+            function actualizarMensaje(totalVisible, filtroVacio) {
+                if (totalVisible === 0) {
+                    $('#mensajeResultados').text('No hay médicos que coincidan con la búsqueda.');
+                } else if (filtroVacio) {
+                    $('#mensajeResultados').text('');
+                } else {
+                    $('#mensajeResultados').text(`Se encontraron ${totalVisible} resultado${totalVisible > 1 ? 's' : ''}.`);
+                }
             }
-        });
-    });
-</script>
 
+            function filtrarTabla() {
+                let valor = $('#filtroBusqueda').val().toLowerCase();
+                let totalVisible = 0;
+
+                $('#tablaMedicos tr').not('.no-resultados').each(function () {
+                    let textoFila = $(this).text().toLowerCase();
+                    if (textoFila.indexOf(valor) > -1) {
+                        $(this).show();
+                        totalVisible++;
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                if (totalVisible === 0) {
+                    noResultadosRow.show();
+                } else {
+                    noResultadosRow.hide();
+                }
+
+                actualizarMensaje(totalVisible, valor === '');
+
+                let indice = 1;
+                $('#tablaMedicos tr:visible').not('.no-resultados').each(function () {
+                    $(this).find('td:first').text(indice++);
+                });
+            }
+
+            $('#filtroBusqueda').on('keyup', filtrarTabla);
+
+            $('#btnLimpiar').on('click', function () {
+                $('#filtroBusqueda').val('');
+                filtrarTabla();
+                $('#mensajeResultados').text('');
+                $('#filtroBusqueda').focus();
+            });
+
+            $('#mensajeResultados').text('');
+        });
+    </script>
 @endsection

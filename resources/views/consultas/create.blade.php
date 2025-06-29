@@ -336,8 +336,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('correo').value = opt.getAttribute('data-correo') || '';
         document.getElementById('direccion').value = opt.getAttribute('data-direccion') || '';
     }
-    pacienteSelect.addEventListener('change', autocompletarPaciente);
-    if (pacienteSelect.value) autocompletarPaciente();
 
     function actualizarVisibilidadTotalPagar() {
         const horaSeleccionada = horaSelect.value;
@@ -358,27 +356,6 @@ document.addEventListener('DOMContentLoaded', function () {
             totalPagarInput.value = '';
         }
     }
-
-    medicoSelect.addEventListener('change', function () {
-        const selected = this.options[this.selectedIndex];
-        const especialidad = selected.getAttribute('data-especialidad') || '';
-        especialidadInput.value = especialidad;
-
-        if (especialidad && preciosPorEspecialidad.hasOwnProperty(especialidad)) {
-            // Actualizar total sólo si la consulta es inmediata
-            if (horaSelect.value === 'inmediata') {
-                totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
-            }
-        } else {
-            totalPagarInput.value = '';
-        }
-
-        cargarHorasDisponibles();
-    });
-
-    fechaConsultaInput.addEventListener('change', cargarHorasDisponibles);
-
-    horaSelect.addEventListener('change', actualizarVisibilidadTotalPagar);
 
     function hora12a24(hora12) {
         if (hora12 === 'inmediata') return null;
@@ -442,7 +419,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (optMatch && !optMatch.disabled) horaSelect.value = horaPrev;
                 }
 
-                actualizarVisibilidadTotalPagar(); // actualizar al cargar horas disponibles
+                actualizarVisibilidadTotalPagar();
             })
             .catch(err => {
                 console.error('Error cargando horas:', err);
@@ -452,64 +429,69 @@ document.addEventListener('DOMContentLoaded', function () {
                     option.textContent = hora12;
                     horaSelect.appendChild(option);
                 });
-                actualizarVisibilidadTotalPagar(); // actualizar al cargar horas disponibles
+                actualizarVisibilidadTotalPagar();
             });
     }
 
-    if (medicoSelect.value) {
-        const selected = medicoSelect.options[medicoSelect.selectedIndex];
+    medicoSelect.addEventListener('change', function () {
+        const selected = this.options[this.selectedIndex];
         const especialidad = selected.getAttribute('data-especialidad') || '';
         especialidadInput.value = especialidad;
 
         if (especialidad && preciosPorEspecialidad.hasOwnProperty(especialidad)) {
-            totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
+            if (horaSelect.value === 'inmediata') {
+                totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
+            }
+        } else {
+            totalPagarInput.value = '';
         }
-    }
 
+        cargarHorasDisponibles();
+    });
+
+    fechaConsultaInput.addEventListener('change', cargarHorasDisponibles);
+    horaSelect.addEventListener('change', actualizarVisibilidadTotalPagar);
+    pacienteSelect.addEventListener('change', autocompletarPaciente);
 
     btnLimpiar.addEventListener('click', function (e) {
-    e.preventDefault(); // Evita el comportamiento por defecto si el botón es de tipo submit
+        e.preventDefault();
+        form.reset();
+        pacienteSelect.value = '';
+        medicoSelect.value = '';
+        horaSelect.innerHTML = `
+            <option value="">-- Selecciona hora --</option>
+            <option value="inmediata">Inmediata</option>
+        `;
+        especialidadInput.value = '';
+        totalPagarInput.value = '';
+        document.getElementById('identidad').value = '';
+        document.getElementById('fecha_nacimiento').value = '';
+        document.getElementById('telefono').value = '';
+        document.getElementById('correo').value = '';
+        document.getElementById('direccion').value = '';
+        generoSelect.value = '';
+        contenedorTotalPagar.style.display = 'none';
 
-    // 🔁 Reset del formulario
-    form.reset();
+        form.querySelectorAll('.is-invalid, .is-valid').forEach(el => {
+            el.classList.remove('is-invalid', 'is-valid');
+        });
 
-    // 🔁 Limpiar manualmente valores (por si reset no afecta algunos campos)
-    pacienteSelect.value = '';
-    medicoSelect.value = '';
-    horaSelect.innerHTML = `
-        <option value="">-- Selecciona hora --</option>
-        <option value="inmediata">Inmediata</option>
-    `;
-    especialidadInput.value = '';
-    totalPagarInput.value = '';
-    
-    // 🔁 Limpiar campos autocompletados
-    document.getElementById('identidad').value = '';
-    document.getElementById('fecha_nacimiento').value = '';
-    document.getElementById('telefono').value = '';
-    document.getElementById('correo').value = '';
-    document.getElementById('direccion').value = '';
-    document.getElementById('genero').value = ''; // ← importante: campo hidden de género
+        form.querySelectorAll('.invalid-feedback').forEach(feedback => {
+            feedback.remove();
+        });
 
-    // 🔁 Ocultar campos dinámicos
-    contenedorTotalPagar.style.display = 'none';
-
-    // 🔁 Quitar clases de validación (visual)
-    form.querySelectorAll('.is-invalid, .is-valid').forEach(el => {
-        el.classList.remove('is-invalid', 'is-valid');
+        form.querySelectorAll('.text-danger').forEach(span => {
+            span.textContent = '';
+        });
     });
 
-    // 🔁 Eliminar todos los mensajes de error generados (invalid-feedback)
-    form.querySelectorAll('.invalid-feedback').forEach(feedback => {
-        feedback.remove();
-    });
+    // 🧠 Ejecutar lógica con datos antiguos si hay errores de validación
+    if (pacienteSelect.value) autocompletarPaciente();
 
-    // 🔁 También puedes limpiar los textos en .text-danger si usaste etiquetas <span>
-    form.querySelectorAll('.text-danger').forEach(span => {
-        span.textContent = '';
-    });
-});
-    // Inicializa visibilidad al cargar la página
-    actualizarVisibilidadTotalPagar();
+    if (medicoSelect.value && fechaConsultaInput.value) {
+        cargarHorasDisponibles();
+    } else {
+        actualizarVisibilidadTotalPagar();
+    }
 });
 </script>

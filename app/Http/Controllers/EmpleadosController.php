@@ -175,7 +175,7 @@ class EmpleadosController extends Controller
             $file = $request->file('foto');
             $nombreArchivo = time() . '_' . $file->getClientOriginalName();
             $file->storeAs('public/fotos', $nombreArchivo);
-            $validated['foto'] = $nombreArchivo;
+            $validated['foto'] = 'fotos/' . $nombreArchivo; // 🔥 aquí agregas la carpeta
         }
 
         $validated['estado'] = 'activo';
@@ -267,6 +267,7 @@ class EmpleadosController extends Controller
             'turno_asignado' => ['required', 'in:Mañana,Tarde,Noche'],
             'estado' => ['required', 'in:Activo,Inactivo'],
             'area' => 'required|string|max:50',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ];
 
         $messages = [
@@ -316,6 +317,10 @@ class EmpleadosController extends Controller
 
             'estado.required' => 'El Estado es obligatorio.',
             'estado.in' => 'El Estado no es válido.',
+
+            'foto.image' => 'La foto debe ser una imagen válida.',
+            'foto.mimes' => 'La foto debe ser un archivo jpg, jpeg, png o gif.',
+            'foto.max' => 'La foto no puede superar los 2MB.',
         ];
 
         $attributes = [
@@ -334,12 +339,17 @@ class EmpleadosController extends Controller
             'observaciones' => 'Observaciones',
             'turno_asignado' => 'Turno asignado',
             'estado' => 'Estado',
+            'foto' => 'foto',
         ];
 
         $validated = $request->validate($rules, $messages, $attributes);
 
         $puesto = Puesto::findOrFail($validated['puesto_id']);
         $validated['area'] = $puesto->area;
+
+        if ($request->hasFile('foto')) {
+            $datosMedico['foto'] = $request->file('foto')->store('fotos_medicos', 'public');
+        }
 
         $empleado->update($validated);
 
