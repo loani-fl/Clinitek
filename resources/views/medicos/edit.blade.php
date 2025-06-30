@@ -221,7 +221,7 @@
 
                 <div class="d-flex justify-content-center gap-3 mt-4">
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-save"></i> Actualizar
+                    <i class="bi bi-save"></i> Guardar Cambios
                 </button>
                 <button type="reset" class="btn btn-warning">
                     <i class="bi bi-arrow-counterclockwise"></i> Restablecer
