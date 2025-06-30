@@ -137,7 +137,7 @@
     {{-- Filtro y botón centrados --}}
     <div class="d-flex justify-content-center align-items-center gap-2 mb-3 flex-wrap">
       <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por nombre, apellido o identidad...">
-      <button id="btnLimpiar" class="btn btn-outline-primary btn-sm">Limpiar filtro</button>
+      <!--<button id="btnLimpiar" class="btn btn-outline-primary btn-sm">Limpiar filtro</button>-->
     </div>
 
     {{-- Tabla de resultados --}}
