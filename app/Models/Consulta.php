@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Paciente;
+use App\Models\Medico;
 
 class Consulta extends Model
 {
@@ -12,24 +13,22 @@ class Consulta extends Model
 
     protected $fillable = [
         'paciente_id',
-        'genero',
         'fecha',
         'hora',
         'especialidad',
-        'medico_id', // ✅ debe estar aquí
+        'medico_id',
         'motivo',
         'sintomas',
     ];
 
     public function paciente()
-{
-    return $this->belongsTo(Paciente::class);
+    {
+        return $this->belongsTo(Paciente::class);
+    }
+
+    public function medico()
+    {
+        return $this->belongsTo(Medico::class);
+    }
 }
 
-public function medico()
-{
-    return $this->belongsTo(Medico::class);
-}
-
-
-}

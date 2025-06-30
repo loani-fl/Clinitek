@@ -13,19 +13,24 @@ return new class extends Migration
     {
         Schema::create('consultas', function (Blueprint $table) {
             $table->id();
+
+            // Relación con paciente
             $table->foreignId('paciente_id')->constrained()->onDelete('cascade');
 
+            // Relación con medico
+            $table->foreignId('medico_id')->constrained()->onDelete('cascade');
 
             // Información de la consulta
-            $table->string('genero')->nullable();
             $table->date('fecha');
             $table->time('hora')->nullable();
             $table->string('especialidad')->nullable();
-            $table->unsignedBigInteger('medico_id');
-            $table->foreign('medico_id')->references('id')->on('medicos');
-
             $table->text('motivo');
             $table->text('sintomas')->nullable();
+
+            // Opcional: puedes agregar estos si quieres más detalle
+            // $table->text('diagnostico')->nullable();
+            // $table->text('tratamiento')->nullable();
+            // $table->text('recomendaciones')->nullable();
 
             $table->timestamps();
         });
@@ -39,3 +44,4 @@ return new class extends Migration
         Schema::dropIfExists('consultas');
     }
 };
+
