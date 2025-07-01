@@ -190,51 +190,12 @@
     {{-- Mensaje debajo de los resultados --}}
     <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
 
-    {{-- Paginación al final --}}
-    @if($pacientes->hasPages())
-      <nav aria-label="Paginación de pacientes" class="pagination-container d-flex justify-content-center mt-2">
-        <ul class="pagination mb-0">
-          {{-- Anterior --}}
-          @if($pacientes->onFirstPage())
-            <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-          @else
-            <li class="page-item">
-              <a class="page-link" href="{{ $pacientes->previousPageUrl() }}" rel="prev">&laquo;</a>
-            </li>
-          @endif
+@if ($pacientes->hasPages())
+  <div class="d-flex justify-content-center mt-3">
+    {{ $pacientes->links('pagination::bootstrap-4') }}
+  </div>
+@endif
 
-          {{-- Números --}}
-          @foreach($pacientes->elements() as $element)
-            @if(is_string($element))
-              <li class="page-item disabled"><span class="page-link">{{ $element }}</span></li>
-            @elseif(is_array($element))
-              @foreach($element as $page => $url)
-                <li class="page-item {{ $page == $pacientes->currentPage() ? 'active' : '' }}">
-                  @if($page == $pacientes->currentPage())
-                    <span class="page-link">{{ $page }}</span>
-                  @else
-                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
-                  @endif
-                </li>
-              @endforeach
-            @endif
-          @endforeach
-
-          {{-- Siguiente --}}
-          @if($pacientes->hasMorePages())
-            <li class="page-item">
-              <a class="page-link" href="{{ $pacientes->nextPageUrl() }}" rel="next">&raquo;</a>
-            </li>
-          @else
-            <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-          @endif
-        </ul>
-      </nav>
-    @endif
-
-  </div> {{-- Cierre de .p-3 --}}
-  
-</div> {{-- Cierre de .card --}}
 
 
 
