@@ -142,7 +142,7 @@ class MedicoController extends Controller
         $query->where('estado', $request->estado);
     }
 
-    $medicos = $query->orderBy('nombre')->paginate(10)->appends($request->all());
+    $medicos = $query->orderBy('nombre')->paginate(4)->appends($request->all());
 
     return view('medicos.index', compact('medicos'));
 }
@@ -289,16 +289,13 @@ public function show($id)
     }
     public function toggleEstado(Medico $medico)
     {
-        $medico->update([
-            'estado' => !$medico->estado,
-        ]);
+        $medico->estado = !$medico->estado;
+        $medico->save();
 
-        $mensaje = $medico->estado
-            ? 'El médico ha sido activado correctamente.'
-            : 'El médico ha sido desactivado correctamente.';
-
-        return back()->with('success', $mensaje);
+        return redirect()->route('medicos.edit', $medico->id)
+            ->with('success', 'Estado del médico actualizado correctamente.');
     }
+
     public function buscar(Request $request)
     {
         $termino = $request->input('buscar');

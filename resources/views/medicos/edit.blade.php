@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <!-- Barra de navegación superior -->
+    <!-- Barra superior -->
     <div class="header d-flex justify-content-between align-items-center px-3 py-2"
          style="background-color: #007BFF; position: sticky; top: 0; z-index: 1030;">
         <div class="d-flex align-items-center">
@@ -17,7 +17,6 @@
         </div>
     </div>
 
-    <!-- Estilo del formulario -->
     <style>
         .custom-card {
             max-width: 1000px;
@@ -56,16 +55,15 @@
             <h2 class="fw-bold text-black mb-0">Editar Médico</h2>
         </div>
 
-        {{-- Botón para cambiar estado --}}
-        <form id="estadoForm" action="{{ route('medicos.toggleEstado', $medico->id) }}" method="POST" class="d-inline mb-3">
+        {{-- Botón cambiar estado --}}
+        <form action="{{ route('medicos.toggleEstado', $medico->id) }}" method="POST" class="d-inline">
             @csrf
             @method('PATCH')
 
-            <button type="submit" id="estadoBtn"
-                    class="btn btn-sm {{ $medico->estado ? 'btn-outline-danger' : 'btn-outline-success' }}"
+            <button type="submit" class="btn btn-sm {{ $medico->estado ? 'btn-danger' : 'btn-success' }}"
                     title="{{ $medico->estado ? 'Desactivar médico' : 'Activar médico' }}">
-                <i id="iconoEstado" class="bi {{ $medico->estado ? 'bi-person-dash' : 'bi-person-check' }}"></i>
-                <span id="textoEstado">{{ $medico->estado ? 'Desactivar Médico' : 'Activar Médico' }}</span>
+                <i class="bi {{ $medico->estado ? 'bi-person-dash' : 'bi-person-check' }}"></i>
+                {{ $medico->estado ? 'Desactivar Médico' : 'Activar Médico' }}
             </button>
         </form>
 
@@ -83,29 +81,24 @@
 
                 <div class="col-md-3">
                     <label class="form-label">Nombre</label>
-                    <input type="text" name="nombre" maxlength="50"
+                    <input type="text" name="nombre" id="nombres" maxlength="50"
                            class="form-control @error('nombre') is-invalid @enderror"
                            value="{{ old('nombre', $medico->nombre) }}" required>
-                    <div class="invalid-feedback">Completa este dato</div>
-                    @error('nombre')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    @error('nombre') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label">Apellidos</label>
-                    <input type="text" name="apellidos" maxlength="50"
+                    <input type="text" name="apellidos" id="apellidos" maxlength="50"
                            class="form-control @error('apellidos') is-invalid @enderror"
                            value="{{ old('apellidos', $medico->apellidos) }}" required>
-                    <div class="invalid-feedback">Completa este dato</div>
-                    @error('apellidos')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    @error('apellidos') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label">Especialidad</label>
-                    <select name="especialidad" id="especialidad" class="form-select @error('especialidad') is-invalid @enderror" required>
+                    <select name="especialidad" id="especialidad"
+                            class="form-select @error('especialidad') is-invalid @enderror" required>
                         <option value="">Seleccionar especialidad</option>
                         @php
                             $especialidades = ['Cardiología', 'Neurología', 'Pediatría', 'Dermatología', 'Psiquiatría', 'Radiología'];
@@ -116,9 +109,7 @@
                             </option>
                         @endforeach
                     </select>
-                    @error('especialidad')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    @error('especialidad') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-3">
@@ -127,10 +118,7 @@
                            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                            class="form-control @error('telefono') is-invalid @enderror"
                            value="{{ old('telefono', $medico->telefono) }}" required>
-                    <div class="invalid-feedback"></div>
-                    @error('telefono')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    @error('telefono') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-3">
@@ -138,31 +126,23 @@
                     <input type="email" name="correo" maxlength="30"
                            class="form-control @error('correo') is-invalid @enderror"
                            value="{{ old('correo', $medico->correo) }}" required>
-                    @error('correo')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    @error('correo') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label">Identidad</label>
-                    <input type="text" name="numero_identidad" maxlength="13"
+                    <input type="text" name="numero_identidad" id="identidad" maxlength="13"
                            class="form-control @error('numero_identidad') is-invalid @enderror"
                            value="{{ old('numero_identidad', $medico->numero_identidad) }}" required>
-                    <div class="invalid-feedback">Completa este dato</div>
-                    @error('numero_identidad')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    @error('numero_identidad') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label">Salario</label>
                     <input type="text" id="salario_mostrado" class="form-control" readonly>
-
                     <input type="hidden" name="salario" id="salario_real"
                            value="{{ old('salario', $medico->salario) }}">
-                    @error('salario')
-                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
+                    @error('salario') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-3">
@@ -171,10 +151,7 @@
                            class="form-control @error('fecha_nacimiento') is-invalid @enderror"
                            value="{{ old('fecha_nacimiento', $medico->fecha_nacimiento) }}"
                            required min="1950-01-01" max="2005-12-31">
-                    <div class="invalid-feedback">Completa este dato</div>
-                    @error('fecha_nacimiento')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    @error('fecha_nacimiento') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 @php
@@ -184,14 +161,11 @@
 
                 <div class="col-md-3">
                     <label class="form-label">Fecha de Ingreso</label>
-                    <input type="date" name="fecha_ingreso" id="fecha_ingreso"
+                    <input type="date" name="fecha_ingreso"
                            class="form-control @error('fecha_ingreso') is-invalid @enderror"
                            value="{{ old('fecha_ingreso', $medico->fecha_ingreso) }}"
                            min="{{ $minFecha }}" max="{{ $maxFecha }}" required>
-                    <div class="invalid-feedback">Completa este dato</div>
-                    @error('fecha_ingreso')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    @error('fecha_ingreso') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-3">
@@ -202,9 +176,7 @@
                         <option value="Femenino" {{ old('genero', $medico->genero) == 'Femenino' ? 'selected' : '' }}>Femenino</option>
                         <option value="Otro" {{ old('genero', $medico->genero) == 'Otro' ? 'selected' : '' }}>Otro</option>
                     </select>
-                    @error('genero')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    @error('genero') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-6">
@@ -212,20 +184,14 @@
                     <textarea name="direccion" maxlength="150" rows="3"
                               class="form-control @error('direccion') is-invalid @enderror"
                               required>{{ old('direccion', $medico->direccion) }}</textarea>
-                    <div class="invalid-feedback">Completa este dato</div>
-                    @error('direccion')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    @error('direccion') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
-
 
                 <div class="col-md-6">
                     <label class="form-label">Observaciones</label>
                     <textarea name="observaciones" maxlength="100" rows="3"
                               class="form-control @error('observaciones') is-invalid @enderror">{{ old('observaciones', $medico->observaciones) }}</textarea>
-                    @error('observaciones')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    @error('observaciones') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-3">
@@ -233,16 +199,16 @@
                     @if(!empty($medico->foto) && file_exists(storage_path('app/public/' . $medico->foto)))
                         <img src="{{ asset('storage/' . $medico->foto) }}"
                              alt="Foto actual del médico"
-                             class="shadow-sm"
-                             style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 2px solid #0d6efd; margin-bottom: 0.5rem;">
+                             class="shadow-sm mb-2"
+                             style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 2px solid #0d6efd;">
                     @else
                         <img src="{{ asset('images/default-user.png') }}"
                              alt="Foto por defecto"
-                             class="shadow-sm"
-                             style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 2px solid #0d6efd; margin-bottom: 0.5rem;">
+                             class="shadow-sm mb-2"
+                             style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 2px solid #0d6efd;">
                     @endif
 
-                    {{-- Input para subir nueva foto --}}
+                    {{-- Input para nueva foto --}}
                     <label for="foto" class="form-label">Foto:</label>
                     <input type="file" name="foto" id="foto"
                            class="form-control form-control-sm @error('foto') is-invalid @enderror"
@@ -253,92 +219,61 @@
                     <div class="form-text">Opcional. Formato: JPG, PNG.</div>
                 </div>
 
-
-
-            </div>
-
-            <div class="d-flex justify-content-center gap-3 mt-4">
+                <div class="d-flex justify-content-center gap-3 mt-4">
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-save"></i> Actualizar
+                    <i class="bi bi-save"></i> Guardar Cambios
                 </button>
-
-                <button type="button" id="btnRestablecer" class="btn btn-warning">
+                <button type="reset" class="btn btn-warning">
                     <i class="bi bi-arrow-counterclockwise"></i> Restablecer
                 </button>
-
                 <a href="{{ route('medicos.index') }}" class="btn btn-success">
                     <i class="bi bi-arrow-left"></i> Regresar
                 </a>
             </div>
-
         </form>
     </div>
 
-    <!-- Script para restablecer formulario -->
+    <!-- Script de validación -->
     <script>
-        document.getElementById('btnRestablecer').addEventListener('click', () => {
-            const form = document.getElementById('formMedico');
-            form.reset();
+        document.addEventListener('DOMContentLoaded', () => {
+            const soloLetras = (e) => {
+                const char = String.fromCharCode(e.which);
+                if (!/[A-Za-zÁÉÍÓÚáéíóúÑñ\s]/.test(char)) e.preventDefault();
+            };
 
-            // Quitar clases de validación de bootstrap
-            form.querySelectorAll('input, select, textarea').forEach(el => {
-                el.classList.remove('is-invalid', 'is-valid');
+            const soloNumeros = (e) => {
+                const char = String.fromCharCode(e.which);
+                if (!/[0-9]/.test(char)) e.preventDefault();
+            };
+
+            document.getElementById('nombres')?.addEventListener('keypress', soloLetras);
+            document.getElementById('apellidos')?.addEventListener('keypress', soloLetras);
+            document.getElementById('identidad')?.addEventListener('keypress', soloNumeros);
+
+            ['nombres', 'apellidos'].forEach(id => {
+                document.getElementById(id)?.addEventListener('paste', e => {
+                    const texto = (e.clipboardData || window.clipboardData).getData('text');
+                    if (/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/.test(texto)) e.preventDefault();
+                });
             });
 
-            form.querySelectorAll('.invalid-feedback').forEach(el => {
-                el.textContent = '';
-                el.style.display = 'none';
+            ['identidad'].forEach(id => {
+                document.getElementById(id)?.addEventListener('paste', e => {
+                    const texto = (e.clipboardData || window.clipboardData).getData('text');
+                    if (/[^0-9]/.test(texto)) e.preventDefault();
+                });
             });
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     </script>
 
-    <!-- Script AJAX para toggle estado (opcional) -->
+    <!-- Script salario automático -->
     <script>
-        document.getElementById('estadoForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const form = this;
-            const btn = document.getElementById('estadoBtn');
-            const icon = document.getElementById('iconoEstado');
-            const texto = document.getElementById('textoEstado');
-
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                },
-                body: new URLSearchParams(new FormData(form))
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.estado) {
-                        btn.classList.remove('btn-outline-success');
-                        btn.classList.add('btn-outline-danger');
-                        icon.className = 'bi bi-person-dash';
-                        texto.textContent = 'Desactivar Médico';
-                    } else {
-                        btn.classList.remove('btn-outline-danger');
-                        btn.classList.add('btn-outline-success');
-                        icon.className = 'bi bi-person-check';
-                        texto.textContent = 'Activar Médico';
-                    }
-                })
-                .catch(err => console.error('Error al cambiar estado:', err));
-        });
-    </script>
-
-    <!-- Script para manejar el salario mostrado -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const especialidadSelect = document.getElementById('especialidad');
             const salarioMostrado = document.getElementById('salario_mostrado');
             const salarioReal = document.getElementById('salario_real');
 
-            const salariosPorEspecialidad = {
+            const salarios = {
                 "Cardiología": 15000,
                 "Neurología": 24800,
                 "Pediatría": 27500,
@@ -347,33 +282,23 @@
                 "Radiología": 16300
             };
 
-            function formatearSalario(valor) {
-                return 'L ' + valor.toLocaleString('es-HN', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
+            function formatear(valor) {
+                return 'L ' + valor.toLocaleString('es-HN', { minimumFractionDigits: 2 });
             }
 
             function actualizarSalario() {
-                const seleccion = especialidadSelect.value;
-                if (salariosPorEspecialidad.hasOwnProperty(seleccion)) {
-                    const salario = salariosPorEspecialidad[seleccion];
-                    salarioReal.value = salario;
-                    salarioMostrado.value = formatearSalario(salario);
+                const esp = especialidadSelect.value;
+                if (salarios[esp]) {
+                    salarioMostrado.value = formatear(salarios[esp]);
+                    salarioReal.value = salarios[esp];
                 } else {
-                    salarioReal.value = '';
                     salarioMostrado.value = '';
+                    salarioReal.value = '';
                 }
             }
 
             especialidadSelect.addEventListener('change', actualizarSalario);
-
-            // Al cargar, mostrar salario actual si hay
-            if (especialidadSelect.value) {
-                actualizarSalario();
-            } else if (salarioReal.value) {
-                salarioMostrado.value = formatearSalario(parseFloat(salarioReal.value));
-            }
+            actualizarSalario();
         });
     </script>
 

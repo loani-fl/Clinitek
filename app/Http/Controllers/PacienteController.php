@@ -85,7 +85,7 @@ class PacienteController extends Controller
         ]);
 
         Paciente::create($request->all());
-        
+
 
         return redirect()->route('pacientes.index')->with('success', 'Paciente registrado exitosamente.');
     }
@@ -114,15 +114,16 @@ public function index() {
     public function update(Request $request, Paciente $paciente)
     {
         $request->validate([
-            'nombre' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
-            'apellidos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
+
+            'nombre' => ['required', 'regex:/^[\pL\s]+$/u', 'max:30'], // Solo letras y espacios, max 30
+            'apellidos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:30'], // Solo letras y espacios, max 30
             'genero' => ['nullable', 'in:Masculino,Femenino,Otro'],
-            'identidad' => ['required', 'digits:13', 'regex:/^(0[1-9]|1[0-8])[0-9]{11}$/'],
+            'identidad' => ['required', 'digits:13', 'regex:/^[0-9]{13}$/'], // Exactamente 13 dígitos numéricos
             'fecha_nacimiento' => ['required', 'date', 'before_or_equal:today'],
             'telefono' => [
                 'required',
                 'digits:8',
-                'regex:/^[0-9]{8}$/',
+                'regex:/^[0-9]{8}$/', // Solo 8 dígitos numéricos
                 \Illuminate\Validation\Rule::unique('pacientes', 'telefono')->ignore($paciente->id),
             ],
             'direccion' => ['required', 'string', 'max:300'],
