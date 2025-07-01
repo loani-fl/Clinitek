@@ -24,13 +24,14 @@ class PuestoController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'codigo' => [
-                'required',
-                'string',
-                'max:10',
-                'regex:/^[A-Za-z0-9\-]+$/',
-                'unique:puestos,codigo',
-            ],
+          'codigo' => [
+    'required',
+    'string',
+    'max:10',
+    'regex:/^[A-Za-zÑñ0-9\-]+$/',
+    'unique:puestos,codigo',
+],
+
             'nombre' => [
                 'required',
                 'string',

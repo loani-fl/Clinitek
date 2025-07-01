@@ -4,62 +4,195 @@
 
 @push('styles')
 <style>
-    /* Opcional: estilos para negrita en valores si quieres */
+    body {
+        background-color: #e8f4fc;
+    }
+
+    .custom-card::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 800px;
+        height: 800px;
+        background-image: url('/images/logo2.jpg');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.15;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .custom-card {
+        max-width: 1000px;
+        background-color: #fff;
+        border-color: #91cfff;
+        position: relative;
+        overflow: hidden;
+        margin: 70px auto 2rem; /* margen superior aumentado para navbar fijo */
+        padding: 1.5rem 5rem 5rem 5rem; /* menos padding arriba para acercar el contenido */
+        border: 1px solid #91cfff;
+        border-radius: 12px;
+    }
+
     .list-group-item strong {
-        color: rgb(58, 60, 63);
+        color: #000;
+        font-weight: bold;
+    }
+
+    /* Estilos navbar */
+    .header {
+        background-color: #007BFF;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100vw;
+        z-index: 1030;
+        padding: 0.5rem 1rem;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header .fw-bold {
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .header .nav-buttons {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .header .nav-buttons a {
+        color: white !important;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .header .nav-buttons a:hover {
+        text-decoration: underline;
+    }
+
+    .custom-card-header {
+        border-bottom: 3px solid #007BFF;
+        padding-bottom: 0.75rem;
+        margin-bottom: 0.5rem; /* menos margen para pegar más al contenido */
+        font-size: 1.5rem;
+        color: #000;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .btn-regresar {
+        font-size: 0.9rem;
+        padding: 0.4rem 1.2rem;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        display: block;
+        margin: 2rem auto 0 auto;
+        width: max-content;
+    }
+
+    .row.g-4 {
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .list-group-item {
+        background-color: transparent;
+        border: none;
+        padding-left: 0;
+        padding-right: 0;
+        font-size: 1rem;
+        color: #222;
+    }
+
+    footer {
+        font-size: 0.85rem;
+        margin-top: 2rem;
+    }
+
+    @media (max-width: 576px) {
+        .custom-card {
+            padding: 1rem;
+            margin: 1rem;
+        }
+
+        .custom-card-header {
+            font-size: 1.2rem;
+        }
+
+        .row.g-4 {
+            max-width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        html, body, #app {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .container, .container-fluid, .row, .col {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
     }
 </style>
 @endpush
 
 @section('content')
-<div class="w-100" style="background-color: #007BFF;">
-    <div class="d-flex justify-content-between align-items-center px-3 py-2">
-        <div class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</div>
-        <div class="d-flex gap-3 flex-wrap">
-        <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
-            <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
-            <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
-        
-        </div>
+
+<!-- Barra de navegación superior -->
+<div class="header">
+    <div class="d-flex align-items-center">
+        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto; margin-right: 6px;">
+        <span class="fw-bold">Clinitek</span>
     </div>
-</div>
-<div class="container-fluid py-4 px-5 bg-light min-vh-100">
-    <div class="card shadow rounded-4 border-0" style="background-color: #e3f2fd;">
-        <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #64b5f6;">
-            <h4 class="mb-0">
-                <i class="bi bi-briefcase-fill me-2"></i> Detalle del Puesto
-            </h4>
-            <a href="{{ route('puestos.index') }}" class="btn btn-success btn-sm px-4 shadow-sm d-flex align-items-center gap-2">
-                    <i class="bi bi-arrow-left"></i> Regresar
-                </a>
-        </div>
 
-        <div class="card-body">
-            <div class="row g-4">
-                {{-- Columna izquierda --}}
-                <div class="col-md-6">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item bg-transparent"><strong>Código:</strong> {{ $puesto->codigo }}</li>
-                        <li class="list-group-item bg-transparent"><strong>Nombre del Puesto:</strong> {{ $puesto->nombre }}</li>
-                        <li class="list-group-item bg-transparent"><strong>Área / Departamento:</strong> {{ $puesto->area }}</li>
-                    </ul>
-                </div>
-
-                {{-- Columna derecha --}}
-                <div class="col-md-6">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item bg-transparent"><strong>Sueldo:</strong> Lps. {{ number_format($puesto->sueldo, 2) }}</li>
-                        <li class="list-group-item bg-transparent"><strong>Función del Puesto:</strong><br>
-                            <span style="white-space: pre-line;">{{ $puesto->funcion }}</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+    <div class="nav-buttons">
+        <a href="{{ route('puestos.create') }}">Crear puesto</a>
+        <a href="{{ route('empleado.create') }}">Registrar empleado</a>
+        <a href="{{ route('medicos.create') }}">Registrar médico</a>
     </div>
 </div>
 
-<footer class="bg-light text-center py-2 border-top mt-4" style="font-size: 0.85rem;">
-    © 2025 Clínitek. Todos los derechos reservados.
-</footer>
+<!-- Contenedor principal -->
+<div class="custom-card">
+    <div class="custom-card-header">
+        Detalle del Puesto
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Código:</strong> {{ $puesto->codigo }}</li>
+                <li class="list-group-item"><strong>Nombre del Puesto:</strong> {{ $puesto->nombre }}</li>
+                <li class="list-group-item"><strong>Área / Departamento:</strong> {{ $puesto->area }}</li>
+            </ul>
+        </div>
+
+        <div class="col-md-6">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Sueldo:</strong> Lps. {{ number_format($puesto->sueldo, 2) }}</li>
+                <li class="list-group-item"><strong>Función del Puesto:</strong><br>
+                    <span style="white-space: pre-line;">{{ $puesto->funcion }}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <a href="{{ route('puestos.index') }}" class="btn btn-success btn-regresar">
+        <i class="bi bi-arrow-left"></i> Regresar
+    </a>
+</div>
+
 @endsection
+
+

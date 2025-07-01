@@ -30,8 +30,22 @@ class ConsultaController extends Controller
 
     public function create()
     {
-        $pacientes = Paciente::select('id', 'nombre', 'apellidos')->orderBy('nombre')->get();
-        $medicos = Medico::select('id', 'nombre', 'apellidos', 'especialidad')->orderBy('nombre')->get();
+        $pacientes = Paciente::select(
+            'id',
+            'nombre',
+            'apellidos',
+            'identidad',
+            'fecha_nacimiento',
+            'telefono',
+            'correo',
+            'direccion',
+            'genero'
+        )->orderBy('nombre')->get();
+
+        $medicos = Medico::select('id', 'nombre', 'apellidos', 'especialidad')
+            ->orderBy('nombre')
+            ->get();
+
 
         return view('consultas.create', compact('pacientes', 'medicos'));
     }
@@ -174,6 +188,106 @@ class ConsultaController extends Controller
 
         return response()->json($ocupadas);
     }
+public function edit($id)
+{
+    $consulta = Consulta::findOrFail($id);
+    $pacientes = Paciente::orderBy('nombre')->get();
+    $medicos = Medico::orderBy('nombre')->get();
+
+    // Horas posibles de 8:00 AM a 5:00 PM, intervalos de 30 min
+    $horas = [];
+    $minutos = 8 * 60;
+    $fin = 17 * 60;
+    while ($minutos <= $fin) {
+        $h = floor($minutos / 60);
+        $m = $minutos % 60;
+        $periodo = $h >= 12 ? 'PM' : 'AM';
+        $hora12 = ($h % 12 === 0 ? 12 : $h % 12);
+        $minutoStr = str_pad($m, 2, '0', STR_PAD_LEFT);
+        $horas[] = "{$hora12}:{$minutoStr} {$periodo}";
+        $minutos += 30;
+    }
+
+    // Horas ocupadas para el médico y fecha, excepto la consulta actual
+    $horasOcupadas = Consulta::where('medico_id', $consulta->medico_id)
+        ->where('fecha', $consulta->fecha)
+        ->where('id', '!=', $consulta->id)
+        ->pluck('hora')
+        ->toArray();
+
+    // Verificar si existe consulta inmediata para este médico y fecha, distinta a la actual
+    $inmediataOcupada = Consulta::where('medico_id', $consulta->medico_id)
+        ->where('fecha', $consulta->fecha)
+        ->where('hora', 'inmediata')
+        ->where('id', '!=', $consulta->id)
+        ->exists();
+
+    // Convertir hora actual a formato 12h, con protección para valor nulo o formato erróneo
+    try {
+        $horaFormato12 = $consulta->hora
+            ? \Carbon\Carbon::createFromFormat('H:i:s', $consulta->hora)->format('g:i A')
+            : 'inmediata';
+    } catch (\Exception $e) {
+        $horaFormato12 = 'inmediata';
+    }
+
+    return view('consultas.edit', compact(
+        'consulta', 'pacientes', 'medicos', 'horas', 'horasOcupadas', 'horaFormato12', 'inmediataOcupada'
+    ));
+}
+
+
+
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'paciente_id' => 'required|exists:pacientes,id',
+        'fecha' => 'required|date|after_or_equal:today',
+        'hora' => 'required|string',
+        'medico_id' => 'required|exists:medicos,id',
+        'especialidad' => 'required|string|max:100',
+        'motivo' => 'required|string|max:255',
+        'sintomas' => 'required|string|max:255',
+        'total_pagar' => 'nullable|numeric|min:0',
+    ], [
+        'required' => 'Este campo es obligatorio.',
+        'exists' => 'La selección no es válida.',
+        'date' => 'Debe ser una fecha válida.',
+        'after_or_equal' => 'La fecha no puede ser anterior a hoy.',
+    ]);
+
+    $consulta = Consulta::findOrFail($id);
+
+    $consulta->paciente_id = $request->paciente_id;
+    $consulta->fecha = $request->fecha;
+
+    $horaInput = trim($request->hora);
+    if ($horaInput === 'inmediata') {
+        $consulta->hora = null; // Guardar null en hora para evitar error SQL
+        $consulta->total_pagar = $request->total_pagar;
+    } else {
+        try {
+            $hora24 = \Carbon\Carbon::createFromFormat('g:i A', $horaInput)->format('H:i:s');
+            $consulta->hora = $hora24;
+            $consulta->total_pagar = null;
+        } catch (\Exception $e) {
+            return back()->withErrors(['hora' => 'El formato de la hora no es válido.'])->withInput();
+        }
+    }
+
+    $consulta->medico_id = $request->medico_id;
+    $consulta->especialidad = $request->especialidad;
+    $consulta->motivo = $request->motivo;
+    $consulta->sintomas = $request->sintomas;
+    $consulta->genero = $request->genero; // si usas este campo
+
+    $consulta->save();
+
+    return redirect()->route('consultas.index')->with('success', 'Consulta actualizada correctamente.');
+}
+
+
+
 }
 
 

@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Clínica - @yield('title', 'Inicio')</title>
 
     {{-- Bootstrap CSS --}}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
     {{-- Estilos personalizados --}}
     <style>
@@ -16,29 +16,21 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         html, body {
             height: 100%;
             background-color: #f0f2f5;
             font-family: 'Segoe UI', sans-serif;
         }
-
         body {
             display: flex;
             flex-direction: column;
+            min-height: 100vh; /* para que flex funcione bien y el footer quede abajo */
         }
-
-        .navbar .container-fluid {
-            padding-left: 15px;
-            padding-right: 15px;
-        }
-
         main {
-            flex: 1;
+            flex: 1; /* ocupa todo el espacio disponible */
             width: 100vw;
             padding: 20px 15px;
         }
-
         footer {
             background-color: #ffffff;
             color: #333;
@@ -46,6 +38,11 @@
             padding: 10px 0;
             font-size: 0.9rem;
             border-top: 1px solid #ccc;
+        }
+
+        .navbar .container-fluid {
+            padding-left: 15px;
+            padding-right: 15px;
         }
 
         .table-container {
@@ -86,17 +83,14 @@
             main {
                 padding: 10px 5px;
             }
-
             .table th, .table td {
                 font-size: 0.8rem;
                 padding: 6px 4px;
             }
-
             .btn {
                 font-size: 0.85rem;
                 padding: 6px 12px;
             }
-
             .header-content {
                 flex-direction: column;
                 align-items: stretch;
@@ -111,29 +105,20 @@
             }
         }
     </style>
-    <style>
-    html, body {
-        height: 100%;
-        background-color: #e8f4fc;
-        margin: 0;
-        padding: 0;
-    }
-</style>
-
 
     @stack('styles')
 </head>
 <body>
 
-   
+    {{-- Aquí puedes incluir navbar si tienes --}}
+    {{-- <nav> ... </nav> --}}
 
     {{-- Contenido principal --}}
     <main>
-        
         @yield('content')
     </main>
 
-    {{-- Footer blanco con texto oscuro --}}
+    {{-- Footer --}}
     <footer>
         © 2025 Clínitek. Todos los derechos reservados.
     </footer>
@@ -143,6 +128,5 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     @stack('scripts')
-
 </body>
 </html>

@@ -25,8 +25,10 @@ class Empleado extends Model
         'salario',
         'turno_asignado',
         'observaciones',
-        'estado'
+        'estado',
+        'foto' 
     ];
+    
 
     public function puesto()
     {

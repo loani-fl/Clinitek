@@ -16,7 +16,11 @@ class Consulta extends Model
         'fecha',
         'hora',
         'especialidad',
+<<<<<<< HEAD
         'medico_id',
+=======
+        'medico_id', 
+>>>>>>> origin/main
         'motivo',
         'sintomas',
     ];
