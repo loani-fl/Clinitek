@@ -118,14 +118,22 @@ public function index() {
             'nombre' => ['required', 'regex:/^[\pL\s]+$/u', 'max:30'], // Solo letras y espacios, max 30
             'apellidos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:30'], // Solo letras y espacios, max 30
             'genero' => ['nullable', 'in:Masculino,Femenino,Otro'],
-            'identidad' => ['required', 'digits:13', 'regex:/^[0-9]{13}$/'], // Exactamente 13 dígitos numéricos
+            'identidad' => [
+                'required',
+                'digits:13',
+                'regex:/^[0-9]{13}$/',
+                Rule::unique('pacientes')->ignore($paciente->id),
+            ],
+
             'fecha_nacimiento' => ['required', 'date', 'before_or_equal:today'],
             'telefono' => [
                 'required',
                 'digits:8',
-                'regex:/^[0-9]{8}$/', // Solo 8 dígitos numéricos
+                'regex:/^[2389][0-9]{7}$/', // Debe comenzar con 2, 3, 8 o 9 y tener 8 dígitos
                 \Illuminate\Validation\Rule::unique('pacientes', 'telefono')->ignore($paciente->id),
-            ],
+
+
+        ],
             'direccion' => ['required', 'string', 'max:300'],
             'correo' => [
                 'nullable',
@@ -149,6 +157,7 @@ public function index() {
             'apellidos.regex' => 'Los apellidos solo pueden contener letras y espacios.',
             'apellidos.max' => 'Los apellidos no pueden exceder 50 caracteres.',
 
+            'identidad.unique' => 'Esta identidad ya está registrada para otro paciente.',
             'identidad.required' => 'La identidad es obligatoria.',
             'identidad.digits' => 'La identidad debe tener exactamente 13 dígitos.',
             'identidad.regex' => 'La identidad debe comenzar entre 01 y 18 y contener solo números.',

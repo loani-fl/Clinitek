@@ -47,19 +47,24 @@
             value="{{ old('identidad', $paciente->identidad ?? '') }}">
         @error('identidad') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
     </div>
+    @php use Carbon\Carbon; @endphp
 
     <div class="col-md-3">
-        <label for="fecha_nacimiento" class="form-label">Fecha de nacimiento: <span class="text-danger">*</span></label>
+        <label for="fecha_nacimiento" class="form-label">
+            Fecha de nacimiento: <span class="text-danger">*</span>
+        </label>
         <input
             type="date"
             name="fecha_nacimiento"
             id="fecha_nacimiento"
             required
             class="form-control @error('fecha_nacimiento') is-invalid @enderror"
-            value="{{ old('fecha_nacimiento', $paciente->fecha_nacimiento ?? '') }}">
-        @error('fecha_nacimiento') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+            value="{{ old('fecha_nacimiento', isset($paciente->fecha_nacimiento) ? Carbon::parse($paciente->fecha_nacimiento)->format('Y-m-d') : '') }}">
+        @error('fecha_nacimiento')
+        <div class="invalid-feedback d-block">{{ $message }}</div>
+        @enderror
     </div>
-</div>
+
 
 <div class="row mb-3">
     <div class="col-md-3">

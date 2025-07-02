@@ -29,6 +29,33 @@
             border: 1px solid #91cfff;
             border-radius: 12px;
         }
+
+        .detalle-paciente {
+            display: flex;
+            gap: 2rem; /* espacio entre columnas */
+            flex-wrap: wrap; /* que se acomode en varias filas si no cabe */
+        }
+
+        .detalle-paciente > div {
+            flex: 1 1 250px; /* ancho flexible mínimo 250px */
+            min-width: 250px;
+            word-wrap: break-word; /* rompe palabras largas */
+            white-space: normal; /* permite el salto de línea */
+            padding: 0.75rem;
+            background-color: #f8f9fa; /* un fondo claro para separar */
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            border: 1.5px solid #ced4da; /* borde gris claro estilo Bootstrap */
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0d6efd;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #0d6efd;
+            padding-bottom: 0.25rem;
+        }
     </style>
 
     <!-- Barra de navegación fija -->
@@ -50,8 +77,11 @@
             </div>
 
             <div class="card-body px-4 py-3">
-                <div class="row gy-3">
 
+                <!-- Título Datos Personales -->
+                <div class="section-title">Datos Personales</div>
+
+                <div class="row gy-3 mb-4">
                     <div class="col-md-3"><strong>Nombre:</strong><br>{{ $paciente->nombre }}</div>
                     <div class="col-md-3"><strong>Apellidos:</strong><br>{{ $paciente->apellidos }}</div>
                     <div class="col-md-3"><strong>Identidad:</strong><br>{{ $paciente->identidad }}</div>
@@ -62,29 +92,50 @@
                     <div class="col-md-3"><strong>Correo:</strong><br>{{ $paciente->correo ?? 'No especificado' }}</div>
                     <div class="col-md-3"><strong>Tipo de Sangre:</strong><br>{{ $paciente->tipo_sangre ?? 'No especificado' }}</div>
 
-                    <div class="col-md-3"><strong>Género:</strong><br>
+                    <div class="col-md-3">
+                        <strong>Género:</strong><br>
                         <span class="badge
-                            {{ $paciente->genero === 'Masculino' ? 'bg-primary' :
-                               ($paciente->genero === 'Femenino' ? 'bg-warning text-dark' : 'bg-info') }}">
-                            {{ $paciente->genero ?? 'No especificado' }}
-                        </span>
+                        {{ $paciente->genero === 'Masculino' ? 'bg-primary' :
+                           ($paciente->genero === 'Femenino' ? 'bg-warning text-dark' : 'bg-info') }}">
+                        {{ $paciente->genero ?? 'No especificado' }}
+                    </span>
                     </div>
-
-                    <div class="col-md-3"><strong>Padecimientos:</strong><br><span style="white-space: pre-line;">{{ $paciente->padecimientos ?: 'No especificado' }}</span></div>
-                    <div class="col-md-3"><strong>Medicamentos:</strong><br><span style="white-space: pre-line;">{{ $paciente->medicamentos ?: 'No especificado' }}</span></div>
-                    <div class="col-md-3"><strong>Historial Clínico:</strong><br><span style="white-space: pre-line;">{{ $paciente->historial_clinico ?: 'No especificado' }}</span></div>
-                    <div class="col-md-3"><strong>Alergias:</strong><br><span style="white-space: pre-line;">{{ $paciente->alergias ?: 'No especificado' }}</span></div>
-                    <div class="col-md-3"><strong>Historial Quirúrgico:</strong><br><span style="white-space: pre-line;">{{ $paciente->historial_quirurgico ?: 'No especificado' }}</span></div>
-
                 </div>
-            </div>
 
-            <div class="text-center pb-4">
-                <a href="{{ route('pacientes.index') }}"
-                   class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2"
-                   style="font-size: 0.85rem;">
-                    <i class="bi bi-arrow-left"></i> Regresar
-                </a>
+                <!-- Título Datos Médicos -->
+                <div class="section-title">Datos Médicos</div>
+
+                <div class="detalle-paciente">
+                    <div>
+                        <strong>Padecimientos:</strong><br>
+                        <p class="text-break" style="white-space: pre-line;">{!! nl2br(e($paciente->padecimientos ?? 'No especificado')) !!}</p>
+                    </div>
+                    <div>
+                        <strong>Medicamentos:</strong><br>
+                        <p class="text-break" style="white-space: pre-line;">{!! nl2br(e($paciente->medicamentos ?? 'No especificado')) !!}</p>
+                    </div>
+                    <div>
+                        <strong>Historial Clínico:</strong><br>
+                        <p class="text-break" style="white-space: pre-line;">{!! nl2br(e($paciente->historial_clinico ?? 'No especificado')) !!}</p>
+                    </div>
+                    <div>
+                        <strong>Alergias:</strong><br>
+                        <p class="text-break" style="white-space: pre-line;">{!! nl2br(e($paciente->alergias ?? 'No especificado')) !!}</p>
+                    </div>
+                    <div>
+                        <strong>Historial Quirúrgico:</strong><br>
+                        <p class="text-break" style="white-space: pre-line;">{!! nl2br(e($paciente->historial_quirurgico ?? 'No especificado')) !!}</p>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4">
+                    <a href="{{ route('pacientes.index') }}"
+                       class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2"
+                       style="font-size: 0.85rem;">
+                        <i class="bi bi-arrow-left"></i> Regresar
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>
