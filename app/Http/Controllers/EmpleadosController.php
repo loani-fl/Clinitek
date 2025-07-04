@@ -91,7 +91,7 @@ class EmpleadosController extends Controller
             'direccion' => [
                 'required',
                 'string',
-                'max:200',
+                'max:250',
                 'regex:/^[\pL\pN\s.,;#\/\-\(\)áéíóúÁÉÍÓÚñÑ]+$/u',
             ],
             'observaciones' => [

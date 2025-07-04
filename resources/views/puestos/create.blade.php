@@ -130,7 +130,8 @@
 <div class="content-wrapper">
     <div class="card custom-card shadow-sm">
         <div class="card-header">
-            <h5>Registro de un nuevo puesto</h5>
+         <h5 class="mb-0 text-dark text-center" style="font-size: 2.25rem; font-weight: bold;">Registro de un nuevo puesto</h5>
+
         </div>
 
         <div class="card-body">
