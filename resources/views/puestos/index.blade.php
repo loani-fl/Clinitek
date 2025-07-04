@@ -3,221 +3,234 @@
 @section('title', 'Listado de Puestos')
 
 @section('content')
- <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            background-color: #e8f4fc; /* fondo azul clarito */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<style>
+    body {
+        background-color: #e8f4fc;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
 
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+    .header {
+        background-color: #007BFF;
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 1100;
+        padding: 0.5rem 1rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    }
 
-        .header {
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            width: 100vw;
-            align-items: center;
-            flex-wrap: wrap;
-            background-color: #007BFF;
-            box-sizing: border-box; /* para que padding no aumente el ancho */
-        }
+    .content-wrapper {
+        margin-top: 60px;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 1rem;
+        position: relative;
+    }
 
-        .header .fw-bold {
-            font-size: 1.75rem;
-            color: #0d6efd;
-        }
+    .custom-card::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 800px;
+        height: 800px;
+        background-image: url('/images/logo2.jpg');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.15;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 0;
+    }
 
-        .header .btn {
-            color: black;
-            border-width: 2px;
-        }
+    .custom-card {
+        background-color: #fff;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        position: relative;
+        z-index: 1;
+    }
 
-        .contenedor-principal {
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: start;
-    padding: 0 3rem; /* MÁS margen lateral */
-    margin: 0;
-    width: 100vw;
+   .card-header {
+    background-color: transparent !important;
+    border-bottom: 3px solid #007BFF;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    position: relative;
 }
 
-.custom-card {
-    flex-grow: 1;
-    background-color: #ffffff;  /* fondo blanco */
-    border-color: #91cfff;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
-    max-width: 1000px;
-    width: 100%;
-    padding: 1.5rem;
-}
 
+    .card-header h3 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #003366;
+        margin: 0;
+    }
 
-        .card-header {
-            background-color: transparent !important;
-            border: none;
-        }
+    .btn-inicio {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        font-size: 0.9rem;
+    }
 
-        .card-header h5 {
-            color: #0d6efd;
-            font-weight: bold;
-        }
+    .d-flex.filter-container {
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
 
-        .table-responsive {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 0 1rem 1rem 1rem;
-        }
+    .filtro-input {
+        font-size: 0.85rem;
+        max-width: 300px;
+        flex-grow: 1;
+    }
 
-        thead tr {
-            background-color: #cce5ff; /* azul más suave */
-            color: #003e7e;
-        }
+    .table {
+        font-size: 0.9rem;
+    }
 
-        tbody tr:hover {
-            background-color: #e9f2ff;
-        }
+    thead tr {
+        background-color: #007BFF;
+        color: white;
+    }
 
-        table tbody tr {
-            height: 50px;
-        }
+    tbody tr:hover {
+        background-color: #e9f2ff;
+    }
 
-        label {
-            font-size: 0.85rem;
-        }
+    .table th, .table td {
+        padding: 0.4rem 0.75rem;
+        vertical-align: middle;
+    }
 
-        input, select, textarea {
-            font-size: 0.85rem !important;
-        }
+    table th:nth-child(1), table td:nth-child(1) {
+        width: 40px;
+        text-align: center;
+    }
 
-        .btn-white-border {
-            background-color: white !important;
-            border-width: 2px;
-            box-shadow: none !important;
-        }
+    .pagination-container {
+        font-size: 0.9rem;
+        margin-top: 1rem;
+        display: flex;
+        justify-content: center;
+    }
+</style>
 
-        .estado-activo i {
-            color: #00c851 !important;
-        }
-
-        .estado-inactivo i {
-            color: #ff3547 !important;
-        }
-
-        footer {
-            position: fixed;
-            bottom: 0;
-            width: 100vw;
-            height: 50px;
-            background-color: #f8f9fa;
-            padding: 10px 0;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #6c757d;
-            z-index: 999;
-            border-top: 1px solid #dee2e6;
-        }
-
-        .custom-card::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 800px; /* tamaño más pequeño */
-            height: 800px; /* tamaño más pequeño */
-            background-image: url('/images/logo2.jpg');
-            background-size: contain;  /* ajusta sin recortar */
-            background-repeat: no-repeat;
-            background-position: center;
-            opacity: 0.15;  /* transparencia baja para que no moleste */
-            transform: translate(-50%, -50%);
-            pointer-events: none; /* para que no interfiera con clicks */
-            z-index: 0;
-        }
-    </style>
-
-{{-- Barra superior fija --}}
-<div class="w-100 fixed-top" style="background-color: #007BFF; z-index: 1050;">
-    <div class="d-flex justify-content-between align-items-center px-3 py-2">
-        <div class="d-flex align-items-center">
-            <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto; margin-right: 6px;">
-            <span class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</span>
-        </div>
-        <div class="d-flex gap-3 flex-wrap">
-            <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
-            <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
-            <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
-        </div>
+<div class="header d-flex justify-content-between align-items-center px-3 py-2">
+    <div class="d-flex align-items-center">
+        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto;">
+        <div class="fw-bold text-white ms-2" style="font-size: 1.5rem;">Clinitek</div>
+    </div>
+    <div class="d-flex gap-3 flex-wrap">
+        <a href="{{ route('puestos.create') }}" class="nav-link text-white">Crear puesto</a>
+        <a href="{{ route('empleado.create') }}" class="nav-link text-white">Registrar empleado</a>
+        <a href="{{ route('medicos.create') }}" class="nav-link text-white">Registrar médico</a>
     </div>
 </div>
 
+<div class="content-wrapper">
+    <div class="card custom-card shadow-sm">
+        <div class="card-header">
+          <h5 class="mb-0 text-dark text-center" style="font-size: 2.25rem; font-weight: bold;">Lista de puestos</h5>
 
-{{-- Contenedor principal --}}
-<div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 70px;">
-    {{-- Encabezado con botón Inicio a la derecha --}}
-    
-    <div class="card-header position-relative py-2 d-flex justify-content-center align-items-center" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-        <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Listado de Puestos</h5>
-        <a href="{{ route('inicio') }}" class="btn btn-light position-absolute end-0 top-50 translate-middle-y me-2">
-            <i class="bi bi-house-door"></i> Inicio
-        </a>
-        
+            <a href="{{ route('inicio') }}" class="btn btn-light btn-inicio">
+                <i class="bi bi-house-door"></i> Inicio
+            </a>
+        </div>
 
-    </div>
-
-    <div class="p-3">
-       
+        <div class="d-flex filter-container">
+            <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por código o nombre...">
+        </div>
 
         @if($puestos->isEmpty())
             <div class="alert alert-info shadow-sm" role="alert">
                 No hay puestos registrados aún.
             </div>
         @else
-           <div class="table-responsive">
+        <div class="table-responsive">
             <table class="table table-bordered table-striped mb-0">
                 <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Departamento</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaPuestos">
+                    @foreach ($puestos as $index => $puesto)
                         <tr>
-                            <th>#</th>
-                            <th>Código</th>
-                            <th>Nombre</th>
-                            <th>Departamento</th>
-                            <th>Acciones</th>
+                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td>{{ $puesto->codigo }}</td>
+                            <td>{{ $puesto->nombre }}</td>
+                            <td>{{ $puesto->area }}</td>
+                            <td class="text-center">
+                                <a href="{{ route('puestos.show', $puesto->id) }}" class="btn btn-sm btn-outline-info me-2" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ route('puestos.edit', $puesto) }}" class="btn btn-sm btn-outline-warning" title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($puestos as $index => $puesto)
-                            <tr>
-                                <td class="text-center">{{ $index + 1 }}</td>
-                                <td>{{ $puesto->codigo }}</td>
-                                <td>{{ $puesto->nombre }}</td>
-                                <td>{{ $puesto->area }}</td>
-                                <td>
-                                    <div class="d-flex gap-2 justify-content-center">
-                                       <a href="{{ route('puestos.show', $puesto->id) }}" class="btn btn-sm btn-outline-info me-2" title="Ver detalles">
-    <i class="bi bi-eye"></i>
-</a>
-<a href="{{ route('puestos.edit', $puesto) }}" class="btn btn-sm btn-outline-warning" title="Editar">
-    <i class="bi bi-pencil-square"></i>
-</a>
-
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
         @endif
+
+        <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function () {
+    const filas = $('#tablaPuestos tr');
+    const mensaje = $('#mensajeResultados');
+
+    function actualizarMensaje(totalVisible, total) {
+        if ($('#filtroBusqueda').val().trim() === '') {
+            mensaje.text('');
+        } else if (totalVisible === 0) {
+            mensaje.html('No hay puestos que coincidan con la búsqueda.');
+        } else {
+            mensaje.html(`<strong>Se encontraron ${totalVisible} resultado${totalVisible > 1 ? 's' : ''} de ${total}.</strong>`);
+        }
+    }
+
+    $('#filtroBusqueda').on('keyup', function () {
+        let valor = $(this).val().toLowerCase();
+        let totalVisible = 0;
+        const total = filas.length;
+
+        filas.each(function () {
+            let texto = $(this).text().toLowerCase();
+            const visible = texto.indexOf(valor) > -1;
+            $(this).toggle(visible);
+            if (visible) totalVisible++;
+        });
+
+        // Reenumerar
+        let i = 1;
+        $('#tablaPuestos tr:visible').each(function () {
+            $(this).find('td:first').text(i++);
+        });
+
+        actualizarMensaje(totalVisible, total);
+    });
+});
+</script>
 @endsection
+
