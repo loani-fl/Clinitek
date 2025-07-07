@@ -38,7 +38,7 @@ class PacienteController extends Controller
                 'email',
                 'max:50',
                 'unique:pacientes,correo',
-                'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/', // Validar que tenga @ y punto en dominio
+                'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/', // validar que tenga @ y punto en dominio
             ],
             'tipo_sangre' => ['nullable', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
             'genero' => ['required', 'in:Femenino,Masculino,Otro'],
@@ -108,7 +108,6 @@ class PacienteController extends Controller
         Paciente::create($request->all());
 
         return redirect()->route('pacientes.index')->with('success', 'Paciente registrado exitosamente.');
-
     }
 
     public function index()
@@ -175,11 +174,10 @@ class PacienteController extends Controller
             'apellidos.regex' => 'Los apellidos solo pueden contener letras y espacios.',
             'apellidos.max' => 'Los apellidos no pueden exceder 50 caracteres.',
 
-            'identidad.unique' => 'Esta identidad ya está registrada para otro paciente.',
             'identidad.required' => 'La identidad es obligatoria.',
             'identidad.regex' => 'La identidad debe comenzar con un código de departamento válido (01-18), municipio válido (01-28) y contener solo números.',
             'identidad.size' => 'La identidad debe tener exactamente 13 dígitos.',
-            'identidad.unique' => 'Esta identidad ya está registrada.',
+            'identidad.unique' => 'Esta identidad ya está registrada para otro paciente.',
 
             'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
             'fecha_nacimiento.date' => 'La fecha debe ser válida.',

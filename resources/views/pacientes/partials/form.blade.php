@@ -3,35 +3,36 @@
 <h5 class="mb-3 text-dark fw-bold">Datos básicos y contacto</h5>
 
 <div class="row mb-3">
-    <div class="col-md-3">
-        <label for="nombre" class="form-label">Nombre(s): <span class="text-danger">*</span></label>
-        <input
-            type="text"
-            name="nombre"
-            id="nombre"
-            maxlength="30"
-            required
-            pattern="[A-Za-z\s]+"
-            title="Solo letras y espacios, máximo 30 caracteres"
-            class="form-control @error('nombre') is-invalid @enderror"
-            value="{{ old('nombre', $paciente->nombre ?? '') }}">
-        @error('nombre') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-    </div>
+<div class="col-md-3">
+    <label for="nombre" class="form-label">Nombre(s): <span class="text-danger">*</span></label>
+    <input
+        type="text"
+        name="nombre"
+        id="nombre"
+        maxlength="30"
+        required
+        pattern="[A-Za-z\s]+"
+        title="Solo letras y espacios, máximo 30 caracteres"
+        class="form-control @error('nombre') is-invalid @enderror"
+        value="{{ old('nombre', $paciente->nombre ?? '') }}">
+    @error('nombre') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+</div>
 
-    <div class="col-md-3">
-        <label for="apellidos" class="form-label">Apellidos: <span class="text-danger">*</span></label>
-        <input
-            type="text"
-            name="apellidos"
-            id="apellidos"
-            maxlength="30"
-            required
-            pattern="[A-Za-z\s]+"
-            title="Solo letras y espacios, máximo 30 caracteres"
-            class="form-control @error('apellidos') is-invalid @enderror"
-            value="{{ old('apellidos', $paciente->apellidos ?? '') }}">
-        @error('apellidos') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-    </div>
+<div class="col-md-3">
+    <label for="apellidos" class="form-label">Apellidos: <span class="text-danger">*</span></label>
+    <input
+        type="text"
+        name="apellidos"
+        id="apellidos"
+        maxlength="30"
+        required
+        pattern="[A-Za-z\s]+"
+        title="Solo letras y espacios, máximo 30 caracteres"
+        class="form-control @error('apellidos') is-invalid @enderror"
+        value="{{ old('apellidos', $paciente->apellidos ?? '') }}">
+    @error('apellidos') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+</div>
+
 
     <div class="col-md-3">
         <label for="identidad" class="form-label">Identidad: <span class="text-danger">*</span></label>
