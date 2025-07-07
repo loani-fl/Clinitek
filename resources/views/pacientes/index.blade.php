@@ -156,7 +156,7 @@
 <div class="content-wrapper">
     <div class="card custom-card shadow-sm">
         <div class="card-header">
-            <h5 class="mb-0 text-dark text-center" style="font-size: 2.25rem; font-weight: bold;">Lista de pacientes</h5>
+            <h5 class="mb-0 text-dark text-center" style="font-size: 2.25rem; font-weight: bold;">Listado de pacientes</h5>
 
             <a href="{{ route('inicio') }}" class="btn btn-light btn-inicio">
                 <i class="bi bi-house-door"></i> Inicio

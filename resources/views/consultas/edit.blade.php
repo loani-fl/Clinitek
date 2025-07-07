@@ -107,6 +107,15 @@
         padding: 0 1rem;
         box-sizing: border-box;
     }
+
+    .no-select {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    pointer-events: none !important;
+    cursor: default;
+}
 </style>
 
 <!-- Barra de navegación fija -->
@@ -129,387 +138,286 @@
         <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Editar consulta médica</h5>
     </div>
 
-    <form action="{{ route('consultas.update', $consulta->id) }}" method="POST" novalidate>
-        @csrf
-        @method('PUT')
 
-        <div class="row g-3 px-2 mt-3">
+<h5 class="text-dark fw-bold mt-4 mb-3">Información del paciente</h5>
 
-            <!-- INFORMACIÓN DEL PACIENTE -->
-            <h5 class="text-dark fw-bold mt-4 mb-3">Información del paciente</h5>
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label for="paciente_id">Paciente <span class="text-danger">*</span></label>
-                    <select name="paciente_id" id="paciente_id" class="form-select form-select-sm @error('paciente_id') is-invalid @enderror" required>
-                        <option value="">-- Selecciona --</option>
-                        @foreach($pacientes as $p)
-                            <option value="{{ $p->id }}"
-                                data-nacimiento="{{ \Carbon\Carbon::parse($p->fecha_nacimiento)->format('Y-m-d') }}"
-                                data-identidad="{{ $p->identidad }}"
-                                data-genero="{{ $p->genero }}"
-                                data-telefono="{{ $p->telefono }}"
-                                data-correo="{{ $p->correo }}"
-                                data-direccion="{{ $p->direccion }}"
-                                {{ (old('paciente_id', $consulta->paciente_id) == $p->id) ? 'selected' : '' }}>
-                                {{ $p->nombre }} {{ $p->apellidos }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('paciente_id')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                </div>
+<div class="row g-3">
+    <div class="col-md-4">
+        <label>Paciente</label>
+        <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
+            <span style="pointer-events: none;">{{ $consulta->paciente->nombre }} {{ $consulta->paciente->apellidos }}</span>
+        </div>
+    </div>
 
-                <div class="col-md-3">
-                    <label>Identidad</label>
-                    <input type="text" id="identidad" class="form-control form-control-sm" readonly value="{{ old('identidad', $consulta->paciente->identidad ?? '') }}">
-                </div>
+    @if ($errors->any())
+    <div class="alert alert-danger">
+        <strong>Por favor corrige los siguientes errores:</strong>
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
-                <div class="col-md-3">
-                    <label>Fecha de nacimiento</label>
-                    <input type="date" id="fecha_nacimiento" class="form-control form-control-sm" readonly value="{{ old('fecha_nacimiento', $consulta->paciente->fecha_nacimiento ?? '') }}">
-                </div>
 
-                <div class="col-md-2">
-                    <label for="genero">Género <span class="text-danger">*</span></label>
-                    <input type="text" id="genero" name="genero" class="form-control form-control-sm @error('genero') is-invalid @enderror" value="{{ old('genero', $consulta->paciente->genero ?? '') }}" readonly required>
-                    @error('genero')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                </div>
+    <div class="col-md-3">
+        <label>Identidad</label>
+        <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
+            <span style="pointer-events: none;">{{ $consulta->paciente->identidad }}</span>
+        </div>
+    </div>
 
-                <div class="col-md-3">
-                    <label>Teléfono</label>
-                    <input type="text" id="telefono" class="form-control form-control-sm" readonly value="{{ old('telefono', $consulta->paciente->telefono ?? '') }}">
-                </div>
+    <div class="col-md-3">
+        <label>Fecha de nacimiento</label>
+        <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
+            <span style="pointer-events: none;">{{ \Carbon\Carbon::parse($consulta->paciente->fecha_nacimiento)->format('d/m/Y') }}</span>
+        </div>
+    </div>
 
-                <div class="col-md-3">
-                    <label>Correo electrónico</label>
-                    <input type="email" id="correo" class="form-control form-control-sm" readonly value="{{ old('correo', $consulta->paciente->correo ?? '') }}">
-                </div>
+    <div class="col-md-2">
+        <label>Género</label>
+        <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
+            <span style="pointer-events: none;">{{ $consulta->paciente->genero }}</span>
+        </div>
+    </div>
 
-                <div class="col-md-6">
-                    <label>Dirección</label>
-                    <input type="text" id="direccion" class="form-control form-control-sm" readonly value="{{ old('direccion', $consulta->paciente->direccion ?? '') }}">
-                </div>
-            </div>
+    <div class="col-md-3">
+        <label>Teléfono</label>
+        <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
+            <span style="pointer-events: none;">{{ $consulta->paciente->telefono }}</span>
+        </div>
+    </div>
 
-            <!-- INFORMACIÓN DE LA CONSULTA MÉDICA -->
-            <h5 class="text-dark fw-bold mt-4 mb-3">Información de la consulta médica</h5>
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <label for="fecha_consulta">Fecha <span class="text-danger">*</span></label>
-                    <input type="date" id="fecha_consulta" name="fecha" class="form-control form-control-sm @error('fecha') is-invalid @enderror"
-                        value="{{ old('fecha', $consulta->fecha) }}" min="{{ now()->format('Y-m-d') }}" required>
-                    @error('fecha')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                </div>
+    <div class="col-md-3">
+        <label>Correo electrónico</label>
+        <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
+            <span style="pointer-events: none;">{{ $consulta->paciente->correo }}</span>
+        </div>
+    </div>
 
-                <div class="col-md-3">
-                    <label for="hora">Hora <span class="text-danger">*</span></label>
-                    <select id="hora" name="hora" class="form-select form-select-sm @error('hora') is-invalid @enderror" required>
-                        <option value="">-- Selecciona hora --</option>
-                        {{-- Opciones generadas dinámicamente con JS --}}
-                    </select>
-                    @error('hora')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                </div>
+    <div class="col-md-6">
+        <label>Dirección</label>
+        <div class="form-control form-control-sm bg-light no-select" style="min-height: 48px;" aria-hidden="true">
+            <span style="pointer-events: none;">{{ $consulta->paciente->direccion }}</span>
+        </div>
+    </div>
+</div>
+<h5 class="text-dark fw-bold mt-4 mb-3">Información de la consulta médica</h5>
 
-                <div class="col-md-3">
-                    <label for="especialidad">Especialidad <span class="text-danger">*</span></label>
-                    <input type="text" id="especialidad" name="especialidad" class="form-control form-control-sm @error('especialidad') is-invalid @enderror" readonly value="{{ old('especialidad', $consulta->medico->especialidad ?? '') }}" required>
-                    @error('especialidad')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="col-md-3">
-                    <label for="medico">Médico que atiende <span class="text-danger">*</span></label>
-                    <select name="medico_id" id="medico" class="form-select form-select-sm @error('medico_id') is-invalid @enderror" required>
-                        <option value="">-- Médico que atiende --</option>
-                        @foreach($medicos as $m)
-                            <option value="{{ $m->id }}" data-nombre="{{ $m->nombre }}" data-especialidad="{{ $m->especialidad }}"
-                                {{ (old('medico_id', $consulta->medico_id) == $m->id) ? 'selected' : '' }}>
-                                {{ $m->nombre }} {{ $m->apellidos }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('medico_id')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <label for="motivo">Motivo de la consulta <span class="text-danger">*</span></label>
-                <textarea name="motivo" rows="2" class="form-control form-control-sm @error('motivo') is-invalid @enderror" required>{{ old('motivo', $consulta->motivo) }}</textarea>
-                @error('motivo')
-                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="col-md-6">
-                <label for="sintomas">Síntomas <span class="text-danger">*</span></label>
-                <textarea name="sintomas" rows="2" class="form-control form-control-sm @error('sintomas') is-invalid @enderror" required>{{ old('sintomas', $consulta->sintomas) }}</textarea>
-                @error('sintomas')
-                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div id="contenedor_total_pagar" style="display:none;">
-                <div class="col-md-2">
-                    <label for="total_pagar">Total a pagar <span id="total_asterisco" class="text-danger">*</span></label>
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-text">L.</span>
-                        <input type="number" step="0.01" min="0" id="total_pagar" name="total_pagar" class="form-control @error('total_pagar') is-invalid @enderror" value="{{ old('total_pagar', $consulta->total_pagar) }}" readonly required>
-                    </div>
-                    @error('total_pagar')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-
-<!-- Botones centrados -->
-<div class="d-flex justify-content-center gap-3 mt-4">
-    <button type="submit" class="btn btn-primary">
-        <i class="bi bi-pencil-square"></i> Actualizar
-    </button>
-
-    <button type="reset" class="btn btn-warning px-4 shadow-sm">
-        <i class="bi bi-arrow-counterclockwise"></i> Restablecer
-    </button>
-
-    <a href="{{ route('consultas.index') }}" class="btn btn-success">
-        <i class="bi bi-arrow-left"></i> Regresar
-    </a>
-
-   <form action="{{ route('consultas.cancelar', $consulta) }}" method="POST" onsubmit="return confirm('¿Estás segura de que deseas cancelar esta cita?')" class="d-inline">
+<form action="{{ route('consultas.update', $consulta->id) }}" method="POST">
     @csrf
-    @method('PATCH')
-    <button type="submit" class="btn btn-outline-danger fw-bold shadow-sm px-4 py-2 rounded-3" style="transition: background-color 0.3s, color 0.3s;">
-        <i class="bi bi-x-circle me-2"></i> Cancelar cita
+    @method('PUT')
+
+    <input type="hidden" name="paciente_id" value="{{ $consulta->paciente_id }}">
+    <input type="hidden" name="especialidad" value="{{ old('especialidad', $consulta->especialidad) }}">
+
+    <div class="row g-3">
+        <div class="col-md-2">
+            <label for="fecha">Fecha <span class="text-danger">*</span></label>
+            <input type="date" id="fecha_consulta" name="fecha" 
+                min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
+                max="{{ \Carbon\Carbon::now()->addMonth()->format('Y-m-d') }}"
+                value="{{ old('fecha', $consulta->fecha) }}" 
+                class="form-control form-control-sm @error('fecha') is-invalid @enderror" required>
+            @error('fecha')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="col-md-4">
+            <label for="medico">Médico que atiende <span class="text-danger">*</span></label>
+            <select name="medico_id" id="medico" class="form-select form-select-sm @error('medico_id') is-invalid @enderror" required>
+                <option value="">-- Médico que atiende --</option>
+                @foreach($medicos as $m)
+                    <option 
+                        value="{{ $m->id }}" 
+                        data-especialidad="{{ $m->especialidad }}"
+                        {{ (old('medico_id', $consulta->medico_id) == $m->id) ? 'selected' : '' }}>
+                        {{ $m->nombre }} {{ $m->apellidos }}
+                    </option>
+                @endforeach
+            </select>
+            @error('medico_id')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="col-md-3">
+            <label for="especialidad">Especialidad</label>
+            <label id="especialidad" class="form-control form-control-sm bg-light"></label>
+        </div>
+
+        <div class="col-md-3">
+            <label for="hora">Hora <span class="text-danger">*</span></label>
+            <select id="hora" name="hora" class="form-select form-select-sm @error('hora') is-invalid @enderror" required>
+                {{-- La opción inicial la pondrá JS con la hora ocupada --}}
+            </select>
+            @error('hora')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="col-md-6 mt-3">
+            <label for="motivo">Motivo de la consulta <span class="text-danger">*</span></label>
+            <textarea name="motivo" maxlength="250" rows="2" class="form-control form-control-sm @error('motivo') is-invalid @enderror" required>{{ old('motivo', $consulta->motivo) }}</textarea>
+            @error('motivo')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="col-md-6 mt-3">
+            <label for="sintomas">Síntomas <span class="text-danger">*</span></label>
+            <textarea name="sintomas" maxlength="250" rows="2" class="form-control form-control-sm @error('sintomas') is-invalid @enderror" required>{{ old('sintomas', $consulta->sintomas) }}</textarea>
+            @error('sintomas')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+<div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
+
+    <!-- Botón Actualizar -->
+    <button type="submit" class="btn btn-primary d-flex align-items-center" data-bs-toggle="tooltip" title="Guardar los cambios">
+        <i class="bi bi-pencil-square me-2"></i> Actualizar
     </button>
-</form>
+
+    <!-- Formulario Botón Cancelar -->
+    <form action="{{ route('consultas.cancelar', $consulta->id) }}" method="POST" onsubmit="return confirm('¿Seguro que quieres cancelar esta consulta?');" style="display:inline;">
+        @csrf
+        <button type="submit" class="btn btn-danger d-flex align-items-center" data-bs-toggle="tooltip" title="Cancelar la consulta">
+            <i class="bi bi-x-circle me-2"></i> Cancelar consulta
+        </button>
+    </form>
+
+    <!-- Botón Restablecer -->
+    <button type="button" id="restablecerBtn" class="btn btn-warning d-flex align-items-center" data-bs-toggle="tooltip" title="Restablecer los campos del formulario">
+        <i class="bi bi-arrow-counterclockwise me-2"></i> Restablecer
+    </button>
+
+    <!-- Botón Regresar -->
+    <a href="{{ route('consultas.index') }}" class="btn btn-success d-flex align-items-center" data-bs-toggle="tooltip" title="Volver al listado de consultas">
+        <i class="bi bi-arrow-left me-2"></i> Regresar
+    </a>
 
 </div>
 
-
-
-<!-- Flatpickr JS (opcional) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
 <script>
-window.addEventListener('load', function () {
-    const pacienteSelect = document.getElementById('paciente_id');
-    const generoInput = document.getElementById('genero');
+document.addEventListener('DOMContentLoaded', function () {
     const medicoSelect = document.getElementById('medico');
-    const especialidadInput = document.getElementById('especialidad');
+    const especialidadLabel = document.getElementById('especialidad');
     const fechaConsultaInput = document.getElementById('fecha_consulta');
     const horaSelect = document.getElementById('hora');
-    const totalPagarInput = document.getElementById('total_pagar');
-    const contenedorTotalPagar = document.getElementById('contenedor_total_pagar');
-    const labelHora = document.getElementById('label_hora');
+    const motivoInput = document.querySelector('textarea[name="motivo"]');
+    const sintomasInput = document.querySelector('textarea[name="sintomas"]');
+    const restablecerBtn = document.getElementById('restablecerBtn');
 
-    const preciosPorEspecialidad = {
-        "Cardiología": 900.00,
-        "Pediatría": 500.00,
-        "Dermatología": 900.00,
-        "Medicina General": 800.00,
-        "Psiquiatría": 500.00,
-        "Neurología": 1000.00,
-        "Radiología": 700.00
-    };
-
-    const horaPrev = @json(old('hora', \Carbon\Carbon::parse($consulta->hora)->format('g:i A')));
+    const consultaHoraOriginal = "{{ $consulta->hora }}"; // Ejemplo: "12:30 PM"
+    const consultaMedicoOriginal = "{{ $consulta->medico_id }}";
+    const consultaFechaOriginal = "{{ $consulta->fecha }}";
+    const consultaMotivoOriginal = `{{ $consulta->motivo }}`;
+    const consultaSintomasOriginal = `{{ $consulta->sintomas }}`;
 
     function hora12a24(hora12) {
-        if (hora12 === 'inmediata') return null;
-        const [hora, minutoPeriodo] = hora12.split(':');
-        const [minuto, periodo] = minutoPeriodo.split(' ');
-        let h = parseInt(hora);
-        if (periodo === 'PM' && h < 12) h += 12;
-        if (periodo === 'AM' && h === 12) h = 0;
-        return `${h.toString().padStart(2, '0')}:${minuto}:00`;
+        const [horaMinuto, periodo] = hora12.split(' ');
+        let [hora, minuto] = horaMinuto.split(':').map(Number);
+        if (periodo === 'PM' && hora !== 12) hora += 12;
+        if (periodo === 'AM' && hora === 12) hora = 0;
+        return `${hora.toString().padStart(2, '0')}:${minuto.toString().padStart(2, '0')}`;
     }
 
     function cargarHorasDisponibles() {
         const medico = medicoSelect.value;
         const fecha = fechaConsultaInput.value;
 
-        if (!medico || !fecha) return;
-
         horaSelect.innerHTML = '';
-        const defaultOption = new Option('-- Selecciona hora --', '');
-        horaSelect.appendChild(defaultOption);
+        horaSelect.appendChild(new Option('-- Selecciona hora --', ''));
 
-        const inmediataOption = new Option('Inmediata', 'inmediata');
-
-        // ✅ Si Laravel indicó que inmediata está ocupada, lo marcamos
-        if (typeof inmediataOcupada !== 'undefined' && inmediataOcupada) {
-            inmediataOption.text = 'Inmediata (Ocupada)';
-            inmediataOption.disabled = true;
-        }
-
-        horaSelect.appendChild(inmediataOption);
+        if (!medico || !fecha) return;
 
         const horas = [];
         let minutos = 8 * 60;
-        const fin = 17 * 60;
-
+        const fin = (16 * 60) + 30;
         while (minutos <= fin) {
             const h = Math.floor(minutos / 60);
             const m = minutos % 60;
             const periodo = h >= 12 ? 'PM' : 'AM';
-            const hora12 = (h % 12 === 0 ? 12 : h % 12);
-            const minutoStr = m.toString().padStart(2, '0');
-            horas.push(`${hora12}:${minutoStr} ${periodo}`);
+            const hora12 = (h % 12 === 0 ? 12 : h % 12) + ':' + m.toString().padStart(2, '0') + ' ' + periodo;
+            horas.push(hora12);
             minutos += 30;
         }
 
         fetch(`/horas-ocupadas?medico_id=${encodeURIComponent(medico)}&fecha=${encodeURIComponent(fecha)}`)
             .then(res => res.json())
             .then(horasOcupadas => {
+                const horasOcupadasSinSegundos = horasOcupadas.map(h => h.slice(0, 5));
+                const horaOriginal24 = consultaHoraOriginal ? hora12a24(consultaHoraOriginal) : null;
+
                 horas.forEach(hora12 => {
                     const hora24 = hora12a24(hora12);
-                    const option = new Option(hora12, hora12);
+                    const option = document.createElement('option');
+                    option.value = hora24;
 
-                    if (horasOcupadas.includes(hora24)) {
-                        option.text = hora12 + ' (Ocupada)';
-                        if (hora12 !== horaPrev) {
-                            option.disabled = true;
-                        }
+                    let textoVisible = hora12;
+                    let estaOcupada = horasOcupadasSinSegundos.includes(hora24);
+
+                    if (horaOriginal24 === hora24) {
+                        option.selected = true;
+                        if (estaOcupada) textoVisible += ' ocupada';
+                    } else if (estaOcupada) {
+                        textoVisible += ' ocupada';
+                        option.disabled = true;
                     }
 
+                    option.textContent = textoVisible;
                     horaSelect.appendChild(option);
                 });
-
-                if (horaPrev) {
-                    const match = Array.from(horaSelect.options).find(op => op.value === horaPrev);
-                    if (match) match.selected = true;
-                }
-
-                actualizarVisibilidadTotalPagar();
             })
-            .catch(err => {
-                console.error('Error cargando horas:', err);
+            .catch(() => {
                 horas.forEach(hora12 => {
-                    const option = new Option(hora12, hora12);
+                    const option = new Option(hora12, hora12a24(hora12));
                     horaSelect.appendChild(option);
                 });
-                actualizarVisibilidadTotalPagar();
             });
     }
 
-    function actualizarVisibilidadTotalPagar() {
-        const horaSeleccionada = horaSelect.value;
-
-        if (horaSeleccionada === 'inmediata') {
-            contenedorTotalPagar.style.display = 'block';
-
-            if (labelHora) {
-                labelHora.textContent = 'Hora (Inmediata Ocupada) 🚨';
-                labelHora.style.color = '#d9534f';
-                labelHora.style.fontWeight = 'bold';
-            }
-
-            const selectedMedico = medicoSelect.options[medicoSelect.selectedIndex];
-            const especialidad = selectedMedico ? selectedMedico.getAttribute('data-especialidad') : '';
-
-            if (especialidad && preciosPorEspecialidad[especialidad]) {
-                totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
-            } else {
-                totalPagarInput.value = '';
-            }
-        } else {
-            contenedorTotalPagar.style.display = 'none';
-            totalPagarInput.value = '';
-
-            if (labelHora) {
-                labelHora.textContent = 'Hora';
-                labelHora.style.color = '';
-                labelHora.style.fontWeight = '';
-            }
-        }
-    }
-
-    function autocompletarPaciente() {
-        const opt = pacienteSelect.options[pacienteSelect.selectedIndex];
-        if (!opt) return;
-        document.getElementById('fecha_nacimiento').value = opt.getAttribute('data-nacimiento') || '';
-        document.getElementById('identidad').value = opt.getAttribute('data-identidad') || '';
-        document.getElementById('telefono').value = opt.getAttribute('data-telefono') || '';
-        document.getElementById('correo').value = opt.getAttribute('data-correo') || '';
-        document.getElementById('direccion').value = opt.getAttribute('data-direccion') || '';
-        generoInput.value = opt.getAttribute('data-genero') || '';
+    function actualizarEspecialidad() {
+        const selected = medicoSelect.options[medicoSelect.selectedIndex];
+        const especialidad = selected ? selected.getAttribute('data-especialidad') : '';
+        especialidadLabel.textContent = especialidad || '';
     }
 
     medicoSelect.addEventListener('change', () => {
-        const especialidad = medicoSelect.selectedOptions[0].getAttribute('data-especialidad') || '';
-        especialidadInput.value = especialidad;
-        if (especialidad && preciosPorEspecialidad[especialidad]) {
-            if (horaSelect.value === 'inmediata') {
-                totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
-            }
-        } else {
-            totalPagarInput.value = '';
-        }
+        actualizarEspecialidad();
         cargarHorasDisponibles();
     });
 
     fechaConsultaInput.addEventListener('change', cargarHorasDisponibles);
-    horaSelect.addEventListener('change', actualizarVisibilidadTotalPagar);
-    pacienteSelect.addEventListener('change', autocompletarPaciente);
 
-    if (pacienteSelect.value) autocompletarPaciente();
-    if (medicoSelect.value && fechaConsultaInput.value) {
+    restablecerBtn.addEventListener('click', () => {
+        // Restaurar valores originales
+        medicoSelect.value = consultaMedicoOriginal;
+        fechaConsultaInput.value = consultaFechaOriginal;
+        motivoInput.value = consultaMotivoOriginal;
+        sintomasInput.value = consultaSintomasOriginal;
+
+        actualizarEspecialidad();
         cargarHorasDisponibles();
-    } else {
-        actualizarVisibilidadTotalPagar();
-    }
-
-    const formulario = horaSelect.closest("form");
-
-    const camposControlados = [
-        pacienteSelect,
-        generoInput,
-        medicoSelect,
-        especialidadInput,
-        fechaConsultaInput,
-        horaSelect,
-        totalPagarInput
-    ];
-
-    const estadoCampos = {};
-
-    camposControlados.forEach(campo => {
-        estadoCampos[campo.id] = {
-            valorInicial: campo.value,
-            modificado: false
-        };
-        campo.addEventListener('change', () => {
-            estadoCampos[campo.id].modificado = true;
-        });
     });
 
-    formulario.addEventListener('reset', () => {
-        setTimeout(() => {
-            camposControlados.forEach(campo => {
-                const estado = estadoCampos[campo.id];
-                if (!estado.modificado) {
-                    campo.value = estado.valorInicial;
-                    if (campo.tagName.toLowerCase() === 'select') {
-                        campo.dispatchEvent(new Event('change'));
-                    }
-                } else {
-                    estado.valorInicial = campo.value;
-                }
-                estado.modificado = false;
-            });
-        }, 50);
-    });
+    actualizarEspecialidad();
+    cargarHorasDisponibles();
+});
+
+document.querySelectorAll('.no-select').forEach(el => {
+    el.addEventListener('contextmenu', e => e.preventDefault());
+    el.addEventListener('keydown', e => e.preventDefault());
+    el.addEventListener('copy', e => e.preventDefault());
+    el.addEventListener('cut', e => e.preventDefault());
 });
 </script>
+
+
 @endsection
+
+

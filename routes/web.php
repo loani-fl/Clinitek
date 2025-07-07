@@ -7,6 +7,7 @@ use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\EmpleadosController;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\ConsultaController;
+use App\Http\Controllers\ConsultahoraController;
 use App\Models\Puesto;
 
 // Página de bienvenida
@@ -59,12 +60,10 @@ Route::get('consultas/{id}/edit', [ConsultaController::class, 'edit'])->name('co
 Route::put('consultas/{id}', [ConsultaController::class, 'update'])->name('consultas.update');
 Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupadas'])->name('consultas.horas.ocupadas');
 
+Route::post('/consultas/{consulta}/cancelar', [\App\Http\Controllers\ConsultaController::class, 'cancelar'])->name('consultas.cancelar');
 
-
-Route::patch('/consultas/{consulta}/cancelar', [ConsultaController::class, 'cancelar'])->name('consultas.cancelar');
-
-
-
+Route::get('/horas-ocupadas', [ConsultahoraController::class, 'horasOcupadas']);
+return redirect()->route('consultas.index')->with('success', 'Consulta cancelada exitosamente.');
 
 
 

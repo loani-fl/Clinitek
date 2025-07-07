@@ -134,6 +134,9 @@ class ConsultaController extends Controller
 public function edit($id)
 {
     $consulta = Consulta::findOrFail($id);
+    $pacienteSeleccionado = $consulta->paciente;
+    
+
     $pacientes = Paciente::orderBy('nombre')->get();
     $medicos = Medico::orderBy('nombre')->get();
 
@@ -181,15 +184,7 @@ public function edit($id)
     ));
 }
 
-public function cancelar(Consulta $consulta)
-{
-    // Cambiar estado a 'Cancelada'
-    $consulta->estado = 'Cancelada';
-    $consulta->save();
 
-    // Redirigir al listado con mensaje de éxito
-    return redirect()->route('consultas.index')->with('success', 'La cita fue cancelada correctamente.');
-}
 
 
 
@@ -214,32 +209,57 @@ public function update(Request $request, $id)
 
     $consulta = Consulta::findOrFail($id);
 
-    $consulta->paciente_id = $request->paciente_id;
-    $consulta->fecha = $request->fecha;
-
     $horaInput = trim($request->hora);
+
     if ($horaInput === 'inmediata') {
-        $consulta->hora = null; // Guardar null en hora para evitar error SQL
+        // Si es inmediata, se guarda null en hora, total_pagar debe venir con valor
+        $consulta->hora = null;
         $consulta->total_pagar = $request->total_pagar;
     } else {
         try {
-            $hora24 = \Carbon\Carbon::createFromFormat('g:i A', $horaInput)->format('H:i:s');
-            $consulta->hora = $hora24;
-            $consulta->total_pagar = null;
+            // Convertir hora a formato 24h para validar y guardar
+         $hora24 = \Carbon\Carbon::createFromFormat('H:i', $horaInput)->format('H:i:s');
+
         } catch (\Exception $e) {
             return back()->withErrors(['hora' => 'El formato de la hora no es válido.'])->withInput();
         }
+
+        // Verificar si la hora está ocupada por otra consulta (mismo médico, misma fecha, distinta consulta)
+        $horaOcupada = Consulta::where('medico_id', $request->medico_id)
+            ->where('fecha', $request->fecha)
+            ->where('hora', $hora24)
+            ->where('id', '!=', $id)
+            ->exists();
+
+        if ($horaOcupada) {
+            return back()->withErrors(['hora' => 'La hora seleccionada ya está ocupada para este médico y fecha.'])->withInput();
+        }
+
+        $consulta->hora = $hora24;
+        $consulta->total_pagar = null;
     }
 
+    // Guardar otros campos
+    $consulta->paciente_id = $request->paciente_id;
+    $consulta->fecha = $request->fecha;
     $consulta->medico_id = $request->medico_id;
     $consulta->especialidad = $request->especialidad;
     $consulta->motivo = $request->motivo;
     $consulta->sintomas = $request->sintomas;
-    $consulta->genero = $request->genero; // si usas este campo
 
     $consulta->save();
 
     return redirect()->route('consultas.index')->with('success', 'Consulta actualizada correctamente.');
 }
+
+public function cancelar(\App\Models\Consulta $consulta)
+{
+    $consulta->cancelada = true; // Marca como cancelada
+    $consulta->save();
+
+    return redirect()->route('consultas.index')->with('success', 'Consulta cancelada exitosamente.');
+}
+
+
 
 }
