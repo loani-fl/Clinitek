@@ -23,11 +23,14 @@ return new class extends Migration
             $table->string('especialidad')->nullable();
             $table->unsignedBigInteger('medico_id');
             $table->foreign('medico_id')->references('id')->on('medicos');
-
+        
             $table->text('motivo');
             $table->text('sintomas')->nullable();
 
             $table->timestamps();
+
+            $table->string('estado')->default('pendiente'); // Aquí agregas el campo estado
+
         });
     }
 

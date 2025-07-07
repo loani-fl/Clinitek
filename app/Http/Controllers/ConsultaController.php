@@ -43,7 +43,6 @@ class ConsultaController extends Controller
 
     $rules = [
         'paciente_id' => ['required', 'exists:pacientes,id'],
-        'genero' => ['required', 'in:Femenino,Masculino'],
         'fecha' => ['required', 'date'],
         'hora' => [
             'required',
@@ -70,20 +69,13 @@ class ConsultaController extends Controller
     $messages = [
         'paciente_id.required' => 'Debe seleccionar un paciente.',
         'paciente_id.exists' => 'El paciente seleccionado no es válido.',
-        'genero.required' => 'El género es obligatorio.',
-        'genero.in' => 'Seleccione un genero válido.',
-        'fecha.required' => 'La fecha de la consulta es obligatoria.',
-        'fecha.date' => 'La fecha debe ser válida.',
         'hora.required' => 'Debe seleccionar una hora o elegir "Inmediata".',
         'medico_id.required' => 'Debe seleccionar un médico.',
         'medico_id.exists' => 'El médico seleccionado no es válido.',
         'motivo.required' => 'El motivo de la consulta es obligatorio.',
-        'motivo.max' => 'El motivo no puede exceder 250 caracteres.',
         'sintomas.required' => 'Los síntomas son obligatorios.',
-        'sintomas.max' => 'Los síntomas no pueden exceder 250 caracteres.',
-        'total_pagar.required' => 'Debe indicar el total a pagar.',
-        'total_pagar.numeric' => 'El total debe ser un número.',
-        'total_pagar.min' => 'El total debe ser mayor o igual a 0.',
+    
+        
     ];
 
     $validated = $request->validate($rules, $messages);
@@ -113,7 +105,6 @@ class ConsultaController extends Controller
 
     Consulta::create([
         'paciente_id' => $validated['paciente_id'],
-        'genero' => $validated['genero'],
         'fecha' => $validated['fecha'],
         'hora' => $esInmediata ? null : $hora24,
         'especialidad' => $especialidad,
@@ -121,6 +112,7 @@ class ConsultaController extends Controller
         'motivo' => $validated['motivo'],
         'sintomas' => $validated['sintomas'],
         'total_pagar' => $esInmediata ? $validated['total_pagar'] : 0,
+        'estado' => 'pendiente',
     ]);
 
     return redirect()->route('consultas.index')->with('success', 'Consulta registrada correctamente.');
@@ -147,8 +139,9 @@ public function edit($id)
 
     // Horas posibles de 8:00 AM a 5:00 PM, intervalos de 30 min
     $horas = [];
-    $minutos = 8 * 60;
-    $fin = 17 * 60;
+    $minutos = 8 * 60; // 8:00 AM
+    $fin = (16 * 60) + 30; // 4:30 PM
+
     while ($minutos <= $fin) {
         $h = floor($minutos / 60);
         $m = $minutos % 60;
@@ -158,6 +151,7 @@ public function edit($id)
         $horas[] = "{$hora12}:{$minutoStr} {$periodo}";
         $minutos += 30;
     }
+
 
     // Horas ocupadas para el médico y fecha, excepto la consulta actual
     $horasOcupadas = Consulta::where('medico_id', $consulta->medico_id)
@@ -193,12 +187,12 @@ public function update(Request $request, $id)
 {
     $request->validate([
         'paciente_id' => 'required|exists:pacientes,id',
-        'fecha' => 'required|date|after_or_equal:today',
+        'fecha' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:' . \Carbon\Carbon::now()->addMonth()->format('Y-m-d')],
         'hora' => 'required|string',
         'medico_id' => 'required|exists:medicos,id',
         'especialidad' => 'required|string|max:100',
-        'motivo' => 'required|string|max:255',
-        'sintomas' => 'required|string|max:255',
+        'motivo' => 'required|string|max:250',
+        'sintomas' => 'required|string|max:250',
         'total_pagar' => 'nullable|numeric|min:0',
     ], [
         'required' => 'Este campo es obligatorio.',
@@ -236,7 +230,5 @@ public function update(Request $request, $id)
 
     return redirect()->route('consultas.index')->with('success', 'Consulta actualizada correctamente.');
 }
-
-
 
 }
