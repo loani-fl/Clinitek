@@ -133,6 +133,13 @@
     <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Listado de Pacientes</h5>
   </div>
 
+  @if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+      <strong>{{ session('success') }}</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+  @endif
+
   <div class="p-3">
     {{-- Filtro y botón centrados --}}
     <div class="d-flex justify-content-center align-items-center gap-2 mb-3 flex-wrap">
