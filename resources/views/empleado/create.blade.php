@@ -108,9 +108,7 @@
   }
 </style>
 
-@if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-@endif
+f
 
 {{-- Barra de navegación fija --}}
 <div class="header d-flex justify-content-between align-items-center px-3 py-2">
@@ -145,7 +143,7 @@
   }
 </style>
 
-<div class="row g-3 mt-2">
+
 
   <div class="row mb-3">
     <div class="col-4th">
@@ -261,7 +259,8 @@
   </div>
 </div>
 
-    <div class="row mb-3">
+   <div class="row mb-3">
+  {{-- Foto --}}
   <div class="col-md-5">
     <label for="foto" class="form-label fw-semibold">Foto:</label>
     <input type="file" name="foto" id="foto" class="form-control @error('foto') is-invalid @enderror"
@@ -275,6 +274,24 @@
     </div>
     @enderror
   </div>
+
+  {{-- Turno --}}
+  <div class="col-md-2">
+    <label for="turno_asignado" class="form-label fw-semibold">Turno asignado <span class="text-danger">*</span></label>
+    <select name="turno_asignado" id="turno_asignado"
+            class="form-select form-select-sm @error('turno_asignado') is-invalid @enderror"
+            required>
+      <option value="">Seleccione</option>
+      @foreach(['Mañana','Tarde','Noche'] as $t)
+          <option value="{{ $t }}" {{ old('turno_asignado', $empleado->turno_asignado ?? '') == $t ? 'selected' : '' }}>{{ $t }}</option>
+      @endforeach
+    </select>
+    @error('turno_asignado')
+    <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+  </div>
+</div>
+
 
  <div class="row mb-3">
   <div class="col-md-5">

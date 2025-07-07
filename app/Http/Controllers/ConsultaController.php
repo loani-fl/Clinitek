@@ -115,7 +115,7 @@ class ConsultaController extends Controller
         'estado' => 'pendiente',
     ]);
 
-    return redirect()->route('consultas.index')->with('success', 'Consulta registrada correctamente.');
+    return redirect()->route('consultas.index');
 }
 
 
@@ -259,6 +259,7 @@ public function cancelar(\App\Models\Consulta $consulta)
 
     return redirect()->route('consultas.index')->with('success', 'Consulta cancelada exitosamente.');
 }
+
 
 
 

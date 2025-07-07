@@ -63,7 +63,7 @@ Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupad
 Route::post('/consultas/{consulta}/cancelar', [\App\Http\Controllers\ConsultaController::class, 'cancelar'])->name('consultas.cancelar');
 
 Route::get('/horas-ocupadas', [ConsultahoraController::class, 'horasOcupadas']);
-return redirect()->route('consultas.index')->with('success', 'Consulta cancelada exitosamente.');
+
 
 
 
