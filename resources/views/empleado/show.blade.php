@@ -101,8 +101,18 @@
                         <span class="badge bg-danger">Inactivo</span>
                     @endif
                 </div>
-                <div class="col-md-6"><strong>Dirección:</strong><br><span style="white-space: pre-line;">{{ $empleado->direccion }}</span></div>
-                <div class="col-md-6"><strong>Observaciones:</strong><br><span style="white-space: pre-line;">{{ $empleado->observaciones ?: 'Sin observaciones.' }}</span></div>
+            </div>
+
+            <!-- Nueva fila para Dirección y Observaciones lado a lado -->
+            <div class="row gy-3 mt-3">
+                <div class="col-md-6">
+                    <strong>Dirección:</strong><br>
+                    <span style="white-space: pre-line;">{{ $empleado->direccion }}</span>
+                </div>
+                <div class="col-md-6">
+                    <strong>Observaciones:</strong><br>
+                    <span style="white-space: pre-line;">{{ $empleado->observaciones ?: 'Sin observaciones.' }}</span>
+                </div>
             </div>
         </div>
 
