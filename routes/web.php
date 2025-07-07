@@ -61,6 +61,9 @@ Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupad
 
 
 
+Route::patch('/consultas/{consulta}/cancelar', [ConsultaController::class, 'cancelar'])->name('consultas.cancelar');
+
+
 
 
 
