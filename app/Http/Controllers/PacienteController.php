@@ -16,13 +16,15 @@ class PacienteController extends Controller
 
     public function store(Request $request)
     {
+        $anioActual = date('Y');
+
         $request->validate([
             'nombre' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
             'apellidos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
             'identidad' => [
                 'required',
-                'regex:/^(0[1-9]|1[0-8])(0[1-9]|1[0-9]|2[0-8])[0-9]{9}$/',
-                'size:13',
+                'digits:13',
+                'regex:/^(0[1-9]|1[0-8])(0[1-9]|1[0-9]|2[0-8])(\d{4})\d{5}$/',
                 'unique:pacientes,identidad'
             ],
             'fecha_nacimiento' => [
@@ -57,8 +59,8 @@ class PacienteController extends Controller
             'apellidos.max' => 'Los apellidos no pueden exceder 50 caracteres.',
 
             'identidad.required' => 'La identidad es obligatoria.',
-            'identidad.regex' => 'La identidad debe comenzar con un código de departamento válido (01-18), municipio válido (01-28) y contener solo números.',
-            'identidad.size' => 'La identidad debe tener exactamente 13 dígitos.',
+            'identidad.digits' => 'La identidad debe contener solo números.',
+            'identidad.regex' => 'La identidad debe comenzar con un código válido (01-18), seguido de (01-28), seguido de un año de 4 dígitos, y respetar la estructura.',
             'identidad.unique' => 'Esta identidad ya está registrada.',
 
             'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
@@ -105,6 +107,13 @@ class PacienteController extends Controller
             'historial_quirurgico.max' => 'No puede exceder 200 caracteres.',
         ]);
 
+        $anioNacimiento = (int)substr($request->identidad, 4, 4);
+        if ($anioNacimiento < 1930 || $anioNacimiento > (int)$anioActual) {
+            return redirect()->back()
+                ->withErrors(['identidad' => "El año en la identidad debe estar entre 1930 y $anioActual."])
+                ->withInput();
+        }
+
         Paciente::create($request->all());
 
         return redirect()->route('pacientes.index')->with('success', 'Paciente registrado exitosamente.');
@@ -129,14 +138,16 @@ class PacienteController extends Controller
 
     public function update(Request $request, Paciente $paciente)
     {
+        $anioActual = date('Y');
+
         $request->validate([
             'nombre' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
             'apellidos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
             'genero' => ['nullable', 'in:Femenino,Masculino,Otro'],
             'identidad' => [
                 'required',
-                'regex:/^(0[1-9]|1[0-8])(0[1-9]|1[0-9]|2[0-8])[0-9]{9}$/',
-                'size:13',
+                'digits:13',
+                'regex:/^(0[1-9]|1[0-8])(0[1-9]|1[0-9]|2[0-8])(\d{4})\d{5}$/',
                 Rule::unique('pacientes', 'identidad')->ignore($paciente->id)
             ],
             'fecha_nacimiento' => [
@@ -175,8 +186,8 @@ class PacienteController extends Controller
             'apellidos.max' => 'Los apellidos no pueden exceder 50 caracteres.',
 
             'identidad.required' => 'La identidad es obligatoria.',
-            'identidad.regex' => 'La identidad debe comenzar con un código de departamento válido (01-18), municipio válido (01-28) y contener solo números.',
-            'identidad.size' => 'La identidad debe tener exactamente 13 dígitos.',
+            'identidad.digits' => 'La identidad debe contener solo números.',
+            'identidad.regex' => 'La identidad debe comenzar con un código válido (01-18), seguido de (01-28), seguido de un año de 4 dígitos, y respetar la estructura.',
             'identidad.unique' => 'Esta identidad ya está registrada para otro paciente.',
 
             'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
@@ -218,6 +229,13 @@ class PacienteController extends Controller
             'historial_quirurgico.regex' => 'Solo se permiten letras y espacios.',
             'historial_quirurgico.max' => 'No puede exceder 200 caracteres.',
         ]);
+
+        $anioNacimiento = (int)substr($request->identidad, 4, 4);
+        if ($anioNacimiento < 1930 || $anioNacimiento > (int)$anioActual) {
+            return redirect()->back()
+                ->withErrors(['identidad' => "El año en la identidad debe estar entre 1930 y $anioActual."])
+                ->withInput();
+        }
 
         $paciente->update($request->only([
             'nombre',
