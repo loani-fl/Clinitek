@@ -132,6 +132,8 @@
     </div>
 </div>
 
+
+
 <!-- Formulario más compacto -->
 <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px; z-index:1;">
     <div class="card-header text-center py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
@@ -149,16 +151,7 @@
         </div>
     </div>
 
-    @if ($errors->any())
-    <div class="alert alert-danger">
-        <strong>Por favor corrige los siguientes errores:</strong>
-        <ul class="mb-0">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+
 
 
     <div class="col-md-3">
@@ -282,13 +275,7 @@
         <i class="bi bi-pencil-square me-2"></i> Actualizar
     </button>
 
-    <!-- Formulario Botón Cancelar -->
-    <form action="{{ route('consultas.cancelar', $consulta->id) }}" method="POST" onsubmit="return confirm('¿Seguro que quieres cancelar esta consulta?');" style="display:inline;">
-        @csrf
-        <button type="submit" class="btn btn-danger d-flex align-items-center" data-bs-toggle="tooltip" title="Cancelar la consulta">
-            <i class="bi bi-x-circle me-2"></i> Cancelar consulta
-        </button>
-    </form>
+ 
 
     <!-- Botón Restablecer -->
     <button type="button" id="restablecerBtn" class="btn btn-warning d-flex align-items-center" data-bs-toggle="tooltip" title="Restablecer los campos del formulario">

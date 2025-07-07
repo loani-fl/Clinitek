@@ -20,11 +20,7 @@
     </div>
 
 
-    @if(session('success'))
-        <div class="alert alert-success">
-            <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
-        </div>
-    @endif
+  
 
     <div class="table-responsive">
         <table class="table table-sm table-bordered table-hover align-middle">
