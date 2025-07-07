@@ -38,7 +38,7 @@ class PacienteController extends Controller
                 'email',
                 'max:50',
                 'unique:pacientes,correo',
-                'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/', // validar que tenga @ y punto en dominio
+                'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
             ],
             'tipo_sangre' => ['nullable', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
             'genero' => ['required', 'in:Femenino,Masculino,Otro'],

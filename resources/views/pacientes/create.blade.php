@@ -55,7 +55,8 @@
         <h2 class="fw-bold text-black mb-0">Registro de paciente</h2>
     </div>
 
-    <form id="formPaciente" action="{{ route('pacientes.store') }}" method="POST" class="needs-validation">
+    <form id="formPaciente" action="{{ route('pacientes.store') }}" method="POST" class="needs-validation" novalidate>
+
         @csrf
 
         <h5 class="mb-3 text-dark fw-bold">Datos básicos y contacto</h5>
