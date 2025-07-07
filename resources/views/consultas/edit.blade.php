@@ -282,6 +282,15 @@
         <i class="bi bi-arrow-counterclockwise me-2"></i> Restablecer
     </button>
 
+<form action="{{ route('consultas.cancelar', $consulta->id) }}" method="POST" onsubmit="return confirm('¿Seguro que quieres cancelar esta consulta?');" style="display:inline;">
+    @csrf
+    <button type="submit" class="btn btn-danger d-flex align-items-center" data-bs-toggle="tooltip" title="Cancelar la consulta">
+        <i class="bi bi-x-circle me-2"></i> Cancelar Consulta
+    </button>
+</form>
+
+
+
     <!-- Botón Regresar -->
     <a href="{{ route('consultas.index') }}" class="btn btn-success d-flex align-items-center" data-bs-toggle="tooltip" title="Volver al listado de consultas">
         <i class="bi bi-arrow-left me-2"></i> Regresar
@@ -319,6 +328,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         horaSelect.innerHTML = '';
         horaSelect.appendChild(new Option('-- Selecciona hora --', ''));
+        horaSelect.appendChild(new Option('Inmediata', 'inmediata'));
 
         if (!medico || !fecha) return;
 

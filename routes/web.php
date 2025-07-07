@@ -61,6 +61,7 @@ Route::put('consultas/{id}', [ConsultaController::class, 'update'])->name('consu
 Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupadas'])->name('consultas.horas.ocupadas');
 
 Route::post('/consultas/{consulta}/cancelar', [\App\Http\Controllers\ConsultaController::class, 'cancelar'])->name('consultas.cancelar');
+Route::patch('/consultas/{consulta}/cancelar', [ConsultaController::class, 'cancelar'])->name('consultas.cancelar');
 
 Route::get('/horas-ocupadas', [ConsultahoraController::class, 'horasOcupadas']);
 
