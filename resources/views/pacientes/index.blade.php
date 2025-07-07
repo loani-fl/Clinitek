@@ -153,29 +153,15 @@
     </div>
 </div>
 
-<div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
-  <div class="card-header position-relative py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-    <!-- Botón a la derecha -->
-    <a href="{{ route('inicio') }}" class="btn btn-light position-absolute end-0 top-50 translate-middle-y me-2">
-      <i class="bi bi-house-door"></i> Inicio
-    </a>
-    <!-- Título centrado -->
-    <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Listado de Pacientes</h5>
-  </div>
+<div class="content-wrapper">
+    <div class="card custom-card shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0 text-dark text-center" style="font-size: 2.25rem; font-weight: bold;">Listado de pacientes</h5>
 
-  @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
-      <strong>{{ session('success') }}</strong>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-    </div>
-  @endif
-
-  <div class="p-3">
-    {{-- Filtro y botón centrados --}}
-    <div class="d-flex justify-content-center align-items-center gap-2 mb-3 flex-wrap">
-      <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por nombre, apellido o identidad...">
-      <!--<button id="btnLimpiar" class="btn btn-outline-primary btn-sm">Limpiar filtro</button>-->
-    </div>
+            <a href="{{ route('inicio') }}" class="btn btn-light btn-inicio">
+                <i class="bi bi-house-door"></i> Inicio
+            </a>
+        </div>
 
         <div class="d-flex filter-container">
             <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por nombre, apellido o identidad...">
