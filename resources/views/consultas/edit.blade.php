@@ -271,7 +271,7 @@
                 </div>
             </div>
 
-            <!-- Botones centrados -->
+<!-- Botones centrados -->
 <div class="d-flex justify-content-center gap-3 mt-4">
     <button type="submit" class="btn btn-primary">
         <i class="bi bi-pencil-square"></i> Actualizar
@@ -284,11 +284,17 @@
     <a href="{{ route('consultas.index') }}" class="btn btn-success">
         <i class="bi bi-arrow-left"></i> Regresar
     </a>
+
+   <form action="{{ route('consultas.cancelar', $consulta) }}" method="POST" onsubmit="return confirm('¿Estás segura de que deseas cancelar esta cita?')" class="d-inline">
+    @csrf
+    @method('PATCH')
+    <button type="submit" class="btn btn-outline-danger fw-bold shadow-sm px-4 py-2 rounded-3" style="transition: background-color 0.3s, color 0.3s;">
+        <i class="bi bi-x-circle me-2"></i> Cancelar cita
+    </button>
+</form>
+
 </div>
 
-        </div>
-    </form>
-</div>
 
 
 <!-- Flatpickr JS (opcional) -->

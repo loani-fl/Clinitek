@@ -21,12 +21,14 @@
     }
 
     .content-wrapper {
-        margin-top: 60px;
+        margin-top: 50px;
         max-width: 900px;
         margin-left: auto;
         margin-right: auto;
         padding: 1rem;
         position: relative;
+           max-width: 1000px;  /* Igual que el max-width del segundo */
+            width: 100%;        /* Para que la card ocupe todo el ancho disponible */
     }
 
     .custom-card::before {
@@ -54,6 +56,8 @@
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         position: relative;
         z-index: 1;
+         max-width: 1000px;  /* Igual que en el segundo */
+    width: 100%;        /* Que ocupe todo el ancho dentro del contenedor */
     }
 
    .card-header {
@@ -97,6 +101,8 @@
 
     .table {
         font-size: 0.9rem;
+            width: 100%;  /* Tabla siempre al 100% del contenedor */
+    border-collapse: collapse; /* Para bordes uniformes */
     }
 
     thead tr {

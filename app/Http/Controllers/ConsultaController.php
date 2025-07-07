@@ -181,6 +181,17 @@ public function edit($id)
     ));
 }
 
+public function cancelar(Consulta $consulta)
+{
+    // Cambiar estado a 'Cancelada'
+    $consulta->estado = 'Cancelada';
+    $consulta->save();
+
+    // Redirigir al listado con mensaje de éxito
+    return redirect()->route('consultas.index')->with('success', 'La cita fue cancelada correctamente.');
+}
+
+
 
 
 public function update(Request $request, $id)

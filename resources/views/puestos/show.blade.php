@@ -183,6 +183,7 @@
                 <li class="list-group-item"><strong>Sueldo:</strong> Lps. {{ number_format($puesto->sueldo, 2) }}</li>
                 <li class="list-group-item"><strong>Función del Puesto:</strong><br>
                     <span style="white-space: pre-line;">{{ $puesto->funcion }}</span>
+                    
                 </li>
             </ul>
         </div>

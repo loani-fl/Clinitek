@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Listado de Puestos')
+
 @section('content')
 <style>
     body {
@@ -9,7 +11,6 @@
         overflow-x: hidden;
     }
 
-    /* Barra fija arriba */
     .header {
         background-color: #007BFF;
         position: fixed;
@@ -19,17 +20,17 @@
         box-shadow: 0 2px 5px rgba(0,0,0,0.15);
     }
 
-    /* Contenedor principal centrado con margen top para no tapar navbar */
     .content-wrapper {
-        margin-top: 60px;
-        max-width: 900px;
+        margin-top: 50px;
+     
         margin-left: auto;
         margin-right: auto;
         padding: 1rem;
         position: relative;
+         max-width: 1000px;  /* Igual que el max-width del segundo */
+            width: 100%;        /* Para que la card ocupe todo el ancho disponible */
     }
 
-    /* Logo translúcido de fondo */
     .custom-card::before {
         content: "";
         position: absolute;
@@ -47,7 +48,6 @@
         z-index: 0;
     }
 
-    /* Tarjeta blanca con sombra y bordes redondeados */
     .custom-card {
         background-color: #fff;
         border-radius: 1.5rem;
@@ -55,18 +55,13 @@
         overflow: hidden;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         position: relative;
+          border-radius: 10px;
         z-index: 1;
+         max-width: 1000px;  /* Igual que en el segundo */
+    width: 100%;        /* Que ocupe todo el ancho dentro del contenedor */
     }
 
-    /* Encabezado de la tarjeta */
-    .card-header {
-        border-bottom: 3px solid #007BFF;
-        padding-bottom: 0.5rem;
-        margin-bottom: 1rem;
-        text-align: center;
-        position: relative;
-    }
-.card-header {
+   .card-header {
     background-color: transparent !important;
     border-bottom: 3px solid #007BFF;
     padding-bottom: 0.5rem;
@@ -76,7 +71,13 @@
 }
 
 
-    /* Botón inicio en la esquina superior derecha dentro del header */
+    .card-header h3 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #003366;
+        margin: 0;
+    }
+
     .btn-inicio {
         position: absolute;
         top: 50%;
@@ -85,7 +86,6 @@
         font-size: 0.9rem;
     }
 
-    /* Contenedor del filtro */
     .d-flex.filter-container {
         justify-content: flex-start;
         align-items: center;
@@ -94,17 +94,23 @@
         margin-bottom: 1rem;
     }
 
-    /* Input filtro tamaño igual */
     .filtro-input {
         font-size: 0.85rem;
         max-width: 300px;
         flex-grow: 1;
     }
 
-    /* Tabla con estilo igual */
     .table {
-        font-size: 0.9rem;
+        font-size: 0.5rem;
+        width: 100%;  /* Tabla siempre al 100% del contenedor */
+    border-collapse: collapse; /* Para bordes uniformes */
     }
+    .table-responsive {
+    flex-grow: 1;
+    overflow-y: auto;
+   
+    max-width: 100%; /* Para que no exceda la card */
+}
 
     thead tr {
         background-color: #007BFF;
@@ -123,18 +129,6 @@
     table th:nth-child(1), table td:nth-child(1) {
         width: 40px;
         text-align: center;
-    }
-
-    table th:nth-child(2), table td:nth-child(2),
-    table th:nth-child(3), table td:nth-child(3),
-    table th:nth-child(4), table td:nth-child(4) {
-        width: 150px;
-    }
-
-    table th:nth-child(5), table td:nth-child(5) {
-        width: 120px;
-        text-align: center;
-        white-space: nowrap;
     }
 
     .pagination-container {

@@ -38,17 +38,32 @@ class EmpleadosController extends Controller
                 'max:50',
                 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'
             ],
-            'identidad' => [
-                'required',
-                'digits:13',
-                'unique:listaempleados,identidad',
-                function ($attribute, $value, $fail) use ($departamentosValidos) {
-                    $codigoDepartamento = substr($value, 0, 2);
-                    if (!in_array($codigoDepartamento, $departamentosValidos)) {
-                        $fail('El código del departamento en la identidad no es válido.');
-                    }
-                }
-            ],
+          'identidad' => [
+    'required',
+    'digits:13',
+    'unique:listaempleados,identidad',
+    function ($attribute, $value, $fail) use ($departamentosValidos) {
+        // Validar departamento (primeros 2 dígitos)
+        $codigoDepartamento = substr($value, 0, 2);
+        if (!in_array($codigoDepartamento, $departamentosValidos)) {
+            return $fail('El código del departamento en la identidad no es válido.');
+        }
+
+        // Validar año de nacimiento (posiciones 4 a 7)
+        $anioNacimiento = substr($value, 4, 4);
+        $anioActual = date('Y');
+        if ($anioNacimiento < 1900 || $anioNacimiento > $anioActual) {
+            return $fail('El año de nacimiento en la identidad no es válido.');
+        }
+
+        // Validar edad calculada
+        $edad = $anioActual - $anioNacimiento;
+        if ($edad < 18 || $edad > 65) {
+            return $fail("La edad calculada a partir de la identidad no es válida (debe ser entre 18 y 65 años; edad actual: $edad).");
+        }
+    }
+],
+
             'telefono' => [
                 'required',
                 'digits:8',
