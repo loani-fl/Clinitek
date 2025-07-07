@@ -18,7 +18,7 @@ class Medico extends Model
         'especialidad',
         'correo',
         'numero_identidad',
-        'salario',      // correcto: salario, no sueldo
+        'salario',     
         'fecha_nacimiento',
         'fecha_ingreso',
         'genero',
