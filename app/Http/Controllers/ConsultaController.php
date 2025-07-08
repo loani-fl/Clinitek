@@ -251,13 +251,15 @@ public function update(Request $request, $id)
 
     return redirect()->route('consultas.index')->with('success', 'Consulta actualizada correctamente.');
 }
-public function cancelar(\App\Models\Consulta $consulta)
+public function cancelar(Consulta $consulta)
 {
-    $consulta->estado = 'cancelada';  // aquí debe ser el campo `estado`
+    $consulta->estado = 'cancelada';
     $consulta->save();
 
-    return redirect()->route('consultas.index')->with('success', 'Consulta cancelada exitosamente.');
+    return redirect()->route('consultas.index')
+        ->with('success', 'Consulta cancelada correctamente.');
 }
+
 
 
 

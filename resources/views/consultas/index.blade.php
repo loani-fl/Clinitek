@@ -5,8 +5,10 @@
 @section('content')
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Título centrado ocupando todo el ancho disponible -->
         <h4 class="text-primary fw-bold mx-auto">Consultas Médicas Registradas</h4>
 
+        <!-- Botones a la derecha -->
         <div class="d-flex gap-2 position-absolute end-0 me-3">
             <a href="{{ route('inicio') }}" class="btn btn-sm btn-light">
                 <i class="bi bi-house-door"></i> Inicio
@@ -16,6 +18,13 @@
             </a>
         </div>
     </div>
+
+
+    @if(session('success'))
+        <div class="alert alert-success">
+            <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
+        </div>
+    @endif
 
     <div class="table-responsive">
         <table class="table table-sm table-bordered table-hover align-middle">
@@ -28,7 +37,6 @@
                     <th>Fecha</th>
                     <th>Hora</th>
                     <th>Motivo</th>
-                    <th>Estado</th> <!-- NUEVA COLUMNA -->
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -60,13 +68,6 @@
                             @endif
                         </td>
                         <td>{{ \Illuminate\Support\Str::limit($consulta->motivo, 30) }}</td>
-                        <td>
-                            @if($consulta->estado === 'cancelada')
-                                <span class="badge bg-danger">Cancelada</span>
-                            @else
-                                <span class="badge bg-primary">Pendiente</span>
-                            @endif
-                        </td>
                         <td class="text-center">
                             <a href="{{ route('consultas.show', $consulta->id) }}" class="btn btn-sm btn-info" title="Ver">
                                 <i class="bi bi-eye"></i>
@@ -85,7 +86,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="text-center">No hay consultas registradas.</td>
+                        <td colspan="8" class="text-center">No hay consultas registradas.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -97,4 +98,3 @@
     </div>
 </div>
 @endsection
-
