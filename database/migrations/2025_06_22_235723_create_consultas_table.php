@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('paciente_id')->constrained()->onDelete('cascade');
 
-
             // Información de la consulta
             $table->string('genero')->nullable();
             $table->date('fecha');
@@ -27,10 +26,9 @@ return new class extends Migration
             $table->text('motivo');
             $table->text('sintomas')->nullable();
 
+            $table->enum('estado', ['pendiente', 'realizada', 'cancelada'])->default('pendiente');
+
             $table->timestamps();
-
-            $table->string('estado')->default('pendiente'); // Aquí agregas el campo estado
-
         });
     }
 
