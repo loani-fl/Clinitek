@@ -20,7 +20,7 @@ class Consulta extends Model
         'motivo',
         'sintomas',
         'estado',
-          'cancelada',
+          
     ];
 
     public function paciente()

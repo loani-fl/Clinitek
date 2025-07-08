@@ -238,14 +238,16 @@ class ConsultaController extends Controller
         return redirect()->route('consultas.index')->with('success', 'Consulta actualizada correctamente.');
     }
 
-    // Cancelar consulta
-    public function cancelar(Consulta $consulta)
-    {
-        $consulta->cancelada = true;
-        $consulta->save();
+public function cancelar(Consulta $consulta)
+{
+    $consulta->estado = 'cancelada';
+    $consulta->save();
 
-        return redirect()->route('consultas.index')->with('success', 'Consulta cancelada exitosamente.');
-    }
+    return redirect()->route('consultas.index')->with('success', 'Consulta cancelada correctamente.');
+}
+
+
+
     public function show($id)
     {
         $consulta = Consulta::with('paciente', 'medico')->findOrFail($id);
