@@ -97,15 +97,18 @@
     </div>
 
     <div class="col-md-3">
-        <label for="direccion" class="form-label">Dirección: <span class="text-danger">*</span></label>
-        <textarea
-            name="direccion"
-            id="direccion"
-            rows="2"
-            maxlength="300"
+        <label for="genero" class="form-label">Género: <span class="text-danger">*</span></label>
+        <select
+            name="genero"
+            id="genero"
             required
-            class="form-control @error('direccion') is-invalid @enderror">{{ old('direccion', $paciente->direccion ?? '') }}</textarea>
-        @error('direccion') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+            class="form-select @error('genero') is-invalid @enderror">
+            <option value="">Seleccione...</option>
+            <option value="Femenino" {{ old('genero', $paciente->genero ?? '') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
+            <option value="Masculino" {{ old('genero', $paciente->genero ?? '') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
+            <option value="Otro" {{ old('genero', $paciente->genero ?? '') == 'Otro' ? 'selected' : '' }}>Otro</option>
+        </select>
+        @error('genero') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
     </div>
 
     <div class="col-md-3">
@@ -125,20 +128,18 @@
     </div>
 </div>
 
-<div class="row mb-3">
+    {{-- CAMBIO: Dirección ahora aparece al final --}}
     <div class="col-md-3">
-        <label for="genero" class="form-label">Género: <span class="text-danger">*</span></label>
-        <select
-            name="genero"
-            id="genero"
+
+        <label for="direccion" class="form-label">Dirección: <span class="text-danger">*</span></label>
+        <textarea
+            name="direccion"
+            id="direccion"
+            rows="2"
+            maxlength="300"
             required
-            class="form-select @error('genero') is-invalid @enderror">
-            <option value="">Seleccione...</option>
-            <option value="Femenino" {{ old('genero', $paciente->genero ?? '') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
-            <option value="Masculino" {{ old('genero', $paciente->genero ?? '') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
-            <option value="Otro" {{ old('genero', $paciente->genero ?? '') == 'Otro' ? 'selected' : '' }}>Otro</option>
-        </select>
-        @error('genero') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+            class="form-control @error('direccion') is-invalid @enderror">{{ old('direccion', $paciente->direccion ?? '') }}</textarea>
+        @error('direccion') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
     </div>
 </div>
 
