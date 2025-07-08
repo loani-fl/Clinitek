@@ -131,6 +131,8 @@ class ConsultaController extends Controller
 
         return response()->json($ocupadas);
     }
+
+    
 public function edit($id)
 {
     $consulta = Consulta::findOrFail($id);
@@ -183,10 +185,6 @@ public function edit($id)
         'consulta', 'pacientes', 'medicos', 'horas', 'horasOcupadas', 'horaFormato12', 'inmediataOcupada'
     ));
 }
-
-
-
-
 
 
 public function update(Request $request, $id)
@@ -259,8 +257,4 @@ public function cancelar(\App\Models\Consulta $consulta)
 
     return redirect()->route('consultas.index')->with('success', 'Consulta cancelada exitosamente.');
 }
-
-
-
-
 }
