@@ -14,6 +14,13 @@ class PacienteController extends Controller
         return view('pacientes.create');
     }
 
+    private function validarAnioIdentidad($identidad)
+    {
+        $anio = (int)substr($identidad, 4, 4);
+        $anioActual = (int)date('Y');
+        return ($anio >= 1930 && $anio <= $anioActual);
+    }
+
     public function store(Request $request)
     {
         $anioActual = date('Y');
@@ -107,8 +114,7 @@ class PacienteController extends Controller
             'historial_quirurgico.max' => 'No puede exceder 200 caracteres.',
         ]);
 
-        $anioNacimiento = (int)substr($request->identidad, 4, 4);
-        if ($anioNacimiento < 1930 || $anioNacimiento > (int)$anioActual) {
+        if (!$this->validarAnioIdentidad($request->identidad)) {
             return redirect()->back()
                 ->withErrors(['identidad' => "El año en la identidad debe estar entre 1930 y $anioActual."])
                 ->withInput();
@@ -230,8 +236,7 @@ class PacienteController extends Controller
             'historial_quirurgico.max' => 'No puede exceder 200 caracteres.',
         ]);
 
-        $anioNacimiento = (int)substr($request->identidad, 4, 4);
-        if ($anioNacimiento < 1930 || $anioNacimiento > (int)$anioActual) {
+        if (!$this->validarAnioIdentidad($request->identidad)) {
             return redirect()->back()
                 ->withErrors(['identidad' => "El año en la identidad debe estar entre 1930 y $anioActual."])
                 ->withInput();

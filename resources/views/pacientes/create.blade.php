@@ -98,18 +98,21 @@
 </div>
 
 
-            <div class="col-md-3">
-                <label for="identidad" class="form-label">Identidad: <span class="text-danger">*</span></label>
-                <input type="text" name="identidad" id="identidad" maxlength="13"
-                       pattern="^(0[1-9]|1[0-8])(0[1-9]|1[0-9]|2[0-8])[0-9]{9}$" required
-                       class="form-control @error('identidad') is-invalid @enderror"
-                       value="{{ old('identidad') }}"
-                       placeholder="Ej: 0703200201564"
-                       title="Debe ingresar 13 números válidos. Formato: Departamento(01-18) Municipio(01-28) + 9 dígitos.">
-                @error('identidad')
-                <div class="invalid-feedback d-block">{{ $message }}</div>
-                @enderror
-            </div>
+<div class="col-md-3">
+    <label for="identidad" class="form-label">Identidad: <span class="text-danger">*</span></label>
+    <input type="text" name="identidad" id="identidad" maxlength="13"
+           pattern="^(0[1-9]|1[0-8])(0[1-9]|1[0-9]|2[0-8])[0-9]{9}$" required
+           class="form-control @error('identidad') is-invalid @enderror"
+           value="{{ old('identidad') }}"
+           placeholder="Ej: 0703200201564 (Depto 01-18, Mun 01-28, Año + 5 dígitos)"
+           title="Debe ingresar 13 números válidos. Formato: Departamento(01-18) Municipio(01-28) + 9 dígitos.">
+    <div id="errorIdentidad" class="invalid-feedback d-block" style="display:none;"></div>
+    @error('identidad')
+    <div class="invalid-feedback d-block">{{ $message }}</div>
+    @enderror
+</div>
+
+
 
             <div class="col-md-3">
                 <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento: <span class="text-danger">*</span></label>
@@ -280,5 +283,31 @@ document.getElementById('btnLimpiar').addEventListener('click', () => {
 });
 
 </script>
+<script>
+function validarAnioIdentidad() {
+    const valor = inputIdentidad.value.trim();
+
+    if (!/^\d{13}$/.test(valor)) {
+        inputIdentidad.setCustomValidity('');
+        return true;
+    }
+
+    const anio = parseInt(valor.substring(4, 8), 10);
+    const anioMin = 1940;
+    const anioMax = new Date().getFullYear();
+
+    if (anio < anioMin || anio > anioMax) {
+        inputIdentidad.setCustomValidity(`El año en la identidad debe estar entre ${anioMin} y ${anioMax}.`);
+        inputIdentidad.reportValidity();
+        return false;
+    } else {
+        inputIdentidad.setCustomValidity('');
+    }
+
+    return true;
+}
+
+</script>
+
 
 @endsection
