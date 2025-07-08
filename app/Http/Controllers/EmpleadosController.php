@@ -401,3 +401,4 @@ class EmpleadosController extends Controller
         return view('empleado.show', compact('empleado'));
     }
 }
+

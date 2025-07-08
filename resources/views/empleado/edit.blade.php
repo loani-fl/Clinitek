@@ -310,6 +310,5 @@ document.querySelector('form').addEventListener('reset', function () {
     actualizarSueldo();
 });
 
-    
 </script>
 @endsection
