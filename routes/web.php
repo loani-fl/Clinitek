@@ -62,11 +62,15 @@ Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupad
 
 
 
-Route::patch('/consultas/{consulta}/cancelar', [ConsultaController::class, 'cancelar'])->name('consultas.cancelar');
 
 
+//Route::patch('/consultas/{consulta}/toggle-estado', [ConsultaController::class, 'toggleEstado'])
+   // ->name('consultas.toggleEstado');
 
-Route::get('/horas-ocupadas', [ConsultahoraController::class, 'horasOcupadas']);
+
+Route::patch('/consultas/{consulta}/cambiar-estado', [ConsultaController::class, 'cambiarEstado'])->name('consultas.cambiarEstado');
+
+    Route::get('/horas-ocupadas', [ConsultahoraController::class, 'horasOcupadas']);
 
 
 

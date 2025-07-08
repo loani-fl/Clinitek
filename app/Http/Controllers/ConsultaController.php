@@ -238,13 +238,24 @@ class ConsultaController extends Controller
         return redirect()->route('consultas.index')->with('success', 'Consulta actualizada correctamente.');
     }
 
-public function cancelar(Consulta $consulta)
+public function cambiarEstado(Request $request, Consulta $consulta)
 {
-    $consulta->estado = 'cancelada';
+    $nuevoEstado = strtolower($request->input('estado'));
+
+    $estadosPermitidos = ['pendiente', 'realizada', 'cancelada'];
+
+    if (!in_array($nuevoEstado, $estadosPermitidos)) {
+        return redirect()->back()->withErrors(['Estado no válido']);
+    }
+
+    $consulta->estado = $nuevoEstado;
     $consulta->save();
 
-    return redirect()->route('consultas.index')->with('success', 'Consulta cancelada correctamente.');
+    return redirect()->back()->with('success', 'Estado de la consulta actualizado a ' . ucfirst($nuevoEstado));
 }
+
+
+
 
 
 

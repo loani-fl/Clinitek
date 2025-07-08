@@ -200,7 +200,7 @@
                                     @php
                                         $estado = strtolower($consulta->estado);
                                         $claseCirculo = match($estado) {
-                                            'realizado' => 'estado-realizado',
+                                            'realizada' => 'estado-realizado',
                                             'pendiente' => 'estado-pendiente',
                                             'cancelada' => 'estado-cancelado',
                                             default => ''

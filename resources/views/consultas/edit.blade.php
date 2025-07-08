@@ -211,7 +211,51 @@
         </div>
     </div>
 </div>
-<h5 class="text-dark fw-bold mt-4 mb-3">Información de la consulta médica</h5>
+@php
+    $estado = strtolower($consulta->estado);
+
+    // Definir el siguiente estado al que quieres cambiar según el estado actual
+    // Ejemplo: pendiente -> realizada, realizada -> cancelada, cancelada -> pendiente
+    $siguienteEstado = match($estado) {
+        'pendiente' => 'realizada',
+        'realizada' => 'cancelada',
+        'cancelada' => 'pendiente',
+        default => 'pendiente',
+    };
+
+    // Clases y textos para el botón según el siguiente estado
+    $claseBoton = match($siguienteEstado) {
+        'pendiente' => 'btn-warning',
+        'realizada' => 'btn-success',
+        'cancelada' => 'btn-danger',
+        default => 'btn-secondary',
+    };
+
+    $iconoBoton = match($siguienteEstado) {
+        'pendiente' => 'bi-clock-history',
+        'realizada' => 'bi-check-circle',
+        'cancelada' => 'bi-x-circle',
+        default => 'bi-question-circle',
+    };
+
+    $textoBoton = ucfirst($siguienteEstado);
+@endphp
+
+<div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+    <h5 class="text-dark fw-bold mb-0">Información de la consulta médica</h5>
+
+    <form action="{{ route('consultas.cambiarEstado', $consulta->id) }}" method="POST" class="d-inline">
+        @csrf
+        @method('PATCH')
+        <input type="hidden" name="estado" value="{{ $siguienteEstado }}">
+
+        <button type="submit" class="btn btn-sm {{ $claseBoton }}" title="Marcar como {{ $textoBoton }}">
+            <i class="bi {{ $iconoBoton }} me-1"></i> {{ $textoBoton }}
+        </button>
+    </form>
+</div>
+
+
 
 <form action="{{ route('consultas.update', $consulta->id) }}" method="POST">
     @csrf
@@ -307,13 +351,7 @@
 
 <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
     <!-- Botón Cancelar Consulta -->
-    <form action="{{ route('consultas.cancelar', $consulta->id) }}" method="POST" style="display:inline;">
-        @csrf
-        @method('PATCH')
-        <button type="submit" class="btn btn-danger d-flex align-items-center" data-bs-toggle="tooltip" title="Cancelar la consulta y marcarla como cancelada">
-            <i class="bi bi-x-circle me-2"></i> Cancelar Consulta
-        </button>
-    </form>
+    
 
     <!-- Botón Regresar -->
     <a href="{{ route('consultas.index') }}" class="btn btn-success d-flex align-items-center" data-bs-toggle="tooltip" title="Volver al listado de consultas">
@@ -337,6 +375,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const consultaFechaOriginal = "{{ $consulta->fecha }}";
     const consultaMotivoOriginal = `{{ $consulta->motivo }}`;
     const consultaSintomasOriginal = `{{ $consulta->sintomas }}`;
+    
 
     function hora12a24(hora12) {
         const [horaMinuto, periodo] = hora12.split(' ');
@@ -451,6 +490,67 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+const estadoInput = document.getElementById('estadoInput'); // input hidden en el formulario del botón cambiarEstado
+const botonEstado = estadoInput.closest('form').querySelector('button[type="submit"]');
+
+restablecerBtn.addEventListener('click', () => {
+    // Restaurar valores originales
+    medicoSelect.value = consultaMedicoOriginal;
+    fechaConsultaInput.value = consultaFechaOriginal;
+    motivoInput.value = consultaMotivoOriginal;
+    sintomasInput.value = consultaSintomasOriginal;
+
+    // Restaurar estado al original (replica la lógica de PHP en JS)
+    const estado = estadoOriginal; // definido antes como: const estadoOriginal = "{{ strtolower($consulta->estado) }}";
+    let siguienteEstado;
+
+    switch (estado) {
+        case 'pendiente':
+            siguienteEstado = 'realizada';
+            break;
+        case 'realizada':
+            siguienteEstado = 'cancelada';
+            break;
+        case 'cancelada':
+            siguienteEstado = 'pendiente';
+            break;
+        default:
+            siguienteEstado = 'pendiente';
+    }
+
+    if (estadoInput) {
+        estadoInput.value = siguienteEstado;
+    }
+
+    // Actualizar botón cambiar estado
+    if (botonEstado) {
+        botonEstado.className = 'btn btn-sm ';
+        switch (siguienteEstado) {
+            case 'pendiente':
+                botonEstado.classList.add('btn-warning');
+                botonEstado.innerHTML = '<i class="bi bi-clock-history me-1"></i> Pendiente';
+                break;
+            case 'realizada':
+                botonEstado.classList.add('btn-success');
+                botonEstado.innerHTML = '<i class="bi bi-check-circle me-1"></i> Realizada';
+                break;
+            case 'cancelada':
+                botonEstado.classList.add('btn-danger');
+                botonEstado.innerHTML = '<i class="bi bi-x-circle me-1"></i> Cancelada';
+                break;
+            default:
+                botonEstado.classList.add('btn-secondary');
+                botonEstado.innerHTML = '<i class="bi bi-question-circle me-1"></i> Desconocido';
+        }
+    }
+
+    // Actualizar especialidad y horas como ya tienes
+    actualizarEspecialidad();
+    cargarHorasDisponibles();
+});
+
+
+</script>
 @endsection
 
 
