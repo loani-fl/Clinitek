@@ -8,7 +8,6 @@
         padding: 0;
         overflow-x: hidden;
     }
-
     .header {
         background-color: #007BFF;
         position: fixed;
@@ -20,7 +19,6 @@
         display: flex;
         align-items: center;
     }
-
     .content-wrapper {
         margin-top: 40px;
         max-width: 1200px;
@@ -28,7 +26,6 @@
         margin-right: auto;
         padding: 2rem;
     }
-
     .custom-card::before {
         content: "";
         position: absolute;
@@ -45,7 +42,6 @@
         pointer-events: none;
         z-index: 0;
     }
-
     .custom-card {
         background-color: #fff;
         border-radius: 1.5rem;
@@ -56,7 +52,6 @@
         position: relative;
         z-index: 1;
     }
-
     .card-header {
         border-bottom: 3px solid #007BFF;
         padding-bottom: 0.5rem;
@@ -65,7 +60,6 @@
         justify-content: space-between;
         align-items: center;
     }
-
     .alert-success-custom {
         background-color: #d4edda;
         border: 1px solid #c3e6cb;
@@ -76,19 +70,16 @@
         z-index: 1200;
         margin-top: 1rem;
     }
-
     .filter-row {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
         margin-bottom: 1rem;
     }
-
     .filter-row > div {
         flex: 1 1 150px;
         min-width: 120px;
     }
-
     .estado-circulo {
         display: inline-block;
         width: 14px;
@@ -97,19 +88,15 @@
         margin: 0 auto;
         vertical-align: middle;
     }
-
     .estado-realizado {
         background-color: #28a745;
     }
-
     .estado-pendiente {
         background-color: #ffc107;
     }
-
     .estado-cancelado {
         background-color: #dc3545;
     }
-
     .estado-leyenda {
         display: flex;
         justify-content: center;
@@ -183,7 +170,7 @@
                         <option value="">-- Todos los Estados --</option>
                         <option value="realizado">Realizado</option>
                         <option value="pendiente">Pendiente</option>
-                        <option value="cancelado">Cancelado</option>
+                        <option value="cancelada">Cancelada</option> <!-- Aquí corrigió a "cancelada" -->
                     </select>
                 </div>
             </div>
@@ -215,11 +202,11 @@
                                         $claseCirculo = match($estado) {
                                             'realizado' => 'estado-realizado',
                                             'pendiente' => 'estado-pendiente',
-                                            'cancelado' => 'estado-cancelado',
+                                            'cancelada' => 'estado-cancelado',
                                             default => ''
                                         };
                                     @endphp
-                                    <span class="estado-circulo {{ $claseCirculo }}" title="{{ ucfirst($estado) }}"></span>
+                                    <span class="estado-circulo {{ $claseCirculo }}" title="{{ $estado }}"></span> 
                                 </td>
                                 <td>
                                     <a href="{{ route('consultas.show', $consulta->id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
@@ -227,6 +214,11 @@
                                 </td>
                             </tr>
                         @endforeach
+
+                                                <tr id="sin-resultados" style="display: none;">
+                            <td colspan="7" class="text-center fst-italic text-muted">No hay resultados que mostrar</td>
+                        </tr>
+
                     </tbody>
                 </table>
             </div>
@@ -236,7 +228,7 @@
             <div class="estado-leyenda">
                 <div><span class="estado-circulo estado-realizado"></span> Realizado</div>
                 <div><span class="estado-circulo estado-pendiente"></span> Pendiente</div>
-                <div><span class="estado-circulo estado-cancelado"></span> Cancelado</div>
+                <div><span class="estado-circulo estado-cancelado"></span> Cancelada</div> <!-- Texto corregido -->
             </div>
 
             <div class="mt-4 pagination-container">
@@ -256,7 +248,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const estadoFiltroSelect = document.getElementById('estadoFiltro');
     const tabla = document.getElementById('tabla-consultas');
     const contadorResultados = document.getElementById('contador-resultados');
-    const filasOriginales = Array.from(tabla.querySelectorAll('tr'));
+    const filasOriginales = Array.from(tabla.querySelectorAll('tr:not(#sin-resultados)'));
+    const filaSinResultados = document.getElementById('sin-resultados');
 
     const hoy = new Date();
     const dosMesesAtras = new Date();
@@ -328,6 +321,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
+        // Mostrar fila "No hay resultados" si no hay nada visible
+        if (cantidadVisible === 0) {
+            filaSinResultados.style.display = '';
+            tabla.appendChild(filaSinResultados);
+        } else {
+            filaSinResultados.style.display = 'none';
+        }
+
         actualizarContador(cantidadVisible);
     }
 
@@ -336,7 +337,10 @@ document.addEventListener('DOMContentLoaded', function () {
     fechaInicioInput.addEventListener('change', filtrarTabla);
     fechaFinInput.addEventListener('change', filtrarTabla);
     estadoFiltroSelect.addEventListener('change', filtrarTabla);
+
+    filtrarTabla();
 });
+
 </script>
 
 @endsection
