@@ -1,7 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
+
+
 <style>
+    /* Estilo para el mensaje de éxito */
+    .alert-success-custom {
+        background-color: #d1e7dd;
+        border: 1px solid #badbcc;
+        color: #0f5132;
+        font-weight: 600;
+        box-shadow: 0 4px 10px rgba(0, 128, 0, 0.2);
+        border-radius: 0.5rem;
+        padding: 1rem 1.5rem;
+        position: relative;
+        z-index: 1200;
+        margin-bottom: 1rem;
+    }
     body {
         padding-top: 40px; /* Espacio suficiente para la navbar fija (ajusta según altura real) */
         margin: 0;
@@ -270,24 +285,42 @@
 
 <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
 
-    <!-- Botón Actualizar -->
-    <button type="submit" class="btn btn-primary d-flex align-items-center" data-bs-toggle="tooltip" title="Guardar los cambios">
-        <i class="bi bi-pencil-square me-2"></i> Actualizar
-    </button>
+<form action="{{ route('consultas.update', $consulta->id) }}" method="POST">
+    @csrf
+    @method('PUT')
 
- 
+    <!-- Aquí van tus campos del formulario -->
 
-    <!-- Botón Restablecer -->
-    <button type="button" id="restablecerBtn" class="btn btn-warning d-flex align-items-center" data-bs-toggle="tooltip" title="Restablecer los campos del formulario">
-        <i class="bi bi-arrow-counterclockwise me-2"></i> Restablecer
-    </button>
+    <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
+        <!-- Botón Actualizar -->
+        <button type="submit" class="btn btn-primary d-flex align-items-center" data-bs-toggle="tooltip" title="Guardar los cambios">
+            <i class="bi bi-pencil-square me-2"></i> Actualizar
+        </button>
+
+        <!-- Botón Restablecer -->
+        <button type="button" id="restablecerBtn" class="btn btn-warning d-flex align-items-center" data-bs-toggle="tooltip" title="Restablecer los campos del formulario">
+            <i class="bi bi-arrow-counterclockwise me-2"></i> Restablecer
+        </button>
+    </div>
+</form> {{-- 👈 Aquí cierra el formulario de actualización --}}
+
+
+<div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
+    <!-- Botón Cancelar Consulta -->
+    <form action="{{ route('consultas.cancelar', $consulta->id) }}" method="POST" style="display:inline;">
+        @csrf
+        @method('PATCH')
+        <button type="submit" class="btn btn-danger d-flex align-items-center" data-bs-toggle="tooltip" title="Cancelar la consulta y marcarla como cancelada">
+            <i class="bi bi-x-circle me-2"></i> Cancelar Consulta
+        </button>
+    </form>
 
     <!-- Botón Regresar -->
     <a href="{{ route('consultas.index') }}" class="btn btn-success d-flex align-items-center" data-bs-toggle="tooltip" title="Volver al listado de consultas">
         <i class="bi bi-arrow-left me-2"></i> Regresar
     </a>
-
 </div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -319,6 +352,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         horaSelect.innerHTML = '';
         horaSelect.appendChild(new Option('-- Selecciona hora --', ''));
+        horaSelect.appendChild(new Option('Inmediata', 'inmediata'));
 
         if (!medico || !fecha) return;
 
@@ -402,7 +436,19 @@ document.querySelectorAll('.no-select').forEach(el => {
     el.addEventListener('copy', e => e.preventDefault());
     el.addEventListener('cut', e => e.preventDefault());
 });
-</script>
+document.addEventListener('DOMContentLoaded', function () {
+    const mensaje = document.getElementById('mensaje-exito');
+    if (mensaje) {
+        setTimeout(() => {
+            // Si usas Bootstrap 5:
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(mensaje);
+            bsAlert.close();
+
+            // Si quieres solo ocultar sin animación, usa esta línea en vez de las dos anteriores:
+            // mensaje.style.display = 'none';
+        }, 6000);
+    }
+});
 
 
 @endsection
