@@ -476,7 +476,7 @@ fechaConsultaInput.max = fechaMax.toISOString().split('T')[0];
     horaSelect.addEventListener('change', actualizarVisibilidadTotalPagar);
     pacienteSelect.addEventListener('change', autocompletarPaciente);
 
-    btnLimpiar.addEventListener('click', function (e) {
+btnLimpiar.addEventListener('click', function (e) {
     e.preventDefault();
 
     form.reset();
@@ -495,6 +495,9 @@ fechaConsultaInput.max = fechaMax.toISOString().split('T')[0];
     document.getElementById('especialidad').textContent = '';
     document.getElementById('total_pagar').textContent = '';
     document.getElementById('genero').textContent = '';
+    document.querySelector('[name="motivo"]').value = '';
+    document.querySelector('[name="sintomas"]').value = '';
+
 
     // Limpiar textarea de dirección
     document.getElementById('direccion').value = '';
@@ -520,13 +523,26 @@ fechaConsultaInput.max = fechaMax.toISOString().split('T')[0];
 });
 
 
-    // Ejecutar lógica con datos antiguos si hay errores de validación
-    if (pacienteSelect.value) autocompletarPaciente();
+        // Ejecutar lógica con datos antiguos si hay errores de validación
+        if (pacienteSelect.value) autocompletarPaciente();
 
-    if (medicoSelect.value && fechaConsultaInput.value) {
-        cargarHorasDisponibles();
-    } else {
-        actualizarVisibilidadTotalPagar();
+if (medicoSelect.value && fechaConsultaInput.value) {
+    cargarHorasDisponibles();
+} else {
+    actualizarVisibilidadTotalPagar();
+}
+
+// Mostrar especialidad si hay un médico previamente seleccionado
+if (medicoSelect.value) {
+    const opt = medicoSelect.options[medicoSelect.selectedIndex];
+    const especialidad = opt.getAttribute('data-especialidad') || '';
+    especialidadInput.textContent = especialidad;
+
+    // Si ya se había seleccionado "inmediata", calcular el total a pagar
+    if (horaSelect.value === 'inmediata' && preciosPorEspecialidad.hasOwnProperty(especialidad)) {
+        totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
+        contenedorTotalPagar.style.display = 'block';
     }
+}
 });
 </script>
