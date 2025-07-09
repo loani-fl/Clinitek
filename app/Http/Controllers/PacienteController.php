@@ -149,7 +149,8 @@ class PacienteController extends Controller
         $request->validate([
             'nombre' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
             'apellidos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
-            'genero' => ['nullable', 'in:Femenino,Masculino,Otro'],
+            'genero' => ['required', 'in:Femenino,Masculino,Otro'],
+
             'identidad' => [
                 'required',
                 'digits:13',
@@ -170,12 +171,13 @@ class PacienteController extends Controller
             ],
             'direccion' => ['required', 'string', 'max:300'],
             'correo' => [
-                'nullable',
+                'required',
                 'email',
                 'max:50',
                 Rule::unique('pacientes', 'correo')->ignore($paciente->id),
                 'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
             ],
+
             'tipo_sangre' => ['nullable', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
             'padecimientos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
             'medicamentos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
@@ -209,12 +211,16 @@ class PacienteController extends Controller
             'direccion.required' => 'La dirección es obligatoria.',
             'direccion.max' => 'La dirección no puede exceder 300 caracteres.',
 
-            'correo.email' => 'Debe ingresar un correo válido.',
-            'correo.max' => 'El correo no puede exceder 50 caracteres.',
+            'correo.required' => 'El correo es obligatorio.',
+            'correo.email' => 'El correo debe contener un "@" y un punto "." en el dominio.',
+
             'correo.unique' => 'Este correo electrónico ya está registrado.',
-            'correo.regex' => 'El correo debe contener un "@" y un punto "." en el dominio.',
+
 
             'tipo_sangre.in' => 'Seleccione un tipo de sangre válido.',
+
+            'genero.required' => 'El género es obligatorio.',
+            'genero.in' => 'Debe seleccionar una opción válida de género.',
 
             'padecimientos.required' => 'Los padecimientos son obligatorios.',
             'padecimientos.regex' => 'Solo se permiten letras y espacios.',

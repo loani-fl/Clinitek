@@ -53,7 +53,7 @@
     <!-- Contenido principal -->
     <div class="custom-card">
         <div class="mb-4 text-center" style="border-bottom: 3px solid #007BFF;">
-            <h2 class="fw-bold text-black mb-0">Editar paciente</h2>
+            <h2 class="fw-bold text-black mb-0">Editar Paciente</h2>
         </div>
 
         <!-- Formulario -->
