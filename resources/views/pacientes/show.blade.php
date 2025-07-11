@@ -73,7 +73,7 @@
     <div class="container mt-5 pt-3" style="max-width: 1000px;">
         <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100 mt-4">
             <div class="card-header text-center py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-                <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Detalles del Paciente</h5>
+                <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Expediente Medico</h5>
             </div>
 
             <div class="card-body px-4 py-3">
@@ -127,6 +127,17 @@
                         <p class="text-break" style="white-space: pre-line;">{!! nl2br(e($paciente->historial_quirurgico ?? 'No especificado')) !!}</p>
                     </div>
                 </div>
+
+                @if($paciente->diagnostico)
+                    <a href="{{ route('diagnosticos.show', $paciente->diagnostico->id) }}" class="btn btn-primary mt-3">
+                        <i class="bi bi-file-medical"></i> Ver Diagnóstico
+                    </a>
+                @else
+                    <button class="btn btn-secondary mt-3" disabled>No hay diagnóstico</button>
+                @endif
+
+
+            </div>
 
                 <div class="text-center pt-4">
                     <a href="{{ route('pacientes.index') }}"

@@ -31,4 +31,9 @@ class Paciente extends Model
     protected $casts = [
         'fecha_nacimiento' => 'date',
     ];
+    public function diagnostico()
+    {
+        return $this->hasOne(Diagnostico::class);
+    }
+
 }

@@ -114,6 +114,9 @@
                 <!-- ✅ Campo oculto para la consulta -->
                 <input type="hidden" name="consulta_id" value="{{ $consulta->id }}">
 
+
+
+
                 <div class="mb-3">
                     <label for="resumen" class="form-label">Resumen <span class="text-danger">*</span></label>
                     <input type="text" name="resumen" id="resumen" class="form-control @error('resumen') is-invalid @enderror" value="{{ old('resumen') }}" required>

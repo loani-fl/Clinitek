@@ -121,16 +121,47 @@
     <div class="container mt-5 pt-3" style="max-width: 1000px;">
         <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100 mt-4">
             <!-- Header con título y botón -->
+            <!-- Header con título y botón -->
             <div class="card-header-flex">
                 <h5>Detalles de la Consulta</h5>
-                <a href="{{ route('diagnosticos.create', [$consulta->paciente->id, $consulta->id]) }}"
 
-                   class="btn btn-primary btn-sm px-3 shadow-sm d-inline-flex align-items-center gap-1"
-                   title="Crear diagnóstico">
-                    <i class="bi bi-journal-medical"></i> Crear diagnóstico
-                </a>
+                <div class="d-flex align-items-center gap-2">
 
+                    <!-- Botón Crear diagnóstico -->
+                    <a href="{{ route('diagnosticos.create', [$consulta->paciente->id, $consulta->id]) }}"
+                       class="btn btn-primary btn-sm px-3 shadow-sm d-inline-flex align-items-center gap-1"
+                       title="Crear diagnóstico">
+                        <i class="bi bi-journal-medical"></i> Crear diagnóstico
+                    </a>
+
+                    <!-- Menú desplegable Opciones -->
+                    <div class="dropdown">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownOpciones" data-bs-toggle="dropdown" aria-expanded="false">
+                            Opciones
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownOpciones">
+                            <li>
+                                <a class="dropdown-item disabled" href="#" tabindex="-1" aria-disabled="true">
+                                    Editar Diagnostico
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item disabled" href="#" tabindex="-1" aria-disabled="true">
+                                    Crear Receta Médica
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item disabled" href="#" tabindex="-1" aria-disabled="true">
+                                    Crear Orden de Examen
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
             </div>
+
 
             <div class="card-body px-4 py-3">
 
