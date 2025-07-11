@@ -124,7 +124,6 @@
                 <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Registro de consulta médica</h5>
             </div>
 
-
             <form action="{{ route('consultas.store') }}" method="POST" novalidate>
                 @csrf
 
@@ -155,32 +154,32 @@
             </div>
 
             <div class="col-md-3">
-                <label>Identidad</label>
-                <label class="form-control form-control-sm bg-light" id="identidad"></label>
-            </div>
+    <label class="form-label">Identidad</label>
+    <div class="form-control form-control-sm bg-light" id="identidad"></div>
+</div>
 
-            <div class="col-md-3">
-                <label>Fecha de nacimiento</label>
-                <label class="form-control form-control-sm bg-light" id="fecha_nacimiento"></label>
-            </div>
+<div class="col-md-3">
+    <label class="form-label">Fecha de nacimiento</label>
+    <div class="form-control form-control-sm bg-light" id="fecha_nacimiento"></div>
+</div>
 
-            <div class="col-md-2">
-                <label for="genero">Género <span class="text-danger">*</span></label>
-                <label class="form-control form-control-sm bg-light @error('genero') is-invalid @enderror" id="genero"></label>
-                @error('genero')
-                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                @enderror
-            </div>
+<div class="col-md-2">
+    <label class="form-label">Género <span class="text-danger">*</span></label>
+    <div class="form-control form-control-sm bg-light @error('genero') is-invalid @enderror" id="genero"></div>
+    @error('genero')
+        <div class="invalid-feedback d-block">{{ $message }}</div>
+    @enderror
+</div>
 
-            <div class="col-md-3">
-                <label>Teléfono</label>
-                <label class="form-control form-control-sm bg-light" id="telefono"></label>
-            </div>
+<div class="col-md-3">
+    <label class="form-label">Teléfono</label>
+    <div class="form-control form-control-sm bg-light" id="telefono"></div>
+</div>
 
-            <div class="col-md-3">
-                <label>Correo electrónico</label>
-                <label class="form-control form-control-sm bg-light" id="correo"></label>
-            </div>
+<div class="col-md-3">
+    <label class="form-label">Correo electrónico</label>
+    <div class="form-control form-control-sm bg-light" id="correo"></div>
+</div>
 
             <div class="col-md-6">
                 <label>Dirección</label>
@@ -334,23 +333,20 @@ console.log(opt.getAttribute('data-genero'));
     };
 
     function autocompletarPaciente() {
-        const opt = pacienteSelect.options[pacienteSelect.selectedIndex];
-        if (!opt) return;
+    const opt = pacienteSelect.options[pacienteSelect.selectedIndex];
+    if (!opt) return;
 
-        console.log('Paciente seleccionado:', opt.textContent, 'Género:', opt.getAttribute('data-genero'));
+    console.log('Paciente seleccionado:', opt.textContent, 'Género:', opt.getAttribute('data-genero'));
 
+    const nacimiento = opt.getAttribute('data-nacimiento') || '';
+    document.getElementById('fecha_nacimiento').textContent = nacimiento.replaceAll('-', '/');
+    document.getElementById('identidad').textContent = opt.getAttribute('data-identidad') || '';
+    document.getElementById('telefono').textContent = opt.getAttribute('data-telefono') || '';
+    document.getElementById('correo').textContent = opt.getAttribute('data-correo') || '';
+    document.getElementById('direccion').value = opt.getAttribute('data-direccion') || ''; // la dejas como está
+    generoInput.textContent = opt.getAttribute('data-genero') || '';
+}
 
-        document.getElementById('fecha_nacimiento').textContent = opt.getAttribute('data-nacimiento') || '';
-        document.getElementById('identidad').textContent = opt.getAttribute('data-identidad') || '';
-        document.getElementById('telefono').textContent = opt.getAttribute('data-telefono') || '';
-        document.getElementById('correo').textContent = opt.getAttribute('data-correo') || '';
-        document.getElementById('direccion').value = opt.getAttribute('data-direccion') || '';
-        const nacimiento = opt.getAttribute('data-nacimiento') || '';
-        document.getElementById('fecha_nacimiento').textContent = nacimiento.replaceAll('-', '/');
-        generoInput.textContent = opt.getAttribute('data-genero') || '';
-
-
-    }
 
     function actualizarVisibilidadTotalPagar() {
         const horaSeleccionada = horaSelect.value;
