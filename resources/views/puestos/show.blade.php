@@ -2,12 +2,8 @@
 
 @section('title', 'Detalle del Puesto')
 
-@push('styles')
+@section('content')
 <style>
-    body {
-        background-color: #e8f4fc;
-    }
-
     .custom-card::before {
         content: "";
         position: absolute;
@@ -31,18 +27,36 @@
         border-color: #91cfff;
         position: relative;
         overflow: hidden;
-        margin: 70px auto 2rem; /* margen superior aumentado para navbar fijo */
-        padding: 1.5rem 5rem 5rem 5rem; /* menos padding arriba para acercar el contenido */
+        margin: 2rem auto;
+        padding: 1rem;
         border: 1px solid #91cfff;
         border-radius: 12px;
     }
 
-    .list-group-item strong {
-        color: #000;
-        font-weight: bold;
+    .funcion-texto {
+        display: block;
+        width: 100%;
+        min-height: 5rem;
+        padding: 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #212529;
+         background-color: #fff; /* Blanco */
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        white-space: pre-wrap;
     }
 
-    /* Estilos navbar */
+    .custom-card-header {
+        background-color: #fff;
+        border-bottom: 4px solid #0d6efd;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #000;
+        padding: 0.75rem;
+    }
+
     .header {
         background-color: #007BFF;
         position: fixed;
@@ -52,10 +66,10 @@
         width: 100vw;
         z-index: 1030;
         padding: 0.5rem 1rem;
-        box-sizing: border-box;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        height: 56px;
     }
 
     .header .fw-bold {
@@ -79,77 +93,18 @@
         text-decoration: underline;
     }
 
-    .custom-card-header {
-        border-bottom: 3px solid #007BFF;
-        padding-bottom: 0.75rem;
-        margin-bottom: 0.5rem; /* menos margen para pegar más al contenido */
-        font-size: 1.5rem;
-        color: #000;
-        font-weight: 700;
-        text-align: center;
+    .row-info > div {
+        margin-bottom: 1rem;
     }
 
     .btn-regresar {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         padding: 0.4rem 1.2rem;
         box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-        display: block;
-        margin: 2rem auto 0 auto;
-        width: max-content;
-    }
-
-    .row.g-4 {
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .list-group-item {
-        background-color: transparent;
-        border: none;
-        padding-left: 0;
-        padding-right: 0;
-        font-size: 1rem;
-        color: #222;
-    }
-
-    footer {
-        font-size: 0.85rem;
-        margin-top: 2rem;
-    }
-
-    @media (max-width: 576px) {
-        .custom-card {
-            padding: 1rem;
-            margin: 1rem;
-        }
-
-        .custom-card-header {
-            font-size: 1.2rem;
-        }
-
-        .row.g-4 {
-            max-width: 100%;
-            margin-left: 0;
-            margin-right: 0;
-        }
-
-        html, body, #app {
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-
-        .container, .container-fluid, .row, .col {
-            margin: 0 !important;
-            padding: 0 !important;
-        }
     }
 </style>
-@endpush
 
-@section('content')
-
-<!-- Barra de navegación superior -->
+<!-- Barra de navegación fija -->
 <div class="header">
     <div class="d-flex align-items-center">
         <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto; margin-right: 6px;">
@@ -164,36 +119,44 @@
 </div>
 
 <!-- Contenedor principal -->
-<div class="custom-card">
-    <div class="custom-card-header">
-        Detalle del Puesto
-    </div>
-
-    <div class="row g-4">
-        <div class="col-md-6">
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item"><strong>Código:</strong> {{ $puesto->codigo }}</li>
-                <li class="list-group-item"><strong>Nombre del Puesto:</strong> {{ $puesto->nombre }}</li>
-                <li class="list-group-item"><strong>Área / Departamento:</strong> {{ $puesto->area }}</li>
-            </ul>
+<div class="container mt-5 pt-4" style="max-width: 1000px;">
+    <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100 mt-4">
+        <div class="custom-card-header">
+            Detalle del Puesto
         </div>
 
-        <div class="col-md-6">
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item"><strong>Sueldo:</strong> Lps. {{ number_format($puesto->sueldo, 2) }}</li>
-                <li class="list-group-item"><strong>Función del Puesto:</strong><br>
-                    <span style="white-space: pre-line;">{{ $puesto->funcion }}</span>
-                    
-                </li>
-            </ul>
+        <div class="card-body px-4 py-3">
+            <div class="row row-info gy-3">
+                <div class="col-md-3">
+                    <strong>Código:</strong><br>{{ $puesto->codigo }}
+                </div>
+                <div class="col-md-3">
+                    <strong>Nombre del Puesto:</strong><br>{{ $puesto->nombre }}
+                </div>
+                <div class="col-md-3">
+                    <strong>Área / Departamento:</strong><br>{{ $puesto->area }}
+                </div>
+                <div class="col-md-3">
+                    <strong>Sueldo:</strong><br>Lps. {{ number_format($puesto->sueldo, 2) }}
+                </div>
+            </div>
+
+            <div class="row mt-4 justify-content-center">
+                <div class="col-md-12">
+                    <strong>Función del Puesto:</strong><br>
+                    <div class="funcion-texto">{{ $puesto->funcion }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón Regresar -->
+        <div class="text-center pb-4">
+            <a href="{{ route('puestos.index') }}"
+               class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2">
+                <i class="bi bi-arrow-left"></i> Regresar
+            </a>
         </div>
     </div>
-
-    <a href="{{ route('puestos.index') }}" class="btn btn-success btn-regresar">
-        <i class="bi bi-arrow-left"></i> Regresar
-    </a>
 </div>
-
 @endsection
-
 

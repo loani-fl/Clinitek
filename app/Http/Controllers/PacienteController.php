@@ -125,11 +125,32 @@ class PacienteController extends Controller
         return redirect()->route('pacientes.index')->with('success', 'Paciente registrado exitosamente.');
     }
 
-    public function index()
-    {
-        $pacientes = Paciente::paginate(6);
-        return view('pacientes.index', compact('pacientes'));
+    public function index(Request $request)
+{
+    $query = $request->get('search');
+    $all = \App\Models\Paciente::count();
+
+    if ($query) {
+        $pacientes = \App\Models\Paciente::where('nombre', 'like', "%{$query}%")
+            ->orWhere('apellidos', 'like', "%{$query}%")
+            ->orWhere('identidad', 'like', "%{$query}%")
+            ->get(); // SIN paginación para mostrar todos los encontrados
+    } else {
+        $pacientes = \App\Models\Paciente::paginate(2);
     }
+
+    if ($request->ajax()) {
+        return response()->json([
+            'html' => view('pacientes.partials.tabla', compact('pacientes'))->render(),
+            'pagination' => (!$query && method_exists($pacientes, 'links')) ? $pacientes->links('pagination::bootstrap-5')->toHtml() : '',
+            'total' => $pacientes->count(),
+            'all' => $all,
+        ]);
+    }
+
+    return view('pacientes.index', compact('pacientes'));
+}
+
 
     public function show($id)
     {

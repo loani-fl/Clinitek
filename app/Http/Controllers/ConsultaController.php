@@ -242,7 +242,7 @@ public function cambiarEstado(Request $request, Consulta $consulta)
 {
     $nuevoEstado = strtolower($request->input('estado'));
 
-    $estadosPermitidos = ['pendiente', 'realizada', 'cancelada'];
+    $estadosPermitidos = ['pendiente', 'cancelada'];
 
     if (!in_array($nuevoEstado, $estadosPermitidos)) {
         return redirect()->back()->withErrors(['Estado no válido']);
@@ -253,6 +253,7 @@ public function cambiarEstado(Request $request, Consulta $consulta)
 
     return redirect()->back()->with('success', 'Estado de la consulta actualizado a ' . ucfirst($nuevoEstado));
 }
+
 
 
 

@@ -45,7 +45,7 @@
 
     label {
         background-color: transparent;
-        color: rgba(0, 0, 0, 0.6); /* Texto claro y semitransparente */
+        color: rgba(0, 0, 0, 0.6);
         font-weight: 600;
         position: relative;
         z-index: 1;
@@ -54,7 +54,7 @@
     input, select, textarea {
         position: relative;
         z-index: 1;
-        background-color: transparent !important; /* Fondo transparente */
+        background-color: transparent !important;
         color: #212529;
         border: 1px solid #ced4da;
         border-radius: 0.375rem;
@@ -67,6 +67,19 @@
         border-color: #007BFF;
         outline: none;
         box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
+    .funcion-texto {
+        min-height: 3.5rem; /* menos alto */
+        padding: 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #212529;
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        white-space: pre-wrap;
+        resize: vertical;
     }
 
     .header {
@@ -83,6 +96,13 @@
         justify-content: space-between;
         align-items: center;
     }
+
+    .card-header {
+    background-color: #fff !important;
+    border-bottom: 3px solid #007BFF !important;
+    padding: 0.75rem 1rem !important;
+}
+
 
     .header img {
         height: 40px;
@@ -158,39 +178,52 @@
         Editar Puesto
     </div>
 
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li><i class="bi bi-exclamation-triangle-fill me-2"></i> {{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
     <form action="{{ route('puestos.update', $puesto->id) }}" method="POST" class="needs-validation" novalidate>
         @csrf
         @method('PUT')
 
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label for="codigo" class="form-label">Código <span class="text-danger">*</span></label>
-                <input type="text" name="codigo" id="codigo" class="form-control" maxlength="10"
-                       value="{{ old('codigo', $puesto->codigo) }}" required>
+        <div class="row row-info gy-3">
+            <div class="col-md-3">
+                <label for="codigo" class="fw-semibold text-muted">
+                    Código <span class="text-danger">*</span>
+                    @error('codigo')
+                        <div class="text-danger small">{{ $message }}</div>
+                    @enderror
+                </label>
+                <input type="text" name="codigo" id="codigo"
+                       class="form-control @error('codigo') is-invalid @enderror"
+                       maxlength="10"
+                       value="{{ old('codigo', $puesto->codigo) }}"
+                       required>
             </div>
 
-            <div class="col-md-4 mb-3">
-                <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
-                <input type="text" name="nombre" id="nombre" class="form-control" maxlength="50"
-                       value="{{ old('nombre', $puesto->nombre) }}" required>
+            <div class="col-md-3">
+                <label for="nombre" class="fw-semibold text-muted">
+                    Nombre <span class="text-danger">*</span>
+                    @error('nombre')
+                        <div class="text-danger small">{{ $message }}</div>
+                    @enderror
+                </label>
+                <input type="text" name="nombre" id="nombre"
+                       class="form-control @error('nombre') is-invalid @enderror"
+                       maxlength="50"
+                       value="{{ old('nombre', $puesto->nombre) }}"
+                       required>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label for="area" class="form-label">Departamento <span class="text-danger">*</span></label>
-                <select name="area" id="area" class="form-select" required>
-                    <option value="" disabled {{ old('area', $puesto->area) ? '' : 'selected' }}>Seleccione un departamento</option>
+            <div class="col-md-3">
+                <label for="area" class="fw-semibold text-muted">
+                    Departamento <span class="text-danger">*</span>
+                    @error('area')
+                        <div class="text-danger small">{{ $message }}</div>
+                    @enderror
+                </label>
+                <select name="area" id="area"
+                        class="form-select @error('area') is-invalid @enderror"
+                        required>
+                    <option value="" disabled {{ old('area', $puesto->area) ? '' : 'selected' }}>
+                        --Seleccione--
+                    </option>
                     @foreach(['Administración', 'Recepción', 'Laboratorio', 'Farmacia', 'Enfermería', 'Mantenimiento'] as $area)
                         <option value="{{ $area }}" {{ old('area', $puesto->area) == $area ? 'selected' : '' }}>
                             {{ $area }}
@@ -199,19 +232,35 @@
                 </select>
             </div>
 
-            <div class="col-md-4 mb-3">
-                <label for="sueldo" class="form-label">Sueldo (Lps.) <span class="text-danger">*</span></label>
-                <input type="text" name="sueldo" id="sueldo" class="form-control" maxlength="8"
-                       value="{{ old('sueldo', $puesto->sueldo) }}" required
+            <div class="col-md-3">
+                <label for="sueldo" class="fw-semibold text-muted">
+                    Sueldo (Lps.) <span class="text-danger">*</span>
+                    @error('sueldo')
+                        <div class="text-danger small">{{ $message }}</div>
+                    @enderror
+                </label>
+                <input type="text" name="sueldo" id="sueldo"
+                       class="form-control @error('sueldo') is-invalid @enderror"
+                       maxlength="8"
+                       value="{{ old('sueldo', $puesto->sueldo) }}"
+                       required
                        pattern="^\d{1,5}(\.\d{1,2})?$"
                        title="Máximo 5 dígitos enteros y 2 decimales (ejemplo: 12345.67)">
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-6 mb-3">
-                <label for="funcion" class="form-label">Funciones del puesto <span class="text-danger">*</span></label>
-                <textarea name="funcion" id="funcion" class="form-control" rows="4" maxlength="300"
+        <div class="row mt-4">
+            <div class="col-12">
+                <label for="funcion" class="fw-semibold text-muted">
+                    Funciones del puesto <span class="text-danger">*</span>
+                    @error('funcion')
+                        <div class="text-danger small">{{ $message }}</div>
+                    @enderror
+                </label>
+                <textarea name="funcion" id="funcion"
+                          class="form-control funcion-texto @error('funcion') is-invalid @enderror"
+                          rows="2"
+                          maxlength="300"
                           required>{{ old('funcion', $puesto->funcion) }}</textarea>
             </div>
         </div>
@@ -231,3 +280,107 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
+    const resetBtn = form.querySelector('button[type="reset"]');
+    const alert = document.querySelector('.alert-danger');
+
+    // Guardar los valores originales al cargar la página
+    const originalValues = {
+        codigo: '{{ $puesto->codigo }}',
+        nombre: '{{ $puesto->nombre }}',
+        area: '{{ $puesto->area }}',
+        sueldo: '{{ $puesto->sueldo }}',
+        funcion: `{{ str_replace(["\r", "\n"], ["", "\\n"], $puesto->funcion) }}`
+    };
+
+    resetBtn.addEventListener('click', (e) => {
+        e.preventDefault(); // prevenimos el reset automático de HTML
+
+        // Restaurar los valores originales
+        form.codigo.value = originalValues.codigo;
+        form.nombre.value = originalValues.nombre;
+        form.area.value = originalValues.area;
+        form.sueldo.value = originalValues.sueldo;
+        form.funcion.value = originalValues.funcion;
+
+        // Quitar la alerta general si existe
+        if (alert) {
+            alert.remove();
+        }
+
+        // Quitar los mensajes de error por campo y las clases is-invalid
+        form.querySelectorAll('.text-danger.small').forEach(el => el.remove());
+        form.querySelectorAll('.is-invalid').forEach(input => input.classList.remove('is-invalid'));
+
+        // También quitar validaciones del navegador si las hubiera
+        form.classList.remove('was-validated');
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
+    const resetBtn = form.querySelector('button[type="reset"]');
+    const alert = document.querySelector('.alert-danger');
+
+    const originalValues = {
+        codigo: '{{ $puesto->codigo }}',
+        nombre: '{{ $puesto->nombre }}',
+        area: '{{ $puesto->area }}',
+        sueldo: '{{ $puesto->sueldo }}',
+        funcion: `{{ str_replace(["\r", "\n"], ["", "\\n"], $puesto->funcion) }}`
+    };
+
+    resetBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        form.codigo.value = originalValues.codigo;
+        form.nombre.value = originalValues.nombre;
+        form.area.value = originalValues.area;
+        form.sueldo.value = originalValues.sueldo;
+        form.funcion.value = originalValues.funcion;
+
+        if (alert) {
+            alert.remove();
+        }
+
+        form.querySelectorAll('.text-danger.small').forEach(el => el.remove());
+        form.querySelectorAll('.is-invalid').forEach(input => input.classList.remove('is-invalid'));
+
+        form.classList.remove('was-validated');
+    });
+
+    const nombreInput = document.getElementById('nombre');
+    const sueldoInput = document.getElementById('sueldo');
+    const codigoInput = document.getElementById('codigo');
+    const funcionInput = document.getElementById('funcion');
+
+    // nombre: letras, espacios, ñ y acentos
+    nombreInput.addEventListener('input', () => {
+        nombreInput.value = nombreInput.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+    });
+
+    // sueldo: números y un solo punto
+    sueldoInput.addEventListener('input', () => {
+        sueldoInput.value = sueldoInput.value.replace(/[^0-9.]/g, '');
+    });
+
+    // código: letras, números y guiones
+    codigoInput.addEventListener('input', () => {
+        codigoInput.value = codigoInput.value.replace(/[^a-zA-Z0-9\-]/g, '');
+    });
+
+    // funcion: letras, espacios, ñ y ;:., únicamente
+    funcionInput.addEventListener('input', () => {
+        funcionInput.value = funcionInput.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s;:.,]/g, '');
+    });
+});
+</script>
+@endpush
+
+
+
+
