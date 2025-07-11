@@ -147,96 +147,73 @@
 <div class="content-wrapper">
     <div class="card custom-card shadow-sm">
         <div class="card-header">
-          <h5 class="mb-0 text-dark text-center" style="font-size: 2.25rem; font-weight: bold;">Lista de puestos</h5>
-
+            <h5 class="mb-0 text-dark text-center" style="font-size: 2.25rem; font-weight: bold;">Lista de puestos</h5>
             <a href="{{ route('inicio') }}" class="btn btn-light btn-inicio">
                 <i class="bi bi-house-door"></i> Inicio
             </a>
         </div>
 
         <div class="d-flex filter-container">
-            <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por código o nombre...">
+            <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por código o nombre">
         </div>
 
-        @if($puestos->isEmpty())
-            <div class="alert alert-info shadow-sm" role="alert">
-                No hay puestos registrados aún.
-            </div>
-        @else
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped mb-0">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Código</th>
-                        <th>Nombre</th>
-                        <th>Departamento</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tablaPuestos">
-                    @foreach ($puestos as $index => $puesto)
-                        <tr>
-                            <td class="text-center">{{ $index + 1 }}</td>
-                            <td>{{ $puesto->codigo }}</td>
-                            <td>{{ $puesto->nombre }}</td>
-                            <td>{{ $puesto->area }}</td>
-                            <td class="text-center">
-                                <a href="{{ route('puestos.show', $puesto->id) }}" class="btn btn-sm btn-outline-info me-2" title="Ver detalles">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <a href="{{ route('puestos.edit', $puesto) }}" class="btn btn-sm btn-outline-warning" title="Editar">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        <div id="tabla-container" class="table-responsive">
+            @include('puestos.partials.tabla', ['puestos' => $puestos])
         </div>
-        @endif
 
         <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
+
+      {{ $puestos->onEachSide(1)->links('pagination::bootstrap-5') }}
     </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
 $(document).ready(function () {
-    const filas = $('#tablaPuestos tr');
-    const mensaje = $('#mensajeResultados');
-
-    function actualizarMensaje(totalVisible, total) {
-        if ($('#filtroBusqueda').val().trim() === '') {
-            mensaje.text('');
-        } else if (totalVisible === 0) {
-            mensaje.html('No hay puestos que coincidan con la búsqueda.');
+    function actualizarMensaje(total, all, query) {
+        if (query === '') {
+            $('#mensajeResultados').html('');
+        } else if (total === 0) {
+            $('#mensajeResultados').html(`No se encontraron resultados para "<strong>${query}</strong>" de un total de ${all}.`);
         } else {
-            mensaje.html(`<strong>Se encontraron ${totalVisible} resultado${totalVisible > 1 ? 's' : ''} de ${total}.</strong>`);
+            $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
         }
     }
 
+    function cargarDatos(page = 1, query = '') {
+        $.ajax({
+            url: "{{ route('puestos.index') }}",
+            type: 'GET',
+            data: { page, search: query },
+            success: function(data) {
+                $('#tabla-container').html(data.html);
+                $('#paginacion-container').html(data.pagination ?? '');
+                actualizarMensaje(data.total, data.all, query);
+            },
+            error: function() {
+                $('#mensajeResultados').html('Error al cargar los datos.');
+            }
+        });
+    }
+
+    cargarDatos();
+
     $('#filtroBusqueda').on('keyup', function () {
-        let valor = $(this).val().toLowerCase();
-        let totalVisible = 0;
-        const total = filas.length;
+        let query = $(this).val();
+        cargarDatos(1, query);
+    });
 
-        filas.each(function () {
-            let texto = $(this).text().toLowerCase();
-            const visible = texto.indexOf(valor) > -1;
-            $(this).toggle(visible);
-            if (visible) totalVisible++;
-        });
-
-        // Reenumerar
-        let i = 1;
-        $('#tablaPuestos tr:visible').each(function () {
-            $(this).find('td:first').text(i++);
-        });
-
-        actualizarMensaje(totalVisible, total);
+    $(document).on('click', '.pagination a', function(e) {
+        e.preventDefault();
+        let url = $(this).attr('href');
+        let page = url.split('page=')[1];
+        let query = $('#filtroBusqueda').val();
+        cargarDatos(page, query);
+        window.history.pushState("", "", url.split('?')[0] + '?page=' + page + (query ? "&search=" + encodeURIComponent(query) : ""));
     });
 });
 </script>
 @endsection
+
 

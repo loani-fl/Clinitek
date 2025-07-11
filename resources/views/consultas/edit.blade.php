@@ -212,47 +212,40 @@
     </div>
 </div>
 @php
-    $estado = strtolower($consulta->estado);
+$estado = strtolower($consulta->estado);
 
-    // Definir el siguiente estado al que quieres cambiar según el estado actual
-    // Ejemplo: pendiente -> realizada, realizada -> cancelada, cancelada -> pendiente
-    $siguienteEstado = match($estado) {
-        'pendiente' => 'realizada',
-        'realizada' => 'cancelada',
-        'cancelada' => 'pendiente',
-        default => 'pendiente',
-    };
+$siguienteEstado = '';
+$claseBoton = '';
+$iconoBoton = '';
+$textoBoton = '';
 
-    // Clases y textos para el botón según el siguiente estado
-    $claseBoton = match($siguienteEstado) {
-        'pendiente' => 'btn-warning',
-        'realizada' => 'btn-success',
-        'cancelada' => 'btn-danger',
-        default => 'btn-secondary',
-    };
-
-    $iconoBoton = match($siguienteEstado) {
-        'pendiente' => 'bi-clock-history',
-        'realizada' => 'bi-check-circle',
-        'cancelada' => 'bi-x-circle',
-        default => 'bi-question-circle',
-    };
-
-    $textoBoton = ucfirst($siguienteEstado);
+if ($estado === 'pendiente') {
+    $siguienteEstado = 'cancelada';
+    $claseBoton = 'btn-danger';
+    $iconoBoton = 'bi-x-circle';
+    $textoBoton = 'Cancelar';
+} elseif ($estado === 'cancelada') {
+    $siguienteEstado = 'pendiente';
+    $claseBoton = 'btn-warning';
+    $iconoBoton = 'bi-clock-history';
+    $textoBoton = 'Volver a Pendiente';
+}
 @endphp
 
 <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
     <h5 class="text-dark fw-bold mb-0">Información de la consulta médica</h5>
 
-    <form action="{{ route('consultas.cambiarEstado', $consulta->id) }}" method="POST" class="d-inline">
-        @csrf
-        @method('PATCH')
-        <input type="hidden" name="estado" value="{{ $siguienteEstado }}">
+   @if ($siguienteEstado)
+<form action="{{ route('consultas.cambiarEstado', $consulta->id) }}" method="POST" class="d-inline">
+    @csrf
+    @method('PATCH')
+    <input type="hidden" name="estado" value="{{ $siguienteEstado }}">
+    <button type="submit" class="btn {{ $claseBoton }} btn-sm">
+        <i class="bi {{ $iconoBoton }}"></i> {{ $textoBoton }}
+    </button>
+</form>
+@endif
 
-        <button type="submit" class="btn btn-sm {{ $claseBoton }}" title="Marcar como {{ $textoBoton }}">
-            <i class="bi {{ $iconoBoton }} me-1"></i> {{ $textoBoton }}
-        </button>
-    </form>
 </div>
 
 
@@ -310,54 +303,44 @@
             @enderror
         </div>
 
-        <div class="col-md-6 mt-3">
-            <label for="motivo">Motivo de la consulta <span class="text-danger">*</span></label>
-            <textarea name="motivo" maxlength="250" rows="2" class="form-control form-control-sm @error('motivo') is-invalid @enderror" required>{{ old('motivo', $consulta->motivo) }}</textarea>
-            @error('motivo')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
+      <div class="col-md-6 mt-3">
+    <label for="motivo">Motivo de la consulta <span class="text-danger">*</span></label>
+    <textarea name="motivo" maxlength="250" rows="2"
+        class="form-control form-control-sm @error('motivo') is-invalid @enderror">{{ old('motivo', $consulta->motivo) }}</textarea>
+    @error('motivo')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>
 
-        <div class="col-md-6 mt-3">
-            <label for="sintomas">Síntomas <span class="text-danger">*</span></label>
-            <textarea name="sintomas" maxlength="250" rows="2" class="form-control form-control-sm @error('sintomas') is-invalid @enderror" required>{{ old('sintomas', $consulta->sintomas) }}</textarea>
-            @error('sintomas')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
+<div class="col-md-6 mt-3">
+    <label for="sintomas">Síntomas <span class="text-danger">*</span></label>
+    <textarea name="sintomas" maxlength="250" rows="2"
+        class="form-control form-control-sm @error('sintomas') is-invalid @enderror">{{ old('sintomas', $consulta->sintomas) }}</textarea>
+    @error('sintomas')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>
+
     </div>
-
-<div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
-
 <form action="{{ route('consultas.update', $consulta->id) }}" method="POST">
     @csrf
     @method('PUT')
 
-    <!-- Aquí van tus campos del formulario -->
+    <!-- campos -->
 
-    <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
-        <!-- Botón Actualizar -->
-        <button type="submit" class="btn btn-primary d-flex align-items-center" data-bs-toggle="tooltip" title="Guardar los cambios">
+    <div class="d-flex justify-content-center gap-3 mt-2 flex-wrap">
+        <button type="submit" class="btn btn-primary d-flex align-items-center" title="Guardar los cambios">
             <i class="bi bi-pencil-square me-2"></i> Actualizar
         </button>
-
-        <!-- Botón Restablecer -->
-        <button type="button" id="restablecerBtn" class="btn btn-warning d-flex align-items-center" data-bs-toggle="tooltip" title="Restablecer los campos del formulario">
+        <button type="button" id="restablecerBtn" class="btn btn-warning d-flex align-items-center" title="Restablecer los campos">
             <i class="bi bi-arrow-counterclockwise me-2"></i> Restablecer
         </button>
+        <a href="{{ route('consultas.index') }}" class="btn btn-success d-flex align-items-center" title="Volver al listado">
+            <i class="bi bi-arrow-left me-2"></i> Regresar
+        </a>
     </div>
-</form> {{-- 👈 Aquí cierra el formulario de actualización --}}
+</form>
 
-
-<div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
-    <!-- Botón Cancelar Consulta -->
-    
-
-    <!-- Botón Regresar -->
-    <a href="{{ route('consultas.index') }}" class="btn btn-success d-flex align-items-center" data-bs-toggle="tooltip" title="Volver al listado de consultas">
-        <i class="bi bi-arrow-left me-2"></i> Regresar
-    </a>
-</div>
 
 
 <script>

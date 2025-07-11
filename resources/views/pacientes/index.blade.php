@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Listado de Puestos')
+@section('title', 'Listado de Pacientes')
 
 @section('content')
 <style>
@@ -139,7 +139,6 @@
     }
 </style>
 
-{{-- Barra superior fija --}}
 <div class="header d-flex justify-content-between align-items-center px-3 py-2">
     <div class="d-flex align-items-center">
         <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto;">
@@ -148,7 +147,7 @@
 
     <div class="d-flex gap-3 flex-wrap">
         <a href="{{ route('puestos.create') }}" class="nav-link text-white">Crear puesto</a>
-        <a href="{{ route('empleado.create') }}" class="nav-link text-white">Registrar empleado</a>
+        <a href="{{ route('pacientes.create') }}" class="nav-link text-white">Registrar paciente</a>
         <a href="{{ route('medicos.create') }}" class="nav-link text-white">Registrar médico</a>
     </div>
 </div>
@@ -157,134 +156,77 @@
     <div class="card custom-card shadow-sm">
         <div class="card-header">
             <h5 class="mb-0 text-dark text-center" style="font-size: 2.25rem; font-weight: bold;">Listado de pacientes</h5>
-
             <a href="{{ route('inicio') }}" class="btn btn-light btn-inicio">
                 <i class="bi bi-house-door"></i> Inicio
             </a>
         </div>
 
         <div class="d-flex filter-container">
-            <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por nombre, apellido o identidad...">
+            <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por nombre, apellido o identidad">
         </div>
 
-        <div class="table-responsive">
-    <table class="table table-bordered table-striped align-middle mb-0">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Nombre(s)</th>
-                <th>Apellidos</th>
-                <th>Identidad</th>
-                <th>Género</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="tablaPacientes">
-            @forelse ($pacientes as $index => $paciente)
-                <tr>
-                    <td>{{ $pacientes->firstItem() + $index }}</td>
-                    <td>{{ $paciente->nombre }}</td>
-                    <td>{{ $paciente->apellidos }}</td>
-                    <td>{{ $paciente->identidad }}</td>
-                    <td>
-                        <span class="badge
-                          {{ $paciente->genero === 'Masculino' ? 'bg-primary' :
-                             ($paciente->genero === 'Femenino' ? 'bg-warning text-dark' : 'bg-info') }}">
-                          {{ $paciente->genero ?? 'No especificado' }}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="d-flex gap-2 justify-content-center">
-                            <a href="{{ route('pacientes.show', $paciente->id) }}" class="btn btn-sm btn-outline-info me-2" title="Ver detalles">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="{{ route('pacientes.edit', $paciente->id) }}" class="btn btn-sm btn-outline-warning" title="Editar paciente">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6" class="text-center">No hay pacientes registrados.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
+        <div id="tabla-container" class="table-responsive">
+            @include('pacientes.partials.tabla')
+        </div>
 
-<div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
+        <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
 
-@if ($pacientes->hasPages())
-    <div class="pagination-container">
-        {{ $pacientes->links('pagination::bootstrap-4') }}
+        <div class="pagination-container">
+            {{ $pacientes->onEachSide(1)->links('pagination::bootstrap-5') }}
+        </div>
     </div>
-@endif
-</div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-    const totalPacientes = {{ $pacientes->total() }};
-</script>
-
-<script>
 $(document).ready(function () {
-    const noResultadosRow = $('<tr class="no-resultados"><td colspan="6" class="text-center">No hay pacientes que coincidan con la búsqueda.</td></tr>');
-    noResultadosRow.hide();
-    $('#tablaPacientes').append(noResultadosRow);
-function actualizarMensaje(totalVisible, filtroVacio) {
-    if (filtroVacio) {
-        $('#mensajeResultados').html('');
-    } else if (totalVisible === 0) {
-        $('#mensajeResultados').html('No hay pacientes que coincidan con la búsqueda.');
-    } else {
-        const total = $('#tablaPacientes tr').not('.no-resultados').length;
-        $('#mensajeResultados').html(`<strong>Se encontraron ${totalVisible} resultado${totalVisible > 1 ? 's' : ''} de ${total}.</strong>`);
+    function actualizarMensaje(total, all, query) {
+        if (query === '') {
+            $('#mensajeResultados').html('');
+        } else if (total === 0) {
+            $('#mensajeResultados').html(`No se encontraron resultados para "<strong>${query}</strong>" de un total de ${all}.`);
+        } else {
+            $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
+        }
     }
-}
 
-
-    function filtrarTabla() {
-        let valor = $('#filtroBusqueda').val().toLowerCase();
-        let totalVisible = 0;
-
-        $('#tablaPacientes tr').not('.no-resultados').each(function () {
-            let textoFila = $(this).text().toLowerCase();
-            if (textoFila.indexOf(valor) > -1) {
-                $(this).show();
-                totalVisible++;
-            } else {
-                $(this).hide();
+    function cargarDatos(page = 1, query = '') {
+        $.ajax({
+            url: "{{ route('pacientes.index') }}",
+            type: 'GET',
+            data: { page, search: query },
+            success: function(data) {
+                $('#tabla-container').html(data.html);
+                $('#paginacion-container').html(data.pagination ?? '');
+                actualizarMensaje(data.total, data.all, query);
+            },
+            error: function() {
+                $('#mensajeResultados').html('Error al cargar los datos.');
             }
         });
-
-        if (totalVisible === 0) {
-            noResultadosRow.show();
-        } else {
-            noResultadosRow.hide();
-        }
-
-        actualizarMensaje(totalVisible, valor === '');
-
-        // Reenumerar visibles
-        let indice = 1;
-        $('#tablaPacientes tr:visible').not('.no-resultados').each(function () {
-            $(this).find('td:first').text(indice++);
-        });
     }
 
-    $('#filtroBusqueda').on('keyup', filtrarTabla);
+    cargarDatos();
 
-    $('#btnLimpiar').on('click', function () {
-        $('#filtroBusqueda').val('');
-        filtrarTabla();
-        $('#mensajeResultados').text('');
-        $('#filtroBusqueda').focus();
+    $('#filtroBusqueda').on('keyup', function () {
+        let query = $(this).val();
+        cargarDatos(1, query);
     });
 
-    $('#mensajeResultados').text('');
+    $(document).on('click', '.pagination a', function(e) {
+        e.preventDefault();
+        let url = $(this).attr('href');
+        let page = url.split('page=')[1];
+        let query = $('#filtroBusqueda').val();
+        cargarDatos(page, query);
+        window.history.pushState("", "", url.split('?')[0] + '?page=' + page + (query ? "&search=" + encodeURIComponent(query) : ""));
+    });
 });
 </script>
 @endsection
+
+
+
+
+
