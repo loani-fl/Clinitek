@@ -15,11 +15,6 @@ class DiagnosticoController extends Controller
         $consulta = Consulta::with('medico')->findOrFail($consultaId);
 
 
-        if ($consulta->estado !== 'realizada') {
-            return redirect()->route('consultas.index')
-                ->with('error', 'No se puede crear diagnóstico porque la consulta no está realizada.');
-        }
-
         return view('diagnosticos.create', compact('paciente', 'consulta'));
     }
     public function store(Request $request)
@@ -60,17 +55,28 @@ class DiagnosticoController extends Controller
         // Crear diagnóstico
         $diagnostico = Diagnostico::create($validatedData);
 
-        // Redirigir a la vista show del diagnóstico creado
+        // Actualizar estado de la consulta a 'realizada'
+        $consulta = Consulta::find($request->consulta_id);
+        if ($consulta) {
+            $consulta->estado = 'realizada'; // Debe coincidir con la migración y con la vista
+            $consulta->save();
+        }
+
+        // Redirigir a la vista show del diagnóstico creado con mensaje de éxito
         return redirect()->route('diagnosticos.show', $diagnostico->id)
             ->with('success', 'Diagnóstico creado correctamente.');
-
-    }
-    public function show(Diagnostico $diagnostico)
-    {
-        $diagnostico->load('paciente');
-        return view('diagnosticos.show', compact('diagnostico'));
     }
 
+    // Mostrar diagnóstico
+
+  public function show(Diagnostico $diagnostico)
+  {
+      $diagnostico->load('paciente');
+
+
+
+      return view('diagnosticos.show', compact('diagnostico'));
+  }
     public function edit(Diagnostico $diagnostico)
     {
         // Cargar relaciones necesarias para mostrar en el formulario (paciente y consulta)
