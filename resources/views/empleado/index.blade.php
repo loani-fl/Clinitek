@@ -187,82 +187,32 @@
             <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Lista de empleados</h5>
         </div>
 
-        <!-- Formulario filtro -->
-<div class="px-3 py-2 mt-4">
-    <form id="formFiltro" method="GET" action="{{ route('empleado.index') }}">
-        <div class="col-12 col-md-9 d-flex gap-2">
-            <input type="text" name="filtro" id="inputFiltro" class="form-control flex-grow-1"
-                placeholder="Buscar por nombre, identidad o puesto"
-                value="{{ request('filtro') }}">
+        <!-- Formulario filtro sin submit normal -->
+        <div class="px-3 py-2 mt-4">
+            <form id="formFiltro" onsubmit="return false;">
+                <div class="col-12 col-md-9 d-flex gap-2">
+                    <input type="text" name="filtro" id="inputFiltro" class="form-control flex-grow-1"
+                        placeholder="Buscar por nombre, identidad o puesto"
+                        value="{{ request('filtro') }}">
 
-            <select name="estado" class="form-select" style="min-width: 160px;" onchange="document.getElementById('formFiltro').submit()">
-                <option value="">Todos los estados</option>
-                <option value="Activo" {{ request('estado') == 'Activo' ? 'selected' : '' }}>Activo</option>
-                <option value="Inactivo" {{ request('estado') == 'Inactivo' ? 'selected' : '' }}>Inactivo</option>
-            </select>
-        </div>
-    </form>
-</div>
-
-
-            <!-- Tabla -->
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped mb-0">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th class="text-center">Nombre</th>
-                            <th class="text-center">Identidad</th>
-                            <th class="text-center">Puesto</th>
-                            <th class="text-center">Estado</th>
-                            <th class="text-center">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla-empleados">
-                        @forelse($empleados as $index => $empleado)
-                            <tr data-estado="{{ $empleado->estado }}">
-                                <td>{{ $empleados->firstItem() + $index }}</td>
-                                <td class="nombre">{{ $empleado->nombres }} {{ $empleado->apellidos }}</td>
-                                <td>{{ $empleado->identidad }}</td>
-                                <td class="puesto">{{ $empleado->puesto->nombre ?? 'Sin puesto' }}</td>
-                                <td class="text-center">
-                                    @if($empleado->estado === 'Activo')
-                                        <span class="estado-activo"><i class="bi bi-circle-fill"></i></span>
-                                    @else
-                                        <span class="estado-inactivo"><i class="bi bi-circle-fill"></i></span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <div class="d-flex gap-2 justify-content-center">
-                                        <a href="{{ route('empleado.show', $empleado->id) }}" class="btn btn-white-border btn-outline-info btn-sm" title="Ver">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="{{ route('empleado.edit', $empleado->id) }}" class="btn btn-white-border btn-outline-warning btn-sm" title="Editar">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8" class="text-center">No hay empleados registrados.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Mensaje de resultados -->
-<div id="mensajeResultados" class="text-center fw-semibold text-dark mt-2">
-    Se encontraron {{ $empleados->total() }} resultado{{ $empleados->total() != 1 ? 's' : '' }}.
-</div>
-
-            <div class="px-3 pb-3">
-                <div class="d-flex justify-content-center">
-                    {{ $empleados->onEachSide(1)->links('pagination::bootstrap-5') }}
+                    <select name="estado" id="selectEstado" class="form-select" style="min-width: 160px;">
+                        <option value="">Todos los estados</option>
+                        <option value="Activo" {{ request('estado') == 'Activo' ? 'selected' : '' }}>Activo</option>
+                        <option value="Inactivo" {{ request('estado') == 'Inactivo' ? 'selected' : '' }}>Inactivo</option>
+                    </select>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
+
+        <!-- Tabla y paginación (contenedor dinámico AJAX) -->
+        <div id="tabla-container">
+            @include('empleado.partials.tabla', ['empleados' => $empleados])
+        </div>
+
+        <!-- Mensaje de resultados -->
+        <div id="mensajeResultados" class="text-center fw-semibold text-dark mt-2">
+            Se encontraron {{ $empleados->total() }} resultado{{ $empleados->total() != 1 ? 's' : '' }}.
+        </div>
     </div>
 </div>
 
@@ -274,32 +224,64 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Solo para ocultar mensaje de éxito -->
 <script>
-    $(document).ready(function () {
-        const mensaje = $('#mensaje-exito');
-        if (mensaje.length) {
-            setTimeout(() => {
-                mensaje.alert('close');
-            }, 3000);
+$(document).ready(function () {
+    function actualizarMensaje(total, all, query) {
+        if (query === '') {
+            $('#mensajeResultados').html('');
+        } else if (total === 0) {
+            $('#mensajeResultados').html(`No se encontraron resultados para "<strong>${query}</strong>" de un total de ${all}.`);
+        } else {
+            $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
         }
-    });
-</script>
+    }
 
-<!-- Script debounce -->
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        let timeout = null;
-        const inputFiltro = document.getElementById('inputFiltro');
-        const formFiltro = document.getElementById('formFiltro');
-
-        inputFiltro.addEventListener('input', () => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                formFiltro.submit();
-            }, 1000);
+    function cargarDatos(page = 1, filtro = '', estado = '') {
+        $.ajax({
+            url: "{{ route('empleado.index') }}",
+            type: 'GET',
+            data: { page, filtro, estado },
+            success: function(data) {
+                $('#tabla-container').html(data.html);
+                actualizarMensaje(data.total, data.all, filtro);
+                window.history.pushState("", "", `?page=${page}&filtro=${encodeURIComponent(filtro)}&estado=${encodeURIComponent(estado)}`);
+            },
+            error: function() {
+                $('#mensajeResultados').html('Error al cargar los datos.');
+            }
         });
+    }
+
+    // Evento para input filtro con debounce
+    let timeout = null;
+    $('#inputFiltro').on('input', function () {
+        clearTimeout(timeout);
+        let filtro = $(this).val();
+        let estado = $('#selectEstado').val();
+        timeout = setTimeout(() => {
+            cargarDatos(1, filtro, estado);
+        }, 500);
     });
+
+    // Evento para select estado
+    $('#selectEstado').on('change', function () {
+        let filtro = $('#inputFiltro').val();
+        let estado = $(this).val();
+        cargarDatos(1, filtro, estado);
+    });
+
+    // Capturar clicks en paginación (delegado)
+    $(document).on('click', '.pagination a', function(e) {
+        e.preventDefault();
+        let url = $(this).attr('href');
+        let page = url.split('page=')[1];
+        let filtro = $('#inputFiltro').val();
+        let estado = $('#selectEstado').val();
+        cargarDatos(page, filtro, estado);
+    });
+
+    // No hace falta recargar al inicio porque ya se carga con Blade
+});
 </script>
 
 </body>

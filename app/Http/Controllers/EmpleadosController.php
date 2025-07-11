@@ -233,8 +233,19 @@ class EmpleadosController extends Controller
         // Paginación con conservación de filtros
         $empleados = $query->orderBy('nombres')->paginate(5)->withQueryString();
     
+        if ($request->ajax()) {
+            $html = view('empleado.partials.tabla', compact('empleados'))->render();
+    
+            return response()->json([
+                'html' => $html,
+                'total' => $empleados->count(),
+                'all' => $empleados->total(),
+            ]);
+        }
+    
         return view('empleado.index', compact('empleados'));
     }
+    
     
 
     public function update(Request $request, string $id)
