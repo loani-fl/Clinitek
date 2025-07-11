@@ -142,7 +142,7 @@ class ConsultaController extends Controller
         $medicos = Medico::orderBy('nombre')->get();
 
         $horas = [];
-        $minutos = 8 * 60; 
+        $minutos = 8 * 60;
         $fin = (16 * 60) + 30;
 
         while ($minutos <= $fin) {
@@ -168,8 +168,8 @@ class ConsultaController extends Controller
             ->exists();
 
         try {
-            $horaFormato12 = $consulta->hora 
-                ? Carbon::createFromFormat('H:i:s', $consulta->hora)->format('g:i A') 
+            $horaFormato12 = $consulta->hora
+                ? Carbon::createFromFormat('H:i:s', $consulta->hora)->format('g:i A')
                 : 'inmediata';
         } catch (\Exception $e) {
             $horaFormato12 = 'inmediata';
