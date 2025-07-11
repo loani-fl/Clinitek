@@ -158,6 +158,7 @@
             text-decoration: underline;
             color: #dceeff;
         }
+        
     </style>
 </head>
 <body>
@@ -178,6 +179,7 @@
 <!-- Contenedor principal -->
 <div class="contenedor-principal">
     <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
+        <!-- Único encabezado -->
         <div class="card-header position-relative py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
             <a href="{{ route('inicio') }}" class="btn btn-light position-absolute end-0 top-50 translate-middle-y me-2">
                 <i class="bi bi-house-door"></i> Inicio
@@ -185,29 +187,23 @@
             <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Lista de empleados</h5>
         </div>
 
-        <form action="{{ route('empleado.store') }}" method="POST" novalidate>
-            @csrf
+        <!-- Formulario filtro -->
+<div class="px-3 py-2 mt-4">
+    <form id="formFiltro" method="GET" action="{{ route('empleado.index') }}">
+        <div class="col-12 col-md-9 d-flex gap-2">
+            <input type="text" name="filtro" id="inputFiltro" class="form-control flex-grow-1"
+                placeholder="Buscar por nombre, identidad o puesto"
+                value="{{ request('filtro') }}">
 
-            @if(session('success'))
-                <div id="mensaje-exito" class="alert alert-success m-3 alert-dismissible fade show">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-                </div>
-            @endif
+            <select name="estado" class="form-select" style="min-width: 160px;" onchange="document.getElementById('formFiltro').submit()">
+                <option value="">Todos los estados</option>
+                <option value="Activo" {{ request('estado') == 'Activo' ? 'selected' : '' }}>Activo</option>
+                <option value="Inactivo" {{ request('estado') == 'Inactivo' ? 'selected' : '' }}>Inactivo</option>
+            </select>
+        </div>
+    </form>
+</div>
 
-            <!-- Filtros -->
-            <div class="row px-3 py-2">
-                <div class="col-md-4 mb-2 mb-md-0">
-                    <input type="text" id="filtro-empleado" class="form-control" placeholder="Buscar por nombre, identidad o puesto" />
-                </div>
-                <div class="col-md-3">
-                    <select id="filtro-estado" class="form-select">
-                        <option value="">Todos los estados</option>
-                        <option value="Activo">Activo</option>
-                        <option value="Inactivo">Inactivo</option>
-                    </select>
-                </div>
-            </div>
 
             <!-- Tabla -->
             <div class="table-responsive">
@@ -252,16 +248,14 @@
                                 <td colspan="8" class="text-center">No hay empleados registrados.</td>
                             </tr>
                         @endforelse
-
-                        <tr id="sin-resultados" style="display: none;">
-                            <td colspan="8" class="text-center text-muted">No hay empleados que coincidan con la búsqueda.</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
 
             <!-- Mensaje de resultados -->
-            <div id="mensajeResultados" class="text-center fw-semibold text-dark mt-2"></div>
+<div id="mensajeResultados" class="text-center fw-semibold text-dark mt-2">
+    Se encontraron {{ $empleados->total() }} resultado{{ $empleados->total() != 1 ? 's' : '' }}.
+</div>
 
             <div class="px-3 pb-3">
                 <div class="d-flex justify-content-center">
@@ -280,63 +274,31 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Script para filtros y mensaje -->
+<!-- Solo para ocultar mensaje de éxito -->
 <script>
-    function actualizarMensajeResultados(totalVisibles, totalEmpleados, filtroVacio) {
-        if (totalVisibles === 0) {
-            $('#mensajeResultados').text('No hay empleados que coincidan con la búsqueda.');
-        } else {
-            $('#mensajeResultados').text(`Se encontraron ${totalVisibles} resultado${totalVisibles !== 1 ? 's' : ''} de ${totalEmpleados}.`);
-        }
-    }
-
-    function aplicarFiltros() {
-        const texto = $('#filtro-empleado').val().toLowerCase();
-        const estado = $('#filtro-estado').val();
-        const noResultadosRow = $('#sin-resultados');
-
-        const filas = $('#tabla-empleados tr').not(noResultadosRow);
-        const totalEmpleados = filas.length;
-
-        let visibles = 0;
-
-        filas.each(function () {
-            const nombre = $(this).find('.nombre').text().toLowerCase();
-            const puesto = $(this).find('.puesto').text().toLowerCase();
-            const identidad = $(this).find('td').eq(2).text().toLowerCase();
-            const estadoActual = $(this).data('estado');
-
-            const coincideTexto = 
-                nombre.startsWith(texto) || 
-                puesto.startsWith(texto) || 
-                identidad.startsWith(texto);
-
-            const coincideEstado = !estado || estado === estadoActual;
-
-            const visible = coincideTexto && coincideEstado;
-            $(this).toggle(visible);
-
-            if (visible) {
-                visibles++;
-                $(this).find('td').eq(0).text(visibles);
-            }
-        });
-
-        noResultadosRow.toggle(visibles === 0);
-        actualizarMensajeResultados(visibles, totalEmpleados, texto === '');
-    }
-
     $(document).ready(function () {
-        $('#filtro-empleado, #filtro-estado').on('input change', aplicarFiltros);
-
         const mensaje = $('#mensaje-exito');
         if (mensaje.length) {
             setTimeout(() => {
                 mensaje.alert('close');
             }, 3000);
         }
+    });
+</script>
 
-        aplicarFiltros();
+<!-- Script debounce -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let timeout = null;
+        const inputFiltro = document.getElementById('inputFiltro');
+        const formFiltro = document.getElementById('formFiltro');
+
+        inputFiltro.addEventListener('input', () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                formFiltro.submit();
+            }, 1000);
+        });
     });
 </script>
 

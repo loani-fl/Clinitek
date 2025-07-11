@@ -208,11 +208,34 @@ class EmpleadosController extends Controller
     }
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $empleados = Empleado::with('puesto')->paginate(10);
+        $query = Empleado::with('puesto');
+    
+        // Filtro por texto (nombre, apellidos, identidad, puesto)
+        if ($request->filled('filtro')) {
+            $filtro = $request->input('filtro');
+            $query->where(function ($q) use ($filtro) {
+                $q->where('nombres', 'like', "%$filtro%")
+                  ->orWhere('apellidos', 'like', "%$filtro%")
+                  ->orWhere('identidad', 'like', "%$filtro%")
+                  ->orWhereHas('puesto', function ($q2) use ($filtro) {
+                      $q2->where('nombre', 'like', "%$filtro%");
+                  });
+            });
+        }
+    
+        // Filtro por estado
+        if ($request->filled('estado')) {
+            $query->where('estado', $request->estado);
+        }
+    
+        // Paginación con conservación de filtros
+        $empleados = $query->orderBy('nombres')->paginate(5)->withQueryString();
+    
         return view('empleado.index', compact('empleados'));
     }
+    
 
     public function update(Request $request, string $id)
 {
