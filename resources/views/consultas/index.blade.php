@@ -138,6 +138,14 @@
             </div>
         @endif
 
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+        @endif
+
+
         <div class="card-body">
 
             <div class="filter-row">
@@ -206,7 +214,7 @@
                                             default => ''
                                         };
                                     @endphp
-                                    <span class="estado-circulo {{ $claseCirculo }}" title="{{ $estado }}"></span> 
+                                    <span class="estado-circulo {{ $claseCirculo }}" title="{{ $estado }}"></span>
                                 </td>
                                 <td>
                                     <a href="{{ route('consultas.show', $consulta->id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>

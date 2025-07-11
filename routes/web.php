@@ -8,6 +8,7 @@ use App\Http\Controllers\EmpleadosController;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\ConsultaController;
 use App\Http\Controllers\ConsultahoraController;
+use App\Http\Controllers\DiagnosticoController;
 use App\Models\Puesto;
 
 // Página de bienvenida
@@ -74,7 +75,15 @@ Route::patch('/consultas/{consulta}/cambiar-estado', [ConsultaController::class,
     Route::get('/horas-ocupadas', [ConsultahoraController::class, 'horasOcupadas']);
 
 
+// Ruta para mostrar formulario con paciente y consulta
+Route::get('diagnosticos/create/{paciente}/{consulta}', [DiagnosticoController::class, 'create'])->name('diagnosticos.create');
 
+
+// Ruta para guardar diagnóstico
+Route::post('diagnosticos', [DiagnosticoController::class, 'store'])->name('diagnosticos.store');
+
+// Ruta para mostrar detalle del diagnóstico
+Route::get('diagnosticos/{diagnostico}', [DiagnosticoController::class, 'show'])->name('diagnosticos.show');
 
 
 

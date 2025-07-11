@@ -17,7 +17,7 @@
     </div>
 
     <style>
-        .custom-card {
+        .custom-card { 
             max-width: 1000px;
             background-color: rgba(255, 255, 255, 0.95);
             border: 1px solid #91cfff;
