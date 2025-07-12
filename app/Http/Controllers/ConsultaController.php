@@ -252,4 +252,6 @@ public function cambiarEstado(Request $request, Consulta $consulta)
         $consulta = Consulta::with('paciente', 'medico')->findOrFail($id);
         return view('consultas.show', compact('consulta'));
     }
+
+
 }

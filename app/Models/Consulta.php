@@ -32,6 +32,9 @@ public function medico()
 {
     return $this->belongsTo(Medico::class);
 }
-
+    public function examenes()
+{
+    return $this->hasMany(\App\Models\Examen::class);
+}
 
 }

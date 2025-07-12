@@ -104,6 +104,21 @@
             margin: 0;
             color: #212529;
         }
+
+        .card-header-flex {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.card-header-flex > div.d-flex {
+    align-self: stretch;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
     </style>
 
     <!-- Barra fija superior -->
@@ -117,13 +132,19 @@
     </div>
 
 
+
     <!-- Contenedor principal -->
     <div class="container mt-5 pt-3" style="max-width: 1000px;">
         <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100 mt-4">
             <!-- Header con título y botón -->
             <!-- Header con título y botón -->
             <div class="card-header-flex">
+                
                 <h5>Detalles de la Consulta</h5>
+<div id="mensaje-error-orden" class="alert alert-danger" style="display:none;" role="alert">
+    Debe haber un  diagnóstico para crear la orden de examen.
+</div>
+
 
                 <div class="d-flex align-items-center gap-2">
 
@@ -151,11 +172,17 @@
                                     Crear Receta Médica
                                 </a>
                             </li>
-                            <li>
-                                <a class="dropdown-item disabled" href="#" tabindex="-1" aria-disabled="true">
-                                    Crear Orden de Examen
-                                </a>
-                            </li>
+@php
+    $puedeCrearOrden = $consulta->estado === 'realizada';
+@endphp
+
+<li>
+    <a href="{{ $puedeCrearOrden ? route('examenes.create', [$consulta->paciente->id, $consulta->id]) : '#' }}"
+       class="crear-orden" data-estado="{{ $puedeCrearOrden ? '1' : '0' }}">
+       Crear Orden de Examen
+    </a>
+</li>
+
                         </ul>
                     </div>
 
@@ -227,3 +254,25 @@
         </div>
     </div>
 @endsection
+
+@if(!$puedeCrearOrden)
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const link = document.querySelector('a.crear-orden');
+    const mensaje = document.getElementById('mensaje-error-orden');
+
+    link.addEventListener('click', function(e) {
+        if(this.dataset.estado === '0') {
+            e.preventDefault();
+            // Mostrar mensaje
+            mensaje.style.display = 'block';
+
+            // Ocultar después de 5 segundos
+            setTimeout(() => {
+                mensaje.style.display = 'none';
+            }, 5000);
+        }
+    });
+});
+</script>
+@endif
