@@ -74,11 +74,18 @@ Route::get('/consultas/{id}', [ConsultaController::class, 'show'])->name('consul
 
 
 
+// Ruta para mostrar formulario con paciente y consulta
+Route::get('diagnosticos/create/{paciente}/{consulta}', [DiagnosticoController::class, 'create'])->name('diagnosticos.create');
 
 
+// Ruta para guardar diagnóstico
+Route::post('diagnosticos', [DiagnosticoController::class, 'store'])->name('diagnosticos.store');
+Route::get('diagnosticos/{diagnostico}/edit', [DiagnosticoController::class, 'edit'])->name('diagnosticos.edit');
+Route::put('diagnosticos/{diagnostico}', [DiagnosticoController::class, 'update'])->name('diagnosticos.update');
 
 
-
+// Ruta para mostrar detalle del diagnóstico
+Route::get('diagnosticos/{diagnostico}', [DiagnosticoController::class, 'show'])->name('diagnosticos.show');
 
 
 

@@ -246,10 +246,9 @@ public function cambiarEstado(Request $request, Consulta $consulta)
 
     return redirect()->back()->with('success', 'Estado de la consulta actualizado a ' . ucfirst($nuevoEstado));
 }
-
 public function show($id)
 {
-    $consulta = Consulta::with('medico', 'paciente.recetas')->findOrFail($id);
+    $consulta = Consulta::with('paciente.recetas', 'medico', 'diagnostico')->findOrFail($id);
     $paciente = $consulta->paciente;
 
     return view('consultas.show', compact('consulta', 'paciente'));
