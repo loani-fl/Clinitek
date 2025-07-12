@@ -41,10 +41,10 @@ public function pacientes()
 {
     return $this->belongsTo(Paciente::class);
 }
-    public function recetas()
-    {
-        return $this->hasMany(Receta::class);
-    }
 
+public function recetas()
+{
+    return $this->hasMany(Receta::class);
+}
 
 }

@@ -142,7 +142,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="observaciones" class="form-label">Observaciones <span class="text-danger">*</span></label>
+                    <label for="observaciones" class="form-label">Observaciones (Opcionales) <span class="text-danger"></span></label>
                     <textarea name="observaciones" id="observaciones" rows="3" class="form-control @error('observaciones') is-invalid @enderror" required>{{ old('observaciones') }}</textarea>
                     @error('observaciones')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -161,9 +161,4 @@
             </form>
         </div>
     </div>
-
-    <footer>
-        &copy; {{ date('Y') }} Clinitek - Todos los derechos reservados.
-    </footer>
 @endsection
-
