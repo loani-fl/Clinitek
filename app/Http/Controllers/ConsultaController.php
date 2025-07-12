@@ -253,3 +253,5 @@ public function show($id)
 
     return view('consultas.show', compact('consulta', 'paciente'));
 }
+
+}
