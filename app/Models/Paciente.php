@@ -36,4 +36,14 @@ class Paciente extends Model
         return $this->hasOne(Diagnostico::class);
     }
 
+    public function consultas()
+{
+    return $this->hasMany(Consulta::class);
+}
+
+public function recetas()
+{
+    return $this->hasManyThrough(Receta::class, Consulta::class);
+}
+
 }

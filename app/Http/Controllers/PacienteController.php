@@ -158,6 +158,10 @@ class PacienteController extends Controller
         $paciente->load('diagnostico');
 
         return view('pacientes.show', compact('paciente'));
+
+        $paciente = Paciente::with('consultas.receta')->findOrFail($id);
+    return view('pacientes.show', compact('paciente'));
+    
     }
 
     public function edit(Paciente $paciente)
@@ -289,5 +293,11 @@ class PacienteController extends Controller
         ]));
 
         return redirect()->route('pacientes.index')->with('success', 'Paciente actualizado correctamente.');
+    }
+
+    public function showRecetas($pacienteId)
+    {
+        $paciente = Paciente::with('recetas')->findOrFail($pacienteId);
+        return view('recetas.show', compact('paciente'));
     }
 }
