@@ -112,11 +112,33 @@
 
     {{-- Aquí puedes incluir navbar si tienes --}}
     {{-- <nav> ... </nav> --}}
+    <body>
+
+    {{-- Barra de navegación superior fija con menú desplegable --}}
+    <div class="header d-flex justify-content-between align-items-center px-3 py-2 fixed-top" style="background-color: #007BFF;">
+        <div class="d-flex align-items-center">
+            <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto;">
+            <div class="fw-bold text-white ms-2" style="font-size: 1.5rem;">Clinitek</div>
+        </div>
+
+        <div class="dropdown">
+            <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                ☰
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                <li><a class="dropdown-item" href="{{ route('puestos.create') }}">Crear puesto</a></li>
+                <li><a class="dropdown-item" href="{{ route('empleado.create') }}">Registrar empleado</a></li>
+                <li><a class="dropdown-item" href="{{ route('medicos.create') }}">Registrar médico</a></li>
+            </ul>
+        </div>
+    </div>
 
     {{-- Contenido principal --}}
-    <main>
+    <main style="padding-top: 10px;">
         @yield('content')
     </main>
+
+
 
     {{-- Footer --}}
     <footer>

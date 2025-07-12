@@ -170,6 +170,10 @@ public function create($paciente_id, $consulta_id)
         $paciente->load('diagnostico');
 
         return view('pacientes.show', compact('paciente'));
+
+        $paciente = Paciente::with('consultas.receta')->findOrFail($id);
+    return view('pacientes.show', compact('paciente'));
+    
     }
 
     public function edit(Paciente $paciente)
@@ -301,5 +305,11 @@ public function create($paciente_id, $consulta_id)
         ]));
 
         return redirect()->route('pacientes.index')->with('success', 'Paciente actualizado correctamente.');
+    }
+
+    public function showRecetas($pacienteId)
+    {
+        $paciente = Paciente::with('recetas')->findOrFail($pacienteId);
+        return view('recetas.show', compact('paciente'));
     }
 }

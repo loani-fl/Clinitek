@@ -22,8 +22,7 @@ class Consulta extends Model
         'estado',
           
     ];
-
-    public function paciente()
+public function paciente()
 {
     return $this->belongsTo(Paciente::class);
 }
@@ -32,9 +31,26 @@ public function medico()
 {
     return $this->belongsTo(Medico::class);
 }
-    public function examenes()
+
+public function examenes()
 {
     return $this->hasMany(\App\Models\Examen::class);
 }
+
+public function diagnostico()
+{
+    return $this->hasOne(Diagnostico::class);
+}
+
+public function pacientes()
+{
+    return $this->belongsTo(Paciente::class);
+}
+
+public function recetas()
+{
+    return $this->hasMany(Receta::class);
+}
+
 
 }

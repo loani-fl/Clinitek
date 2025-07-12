@@ -161,16 +161,23 @@
                             Opciones
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownOpciones">
-                            <li>
-                                <a class="dropdown-item disabled" href="#" tabindex="-1" aria-disabled="true">
-                                    Editar Diagnostico
-                                </a>
-                            </li>
+                        <li>
+                        @if ($consulta->diagnostico)
+                            <a class="dropdown-item" href="{{ route('diagnosticos.edit', $consulta->diagnostico->id) }}">
+                                Editar Diagnóstico
+                            </a>
+                        @else
+                            <a class="dropdown-item disabled" href="#" tabindex="-1" aria-disabled="true">
+                                No hay diagnóstico para editar
+                            </a>
+                        @endif
+
+                        </li>
+
 
                             <li>
-                                <a class="dropdown-item disabled" href="#" tabindex="-1" aria-disabled="true">
-                                    Crear Receta Médica
-                                </a>
+                            <a href="{{ route('recetas.create', $consulta->id) }}">Crear receta médica</a>
+
                             </li>
 @php
     $puedeCrearOrden = $consulta->estado === 'realizada';

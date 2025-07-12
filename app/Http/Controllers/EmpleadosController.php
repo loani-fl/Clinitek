@@ -107,13 +107,13 @@ class EmpleadosController extends Controller
                 'required',
                 'string',
                 'max:250',
-                'regex:/^[\pL\pN\s.,;#\/\-\(\)áéíóúÁÉÍÓÚñÑ]+$/u',
+                'regex:/^[\pL\pN\s#\/\-\(\)]+$/u',
             ],
             'observaciones' => [
                 'required',
                 'string',
                 'max:350',
-                'regex:/^[\pL\pN\s.,;áéíóúÁÉÍÓÚñÑ]+$/u',
+                'regex:/^[\pL\pN\s]+$/u',
             ],
             'genero' => 'required|in:Masculino,Femenino,Otro',
             'estado_civil' => 'nullable|in:Soltero,Casado,Divorciado,Viudo',
@@ -190,7 +190,7 @@ class EmpleadosController extends Controller
             $file = $request->file('foto');
             $nombreArchivo = time() . '_' . $file->getClientOriginalName();
             $file->storeAs('public/fotos', $nombreArchivo);
-            $validated['foto'] = 'fotos/' . $nombreArchivo; // 🔥 aquí agregas la carpeta
+            $validated['foto'] = 'fotos/' . $nombreArchivo; 
         }
 
         $validated['estado'] = 'activo';
