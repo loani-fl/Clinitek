@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -7,9 +7,11 @@ use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\EmpleadosController;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\ConsultaController;
+use App\Http\Controllers\ConsultahoraController;
+use App\Http\Controllers\DiagnosticoController;
+use App\Http\Controllers\ExamenController;
 use App\Models\Puesto;
 use App\Http\Controllers\RecetaController;
-use App\Http\Controllers\DiagnosticoController;
 
 // Página de bienvenida
 Route::get('/', function () {
@@ -20,13 +22,9 @@ Route::get('/', function () {
     return view('welcome'); // O la vista que uses como inicio
 })->name('inicio');
 
-
-
-
-//Rutas para puestos
+// Rutas para puestos
 Route::get('/puestos/create', [PuestoController::class, 'create'])->name('puestos.create');
 Route::post('/puestos', [PuestoController::class, 'store'])->name('puestos.store');
-
 
 Route::get('/empleado', [EmpleadosController::class, 'index'])->name('empleado.index');
 Route::get('/empleado/create', [EmpleadosController::class, 'create'])->name('empleado.create');
@@ -49,9 +47,7 @@ Route::get('/pacientes/create', [PacienteController::class, 'create'])->name('pa
 Route::get('/pacientes', [PacienteController::class, 'index'])->name('pacientes.index');
 Route::get('/pacientes/{id}', [PacienteController::class, 'show'])->name('pacientes.show');
 Route::get('pacientes/{paciente}/edit', [App\Http\Controllers\PacienteController::class, 'edit'])->name('pacientes.edit');
-
 Route::put('/pacientes/{paciente}', [PacienteController::class, 'update'])->name('pacientes.update');
-
 
 Route::resource('consultas', ConsultaController::class);
 Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupadas']);
@@ -64,7 +60,6 @@ Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('
 Route::patch('/consultas/{consulta}/cancelar', [ConsultaController::class, 'cancelar'])->name('consultas.cancelar');
 Route::patch('/consultas/{consulta}/cambiar-estado', [ConsultaController::class, 'cambiarEstado'])->name('consultas.cambiarEstado');
 
-
 Route::resource('diagnosticos', DiagnosticoController::class);
 
 Route::get('/recetas/create/{consulta}', [RecetaController::class, 'create'])->name('recetas.create');
@@ -72,21 +67,26 @@ Route::post('/recetas/{consulta}', [RecetaController::class, 'store'])->name('re
 Route::get('/pacientes/{paciente}/recetas', [PacienteController::class, 'showRecetas'])->name('recetas.show');
 Route::get('/consultas/{id}', [ConsultaController::class, 'show'])->name('consultas.show');
 
-
-
 // Ruta para mostrar formulario con paciente y consulta
 Route::get('diagnosticos/create/{paciente}/{consulta}', [DiagnosticoController::class, 'create'])->name('diagnosticos.create');
-
 
 // Ruta para guardar diagnóstico
 Route::post('diagnosticos', [DiagnosticoController::class, 'store'])->name('diagnosticos.store');
 Route::get('diagnosticos/{diagnostico}/edit', [DiagnosticoController::class, 'edit'])->name('diagnosticos.edit');
 Route::put('diagnosticos/{diagnostico}', [DiagnosticoController::class, 'update'])->name('diagnosticos.update');
 
-
 // Ruta para mostrar detalle del diagnóstico
 Route::get('diagnosticos/{diagnostico}', [DiagnosticoController::class, 'show'])->name('diagnosticos.show');
 
+// Rutas para ExamenController
+Route::get('/pacientes/{paciente}/consultas/{consulta}/examenes/create', [ExamenController::class, 'create'])->name('examenes.create');
+Route::post('/pacientes/{paciente}/consultas/{consulta}/examenes', [ExamenController::class, 'store'])->name('examenes.store');
 
+// prueba show
+Route::get('/examenes/prueba/{consulta}', [ExamenController::class, 'showPrueba'])->name('examenes.show');
+Route::get('/examenes/create/{paciente_id}/{consulta_id}', [ExamenController::class, 'create'])->name('examenes.create');
+Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('consultas.show');
 
-
+// ejemplo de rutas en web.php para show
+Route::get('examenes/{paciente}/{consulta}', [ExamenController::class, 'show'])->name('examenes.show');
+Route::post('examenes/{paciente}/{consulta}', [ExamenController::class, 'store'])->name('examenes.store');

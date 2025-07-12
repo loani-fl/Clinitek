@@ -9,10 +9,18 @@ use Carbon\Carbon;
 
 class PacienteController extends Controller
 {
-    public function create()
-    {
-        return view('pacientes.create');
+public function create($paciente_id, $consulta_id)
+{
+    $consulta = Consulta::findOrFail($consulta_id);
+
+    if ($consulta->estado !== 'realizada') {
+        return redirect()->back()->with('error', 'Antes debe realizarse un diagnóstico para poder crear la orden de examen.');
     }
+
+    return view('pacientes.create', compact('paciente_id', 'consulta_id'));
+}
+
+
 
     private function validarAnioIdentidad($identidad)
     {
@@ -49,6 +57,7 @@ class PacienteController extends Controller
                 'unique:pacientes,correo',
                 'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
             ],
+                    'examenes' => 'required|array|min:1|max:10',
             'tipo_sangre' => ['nullable', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
             'genero' => ['required', 'in:Femenino,Masculino,Otro'],
             'padecimientos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
@@ -111,7 +120,10 @@ class PacienteController extends Controller
             'alergias.max' => 'No puede exceder 200 caracteres.',
 
             'historial_quirurgico.regex' => 'Solo se permiten letras y espacios.',
+           
             'historial_quirurgico.max' => 'No puede exceder 200 caracteres.',
+
+           
         ]);
 
         if (!$this->validarAnioIdentidad($request->identidad)) {
