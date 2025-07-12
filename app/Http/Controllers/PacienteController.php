@@ -155,6 +155,8 @@ class PacienteController extends Controller
     public function show($id)
     {
         $paciente = Paciente::findOrFail($id);
+        $paciente->load('diagnostico');
+
         return view('pacientes.show', compact('paciente'));
     }
 
