@@ -7,9 +7,9 @@ use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\EmpleadosController;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\ConsultaController;
-use App\Http\Controllers\ConsultahoraController;
-use App\Http\Controllers\DiagnosticoController;
 use App\Models\Puesto;
+use App\Http\Controllers\RecetaController;
+use App\Http\Controllers\DiagnosticoController;
 
 // Página de bienvenida
 Route::get('/', function () {
@@ -50,7 +50,6 @@ Route::get('/pacientes', [PacienteController::class, 'index'])->name('pacientes.
 Route::get('/pacientes/{id}', [PacienteController::class, 'show'])->name('pacientes.show');
 Route::get('pacientes/{paciente}/edit', [App\Http\Controllers\PacienteController::class, 'edit'])->name('pacientes.edit');
 
-
 Route::put('/pacientes/{paciente}', [PacienteController::class, 'update'])->name('pacientes.update');
 
 
@@ -61,29 +60,26 @@ Route::get('/horas-ocupadas', [App\Http\Controllers\ConsultaController::class, '
 Route::get('consultas/{id}/edit', [ConsultaController::class, 'edit'])->name('consultas.edit');
 Route::put('consultas/{id}', [ConsultaController::class, 'update'])->name('consultas.update');
 Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupadas'])->name('consultas.horas.ocupadas');
-
-
-
-
-
-//Route::patch('/consultas/{consulta}/toggle-estado', [ConsultaController::class, 'toggleEstado'])
-   // ->name('consultas.toggleEstado');
-
-
+Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('consultas.show');
+Route::patch('/consultas/{consulta}/cancelar', [ConsultaController::class, 'cancelar'])->name('consultas.cancelar');
 Route::patch('/consultas/{consulta}/cambiar-estado', [ConsultaController::class, 'cambiarEstado'])->name('consultas.cambiarEstado');
 
-    Route::get('/horas-ocupadas', [ConsultahoraController::class, 'horasOcupadas']);
+
+Route::resource('diagnosticos', DiagnosticoController::class);
+
+Route::get('/recetas/create/{consulta}', [RecetaController::class, 'create'])->name('recetas.create');
+Route::post('/recetas/{consulta}', [RecetaController::class, 'store'])->name('recetas.store');
+Route::get('/pacientes/{paciente}/recetas', [PacienteController::class, 'showRecetas'])->name('recetas.show');
+Route::get('/consultas/{id}', [ConsultaController::class, 'show'])->name('consultas.show');
 
 
-// Ruta para mostrar formulario con paciente y consulta
-Route::get('diagnosticos/create/{paciente}/{consulta}', [DiagnosticoController::class, 'create'])->name('diagnosticos.create');
 
 
-// Ruta para guardar diagnóstico
-Route::post('diagnosticos', [DiagnosticoController::class, 'store'])->name('diagnosticos.store');
 
-// Ruta para mostrar detalle del diagnóstico
-Route::get('diagnosticos/{diagnostico}', [DiagnosticoController::class, 'show'])->name('diagnosticos.show');
+
+
+
+
 
 
 

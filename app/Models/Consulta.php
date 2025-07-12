@@ -33,5 +33,18 @@ public function medico()
     return $this->belongsTo(Medico::class);
 }
 
+public function diagnostico()
+{
+    return $this->hasOne(Diagnostico::class);
+}
+public function pacientes()
+{
+    return $this->belongsTo(Paciente::class);
+}
+    public function recetas()
+    {
+        return $this->hasMany(Receta::class);
+    }
+
 
 }

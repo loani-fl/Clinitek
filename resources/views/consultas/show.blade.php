@@ -147,9 +147,8 @@
                             </li>
 
                             <li>
-                                <a class="dropdown-item disabled" href="#" tabindex="-1" aria-disabled="true">
-                                    Crear Receta Médica
-                                </a>
+                            <a href="{{ route('recetas.create', $consulta->id) }}">Crear receta médica</a>
+
                             </li>
                             <li>
                                 <a class="dropdown-item disabled" href="#" tabindex="-1" aria-disabled="true">
