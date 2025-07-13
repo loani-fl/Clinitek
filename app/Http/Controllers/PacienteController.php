@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Consulta;
 use App\Models\Paciente;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -9,17 +10,21 @@ use Carbon\Carbon;
 
 class PacienteController extends Controller
 {
-public function create($paciente_id, $consulta_id)
-{
-    $consulta = Consulta::findOrFail($consulta_id);
-
-    if ($consulta->estado !== 'realizada') {
-        return redirect()->back()->with('error', 'Antes debe realizarse un diagnóstico para poder crear la orden de examen.');
+    public function create($paciente_id = null, $consulta_id = null)
+    {
+        if ($paciente_id && $consulta_id) {
+            $consulta = Consulta::findOrFail($consulta_id);
+    
+            if ($consulta->estado !== 'realizada') {
+                return redirect()->back()->with('error', 'Antes debe realizarse un diagnóstico para poder crear la orden de examen.');
+            }
+    
+            return view('pacientes.create', compact('paciente_id', 'consulta_id'));
+        }
+    
+        return view('pacientes.create');
     }
-
-    return view('pacientes.create', compact('paciente_id', 'consulta_id'));
-}
-
+    
 
 
     private function validarAnioIdentidad($identidad)
