@@ -58,17 +58,18 @@
         }
     </style>
 
-    <!-- Barra de navegación fija -->
-    <div class="w-100 fixed-top" style="background-color: #007BFF; z-index: 1050; height: 56px;">
-        <div class="d-flex justify-content-between align-items-center px-3" style="height: 56px;">
-            <div class="d-flex align-items-center">
-                <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek"
-                     style="height: 40px; width: auto; margin-right: 6px;">
-                <span class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</span>
-            </div>
-        </div>
+    {{-- Menú desplegable estilo Bootstrap --}}
+    <div class="dropdown">
+        <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            ☰
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" href="{{ route('puestos.create') }}">Crear puesto</a></li>
+            <li><a class="dropdown-item" href="{{ route('empleado.create') }}">Registrar empleado</a></li>
+            <li><a class="dropdown-item" href="{{ route('medicos.create') }}">Registrar médico</a></li>
+        </ul>
     </div>
-
+</div>
     <!-- Contenedor principal -->
     <div class="container mt-5 pt-3" style="max-width: 1000px;">
         <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100 mt-4">
