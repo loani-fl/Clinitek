@@ -249,5 +249,16 @@ public function horasOcupadas(Request $request)
     return response()->json($horasOcupadas);
 }
 
+public function cambiarEstado(Request $request, $id)
+{
+    $consulta = Consulta::findOrFail($id);
+
+    $consulta->estado = $consulta->estado === 'pendiente' ? 'cancelada' : 'pendiente';
+
+    $consulta->save();
+
+    return redirect()->back()->with('success', 'Estado de la consulta actualizado.');
+}
+
 
 }
