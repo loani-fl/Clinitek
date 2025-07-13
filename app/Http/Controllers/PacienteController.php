@@ -12,7 +12,6 @@ class PacienteController extends Controller
 {
     public function create()
     {
-        // creación general sin parámetros
         return view('pacientes.create');
     }
     
