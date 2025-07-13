@@ -48,6 +48,7 @@
             padding: 0 3rem;
             margin: 0;
             width: 100vw;
+            padding-top: 70px;
         }
 
         .custom-card {
@@ -163,18 +164,26 @@
 </head>
 <body>
 
-<!-- Barra de navegación fija -->
-<div class="header d-flex justify-content-between align-items-center px-3 py-2" style="background-color: #007BFF; position: sticky; top: 0; z-index: 1030;">
-    <div class="d-flex align-items-center">
-        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto; margin-right: 6px;">
-        <span class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</span>
+{{-- Barra de navegación superior fija con menú desplegable --}}
+    <div class="header d-flex justify-content-between align-items-center px-3 py-2 fixed-top" style="background-color: #007BFF;">
+        <div class="d-flex align-items-center">
+            <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto;">
+            <div class="fw-bold text-white ms-2" style="font-size: 1.5rem;">Clinitek</div>
+        </div>
+
+        <div class="dropdown">
+            <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                ☰
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                <li><a class="dropdown-item" href="{{ route('puestos.create') }}">Crear puesto</a></li>
+                <li><a class="dropdown-item" href="{{ route('empleado.create') }}">Registrar empleado</a></li>
+                <li><a class="dropdown-item" href="{{ route('medicos.create') }}">Registrar médico</a></li>
+                <li><a class="dropdown-item" href="{{ route('consultas.create') }}">Registrar consulta</a></li>
+                <li><a class="dropdown-item" href="{{ route('pacientes.create') }}">Registrar paciente</a></li>
+            </ul>
+        </div>
     </div>
-    <div class="d-flex gap-3 flex-wrap">
-        <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
-        <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
-        <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
-    </div>
-</div>
 
 <!-- Contenedor principal -->
 <div class="contenedor-principal">
