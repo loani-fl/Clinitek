@@ -54,6 +54,7 @@
     }
 </style>
 
+<!--
 <div class="header d-flex justify-content-between align-items-center px-3 py-2"
     style="background-color: #007BFF; position: sticky; top: 0; z-index: 1000;">
     
@@ -69,6 +70,8 @@
         <a href="{{ route('pacientes.index') }}" class="nav-link">Registro Pacientes</a>
     </div>
 </div>
+-->
+
 
 <div class="d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 56px - 100px); margin-top: 2rem;">
     <div class="card custom-card shadow-sm border rounded-4 w-100 mt-0">

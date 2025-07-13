@@ -18,7 +18,7 @@ class ExamenController extends Controller
 }
 public function store(Request $request, $pacienteId, $consultaId)
 {
-    $consulta = Consulta::with('paciente', 'medico', 'examenes')->findOrFail($consultaId);
+    $consulta = Consulta::with('paciente', 'medico', 'examens')->findOrFail($consultaId);
 
     // Validar que la consulta esté realizada
     if ($consulta->estado !== 'realizada') {
