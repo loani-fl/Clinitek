@@ -115,10 +115,10 @@
         <div class="signature-line">Firma del Médico</div>
 
         <a href="{{ route('consultas.show', $consulta->id) }}" 
-            style="background-color: #FFD700; color: black; padding: 10px 16px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;"
-            rel="noopener">
-            <i class="bi bi-printer"></i> Imprimir
-        </a>
+   style="background-color: #808080; color: black; padding: 10px 16px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;"
+   rel="noopener">
+   <i class="bi bi-printer"></i> Imprimir
+</a>
 
         <button type="submit"
             style="background-color: #007BFF; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">

@@ -146,7 +146,8 @@ public function create($paciente_id, $consulta_id)
         $pacientes = \App\Models\Paciente::where('nombre', 'like', "%{$query}%")
             ->orWhere('apellidos', 'like', "%{$query}%")
             ->orWhere('identidad', 'like', "%{$query}%")
-            ->get(); // SIN paginación para mostrar todos los encontrados
+            ->paginate(2)
+            ->appends(['search' => $query]); // mantiene el filtro activo
     } else {
         $pacientes = \App\Models\Paciente::paginate(2);
     }
@@ -162,6 +163,7 @@ public function create($paciente_id, $consulta_id)
 
     return view('pacientes.index', compact('pacientes'));
 }
+
 
 
     public function show($id)
