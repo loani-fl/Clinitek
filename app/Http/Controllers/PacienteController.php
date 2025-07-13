@@ -64,7 +64,6 @@ class PacienteController extends Controller
                 'unique:pacientes,correo',
                 'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
             ],
-                    'examenes' => 'required|array|min:1|max:10',
             'tipo_sangre' => ['nullable', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
             'genero' => ['required', 'in:Femenino,Masculino,Otro'],
             'padecimientos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
