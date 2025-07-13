@@ -302,8 +302,14 @@
 
 @php
 use Carbon\Carbon;
-$horaFormateada = Carbon::createFromFormat('H:i:s', $consulta->hora)->format('g:i A');
+
+try {
+    $horaFormateada = $consulta->hora ? Carbon::parse($consulta->hora)->format('g:i A') : null;
+} catch (\Exception $e) {
+    $horaFormateada = null;
+}
 @endphp
+
 
 <script>
 // Función para convertir hora 12h a 24h (ej: 2:30 PM -> 14:30:00)
