@@ -127,6 +127,8 @@
                 <li><a class="dropdown-item" href="{{ route('puestos.create') }}">Crear puesto</a></li>
                 <li><a class="dropdown-item" href="{{ route('empleado.create') }}">Registrar empleado</a></li>
                 <li><a class="dropdown-item" href="{{ route('medicos.create') }}">Registrar médico</a></li>
+                <li><a class="dropdown-item" href="{{ route('consultas.create') }}">Registrar consulta</a></li>
+                <li><a class="dropdown-item" href="{{ route('pacientes.create') }}">Registrar paciente</a></li>
             </ul>
         </div>
     </div>
