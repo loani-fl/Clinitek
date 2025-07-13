@@ -300,6 +300,11 @@
     </form>
 </div>
 
+@php
+use Carbon\Carbon;
+$horaFormateada = Carbon::createFromFormat('H:i:s', $consulta->hora)->format('g:i A');
+@endphp
+
 <script>
 // Función para convertir hora 12h a 24h (ej: 2:30 PM -> 14:30:00)
 function hora12a24(hora12) {
@@ -332,7 +337,7 @@ function cargarHorasDisponiblesEditar(horaActual) {
     // Opción inicial deshabilitada
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
-    defaultOption.textContent = '12:00 ocupada';
+    defaultOption.textContent = 'Seleccione una hora';
     defaultOption.disabled = true;
     defaultOption.selected = true;
     horaSelect.appendChild(defaultOption);
@@ -344,7 +349,6 @@ function cargarHorasDisponiblesEditar(horaActual) {
 
     if (!medico || !fecha) return;
 
-    // Genera las horas en formato 12h
     const horas = [];
     let minutos = 8 * 60;
     const fin = (16 * 60) + 30;
@@ -368,7 +372,6 @@ function cargarHorasDisponiblesEditar(horaActual) {
                 option.value = hora12;
                 option.textContent = hora12;
 
-                // Si está ocupada y no es la hora actual, deshabilitarla
                 if (horasOcupadas.includes(hora24) && hora12 !== horaActual) {
                     option.disabled = true;
                     option.textContent += ' (Ocupada)';
@@ -377,16 +380,12 @@ function cargarHorasDisponiblesEditar(horaActual) {
                 horaSelect.appendChild(option);
             });
 
-            // Seleccionar la hora actual o la vieja, si existe y está habilitada
             if (horaActual) {
                 const optMatch = Array.from(horaSelect.options).find(opt => opt.value === horaActual);
-                if (optMatch && !optMatch.disabled) {
-                    horaSelect.value = horaActual;
-                } else if (optMatch && optMatch.disabled) {
-                    // Si la hora actual está ocupada, pero es la que corresponde, habilitar y seleccionar
+                if (optMatch) {
                     optMatch.disabled = false;
-                    horaSelect.value = horaActual;
-                    optMatch.textContent = horaActual; // quitar "(Ocupada)"
+                    optMatch.textContent = horaActual; 
+                    optMatch.selected = true;
                 }
             }
         })
@@ -402,34 +401,29 @@ function cargarHorasDisponiblesEditar(horaActual) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Mostrar la especialidad al cargar la página según médico seleccionado
     actualizarEspecialidad();
 
-    // Cargar las horas disponibles, enviando la hora actual seleccionada (formato 12h)
-    const horaConsulta = "{{ old('hora', $consulta->hora) }}";
+    const horaConsulta = "{{ old('hora', $horaFormateada) }}"; // 👈 aquí insertamos la hora formateada
     cargarHorasDisponiblesEditar(horaConsulta);
 
-    // Evento cambio de médico: actualizar especialidad y recargar horas disponibles
     document.getElementById('medico').addEventListener('change', function() {
         actualizarEspecialidad();
         cargarHorasDisponiblesEditar(null);
     });
 
-    // Evento cambio de fecha: recargar horas disponibles
     document.getElementById('fecha_consulta').addEventListener('change', function() {
         cargarHorasDisponiblesEditar(null);
     });
 
-    // Botón restablecer (recarga la página para resetear formulario)
     document.getElementById('restablecerBtn').addEventListener('click', function() {
         location.reload();
     });
 });
+
 document.querySelector('form').addEventListener('submit', function(e) {
     const motivo = this.motivo.value.trim();
     const sintomas = this.sintomas.value.trim();
 
-    // Solo letras, números, espacios, comas, puntos y guiones, incluyendo acentos y ñ
     const regex = /^[a-zA-Z0-9\s.,áéíóúÁÉÍÓÚñÑ-]+$/;
 
     if (!regex.test(motivo)) {
@@ -447,6 +441,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
     }
 });
 </script>
+
 
 @endsection
 

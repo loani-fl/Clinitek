@@ -94,3 +94,6 @@ Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('
 // ejemplo de rutas en web.php para show
 Route::get('examenes/{paciente}/{consulta}', [ExamenController::class, 'show'])->name('examenes.show');
 Route::post('examenes/{paciente}/{consulta}', [ExamenController::class, 'store'])->name('examenes.store');
+
+
+Route::post('/consultas/{id}/cambiar-estado', [ConsultaController::class, 'cambiarEstado'])->name('consultas.cambiarEstado');
