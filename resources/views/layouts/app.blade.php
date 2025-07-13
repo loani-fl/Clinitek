@@ -30,6 +30,7 @@
             flex: 1; /* ocupa todo el espacio disponible */
             width: 100vw;
             padding: 20px 15px;
+            padding-top: 60px; /* espacio para navbar fixed */
         }
         footer {
             background-color: #ffffff;
@@ -82,6 +83,7 @@
         @media (max-width: 576px) {
             main {
                 padding: 10px 5px;
+                padding-top: 60px; /* mantener espacio para navbar */
             }
             .table th, .table td {
                 font-size: 0.8rem;
@@ -110,10 +112,6 @@
 </head>
 <body>
 
-    {{-- Aquí puedes incluir navbar si tienes --}}
-    {{-- <nav> ... </nav> --}}
-    <body>
-
     {{-- Barra de navegación superior fija con menú desplegable --}}
     <div class="header d-flex justify-content-between align-items-center px-3 py-2 fixed-top" style="background-color: #007BFF;">
         <div class="d-flex align-items-center">
@@ -134,11 +132,9 @@
     </div>
 
     {{-- Contenido principal --}}
-    <main style="padding-top: 10px;">
+    <main>
         @yield('content')
     </main>
-
-
 
     {{-- Footer --}}
     <footer>
