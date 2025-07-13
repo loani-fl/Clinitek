@@ -254,4 +254,22 @@ public function show($id)
     return view('consultas.show', compact('consulta', 'paciente'));
 }
 
+public function horasOcupadas(Request $request)
+{
+    $medicoId = $request->query('medico_id');
+    $fecha = $request->query('fecha');
+
+    if (!$medicoId || !$fecha) {
+        return response()->json([]);
+    }
+
+    $horasOcupadas = Consulta::where('medico_id', $medicoId)
+        ->where('fecha', $fecha)
+        ->pluck('hora')
+        ->toArray();
+
+    return response()->json($horasOcupadas);
+}
+
+
 }
