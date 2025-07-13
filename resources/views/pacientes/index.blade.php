@@ -171,9 +171,10 @@
 
         <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
 
-        <div class="pagination-container">
-            {{ $pacientes->onEachSide(1)->links('pagination::bootstrap-5') }}
-        </div>
+       <div id="paginacion-container" class="pagination-container">
+    {{ $pacientes->onEachSide(1)->links('pagination::bootstrap-5') }}
+</div>
+
     </div>
 </div>
 

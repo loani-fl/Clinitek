@@ -1,24 +1,28 @@
 <?php
-namespace App\Http\Controllers; 
+namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Models\Consulta;
 
 class ConsultahoraController extends Controller
 {
-public function horasOcupadas(Request $request)
-{
-    $medico_id = $request->query('medico_id');
-    $fecha = $request->query('fecha');
+    public function horasOcupadas(Request $request)
+    {
+        $medico_id = $request->query('medico_id');
+        $fecha = $request->query('fecha');
 
-    $horas = Consulta::where('medico_id', $medico_id)
+        if (!$medico_id || !$fecha) {
+            return response()->json([], 400);
+        }
+
+        // Obtener las horas ocupadas (hora en formato 24h HH:mm:ss)
+        $horasOcupadas = Consulta::where('medico_id', $medico_id)
             ->where('fecha', $fecha)
-            ->whereNotNull('hora')  // Excluir valores nulos
-            ->pluck('hora');
+            ->pluck('hora')  // Asumiendo que el campo 'hora' está guardado en formato 24h "HH:mm:ss"
+            ->toArray();
 
-    return response()->json($horas);
+        return response()->json($horasOcupadas);
+    }
 }
 
-
-
-}
 
