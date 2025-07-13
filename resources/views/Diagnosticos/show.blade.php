@@ -67,6 +67,28 @@
             <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Detalles del Diagnóstico</h5>
         </div>
 
+
+                @if (session('success'))
+            <div id="alert-success" class="alert alert-success shadow-sm mt-3" role="alert">
+                {{ session('success') }}
+            </div>
+
+            <script>
+                // Ocultar el mensaje después de 4 segundos (4000 milisegundos)
+                setTimeout(() => {
+                    const alert = document.getElementById('alert-success');
+                    if (alert) {
+                        alert.classList.add('fade');
+                        alert.style.transition = 'opacity 0.5s ease';
+                        alert.style.opacity = '0';
+                        setTimeout(() => alert.remove(), 500); // Elimina del DOM después de la animación
+                    }
+                }, 4000);
+            </script>
+        @endif
+
+
+
         <div class="card-body px-4 py-3">
 
             <div class="section-title">Información del Paciente</div>
@@ -86,7 +108,11 @@
                 <a href="{{ route('consultas.index') }}" class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2" style="font-size: 0.85rem;">
                     <i class="bi bi-arrow-left"></i> Regresar
                 </a>
+                <a href="{{ route('diagnosticos.edit', $diagnostico->id) }}" class="btn btn-primary btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2 ms-2" style="font-size: 0.85rem;">
+                    <i class="bi bi-pencil-square"></i> Editar
+                </a>
             </div>
+
         </div>
     </div>
 </div>
