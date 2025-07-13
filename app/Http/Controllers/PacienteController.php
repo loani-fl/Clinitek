@@ -142,33 +142,38 @@ class PacienteController extends Controller
 
         return redirect()->route('pacientes.index')->with('success', 'Paciente registrado exitosamente.');
     }
-
-    public function index(Request $request)
+public function index(Request $request)
 {
-    $query = $request->get('search');
-    $all = \App\Models\Paciente::count();
+    $query = $request->input('search', '');
+
+    $pacientesQuery = \App\Models\Paciente::query();
 
     if ($query) {
-        $pacientes = \App\Models\Paciente::where('nombre', 'like', "%{$query}%")
-            ->orWhere('apellidos', 'like', "%{$query}%")
-            ->orWhere('identidad', 'like', "%{$query}%")
-            ->paginate(2)
-            ->appends(['search' => $query]); // mantiene el filtro activo
+        $pacientesQuery->where(function ($q) use ($query) {
+            $q->where('nombre', 'like', "%$query%")
+              ->orWhere('apellidos', 'like', "%$query%")
+              ->orWhere('identidad', 'like', "%$query%");
+        });
+
+        $pacientes = $pacientesQuery->get(); // sin paginar
     } else {
-        $pacientes = \App\Models\Paciente::paginate(2);
+        $pacientes = $pacientesQuery->paginate(2);
     }
 
     if ($request->ajax()) {
         return response()->json([
             'html' => view('pacientes.partials.tabla', compact('pacientes'))->render(),
-            'pagination' => (!$query && method_exists($pacientes, 'links')) ? $pacientes->links('pagination::bootstrap-5')->toHtml() : '',
+            'pagination' => ($pacientes instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                ? $pacientes->links('pagination::bootstrap-5')->render()
+                : '',
             'total' => $pacientes->count(),
-            'all' => $all,
+            'all' => \App\Models\Paciente::count(),
         ]);
     }
 
     return view('pacientes.index', compact('pacientes'));
 }
+
 
 
 
