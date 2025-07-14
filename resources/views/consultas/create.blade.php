@@ -284,8 +284,9 @@
 
 
 
-            <!-- Botones centrados -->
-            <div class="d-flex justify-content-center gap-3 mt-4">
+            <!-- Botones centrados con margen superior aumentado -->
+            <div class="d-flex justify-content-center gap-3 mt-4 mb-4">
+
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-plus-circle"></i> Registrar
                 </button>

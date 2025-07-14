@@ -112,7 +112,7 @@
         @enderror
     </div>
 
-    <!-- ✅ Botones deben ir dentro del form -->
+    <!-- Botones deben ir dentro del form -->
     <div class="d-flex justify-content-center gap-3 mt-4">
         <button type="submit" class="btn btn-success">
             <i class="bi bi-pencil-square"></i> Actualizar Diagnóstico
