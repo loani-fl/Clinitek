@@ -14,19 +14,19 @@ class PacienteController extends Controller
     {
         return view('pacientes.create');
     }
-    
+
     public function createConConsulta($paciente_id, $consulta_id)
     {
         $consulta = Consulta::findOrFail($consulta_id);
-    
+
         if ($consulta->estado !== 'realizada') {
             return redirect()->back()->with('error', 'Antes debe realizarse un diagnóstico para poder crear la orden de examen.');
         }
-    
+
         return view('pacientes.create', compact('paciente_id', 'consulta_id'));
     }
-    
-    
+
+
 
 
     private function validarAnioIdentidad($identidad)
@@ -126,10 +126,10 @@ class PacienteController extends Controller
             'alergias.max' => 'No puede exceder 200 caracteres.',
 
             'historial_quirurgico.regex' => 'Solo se permiten letras y espacios.',
-           
+
             'historial_quirurgico.max' => 'No puede exceder 200 caracteres.',
 
-           
+
         ]);
 
         if (!$this->validarAnioIdentidad($request->identidad)) {
@@ -155,7 +155,7 @@ public function index(Request $request)
               ->orWhere('identidad', 'like', "%$query%");
         });
 
-        $pacientes = $pacientesQuery->get(); // sin paginar
+        $pacientes = $pacientesQuery->get(); // sin paginar si hay búsqueda
     } else {
         $pacientes = $pacientesQuery->paginate(2);
     }
@@ -164,7 +164,7 @@ public function index(Request $request)
         return response()->json([
             'html' => view('pacientes.partials.tabla', compact('pacientes'))->render(),
             'pagination' => ($pacientes instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                ? $pacientes->links('pagination::bootstrap-5')->render()
+                ? $pacientes->links('pagination::bootstrap-5')->toHtml()
                 : '',
             'total' => $pacientes->count(),
             'all' => \App\Models\Paciente::count(),
@@ -186,7 +186,7 @@ public function index(Request $request)
 
         $paciente = Paciente::with('consultas.receta')->findOrFail($id);
     return view('pacientes.show', compact('paciente'));
-    
+
     }
 
     public function edit(Paciente $paciente)
@@ -320,9 +320,20 @@ public function index(Request $request)
         return redirect()->route('pacientes.index')->with('success', 'Paciente actualizado correctamente.');
     }
 
-    public function showRecetas($pacienteId)
-    {
-        $paciente = Paciente::with('recetas')->findOrFail($pacienteId);
-        return view('recetas.show', compact('paciente'));
+    public function showRecetas($pacienteId, Request $request)
+{
+    $paciente = Paciente::findOrFail($pacienteId);
+
+    $recetasQuery = $paciente->recetas()->with('consulta.medico')->orderBy('recetas.created_at', 'desc');
+
+    if ($request->filled('fecha')) {
+        $recetasQuery->whereDate('recetas.created_at', $request->fecha);
     }
+
+    $recetas = $recetasQuery->get();
+
+    return view('recetas.show', compact('paciente', 'recetas'));
+}
+
+
 }

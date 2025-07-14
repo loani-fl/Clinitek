@@ -12,11 +12,16 @@ class Receta extends Model
     protected $fillable = [
         'consulta_id',
         'detalles',
-    
     ];
 
     public function consulta()
     {
         return $this->belongsTo(Consulta::class);
+    }
+
+    // Relación con el diagnóstico
+    public function diagnostico()
+    {
+        return $this->hasOne(Diagnostico::class);
     }
 }
