@@ -267,24 +267,55 @@
                 @enderror
             </div>
 
-            <div class="col-md-6 mt-3">
-                <label for="motivo" class="@error('motivo') is-invalid @enderror">Motivo de la consulta <span class="text-danger">*</span></label>
-                <textarea name="motivo" maxlength="250" rows="2" required
-                    class="form-control form-control-sm @error('motivo') is-invalid @enderror">{{ old('motivo', $consulta->motivo) }}</textarea>
-                @error('motivo')
-                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                @enderror
-            </div>
+           <div class="col-md-6 mt-3">
+    <label for="motivo" class="fw-bold">
+        Motivo de la consulta <span class="text-danger">*</span>
+    </label>
+    <textarea name="motivo" id="motivo" maxlength="250" rows="2" required
+        class="form-control form-control-sm @error('motivo') is-invalid @enderror">{{ old('motivo', $consulta->motivo) }}</textarea>
+    @error('motivo')
+        <div class="invalid-feedback d-block">{{ $message }}</div>
+    @enderror
+</div>
 
-            <div class="col-md-6 mt-3">
-                <label for="sintomas" class="@error('sintomas') is-invalid @enderror">Síntomas <span class="text-danger">*</span></label>
-                <textarea name="sintomas" maxlength="250" rows="2" required
-                    class="form-control form-control-sm @error('sintomas') is-invalid @enderror">{{ old('sintomas', $consulta->sintomas) }}</textarea>
-                @error('sintomas')
-                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                @enderror
-            </div>
+<div class="col-md-6 mt-3">
+    <label for="sintomas" class="fw-bold">
+        Síntomas <span class="text-danger">*</span>
+    </label>
+    <textarea name="sintomas" id="sintomas" maxlength="250" rows="2" required
+        class="form-control form-control-sm @error('sintomas') is-invalid @enderror">{{ old('sintomas', $consulta->sintomas) }}</textarea>
+    @error('sintomas')
+        <div class="invalid-feedback d-block">{{ $message }}</div>
+    @enderror
+</div>
+
         </div>
+
+{{-- Dentro del <form> debajo de los campos existentes, antes de los botones: --}}
+<div id="contenedor_total_pagar" style="display:none;">
+    <div class="col-md-2">
+        <label for="total_pagar">Total a pagar <span id="total_asterisco" class="text-danger">*</span></label>
+        <div class="input-group input-group-sm">
+            <span class="input-group-text">L.</span>
+            <input 
+                type="number" 
+                step="0.01" 
+                min="0" 
+                id="total_pagar" 
+                name="total_pagar" 
+                class="form-control @error('total_pagar') is-invalid @enderror" 
+                value="{{ old('total_pagar', $consulta->total_pagar) }}" 
+                readonly
+                required
+            >
+        </div>
+        @error('total_pagar')
+            <div class="invalid-feedback d-block">{{ $message }}</div>
+        @enderror
+    </div>
+</div>
+
+
 
         <div class="d-flex justify-content-center gap-3 mt-2 flex-wrap">
             <button type="submit" class="btn btn-primary d-flex align-items-center" title="Guardar los cambios">
@@ -302,7 +333,15 @@
 
 @php
 use Carbon\Carbon;
-$horaFormateada = Carbon::createFromFormat('H:i:s', $consulta->hora)->format('g:i A');
+
+$horaFormateada = null;
+if (!empty($consulta->hora)) {
+    try {
+        $horaFormateada = Carbon::createFromFormat('H:i:s', $consulta->hora)->format('g:i A');
+    } catch (\Exception $e) {
+        $horaFormateada = null;
+    }
+}
 @endphp
 
 <script>
@@ -403,7 +442,8 @@ function cargarHorasDisponiblesEditar(horaActual) {
 document.addEventListener('DOMContentLoaded', function() {
     actualizarEspecialidad();
 
-    const horaConsulta = "{{ old('hora', $horaFormateada) }}"; // 👈 aquí insertamos la hora formateada
+    
+    const horaConsulta = @json(old('hora', $horaFormateada ?? '')); // 👈 aquí insertamos la hora formateada
     cargarHorasDisponiblesEditar(horaConsulta);
 
     document.getElementById('medico').addEventListener('change', function() {
@@ -420,26 +460,61 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-document.querySelector('form').addEventListener('submit', function(e) {
-    const motivo = this.motivo.value.trim();
-    const sintomas = this.sintomas.value.trim();
 
-    const regex = /^[a-zA-Z0-9\s.,áéíóúÁÉÍÓÚñÑ-]+$/;
 
-    if (!regex.test(motivo)) {
-        e.preventDefault();
-        alert('El motivo solo puede contener letras, números, espacios, comas, puntos y guiones.');
-        this.motivo.focus();
-        return false;
+const preciosPorEspecialidad = {
+    "Cardiología": 900.00,
+    "Pediatría": 500.00,
+    "Dermatología": 900.00,
+    "Medicina General": 800.00,
+    "Psiquiatría": 500.00,
+    "Neurología": 1000.00,
+    "Radiología": 700.00
+};
+
+const contenedorTotalPagar = document.getElementById('contenedor_total_pagar');
+const totalPagarInput = document.getElementById('total_pagar');
+const horaSelect = document.getElementById('hora');
+const medicoSelect = document.getElementById('medico');
+
+function actualizarVisibilidadTotalPagar() {
+    const horaSeleccionada = horaSelect.value;
+
+    if (horaSeleccionada === 'inmediata') {
+        contenedorTotalPagar.style.display = 'block';
+
+        const selectedMedico = medicoSelect.options[medicoSelect.selectedIndex];
+        const especialidad = selectedMedico ? selectedMedico.getAttribute('data-especialidad') : '';
+
+        if (especialidad && preciosPorEspecialidad.hasOwnProperty(especialidad)) {
+            totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
+        } else {
+            totalPagarInput.value = '';
+        }
+    } else {
+        contenedorTotalPagar.style.display = 'none';
+        totalPagarInput.value = '';
     }
+}
 
-    if (!regex.test(sintomas)) {
-        e.preventDefault();
-        alert('Los síntomas solo pueden contener letras, números, espacios, comas, puntos y guiones.');
-        this.sintomas.focus();
-        return false;
+// Escucha los cambios
+horaSelect.addEventListener('change', actualizarVisibilidadTotalPagar);
+
+medicoSelect.addEventListener('change', function () {
+    if (horaSelect.value === 'inmediata') {
+        actualizarVisibilidadTotalPagar();
     }
 });
+
+// Ejecuta al cargar
+document.addEventListener('DOMContentLoaded', function () {
+    if (horaSelect.value === 'inmediata') {
+        actualizarVisibilidadTotalPagar();
+    }
+});
+
+
+
 </script>
 
 
