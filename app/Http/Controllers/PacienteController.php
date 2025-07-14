@@ -10,25 +10,25 @@ use Carbon\Carbon;
 
 class PacienteController extends Controller
 {
+    // Mostrar formulario para crear nuevo paciente
     public function create()
     {
         return view('pacientes.create');
     }
-    
+
+    // Crear paciente relacionado a una consulta (solo si la consulta está realizada)
     public function createConConsulta($paciente_id, $consulta_id)
     {
         $consulta = Consulta::findOrFail($consulta_id);
-    
+
         if ($consulta->estado !== 'realizada') {
             return redirect()->back()->with('error', 'Antes debe realizarse un diagnóstico para poder crear la orden de examen.');
         }
-    
+
         return view('pacientes.create', compact('paciente_id', 'consulta_id'));
     }
-    
-    
 
-
+    // Validar año contenido en identidad (entre 1930 y año actual)
     private function validarAnioIdentidad($identidad)
     {
         $anio = (int)substr($identidad, 4, 4);
@@ -36,6 +36,7 @@ class PacienteController extends Controller
         return ($anio >= 1930 && $anio <= $anioActual);
     }
 
+    // Guardar nuevo paciente
     public function store(Request $request)
     {
         $anioActual = date('Y');
@@ -72,6 +73,7 @@ class PacienteController extends Controller
             'alergias' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
             'historial_quirurgico' => ['nullable', 'regex:/^[\pL\s]*$/u', 'max:200'],
         ], [
+            // Mensajes personalizados de validación
             'nombre.required' => 'El nombre es obligatorio.',
             'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
             'nombre.max' => 'El nombre no puede exceder 50 caracteres.',
@@ -126,10 +128,7 @@ class PacienteController extends Controller
             'alergias.max' => 'No puede exceder 200 caracteres.',
 
             'historial_quirurgico.regex' => 'Solo se permiten letras y espacios.',
-           
             'historial_quirurgico.max' => 'No puede exceder 200 caracteres.',
-
-           
         ]);
 
         if (!$this->validarAnioIdentidad($request->identidad)) {
@@ -142,58 +141,54 @@ class PacienteController extends Controller
 
         return redirect()->route('pacientes.index')->with('success', 'Paciente registrado exitosamente.');
     }
-public function index(Request $request)
-{
-    $query = $request->input('search', '');
 
-    $pacientesQuery = \App\Models\Paciente::query();
+    // Listar pacientes, con búsqueda y paginación
+    public function index(Request $request)
+    {
+        $query = $request->input('search', '');
 
-    if ($query) {
-        $pacientesQuery->where(function ($q) use ($query) {
-            $q->where('nombre', 'like', "%$query%")
-              ->orWhere('apellidos', 'like', "%$query%")
-              ->orWhere('identidad', 'like', "%$query%");
-        });
+        $pacientesQuery = Paciente::query();
 
-        $pacientes = $pacientesQuery->get(); // sin paginar
-    } else {
-        $pacientes = $pacientesQuery->paginate(2);
+        if ($query) {
+            $pacientesQuery->where(function ($q) use ($query) {
+                $q->where('nombre', 'like', "%$query%")
+                  ->orWhere('apellidos', 'like', "%$query%")
+                  ->orWhere('identidad', 'like', "%$query%");
+            });
+
+            $pacientes = $pacientesQuery->get(); // sin paginar para búsqueda
+        } else {
+            $pacientes = $pacientesQuery->paginate(2);
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('pacientes.partials.tabla', compact('pacientes'))->render(),
+                'pagination' => ($pacientes instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                    ? $pacientes->links('pagination::bootstrap-5')->render()
+                    : '',
+                'total' => $pacientes->count(),
+                'all' => Paciente::count(),
+            ]);
+        }
+
+        return view('pacientes.index', compact('pacientes'));
     }
 
-    if ($request->ajax()) {
-        return response()->json([
-            'html' => view('pacientes.partials.tabla', compact('pacientes'))->render(),
-            'pagination' => ($pacientes instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                ? $pacientes->links('pagination::bootstrap-5')->render()
-                : '',
-            'total' => $pacientes->count(),
-            'all' => \App\Models\Paciente::count(),
-        ]);
-    }
-
-    return view('pacientes.index', compact('pacientes'));
-}
-
-
-
-
+    // Mostrar detalle de paciente con diagnosticos y consultas
     public function show($id)
     {
-        $paciente = Paciente::findOrFail($id);
-        $paciente->load('diagnostico');
-
+        $paciente = Paciente::with('diagnostico', 'consultas.receta')->findOrFail($id);
         return view('pacientes.show', compact('paciente'));
-
-        $paciente = Paciente::with('consultas.receta')->findOrFail($id);
-    return view('pacientes.show', compact('paciente'));
-    
     }
 
+    // Mostrar formulario para editar paciente
     public function edit(Paciente $paciente)
     {
         return view('pacientes.edit', compact('paciente'));
     }
 
+    // Actualizar paciente
     public function update(Request $request, Paciente $paciente)
     {
         $anioActual = date('Y');
@@ -237,6 +232,7 @@ public function index(Request $request)
             'alergias' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
             'historial_quirurgico' => ['nullable', 'regex:/^[\pL\s]*$/u', 'max:200'],
         ], [
+            // Mensajes personalizados (los mismos que en store)
             'nombre.required' => 'El nombre es obligatorio.',
             'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
             'nombre.max' => 'El nombre no puede exceder 50 caracteres.',
@@ -267,7 +263,6 @@ public function index(Request $request)
             'correo.email' => 'El correo debe contener un "@" y un punto "." en el dominio.',
 
             'correo.unique' => 'Este correo electrónico ya está registrado.',
-
 
             'tipo_sangre.in' => 'Seleccione un tipo de sangre válido.',
 
@@ -320,6 +315,7 @@ public function index(Request $request)
         return redirect()->route('pacientes.index')->with('success', 'Paciente actualizado correctamente.');
     }
 
+    // Mostrar recetas de un paciente
     public function showRecetas($pacienteId)
     {
         $paciente = Paciente::with('recetas')->findOrFail($pacienteId);
