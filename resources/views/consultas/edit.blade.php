@@ -2,7 +2,6 @@
 
 @section('content')
 
-
 <style>
     /* Estilo para el mensaje de éxito */
     .alert-success-custom {
@@ -18,7 +17,7 @@
         margin-bottom: 1rem;
     }
     body {
-        padding-top: 40px; /* Espacio suficiente para la navbar fija (ajusta según altura real) */
+        padding-top: 40px; /* Espacio para navbar fija */
         margin: 0;
         overflow-x: hidden;
         max-width: 100%;
@@ -45,20 +44,9 @@
         overflow: hidden;
     }
 
-    .table-responsive {
-        overflow-x: auto;
-        max-width: 100%;
-    }
-
     input, select, textarea {
         max-width: 100%;
         box-sizing: border-box;
-    }
-
-    .valid-feedback {
-        display: block;
-        font-size: 0.75rem;
-        color: #198754;
     }
 
     .form-control.is-valid {
@@ -78,18 +66,6 @@
     form {
         padding-left: 10px;
         padding-right: 10px;
-    }
-
-    footer {
-        position: static;
-        width: 100%;
-        background-color: #f8f9fa;
-        padding: 10px 0;
-        text-align: center;
-        font-size: 0.9rem;
-        color: #6c757d;
-        border-top: 1px solid #dee2e6;
-        margin-top: 40px;
     }
 
     .custom-card::before {
@@ -124,13 +100,13 @@
     }
 
     .no-select {
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    -moz-user-select: none !important;
-    -ms-user-select: none !important;
-    pointer-events: none !important;
-    cursor: default;
-}
+        user-select: none !important;
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        pointer-events: none !important;
+        cursor: default;
+    }
 </style>
 
 <!-- Barra de navegación fija -->
@@ -147,393 +123,401 @@
     </div>
 </div>
 
-
-
 <!-- Formulario más compacto -->
 <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px; z-index:1;">
     <div class="card-header text-center py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
         <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Editar consulta médica</h5>
     </div>
 
-
-<h5 class="text-dark fw-bold mt-4 mb-3">Información del paciente</h5>
-
-<div class="row g-3">
-    <div class="col-md-4">
-        <label>Paciente</label>
-        <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
-            <span style="pointer-events: none;">{{ $consulta->paciente->nombre }} {{ $consulta->paciente->apellidos }}</span>
-        </div>
-    </div>
-
-
-
-
-    <div class="col-md-3">
-        <label>Identidad</label>
-        <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
-            <span style="pointer-events: none;">{{ $consulta->paciente->identidad }}</span>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <label>Fecha de nacimiento</label>
-        <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
-            <span style="pointer-events: none;">{{ \Carbon\Carbon::parse($consulta->paciente->fecha_nacimiento)->format('d/m/Y') }}</span>
-        </div>
-    </div>
-
-    <div class="col-md-2">
-        <label>Género</label>
-        <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
-            <span style="pointer-events: none;">{{ $consulta->paciente->genero }}</span>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <label>Teléfono</label>
-        <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
-            <span style="pointer-events: none;">{{ $consulta->paciente->telefono }}</span>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <label>Correo electrónico</label>
-        <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
-            <span style="pointer-events: none;">{{ $consulta->paciente->correo }}</span>
-        </div>
-    </div>
-
-    <div class="col-md-6">
-        <label>Dirección</label>
-        <div class="form-control form-control-sm bg-light no-select" style="min-height: 48px;" aria-hidden="true">
-            <span style="pointer-events: none;">{{ $consulta->paciente->direccion }}</span>
-        </div>
-    </div>
-</div>
-@php
-$estado = strtolower($consulta->estado);
-
-$siguienteEstado = '';
-$claseBoton = '';
-$iconoBoton = '';
-$textoBoton = '';
-
-if ($estado === 'pendiente') {
-    $siguienteEstado = 'cancelada';
-    $claseBoton = 'btn-danger';
-    $iconoBoton = 'bi-x-circle';
-    $textoBoton = 'Cancelar';
-} elseif ($estado === 'cancelada') {
-    $siguienteEstado = 'pendiente';
-    $claseBoton = 'btn-warning';
-    $iconoBoton = 'bi-clock-history';
-    $textoBoton = 'Volver a Pendiente';
-}
-@endphp
-
-<div class="d-flex justify-content-between align-items-center mt-4 mb-3">
-    <h5 class="text-dark fw-bold mb-0">Información de la consulta médica</h5>
-
-   @if ($siguienteEstado)
-<form action="{{ route('consultas.cambiarEstado', $consulta->id) }}" method="POST" class="d-inline">
-    @csrf
-    @method('PATCH')
-    <input type="hidden" name="estado" value="{{ $siguienteEstado }}">
-    <button type="submit" class="btn {{ $claseBoton }} btn-sm">
-        <i class="bi {{ $iconoBoton }}"></i> {{ $textoBoton }}
-    </button>
-</form>
-@endif
-
-</div>
-
-
-
-<form action="{{ route('consultas.update', $consulta->id) }}" method="POST">
-    @csrf
-    @method('PUT')
-
-    <input type="hidden" name="paciente_id" value="{{ $consulta->paciente_id }}">
-    <input type="hidden" name="especialidad" value="{{ old('especialidad', $consulta->especialidad) }}">
+    <h5 class="text-dark fw-bold mt-4 mb-3">Información del paciente</h5>
 
     <div class="row g-3">
-        <div class="col-md-2">
-            <label for="fecha">Fecha <span class="text-danger">*</span></label>
-            <input type="date" id="fecha_consulta" name="fecha" 
-                min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
-                max="{{ \Carbon\Carbon::now()->addMonth()->format('Y-m-d') }}"
-                value="{{ old('fecha', $consulta->fecha) }}" 
-                class="form-control form-control-sm @error('fecha') is-invalid @enderror" required>
-            @error('fecha')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
-
+        <!-- Aquí va la info paciente -->
         <div class="col-md-4">
-            <label for="medico">Médico que atiende <span class="text-danger">*</span></label>
-            <select name="medico_id" id="medico" class="form-select form-select-sm @error('medico_id') is-invalid @enderror" required>
-                <option value="">-- Médico que atiende --</option>
-                @foreach($medicos as $m)
-                    <option 
-                        value="{{ $m->id }}" 
-                        data-especialidad="{{ $m->especialidad }}"
-                        {{ (old('medico_id', $consulta->medico_id) == $m->id) ? 'selected' : '' }}>
-                        {{ $m->nombre }} {{ $m->apellidos }}
-                    </option>
-                @endforeach
-            </select>
-            @error('medico_id')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+            <label>Paciente</label>
+            <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
+                <span style="pointer-events: none;">{{ $consulta->paciente->nombre }} {{ $consulta->paciente->apellidos }}</span>
+            </div>
         </div>
-
         <div class="col-md-3">
-            <label for="especialidad">Especialidad</label>
-            <label id="especialidad" class="form-control form-control-sm bg-light"></label>
+            <label>Identidad</label>
+            <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
+                <span style="pointer-events: none;">{{ $consulta->paciente->identidad }}</span>
+            </div>
         </div>
-
         <div class="col-md-3">
-            <label for="hora">Hora <span class="text-danger">*</span></label>
-            <select id="hora" name="hora" class="form-select form-select-sm @error('hora') is-invalid @enderror" required>
-                {{-- La opción inicial la pondrá JS con la hora ocupada --}}
-            </select>
-            @error('hora')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+            <label>Fecha de nacimiento</label>
+            <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
+                <span style="pointer-events: none;">{{ \Carbon\Carbon::parse($consulta->paciente->fecha_nacimiento)->format('d/m/Y') }}</span>
+            </div>
         </div>
+        <div class="col-md-2">
+            <label>Género</label>
+            <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
+                <span style="pointer-events: none;">{{ $consulta->paciente->genero }}</span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label>Teléfono</label>
+            <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
+                <span style="pointer-events: none;">{{ $consulta->paciente->telefono }}</span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label>Correo electrónico</label>
+            <div class="form-control form-control-sm bg-light no-select" aria-hidden="true">
+                <span style="pointer-events: none;">{{ $consulta->paciente->correo }}</span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label>Dirección</label>
+            <div class="form-control form-control-sm bg-light no-select" style="min-height: 48px;" aria-hidden="true">
+                <span style="pointer-events: none;">{{ $consulta->paciente->direccion }}</span>
+            </div>
+        </div>
+    </div>
 
-      <div class="col-md-6 mt-3">
-    <label for="motivo">Motivo de la consulta <span class="text-danger">*</span></label>
-    <textarea name="motivo" maxlength="250" rows="2"
+    @php
+    $estado = strtolower($consulta->estado);
+
+    $siguienteEstado = '';
+    $claseBoton = '';
+    $iconoBoton = '';
+    $textoBoton = '';
+
+    if ($estado === 'pendiente') {
+        $siguienteEstado = 'cancelada';
+        $claseBoton = 'btn-danger';
+        $iconoBoton = 'bi-x-circle';
+        $textoBoton = 'Cancelar';
+    } elseif ($estado === 'cancelada') {
+        $siguienteEstado = 'pendiente';
+        $claseBoton = 'btn-warning';
+        $iconoBoton = 'bi-clock-history';
+        $textoBoton = 'Volver a Pendiente';
+    }
+    @endphp
+
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+        <h5 class="text-dark fw-bold mb-0">Información de la consulta médica</h5>
+
+       @if ($siguienteEstado)
+    <form action="{{ route('consultas.cambiarEstado', $consulta->id) }}" method="POST" class="d-inline">
+        @csrf
+        @method('PATCH')
+        <input type="hidden" name="estado" value="{{ $siguienteEstado }}">
+        <button type="submit" class="btn {{ $claseBoton }} btn-sm">
+            <i class="bi {{ $iconoBoton }}"></i> {{ $textoBoton }}
+        </button>
+    </form>
+    @endif
+
+    </div>
+
+    <form action="{{ route('consultas.update', $consulta->id) }}" method="POST" novalidate>
+        @csrf
+        @method('PUT')
+
+        <input type="hidden" name="paciente_id" value="{{ $consulta->paciente_id }}">
+        <input type="hidden" name="especialidad" value="{{ old('especialidad', $consulta->especialidad) }}">
+
+        <div class="row g-3">
+            <div class="col-md-2">
+                <label for="fecha" class="@error('fecha') is-invalid @enderror">Fecha <span class="text-danger">*</span></label>
+                <input type="date" id="fecha_consulta" name="fecha" 
+                    min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
+                    max="{{ \Carbon\Carbon::now()->addMonth()->format('Y-m-d') }}"
+                    value="{{ old('fecha', $consulta->fecha) }}" 
+                    class="form-control form-control-sm @error('fecha') is-invalid @enderror" required>
+                @error('fecha')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="col-md-4">
+                <label for="medico" class="@error('medico_id') is-invalid @enderror">Médico que atiende <span class="text-danger">*</span></label>
+                <select name="medico_id" id="medico" class="form-select form-select-sm @error('medico_id') is-invalid @enderror" required>
+                    <option value="">-- Médico que atiende --</option>
+                    @foreach($medicos as $m)
+                        <option 
+                            value="{{ $m->id }}" 
+                            data-especialidad="{{ $m->especialidad }}"
+                            {{ (old('medico_id', $consulta->medico_id) == $m->id) ? 'selected' : '' }}>
+                            {{ $m->nombre }} {{ $m->apellidos }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('medico_id')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="col-md-3">
+                <label for="especialidad">Especialidad</label>
+                <label id="especialidad" class="form-control form-control-sm bg-light"></label>
+            </div>
+
+            <div class="col-md-3">
+                <label for="hora" class="@error('hora') is-invalid @enderror">Hora <span class="text-danger">*</span></label>
+                <select id="hora" name="hora" class="form-select form-select-sm @error('hora') is-invalid @enderror" required>
+                    {{-- Opciones las carga JS --}}
+                </select>
+                @error('hora')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+           <div class="col-md-6 mt-3">
+    <label for="motivo" class="fw-bold">
+        Motivo de la consulta <span class="text-danger">*</span>
+    </label>
+    <textarea name="motivo" id="motivo" maxlength="250" rows="2" required
         class="form-control form-control-sm @error('motivo') is-invalid @enderror">{{ old('motivo', $consulta->motivo) }}</textarea>
     @error('motivo')
-        <div class="invalid-feedback">{{ $message }}</div>
+        <div class="invalid-feedback d-block">{{ $message }}</div>
     @enderror
 </div>
 
 <div class="col-md-6 mt-3">
-    <label for="sintomas">Síntomas <span class="text-danger">*</span></label>
-    <textarea name="sintomas" maxlength="250" rows="2"
+    <label for="sintomas" class="fw-bold">
+        Síntomas <span class="text-danger">*</span>
+    </label>
+    <textarea name="sintomas" id="sintomas" maxlength="250" rows="2" required
         class="form-control form-control-sm @error('sintomas') is-invalid @enderror">{{ old('sintomas', $consulta->sintomas) }}</textarea>
     @error('sintomas')
-        <div class="invalid-feedback">{{ $message }}</div>
+        <div class="invalid-feedback d-block">{{ $message }}</div>
     @enderror
 </div>
 
-    </div>
-<form action="{{ route('consultas.update', $consulta->id) }}" method="POST">
-    @csrf
-    @method('PUT')
+        </div>
 
-    <!-- campos -->
-
-    <div class="d-flex justify-content-center gap-3 mt-2 flex-wrap">
-        <button type="submit" class="btn btn-primary d-flex align-items-center" title="Guardar los cambios">
-            <i class="bi bi-pencil-square me-2"></i> Actualizar
-        </button>
-        <button type="button" id="restablecerBtn" class="btn btn-warning d-flex align-items-center" title="Restablecer los campos">
-            <i class="bi bi-arrow-counterclockwise me-2"></i> Restablecer
-        </button>
-        <a href="{{ route('consultas.index') }}" class="btn btn-success d-flex align-items-center" title="Volver al listado">
-            <i class="bi bi-arrow-left me-2"></i> Regresar
-        </a>
+{{-- Dentro del <form> debajo de los campos existentes, antes de los botones: --}}
+<div id="contenedor_total_pagar" style="display:none;">
+    <div class="col-md-2">
+        <label for="total_pagar">Total a pagar <span id="total_asterisco" class="text-danger">*</span></label>
+        <div class="input-group input-group-sm">
+            <span class="input-group-text">L.</span>
+            <input 
+                type="number" 
+                step="0.01" 
+                min="0" 
+                id="total_pagar" 
+                name="total_pagar" 
+                class="form-control @error('total_pagar') is-invalid @enderror" 
+                value="{{ old('total_pagar', $consulta->total_pagar) }}" 
+                readonly
+                required
+            >
+        </div>
+        @error('total_pagar')
+            <div class="invalid-feedback d-block">{{ $message }}</div>
+        @enderror
     </div>
-</form>
+</div>
+
+
+
+        <div class="d-flex justify-content-center gap-3 mt-2 flex-wrap">
+            <button type="submit" class="btn btn-primary d-flex align-items-center" title="Guardar los cambios">
+                <i class="bi bi-pencil-square me-2"></i> Actualizar
+            </button>
+            <button type="button" id="restablecerBtn" class="btn btn-warning d-flex align-items-center" title="Restablecer los campos">
+                <i class="bi bi-arrow-counterclockwise me-2"></i> Restablecer
+            </button>
+            <a href="{{ route('consultas.index') }}" class="btn btn-success d-flex align-items-center" title="Volver al listado">
+                <i class="bi bi-arrow-left me-2"></i> Regresar
+            </a>
+        </div>
+    </form>
+</div>
+
+@php
+use Carbon\Carbon;
+
+$horaFormateada = null;
+if (!empty($consulta->hora)) {
+    try {
+        $horaFormateada = Carbon::createFromFormat('H:i:s', $consulta->hora)->format('g:i A');
+    } catch (\Exception $e) {
+        $horaFormateada = null;
+    }
+}
+@endphp
 
 
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const medicoSelect = document.getElementById('medico');
+// Función para convertir hora 12h a 24h (ej: 2:30 PM -> 14:30:00)
+function hora12a24(hora12) {
+    if (hora12 === 'inmediata') return null;
+    const [hora, minutoPeriodo] = hora12.split(':');
+    const [minuto, periodo] = minutoPeriodo.split(' ');
+    let h = parseInt(hora);
+    if (periodo === 'PM' && h < 12) h += 12;
+    if (periodo === 'AM' && h === 12) h = 0;
+    return `${h.toString().padStart(2, '0')}:${minuto}:00`;
+}
+
+// Carga especialidad según médico seleccionado
+function actualizarEspecialidad() {
+    const selectMedico = document.getElementById('medico');
     const especialidadLabel = document.getElementById('especialidad');
-    const fechaConsultaInput = document.getElementById('fecha_consulta');
+    const medicoSeleccionado = selectMedico.options[selectMedico.selectedIndex];
+    const especialidad = medicoSeleccionado ? medicoSeleccionado.getAttribute('data-especialidad') : '';
+    especialidadLabel.textContent = especialidad || '';
+}
+
+// Carga las horas disponibles y marca las ocupadas
+function cargarHorasDisponiblesEditar(horaActual) {
+    const medico = document.getElementById('medico').value;
+    const fecha = document.getElementById('fecha_consulta').value;
     const horaSelect = document.getElementById('hora');
-    const motivoInput = document.querySelector('textarea[name="motivo"]');
-    const sintomasInput = document.querySelector('textarea[name="sintomas"]');
-    const restablecerBtn = document.getElementById('restablecerBtn');
 
-    const consultaHoraOriginal = "{{ $consulta->hora }}"; // Ejemplo: "12:30 PM"
-    const consultaMedicoOriginal = "{{ $consulta->medico_id }}";
-    const consultaFechaOriginal = "{{ $consulta->fecha }}";
-    const consultaMotivoOriginal = `{{ $consulta->motivo }}`;
-    const consultaSintomasOriginal = `{{ $consulta->sintomas }}`;
-    
+    horaSelect.innerHTML = '';
 
-    function hora12a24(hora12) {
-        const [horaMinuto, periodo] = hora12.split(' ');
-        let [hora, minuto] = horaMinuto.split(':').map(Number);
-        if (periodo === 'PM' && hora !== 12) hora += 12;
-        if (periodo === 'AM' && hora === 12) hora = 0;
-        return `${hora.toString().padStart(2, '0')}:${minuto.toString().padStart(2, '0')}`;
+    // Opción inicial deshabilitada
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Seleccione una hora';
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    horaSelect.appendChild(defaultOption);
+
+    const inmediataOption = document.createElement('option');
+    inmediataOption.value = 'inmediata';
+    inmediataOption.textContent = 'Inmediata';
+    horaSelect.appendChild(inmediataOption);
+
+    if (!medico || !fecha) return;
+
+    const horas = [];
+    let minutos = 8 * 60;
+    const fin = (16 * 60) + 30;
+
+    while (minutos <= fin) {
+        const h = Math.floor(minutos / 60);
+        const m = minutos % 60;
+        const periodo = h >= 12 ? 'PM' : 'AM';
+        const hora12 = (h % 12 === 0 ? 12 : h % 12);
+        const minutoStr = m.toString().padStart(2, '0');
+        horas.push(`${hora12}:${minutoStr} ${periodo}`);
+        minutos += 30;
     }
 
-    function cargarHorasDisponibles() {
-        const medico = medicoSelect.value;
-        const fecha = fechaConsultaInput.value;
+    fetch(`/horas-ocupadas?medico_id=${encodeURIComponent(medico)}&fecha=${encodeURIComponent(fecha)}`)
+        .then(res => res.json())
+        .then(horasOcupadas => {
+            horas.forEach(hora12 => {
+                const hora24 = hora12a24(hora12);
+                const option = document.createElement('option');
+                option.value = hora12;
+                option.textContent = hora12;
 
-        horaSelect.innerHTML = '';
-        horaSelect.appendChild(new Option('-- Selecciona hora --', ''));
-        horaSelect.appendChild(new Option('Inmediata', 'inmediata'));
+                if (horasOcupadas.includes(hora24) && hora12 !== horaActual) {
+                    option.disabled = true;
+                    option.textContent += ' (Ocupada)';
+                }
 
-        if (!medico || !fecha) return;
-
-        const horas = [];
-        let minutos = 8 * 60;
-        const fin = (16 * 60) + 30;
-        while (minutos <= fin) {
-            const h = Math.floor(minutos / 60);
-            const m = minutos % 60;
-            const periodo = h >= 12 ? 'PM' : 'AM';
-            const hora12 = (h % 12 === 0 ? 12 : h % 12) + ':' + m.toString().padStart(2, '0') + ' ' + periodo;
-            horas.push(hora12);
-            minutos += 30;
-        }
-
-        fetch(`/horas-ocupadas?medico_id=${encodeURIComponent(medico)}&fecha=${encodeURIComponent(fecha)}`)
-            .then(res => res.json())
-            .then(horasOcupadas => {
-                const horasOcupadasSinSegundos = horasOcupadas.map(h => h.slice(0, 5));
-                const horaOriginal24 = consultaHoraOriginal ? hora12a24(consultaHoraOriginal) : null;
-
-                horas.forEach(hora12 => {
-                    const hora24 = hora12a24(hora12);
-                    const option = document.createElement('option');
-                    option.value = hora24;
-
-                    let textoVisible = hora12;
-                    let estaOcupada = horasOcupadasSinSegundos.includes(hora24);
-
-                    if (horaOriginal24 === hora24) {
-                        option.selected = true;
-                        if (estaOcupada) textoVisible += ' ocupada';
-                    } else if (estaOcupada) {
-                        textoVisible += ' ocupada';
-                        option.disabled = true;
-                    }
-
-                    option.textContent = textoVisible;
-                    horaSelect.appendChild(option);
-                });
-            })
-            .catch(() => {
-                horas.forEach(hora12 => {
-                    const option = new Option(hora12, hora12a24(hora12));
-                    horaSelect.appendChild(option);
-                });
+                horaSelect.appendChild(option);
             });
-    }
 
-    function actualizarEspecialidad() {
-        const selected = medicoSelect.options[medicoSelect.selectedIndex];
-        const especialidad = selected ? selected.getAttribute('data-especialidad') : '';
-        especialidadLabel.textContent = especialidad || '';
-    }
+            if (horaActual) {
+                const optMatch = Array.from(horaSelect.options).find(opt => opt.value === horaActual);
+                if (optMatch) {
+                    optMatch.disabled = false;
+                    optMatch.textContent = horaActual; 
+                    optMatch.selected = true;
+                }
+            }
+        })
+        .catch(err => {
+            console.error('Error cargando horas:', err);
+            horas.forEach(hora12 => {
+                const option = document.createElement('option');
+                option.value = hora12;
+                option.textContent = hora12;
+                horaSelect.appendChild(option);
+            });
+        });
+}
 
-    medicoSelect.addEventListener('change', () => {
-        actualizarEspecialidad();
-        cargarHorasDisponibles();
-    });
-
-    fechaConsultaInput.addEventListener('change', cargarHorasDisponibles);
-
-    restablecerBtn.addEventListener('click', () => {
-        // Restaurar valores originales
-        medicoSelect.value = consultaMedicoOriginal;
-        fechaConsultaInput.value = consultaFechaOriginal;
-        motivoInput.value = consultaMotivoOriginal;
-        sintomasInput.value = consultaSintomasOriginal;
-
-        actualizarEspecialidad();
-        cargarHorasDisponibles();
-    });
-
+document.addEventListener('DOMContentLoaded', function() {
     actualizarEspecialidad();
-    cargarHorasDisponibles();
-});
 
-document.querySelectorAll('.no-select').forEach(el => {
-    el.addEventListener('contextmenu', e => e.preventDefault());
-    el.addEventListener('keydown', e => e.preventDefault());
-    el.addEventListener('copy', e => e.preventDefault());
-    el.addEventListener('cut', e => e.preventDefault());
-});
-document.addEventListener('DOMContentLoaded', function () {
-    const mensaje = document.getElementById('mensaje-exito');
-    if (mensaje) {
-        setTimeout(() => {
-            // Si usas Bootstrap 5:
-            const bsAlert = bootstrap.Alert.getOrCreateInstance(mensaje);
-            bsAlert.close();
+    
+    const horaConsulta = @json(old('hora', $horaFormateada ?? '')); // 👈 aquí insertamos la hora formateada
+    cargarHorasDisponiblesEditar(horaConsulta);
 
-            // Si quieres solo ocultar sin animación, usa esta línea en vez de las dos anteriores:
-            // mensaje.style.display = 'none';
-        }, 6000);
-    }
+    document.getElementById('medico').addEventListener('change', function() {
+        actualizarEspecialidad();
+        cargarHorasDisponiblesEditar(null);
+    });
+
+    document.getElementById('fecha_consulta').addEventListener('change', function() {
+        cargarHorasDisponiblesEditar(null);
+    });
+
+    document.getElementById('restablecerBtn').addEventListener('click', function() {
+        location.reload();
+    });
 });
 
 
-const estadoInput = document.getElementById('estadoInput'); // input hidden en el formulario del botón cambiarEstado
-const botonEstado = estadoInput.closest('form').querySelector('button[type="submit"]');
 
-restablecerBtn.addEventListener('click', () => {
-    // Restaurar valores originales
-    medicoSelect.value = consultaMedicoOriginal;
-    fechaConsultaInput.value = consultaFechaOriginal;
-    motivoInput.value = consultaMotivoOriginal;
-    sintomasInput.value = consultaSintomasOriginal;
+const preciosPorEspecialidad = {
+    "Cardiología": 900.00,
+    "Pediatría": 500.00,
+    "Dermatología": 900.00,
+    "Medicina General": 800.00,
+    "Psiquiatría": 500.00,
+    "Neurología": 1000.00,
+    "Radiología": 700.00
+};
 
-    // Restaurar estado al original (replica la lógica de PHP en JS)
-    const estado = estadoOriginal; // definido antes como: const estadoOriginal = "{{ strtolower($consulta->estado) }}";
-    let siguienteEstado;
+const contenedorTotalPagar = document.getElementById('contenedor_total_pagar');
+const totalPagarInput = document.getElementById('total_pagar');
+const horaSelect = document.getElementById('hora');
+const medicoSelect = document.getElementById('medico');
 
-    switch (estado) {
-        case 'pendiente':
-            siguienteEstado = 'realizada';
-            break;
-        case 'realizada':
-            siguienteEstado = 'cancelada';
-            break;
-        case 'cancelada':
-            siguienteEstado = 'pendiente';
-            break;
-        default:
-            siguienteEstado = 'pendiente';
-    }
+function actualizarVisibilidadTotalPagar() {
+    const horaSeleccionada = horaSelect.value;
 
-    if (estadoInput) {
-        estadoInput.value = siguienteEstado;
-    }
+    if (horaSeleccionada === 'inmediata') {
+        contenedorTotalPagar.style.display = 'block';
 
-    // Actualizar botón cambiar estado
-    if (botonEstado) {
-        botonEstado.className = 'btn btn-sm ';
-        switch (siguienteEstado) {
-            case 'pendiente':
-                botonEstado.classList.add('btn-warning');
-                botonEstado.innerHTML = '<i class="bi bi-clock-history me-1"></i> Pendiente';
-                break;
-            case 'realizada':
-                botonEstado.classList.add('btn-success');
-                botonEstado.innerHTML = '<i class="bi bi-check-circle me-1"></i> Realizada';
-                break;
-            case 'cancelada':
-                botonEstado.classList.add('btn-danger');
-                botonEstado.innerHTML = '<i class="bi bi-x-circle me-1"></i> Cancelada';
-                break;
-            default:
-                botonEstado.classList.add('btn-secondary');
-                botonEstado.innerHTML = '<i class="bi bi-question-circle me-1"></i> Desconocido';
+        const selectedMedico = medicoSelect.options[medicoSelect.selectedIndex];
+        const especialidad = selectedMedico ? selectedMedico.getAttribute('data-especialidad') : '';
+
+        if (especialidad && preciosPorEspecialidad.hasOwnProperty(especialidad)) {
+            totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
+        } else {
+            totalPagarInput.value = '';
         }
+    } else {
+        contenedorTotalPagar.style.display = 'none';
+        totalPagarInput.value = '';
     }
+}
 
-    // Actualizar especialidad y horas como ya tienes
-    actualizarEspecialidad();
-    cargarHorasDisponibles();
+// Escucha los cambios
+horaSelect.addEventListener('change', actualizarVisibilidadTotalPagar);
+
+medicoSelect.addEventListener('change', function () {
+    if (horaSelect.value === 'inmediata') {
+        actualizarVisibilidadTotalPagar();
+    }
 });
+
+// Ejecuta al cargar
+document.addEventListener('DOMContentLoaded', function () {
+    if (horaSelect.value === 'inmediata') {
+        actualizarVisibilidadTotalPagar();
+    }
+});
+
 
 
 </script>
+
+
 @endsection
-
-

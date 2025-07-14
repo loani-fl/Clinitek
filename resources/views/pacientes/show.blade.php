@@ -82,7 +82,7 @@
             &#9776;
         </button>
         <ul class="dropdown-menu dropdown-menu-end border rounded shadow-sm" aria-labelledby="menuDropdown" style="min-width: 150px;">
-            <li><a class="dropdown-item text-dark" href="{{ route('diagnosticos.index') }}">Diagnósticos</a></li>
+            <li><a class="dropdown-item text-dark" href="{{ route('diagnosticos.show', $paciente->id ?? 1) }}">Diagnósticos</a></li>
             <li><a class="dropdown-item text-dark" href="{{ route('recetas.show', $paciente->id ?? 1) }}">Recetas Médicas</a></li>
         </ul>
     </div>

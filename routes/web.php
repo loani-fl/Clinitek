@@ -52,6 +52,10 @@ Route::put('/pacientes/{paciente}', [PacienteController::class, 'update'])->name
 Route::resource('consultas', ConsultaController::class);
 Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupadas']);
 Route::get('/horas-ocupadas', [App\Http\Controllers\ConsultaController::class, 'horasOcupadas']);
+Route::get('/horas-ocupadas', [ConsultaController::class, 'horasOcupadas']);
+
+
+Route::get('/horas-ocupadas', [ConsultahoraController::class, 'horasOcupadas'])->name('horas.ocupadas');
 
 Route::get('consultas/{id}/edit', [ConsultaController::class, 'edit'])->name('consultas.edit');
 Route::put('consultas/{id}', [ConsultaController::class, 'update'])->name('consultas.update');
@@ -90,3 +94,6 @@ Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('
 // ejemplo de rutas en web.php para show
 Route::get('examenes/{paciente}/{consulta}', [ExamenController::class, 'show'])->name('examenes.show');
 Route::post('examenes/{paciente}/{consulta}', [ExamenController::class, 'store'])->name('examenes.store');
+
+
+Route::post('/consultas/{id}/cambiar-estado', [ConsultaController::class, 'cambiarEstado'])->name('consultas.cambiarEstado');

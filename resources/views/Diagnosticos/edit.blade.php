@@ -33,13 +33,6 @@
     input, select, textarea { font-size: 0.9rem !important; }
 </style>
 
-<div class="header d-flex justify-content-between align-items-center px-3 py-2" style="background-color: #007BFF; position: sticky; top: 0; z-index: 1030;">
-    <div class="d-flex align-items-center">
-        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto; margin-right: 6px;">
-        <span class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</span>
-    </div>
-</div>
-
 <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100 mt-4 position-relative" style="z-index:1;">
     <div class="card-header text-center py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
         <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Editar Diagnóstico</h5>
