@@ -27,10 +27,8 @@ return new class extends Migration
             $table->text('motivo');
             $table->text('sintomas')->nullable();
 
-            // Opcional: puedes agregar estos si quieres más detalle
-            // $table->text('diagnostico')->nullable();
-            // $table->text('tratamiento')->nullable();
-            // $table->text('recomendaciones')->nullable();
+            // Estado de la consulta
+            $table->enum('estado', ['pendiente', 'realizada', 'cancelada'])->default('pendiente');
 
             $table->timestamps();
         });
@@ -44,4 +42,3 @@ return new class extends Migration
         Schema::dropIfExists('consultas');
     }
 };
-

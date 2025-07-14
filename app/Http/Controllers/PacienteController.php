@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Consulta;
 use App\Models\Paciente;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class PacienteController extends Controller
 {
@@ -12,17 +14,56 @@ class PacienteController extends Controller
     {
         return view('pacientes.create');
     }
+    
+    public function createConConsulta($paciente_id, $consulta_id)
+    {
+        $consulta = Consulta::findOrFail($consulta_id);
+    
+        if ($consulta->estado !== 'realizada') {
+            return redirect()->back()->with('error', 'Antes debe realizarse un diagnóstico para poder crear la orden de examen.');
+        }
+    
+        return view('pacientes.create', compact('paciente_id', 'consulta_id'));
+    }
+    
+    
+
+
+    private function validarAnioIdentidad($identidad)
+    {
+        $anio = (int)substr($identidad, 4, 4);
+        $anioActual = (int)date('Y');
+        return ($anio >= 1930 && $anio <= $anioActual);
+    }
 
     public function store(Request $request)
     {
+        $anioActual = date('Y');
+
         $request->validate([
             'nombre' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
             'apellidos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
-            'identidad' => ['required', 'regex:/^(0[1-9]|1[0-8])[0-9]{11}$/', 'size:13'],
-            'fecha_nacimiento' => ['required', 'date', 'before_or_equal:today'],
-            'telefono' => ['required', 'digits:8', 'regex:/^[2389][0-9]{7}$/'],
+            'identidad' => [
+                'required',
+                'digits:13',
+                'regex:/^(0[1-9]|1[0-8])(0[1-9]|1[0-9]|2[0-8])(\d{4})\d{5}$/',
+                'unique:pacientes,identidad'
+            ],
+            'fecha_nacimiento' => [
+                'required',
+                'date',
+                'before_or_equal:' . Carbon::now()->subYears(21)->format('Y-m-d'),
+                'after_or_equal:' . Carbon::now()->subYears(60)->format('Y-m-d'),
+            ],
+            'telefono' => ['required', 'digits:8', 'regex:/^[2389][0-9]{7}$/', 'unique:pacientes,telefono'],
             'direccion' => ['required', 'string', 'max:300'],
-            'correo' => ['required', 'email', 'max:50', 'unique:pacientes,correo'],
+            'correo' => [
+                'required',
+                'email',
+                'max:50',
+                'unique:pacientes,correo',
+                'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
+            ],
             'tipo_sangre' => ['nullable', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
             'genero' => ['required', 'in:Femenino,Masculino,Otro'],
             'padecimientos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
@@ -31,14 +72,6 @@ class PacienteController extends Controller
             'alergias' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
             'historial_quirurgico' => ['nullable', 'regex:/^[\pL\s]*$/u', 'max:200'],
         ], [
-            'correo.required' => 'El correo electrónico es obligatorio.',
-            'correo.email' => 'Debe ingresar un correo válido que contenga @ y un dominio (ejemplo.com).',
-            'correo.max' => 'El correo no puede exceder 50 caracteres.',
-            'correo.unique' => 'Este correo electrónico ya está registrado.',
-
-            'genero.required' => 'El género es obligatorio.',
-            'genero.in' => 'Debe seleccionar una opción válida de género.',
-
             'nombre.required' => 'El nombre es obligatorio.',
             'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
             'nombre.max' => 'El nombre no puede exceder 50 caracteres.',
@@ -48,21 +81,33 @@ class PacienteController extends Controller
             'apellidos.max' => 'Los apellidos no pueden exceder 50 caracteres.',
 
             'identidad.required' => 'La identidad es obligatoria.',
-            'identidad.regex' => 'La identidad debe comenzar con un valor válido (01-18) y contener 13 dígitos.',
-            'identidad.size' => 'La identidad debe tener exactamente 13 caracteres.',
+            'identidad.digits' => 'La identidad debe contener solo números.',
+            'identidad.regex' => 'La identidad debe comenzar con un código válido (01-18), seguido de (01-28), seguido de un año de 4 dígitos, y respetar la estructura.',
+            'identidad.unique' => 'Esta identidad ya está registrada.',
 
             'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
             'fecha_nacimiento.date' => 'La fecha debe ser válida.',
-            'fecha_nacimiento.before_or_equal' => 'La fecha no puede ser futura.',
+            'fecha_nacimiento.before_or_equal' => 'La persona debe tener al menos 21 años.',
+            'fecha_nacimiento.after_or_equal' => 'La persona no puede tener más de 60 años.',
 
             'telefono.required' => 'El teléfono es obligatorio.',
             'telefono.digits' => 'El teléfono debe tener 8 dígitos.',
             'telefono.regex' => 'El teléfono debe comenzar con 2, 3, 8 o 9.',
+            'telefono.unique' => 'Este número de teléfono ya está registrado.',
 
             'direccion.required' => 'La dirección es obligatoria.',
             'direccion.max' => 'La dirección no puede exceder 300 caracteres.',
 
+            'correo.required' => 'El correo electrónico es obligatorio.',
+            'correo.email' => 'El correo debe contener un "@" y un punto "." en el dominio.',
+            'correo.max' => 'El correo no puede exceder 50 caracteres.',
+            'correo.unique' => 'Este correo electrónico ya está registrado.',
+            'correo.regex' => 'El correo debe contener un "@" y un punto "." en el dominio.',
+
             'tipo_sangre.in' => 'Seleccione un tipo de sangre válido.',
+
+            'genero.required' => 'El género es obligatorio.',
+            'genero.in' => 'Debe seleccionar una opción válida de género.',
 
             'padecimientos.required' => 'Los padecimientos son obligatorios.',
             'padecimientos.regex' => 'Solo se permiten letras y espacios.',
@@ -81,27 +126,67 @@ class PacienteController extends Controller
             'alergias.max' => 'No puede exceder 200 caracteres.',
 
             'historial_quirurgico.regex' => 'Solo se permiten letras y espacios.',
+           
             'historial_quirurgico.max' => 'No puede exceder 200 caracteres.',
+
+           
         ]);
 
+        if (!$this->validarAnioIdentidad($request->identidad)) {
+            return redirect()->back()
+                ->withErrors(['identidad' => "El año en la identidad debe estar entre 1930 y $anioActual."])
+                ->withInput();
+        }
+
         Paciente::create($request->all());
-        
 
         return redirect()->route('pacientes.index')->with('success', 'Paciente registrado exitosamente.');
     }
-
-  public function index()
+public function index(Request $request)
 {
-    // Obtener todos los pacientes paginados o sin paginar
-    $pacientes = Paciente::orderBy('nombre')->paginate(5);
+    $query = $request->input('search', '');
+
+    $pacientesQuery = \App\Models\Paciente::query();
+
+    if ($query) {
+        $pacientesQuery->where(function ($q) use ($query) {
+            $q->where('nombre', 'like', "%$query%")
+              ->orWhere('apellidos', 'like', "%$query%")
+              ->orWhere('identidad', 'like', "%$query%");
+        });
+
+        $pacientes = $pacientesQuery->get(); // sin paginar
+    } else {
+        $pacientes = $pacientesQuery->paginate(2);
+    }
+
+    if ($request->ajax()) {
+        return response()->json([
+            'html' => view('pacientes.partials.tabla', compact('pacientes'))->render(),
+            'pagination' => ($pacientes instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                ? $pacientes->links('pagination::bootstrap-5')->render()
+                : '',
+            'total' => $pacientes->count(),
+            'all' => \App\Models\Paciente::count(),
+        ]);
+    }
+
     return view('pacientes.index', compact('pacientes'));
 }
+
+
 
 
     public function show($id)
     {
         $paciente = Paciente::findOrFail($id);
+        $paciente->load('diagnostico');
+
         return view('pacientes.show', compact('paciente'));
+
+        $paciente = Paciente::with('consultas.receta')->findOrFail($id);
+    return view('pacientes.show', compact('paciente'));
+    
     }
 
     public function edit(Paciente $paciente)
@@ -111,25 +196,40 @@ class PacienteController extends Controller
 
     public function update(Request $request, Paciente $paciente)
     {
+        $anioActual = date('Y');
+
         $request->validate([
             'nombre' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
             'apellidos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
-            'genero' => ['nullable', 'in:Masculino,Femenino,Otro'],
-            'identidad' => ['required', 'digits:13', 'regex:/^(0[1-9]|1[0-8])[0-9]{11}$/'],
-            'fecha_nacimiento' => ['required', 'date', 'before_or_equal:today'],
+            'genero' => ['required', 'in:Femenino,Masculino,Otro'],
+
+            'identidad' => [
+                'required',
+                'digits:13',
+                'regex:/^(0[1-9]|1[0-8])(0[1-9]|1[0-9]|2[0-8])(\d{4})\d{5}$/',
+                Rule::unique('pacientes', 'identidad')->ignore($paciente->id)
+            ],
+            'fecha_nacimiento' => [
+                'required',
+                'date',
+                'before_or_equal:' . Carbon::now()->subYears(21)->format('Y-m-d'),
+                'after_or_equal:' . Carbon::now()->subYears(60)->format('Y-m-d'),
+            ],
             'telefono' => [
                 'required',
                 'digits:8',
-                'regex:/^[0-9]{8}$/',
-                \Illuminate\Validation\Rule::unique('pacientes', 'telefono')->ignore($paciente->id),
+                'regex:/^[2389][0-9]{7}$/',
+                Rule::unique('pacientes', 'telefono')->ignore($paciente->id),
             ],
             'direccion' => ['required', 'string', 'max:300'],
             'correo' => [
-                'nullable',
+                'required',
                 'email',
                 'max:50',
-                \Illuminate\Validation\Rule::unique('pacientes', 'correo')->ignore($paciente->id),
+                Rule::unique('pacientes', 'correo')->ignore($paciente->id),
+                'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
             ],
+
             'tipo_sangre' => ['nullable', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
             'padecimientos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
             'medicamentos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
@@ -137,7 +237,6 @@ class PacienteController extends Controller
             'alergias' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
             'historial_quirurgico' => ['nullable', 'regex:/^[\pL\s]*$/u', 'max:200'],
         ], [
-
             'nombre.required' => 'El nombre es obligatorio.',
             'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
             'nombre.max' => 'El nombre no puede exceder 50 caracteres.',
@@ -147,26 +246,33 @@ class PacienteController extends Controller
             'apellidos.max' => 'Los apellidos no pueden exceder 50 caracteres.',
 
             'identidad.required' => 'La identidad es obligatoria.',
-            'identidad.digits' => 'La identidad debe tener exactamente 13 dígitos.',
-            'identidad.regex' => 'La identidad debe comenzar entre 01 y 18 y contener solo números.',
+            'identidad.digits' => 'La identidad debe contener solo números.',
+            'identidad.regex' => 'La identidad debe comenzar con un código válido (01-18), seguido de (01-28), seguido de un año de 4 dígitos, y respetar la estructura.',
+            'identidad.unique' => 'Esta identidad ya está registrada para otro paciente.',
 
             'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
             'fecha_nacimiento.date' => 'La fecha debe ser válida.',
-            'fecha_nacimiento.before_or_equal' => 'La fecha no puede ser futura.',
+            'fecha_nacimiento.before_or_equal' => 'La persona debe tener al menos 21 años.',
+            'fecha_nacimiento.after_or_equal' => 'La persona no puede tener más de 60 años.',
 
             'telefono.required' => 'El teléfono es obligatorio.',
             'telefono.digits' => 'El teléfono debe tener 8 dígitos.',
             'telefono.regex' => 'El teléfono debe comenzar con 2, 3, 8 o 9.',
-            'telefono.unique'   => 'Este número de teléfono ya existe.',
+            'telefono.unique' => 'Este número de teléfono ya está registrado.',
 
             'direccion.required' => 'La dirección es obligatoria.',
             'direccion.max' => 'La dirección no puede exceder 300 caracteres.',
 
-            'correo.email' => 'Debe ingresar un correo válido.',
-            'correo.max' => 'El correo no puede exceder 50 caracteres.',
+            'correo.required' => 'El correo es obligatorio.',
+            'correo.email' => 'El correo debe contener un "@" y un punto "." en el dominio.',
+
             'correo.unique' => 'Este correo electrónico ya está registrado.',
 
+
             'tipo_sangre.in' => 'Seleccione un tipo de sangre válido.',
+
+            'genero.required' => 'El género es obligatorio.',
+            'genero.in' => 'Debe seleccionar una opción válida de género.',
 
             'padecimientos.required' => 'Los padecimientos son obligatorios.',
             'padecimientos.regex' => 'Solo se permiten letras y espacios.',
@@ -187,6 +293,12 @@ class PacienteController extends Controller
             'historial_quirurgico.regex' => 'Solo se permiten letras y espacios.',
             'historial_quirurgico.max' => 'No puede exceder 200 caracteres.',
         ]);
+
+        if (!$this->validarAnioIdentidad($request->identidad)) {
+            return redirect()->back()
+                ->withErrors(['identidad' => "El año en la identidad debe estar entre 1930 y $anioActual."])
+                ->withInput();
+        }
 
         $paciente->update($request->only([
             'nombre',
@@ -206,5 +318,11 @@ class PacienteController extends Controller
         ]));
 
         return redirect()->route('pacientes.index')->with('success', 'Paciente actualizado correctamente.');
+    }
+
+    public function showRecetas($pacienteId)
+    {
+        $paciente = Paciente::with('recetas')->findOrFail($pacienteId);
+        return view('recetas.show', compact('paciente'));
     }
 }

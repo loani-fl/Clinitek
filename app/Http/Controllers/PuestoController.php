@@ -8,11 +8,34 @@ use Illuminate\Http\Request;
 class PuestoController extends Controller
 {
     // Mostrar la lista de puestos
-    public function index()
-    {
-        $puestos = Puesto::all();
-        return view('puestos.index', compact('puestos'));
+ public function index(Request $request)
+{
+    $query = $request->input('search', '');
+
+    $puestos = Puesto::query()
+        ->when($query, function ($q) use ($query) {
+            $q->where('codigo', 'like', "%{$query}%")
+              ->orWhere('nombre', 'like', "%{$query}%");
+        })
+        ->orderBy('id')
+        ->paginate(2);
+
+    // Si es AJAX devuelve vista parcial
+    if ($request->ajax()) {
+        $view = view('puestos.partials.tabla', compact('puestos'))->render();
+
+        // Envía también la paginación y total para JS
+        return response()->json([
+            'html' => $view,
+            'pagination' => (string) $puestos->links('pagination::bootstrap-4'),
+            'total' => $puestos->count(),
+            'all' => $puestos->total(),
+        ]);
     }
+
+    return view('puestos.index', compact('puestos'));
+}
+
 
     // Mostrar formulario de creación
     public function create()
@@ -24,13 +47,14 @@ class PuestoController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'codigo' => [
-                'required',
-                'string',
-                'max:10',
-                'regex:/^[A-Za-z0-9\-]+$/',
-                'unique:puestos,codigo',
-            ],
+          'codigo' => [
+    'required',
+    'string',
+    'max:10',
+    'regex:/^[A-Za-zÑñ0-9\-]+$/',
+    'unique:puestos,codigo',
+],
+
             'nombre' => [
                 'required',
                 'string',

@@ -22,11 +22,13 @@ class Empleado extends Model
         'direccion',
         'puesto_id',
         'area',
-        'salario',
+        'sueldo',
         'turno_asignado',
         'observaciones',
-        'estado'
+        'estado',
+        'foto' 
     ];
+    
 
     public function puesto()
     {

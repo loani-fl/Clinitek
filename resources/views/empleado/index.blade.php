@@ -11,7 +11,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            background-color: #e8f4fc; /* fondo azul clarito */
+            background-color: #e8f4fc;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
@@ -41,28 +41,29 @@
         }
 
         .contenedor-principal {
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: start;
-    padding: 0 3rem; /* MÁS margen lateral */
-    margin: 0;
-    width: 100vw;
-}
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: start;
+            padding: 0 3rem;
+            margin: 0;
+            width: 100vw;
+            padding-top: 70px;
+        }
 
-.custom-card {
-    flex-grow: 1;
-    background-color: #ffffff;  /* fondo blanco */
-    border-color: #91cfff;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
-    max-width: 1000px;
-    width: 100%;
-    padding: 1.5rem;
-}
-
+        .custom-card {
+            flex-grow: 1;
+            background-color: #ffffff;
+            border-color: #91cfff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            max-width: 1000px;
+            width: 100%;
+            padding: 1.5rem;
+            position: relative;
+        }
 
         .card-header {
             background-color: transparent !important;
@@ -81,7 +82,7 @@
         }
 
         thead tr {
-            background-color: #cce5ff; /* azul más suave */
+            background-color: #cce5ff;
             color: #003e7e;
         }
 
@@ -134,199 +135,163 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 800px; /* tamaño más pequeño */
-            height: 800px; /* tamaño más pequeño */
+            width: 800px;
+            height: 800px;
             background-image: url('/images/logo2.jpg');
-            background-size: contain;  /* ajusta sin recortar */
+            background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            opacity: 0.15;  /* transparencia baja para que no moleste */
+            opacity: 0.15;
             transform: translate(-50%, -50%);
-            pointer-events: none; /* para que no interfiera con clicks */
+            pointer-events: none;
             z-index: 0;
         }
+
+        #mensajeResultados {
+            font-weight: 600;
+            color: #000000;
+            margin-top: 0.5rem;
+            min-height: 1.2em;
+            text-align: center;
+        }
+
+        .header a:hover {
+            text-decoration: underline;
+            color: #dceeff;
+        }
+        
     </style>
 </head>
 <body>
 
-<!-- Hover de enlaces -->
-<style>
-    .header a:hover {
-        text-decoration: underline;
-        color: #dceeff;
-    }
-</style>
+{{-- Barra de navegación superior fija con menú desplegable --}}
+    <div class="header d-flex justify-content-between align-items-center px-3 py-2 fixed-top" style="background-color: #007BFF;">
+        <div class="d-flex align-items-center">
+            <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto;">
+            <div class="fw-bold text-white ms-2" style="font-size: 1.5rem;">Clinitek</div>
+        </div>
 
-<!-- Barra de navegación fija -->
-<div class="header d-flex justify-content-between align-items-center px-3 py-2" style="background-color: #007BFF; position: sticky; top: 0; z-index: 1030;">
-    <div class="d-flex align-items-center">
-        <!-- Logo con margen reducido para acercar el texto -->
-        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" 
-             style="height: 40px; width: auto; margin-right: 6px;">
-
-        <span class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</span>
+        <div class="dropdown">
+            <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                ☰
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                <li><a class="dropdown-item" href="{{ route('puestos.create') }}">Crear puesto</a></li>
+                <li><a class="dropdown-item" href="{{ route('empleado.create') }}">Registrar empleado</a></li>
+                <li><a class="dropdown-item" href="{{ route('medicos.create') }}">Registrar médico</a></li>
+                <li><a class="dropdown-item" href="{{ route('consultas.create') }}">Registrar consulta</a></li>
+                <li><a class="dropdown-item" href="{{ route('pacientes.create') }}">Registrar paciente</a></li>
+            </ul>
+        </div>
     </div>
-        <div class="d-flex gap-3 flex-wrap">
-            <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
-            <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
-            <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
+
+<!-- Contenedor principal -->
+<div class="contenedor-principal">
+    <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
+        <!-- Único encabezado -->
+        <div class="card-header position-relative py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
+            <a href="{{ route('inicio') }}" class="btn btn-light position-absolute end-0 top-50 translate-middle-y me-2">
+                <i class="bi bi-house-door"></i> Inicio
+            </a>
+            <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Lista de empleados</h5>
+        </div>
+
+        <!-- Formulario filtro sin submit normal -->
+        <div class="px-3 py-2 mt-4">
+            <form id="formFiltro" onsubmit="return false;">
+                <div class="col-12 col-md-9 d-flex gap-2">
+                    <input type="text" name="filtro" id="inputFiltro" class="form-control flex-grow-1"
+                        placeholder="Buscar por nombre, identidad o puesto"
+                        value="{{ request('filtro') }}">
+
+                    <select name="estado" id="selectEstado" class="form-select" style="min-width: 160px;">
+                        <option value="">Todos los estados</option>
+                        <option value="Activo" {{ request('estado') == 'Activo' ? 'selected' : '' }}>Activo</option>
+                        <option value="Inactivo" {{ request('estado') == 'Inactivo' ? 'selected' : '' }}>Inactivo</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tabla y paginación (contenedor dinámico AJAX) -->
+        <div id="tabla-container">
+            @include('empleado.partials.tabla', ['empleados' => $empleados])
+        </div>
+
+        <!-- Mensaje de resultados -->
+        <div id="mensajeResultados" class="text-center fw-semibold text-dark mt-2">
+            Se encontraron {{ $empleados->total() }} resultado{{ $empleados->total() != 1 ? 's' : '' }}.
         </div>
     </div>
 </div>
 
-
-<!-- Formulario más compacto -->
-<div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
-    <div class="card-header position-relative py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-        <!-- Botón a la derecha -->
-        <a href="{{ route('inicio') }}" class="btn btn-light position-absolute end-0 top-50 translate-middle-y me-2">
-            <i class="bi bi-house-door"></i> Inicio
-        </a>
-        <!-- Título centrado -->
-        <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Lista de empleados</h5>
-    </div>
-
-
-
-    <form action="{{ route('empleado.store') }}" method="POST" novalidate>
-        @csrf
-
-    
-        <!-- Alerta de éxito -->
-        @if(session('success'))
-            <div id="mensaje-exito" class="alert alert-success m-3 alert-dismissible fade show">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-            </div>
-        @endif
-
-        <!-- FILTROS -->
-        <div class="row px-3 py-2">
-            <div class="col-md-4 mb-2 mb-md-0">
-                <input type="text" id="filtro-empleado" class="form-control" placeholder="Buscar por nombre, identidad o puesto" />
-            </div>
-            <div class="col-md-3">
-                <select id="filtro-estado" class="form-select">
-                    <option value="">Todos los estados</option>
-                    <option value="Activo">Activo</option>
-                    <option value="Inactivo">Inactivo</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Tabla -->
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped mb-0">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th class="text-center">Nombre</th>
-                        <th class="text-center">Identidad</th>
-                        <th class="text-center">Puesto</th>
-                        <th class="text-center">Estado</th>
-                        <th class="text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tabla-empleados">
-                @forelse($empleados as $index => $empleado)
-                    <tr data-estado="{{ $empleado->estado }}">
-                        <td>{{ $empleados->firstItem() + $index }}</td>
-                        <td class="nombre">{{ $empleado->nombres }} {{ $empleado->apellidos }}</td>
-                        <td>{{ $empleado->identidad }}</td>
-                        <td class="puesto">{{ $empleado->puesto->nombre ?? 'Sin puesto' }}</td>
-                        <td class="text-center">
-                            @if($empleado->estado === 'Activo')
-                                <span class="estado-activo"><i class="bi bi-circle-fill"></i></span>
-                            @else
-                                <span class="estado-inactivo"><i class="bi bi-circle-fill"></i></span>
-                            @endif
-                        </td>
-                        <td>
-                            <div class="d-flex gap-2 justify-content-center">
-                                <a href="{{ route('empleado.show', $empleado->id) }}" class="btn btn-white-border btn-outline-info btn-sm" title="Ver">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <a href="{{ route('empleado.edit', $empleado->id) }}" class="btn btn-white-border btn-outline-warning btn-sm" title="Editar">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="8" class="text-center">No hay empleados registrados.</td>
-                    </tr>
-                @endforelse
-
-                <tr id="sin-resultados" style="display: none;">
-                    <td colspan="8" class="text-center text-muted">No hay empleados que coincidan con la búsqueda.</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="px-3 pb-3">
-            <div class="d-flex justify-content-center">
-                {{ $empleados->onEachSide(1)->links('pagination::bootstrap-5') }}
-            </div>
-        </div>
-
-    </div>
-</div>
-
-<!-- Footer fijo -->
+<!-- Footer -->
 <footer>
     © 2025 Clínitek. Todos los derechos reservados.
 </footer>
 
-<!-- Bootstrap Bundle -->
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Script de filtros y mensaje -->
 <script>
-   function aplicarFiltros() {
-    const texto = $('#filtro-empleado').val().toLowerCase();
-    const estado = $('#filtro-estado').val();
-    let visibles = 0;
-
-    $('#tabla-empleados tr').not('#sin-resultados').each(function () {
-        const nombre = $(this).find('.nombre').text().toLowerCase();
-        const puesto = $(this).find('.puesto').text().toLowerCase();
-        const identidad = $(this).find('td').eq(2).text().toLowerCase();
-        const estadoActual = $(this).data('estado');
-
-        const coincideTexto = 
-            nombre.startsWith(texto) || 
-            puesto.startsWith(texto) || 
-            identidad.startsWith(texto);
-
-        const coincideEstado = !estado || estado === estadoActual;
-
-        const visible = coincideTexto && coincideEstado;
-        $(this).toggle(visible);
-
-        if (visible) {
-            visibles++;
-            $(this).find('td').eq(0).text(visibles);
+$(document).ready(function () {
+    function actualizarMensaje(total, all, query) {
+        if (query === '') {
+            $('#mensajeResultados').html('');
+        } else if (total === 0) {
+            $('#mensajeResultados').html(`No se encontraron resultados para "<strong>${query}</strong>" de un total de ${all}.`);
+        } else {
+            $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
         }
+    }
+
+    function cargarDatos(page = 1, filtro = '', estado = '') {
+        $.ajax({
+            url: "{{ route('empleado.index') }}",
+            type: 'GET',
+            data: { page, filtro, estado },
+            success: function(data) {
+                $('#tabla-container').html(data.html);
+                actualizarMensaje(data.total, data.all, filtro);
+                window.history.pushState("", "", `?page=${page}&filtro=${encodeURIComponent(filtro)}&estado=${encodeURIComponent(estado)}`);
+            },
+            error: function() {
+                $('#mensajeResultados').html('Error al cargar los datos.');
+            }
+        });
+    }
+
+    // Evento para input filtro con debounce
+    let timeout = null;
+    $('#inputFiltro').on('input', function () {
+        clearTimeout(timeout);
+        let filtro = $(this).val();
+        let estado = $('#selectEstado').val();
+        timeout = setTimeout(() => {
+            cargarDatos(1, filtro, estado);
+        }, 500);
     });
 
-    $('#sin-resultados').toggle(visibles === 0);
-}
-
-
-
-    $(document).ready(function () {
-        $('#filtro-empleado, #filtro-estado').on('input change', aplicarFiltros);
-
-        // Ocultar mensaje de éxito tras 3 segundos
-        const mensaje = $('#mensaje-exito');
-        if (mensaje.length) {
-            setTimeout(() => {
-                mensaje.alert('close');
-            }, 3000);
-        }
+    // Evento para select estado
+    $('#selectEstado').on('change', function () {
+        let filtro = $('#inputFiltro').val();
+        let estado = $(this).val();
+        cargarDatos(1, filtro, estado);
     });
+
+    // Capturar clicks en paginación (delegado)
+    $(document).on('click', '.pagination a', function(e) {
+        e.preventDefault();
+        let url = $(this).attr('href');
+        let page = url.split('page=')[1];
+        let filtro = $('#inputFiltro').val();
+        let estado = $('#selectEstado').val();
+        cargarDatos(page, filtro, estado);
+    });
+
+    // No hace falta recargar al inicio porque ya se carga con Blade
+});
 </script>
+
 </body>
 </html>

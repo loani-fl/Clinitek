@@ -13,17 +13,18 @@ return [
     'exists' => 'El valor seleccionado para :attribute es inválido.',
     'numeric' => ':attribute debe ser un número.',
     'between' => ':attribute debe ser un número válido con hasta 2 decimales.',
+    'regex' => 'El formato de :attribute es inválido.',
 
     // Mensajes personalizados
     'custom' => [
         'nombre' => [
-        'required' => 'Los Nombres son obligatorios.',
-        'regex' => 'Los Nombres solo deben contener letras y espacios.',
-    ],
+            'required' => 'Los Nombres son obligatorios.',
+            'regex' => 'Los Nombres solo deben contener letras y espacios.',
+        ],
         'apellidos' => [
-        'required' => 'Los Apellidos son obligatorios.',
-        'regex' => 'Los Apellidos solo deben contener letras y espacios.',
-    ],
+            'required' => 'Los Apellidos son obligatorios.',
+            'regex' => 'Los Apellidos solo deben contener letras y espacios.',
+        ],
         'identidad' => [
             'required' => 'La identidad es obligatoria.',
             'digits' => 'La identidad debe contener exactamente 13 dígitos.',
@@ -35,21 +36,22 @@ return [
         ],
         'correo' => [
             'required' => 'El correo es obligatorio.',
-            'max' => 'El correo no debe tener más de 30 caracteres.',
+            'max' => 'El correo no debe tener más de 50 caracteres.',
             'email' => 'El correo debe ser un correo válido.',
             'unique' => 'El correo ya está en uso.',
+            'regex' => 'El correo debe contener un "@" y un punto "." en el dominio.',
         ],
         'fecha_nacimiento' => [
-        'required' => 'La Fecha de nacimiento es obligatoria.',
-        'date' => 'La Fecha de nacimiento debe ser una fecha válida.',
-        'before_or_equal' => 'La Fecha de nacimiento debe ser antes o igual a hoy menos 18 años.',
-    ],
+            'required' => 'La Fecha de nacimiento es obligatoria.',
+            'date' => 'La Fecha de nacimiento debe ser una fecha válida.',
+            'before_or_equal' => 'La Fecha de nacimiento debe ser antes o igual a hoy menos 18 años.',
+        ],
         'fecha_ingreso' => [
-        'required' => 'La Fecha de ingreso es obligatoria.',
-        'date' => 'La Fecha de ingreso debe ser una fecha válida.',
-        'after_or_equal' => 'La Fecha de ingreso no puede ser anterior al mes pasado.',
-        'before_or_equal' => 'La Fecha de ingreso no puede ser posterior al próximo mes.',
-    ],
+            'required' => 'La Fecha de ingreso es obligatoria.',
+            'date' => 'La Fecha de ingreso debe ser una fecha válida.',
+            'after_or_equal' => 'La Fecha de ingreso no puede ser anterior al mes pasado.',
+            'before_or_equal' => 'La Fecha de ingreso no puede ser posterior al próximo mes.',
+        ],
         'direccion' => [
             'required' => 'La Dirección es obligatoria.',
             'max' => 'La Dirección no puede tener más de 50 caracteres.',

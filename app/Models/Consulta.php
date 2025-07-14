@@ -19,16 +19,36 @@ class Consulta extends Model
         'medico_id',
         'motivo',
         'sintomas',
+        'estado',
     ];
 
+    // Relación con Paciente (única)
     public function paciente()
     {
         return $this->belongsTo(Paciente::class);
     }
 
+    // Relación con Médico
     public function medico()
     {
         return $this->belongsTo(Medico::class);
     }
-}
 
+    // Relación con Exámenes (varios)
+    public function examens()
+    {
+        return $this->hasMany(\App\Models\Examen::class);
+    }
+
+    // Relación con Diagnóstico (uno)
+    public function diagnostico()
+    {
+        return $this->hasOne(Diagnostico::class);
+    }
+
+    // Relación con Recetas (varias)
+    public function recetas()
+    {
+        return $this->hasMany(Receta::class);
+    }
+}

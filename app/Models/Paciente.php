@@ -31,4 +31,19 @@ class Paciente extends Model
     protected $casts = [
         'fecha_nacimiento' => 'date',
     ];
+    public function diagnostico()
+    {
+        return $this->hasOne(Diagnostico::class);
+    }
+
+    public function consultas()
+{
+    return $this->hasMany(Consulta::class);
+}
+
+public function recetas()
+{
+    return $this->hasManyThrough(Receta::class, Consulta::class);
+}
+
 }

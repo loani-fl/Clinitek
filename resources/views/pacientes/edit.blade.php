@@ -53,7 +53,7 @@
     <!-- Contenido principal -->
     <div class="custom-card">
         <div class="mb-4 text-center" style="border-bottom: 3px solid #007BFF;">
-            <h2 class="fw-bold text-black mb-0">Editar paciente</h2>
+            <h2 class="fw-bold text-black mb-0">Editar Paciente</h2>
         </div>
 
         <!-- Formulario -->
@@ -70,7 +70,7 @@
 
             <div class="d-flex justify-content-center gap-3 mt-4">
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-save"></i> Actualizar
+                    <i class="bi bi-save"></i> Guardar Cambios
                 </button>
                 <button type="button" id="btnRestablecer" class="btn btn-warning">
                     <i class="bi bi-arrow-counterclockwise"></i> Restablecer
