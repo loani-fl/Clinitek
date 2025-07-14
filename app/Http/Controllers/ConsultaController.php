@@ -283,5 +283,4 @@ public function cambiarEstado(Request $request, $id)
     return redirect()->back()->with('success', 'Estado de la consulta actualizado.');
 }
 
-
 }

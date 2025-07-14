@@ -344,6 +344,8 @@ if (!empty($consulta->hora)) {
 }
 @endphp
 
+
+
 <script>
 // Función para convertir hora 12h a 24h (ej: 2:30 PM -> 14:30:00)
 function hora12a24(hora12) {
@@ -519,9 +521,3 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 @endsection
-
-
-
-
-
-
