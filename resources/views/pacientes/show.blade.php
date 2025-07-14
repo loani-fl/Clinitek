@@ -74,7 +74,7 @@
     <div class="container mt-5 pt-3" style="max-width: 1000px;">
         <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100 mt-4">
         <div class="card-header d-flex justify-content-between align-items-center py-2 px-3" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-    <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Expediente Medico</h5>
+    <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Expediente medico</h5>
 
     <div class="dropdown">
         <button class="btn p-0 border-0" type="button" id="menuDropdown" data-bs-toggle="dropdown"

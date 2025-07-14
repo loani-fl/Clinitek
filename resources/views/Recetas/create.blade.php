@@ -91,8 +91,9 @@
     <p><strong>Fecha:</strong> {{ $consulta->fecha ?? 'Sin fecha' }}</p>
 
     <!-- Formulario -->
-    <form action="{{ route('recetas.store', $consulta->id) }}" method="POST" novalidate>
+    <form action="{{ route('recetas.store', ['paciente' => $consulta->paciente->id]) }}" method="POST" novalidate>
         @csrf
+        <input type="hidden" name="consulta_id" value="{{ $consulta->id }}">
 
         <div style="margin-bottom: 5rem;">
             <label for="detalles" style="display: block; font-weight: 600; margin-bottom: 0.25rem;">
@@ -115,10 +116,10 @@
         <div class="signature-line">Firma del Médico</div>
 
         <a href="{{ route('consultas.show', $consulta->id) }}" 
-   style="background-color: #808080; color: black; padding: 10px 16px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;"
-   rel="noopener">
-   <i class="bi bi-printer"></i> Imprimir
-</a>
+            style="background-color: #808080; color: black; padding: 10px 16px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;"
+            rel="noopener">
+            <i class="bi bi-printer"></i> Imprimir
+        </a>
 
         <button type="submit"
             style="background-color: #007BFF; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">

@@ -7,13 +7,15 @@ use App\Models\Paciente;
 use App\Models\Medico;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
 
 class ConsultaController extends Controller
 {
     // Mostrar la lista de consultas
     public function index()
     {
-        $consultas = Consulta::with('paciente', 'medico')->orderBy('fecha', 'desc')->paginate(10);
+        $consultas = Consulta::with('paciente', 'medico')->orderBy('fecha', 'desc')->paginate(5);
         $medicos = Medico::orderBy('nombre')->get();
 
         return view('consultas.index', compact('consultas', 'medicos'));
@@ -169,8 +171,8 @@ class ConsultaController extends Controller
     }
 
     // 👇 Aquí calculamos la hora más ocupada para este médico y fecha
-    $horaMasOcupada = \DB::table('consultas')
-        ->select('hora', \DB::raw('COUNT(*) as total'))
+    $horaMasOcupada = DB::table('consultas')
+        ->select('hora', DB::raw('COUNT(*) as total'))
         ->where('medico_id', $consulta->medico_id)
         ->where('fecha', $consulta->fecha)
         ->where('hora', '!=', 'inmediata')
