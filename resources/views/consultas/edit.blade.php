@@ -323,6 +323,7 @@ function hora12a24(hora12) {
     return `${h.toString().padStart(2, '0')}:${minuto}:00`;
 }
 
+
 // Carga especialidad según médico seleccionado
 function actualizarEspecialidad() {
     const selectMedico = document.getElementById('medico');
@@ -447,6 +448,4 @@ document.querySelector('form').addEventListener('submit', function(e) {
     }
 });
 </script>
-
-
 @endsection

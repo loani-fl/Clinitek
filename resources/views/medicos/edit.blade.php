@@ -32,21 +32,21 @@
         }
 
         .custom-card::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 800px;
-            height: 800px;
-            background-image: url('{{ asset('images/logo2.jpg') }}');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            opacity: 0.15;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 0;
-        }
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 800px;
+    height: 800px;
+    background-image: url('/images/logo2.jpg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.15;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 0;
+}
     </style>
 
     <div class="custom-card">
