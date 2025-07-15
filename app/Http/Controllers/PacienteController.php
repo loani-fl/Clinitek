@@ -68,6 +68,62 @@ class PacienteController extends Controller
             'historial_clinico' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
             'alergias' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
             'historial_quirurgico' => ['nullable', 'regex:/^[\pL\s]*$/u', 'max:200'],
+        ], [
+            'nombre.required' => 'El nombre es obligatorio.',
+            'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+            'nombre.max' => 'El nombre no puede superar los 50 caracteres.',
+
+            'apellidos.required' => 'Los apellidos son obligatorios.',
+            'apellidos.regex' => 'Los apellidos solo pueden contener letras y espacios.',
+            'apellidos.max' => 'Los apellidos no pueden superar los 50 caracteres.',
+
+            'identidad.required' => 'La identidad es obligatoria.',
+            'identidad.digits' => 'La identidad debe tener exactamente 13 dígitos.',
+            'identidad.regex' => 'El formato de la identidad no es válido.',
+            'identidad.unique' => 'Esta identidad ya está registrada.',
+
+            'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
+            'fecha_nacimiento.date' => 'Debe ser una fecha válida.',
+            'fecha_nacimiento.before_or_equal' => 'El paciente debe tener al menos 21 años.',
+            'fecha_nacimiento.after_or_equal' => 'El paciente no puede tener más de 60 años.',
+
+            'telefono.required' => 'El teléfono es obligatorio.',
+            'telefono.digits' => 'El teléfono debe tener exactamente 8 dígitos.',
+            'telefono.regex' => 'El teléfono debe iniciar con 2, 3, 8 o 9.',
+            'telefono.unique' => 'Este teléfono ya está registrado.',
+
+            'direccion.required' => 'La dirección es obligatoria.',
+            'direccion.max' => 'La dirección no puede superar los 300 caracteres.',
+
+            'correo.required' => 'El correo electrónico es obligatorio.',
+            'correo.email' => 'Debe ser un correo válido.',
+            'correo.regex' => 'El formato del correo electrónico no es válido.',
+            'correo.unique' => 'Este correo ya está registrado.',
+            'correo.max' => 'El correo no puede superar los 50 caracteres.',
+
+            'tipo_sangre.in' => 'El tipo de sangre debe ser uno válido (A+, A-, B+, B-, AB+, AB-, O+, O-).',
+
+            'genero.required' => 'El género es obligatorio.',
+            'genero.in' => 'El género debe ser Femenino, Masculino u Otro.',
+
+            'padecimientos.required' => 'Los padecimientos son obligatorios.',
+            'padecimientos.regex' => 'Los padecimientos solo pueden contener letras y espacios.',
+            'padecimientos.max' => 'Los padecimientos no pueden superar los 200 caracteres.',
+
+            'medicamentos.required' => 'Los medicamentos son obligatorios.',
+            'medicamentos.regex' => 'Los medicamentos solo pueden contener letras y espacios.',
+            'medicamentos.max' => 'Los medicamentos no pueden superar los 200 caracteres.',
+
+            'historial_clinico.required' => 'El historial clínico es obligatorio.',
+            'historial_clinico.regex' => 'El historial clínico solo puede contener letras y espacios.',
+            'historial_clinico.max' => 'El historial clínico no puede superar los 200 caracteres.',
+
+            'alergias.required' => 'Las alergias son obligatorias.',
+            'alergias.regex' => 'Las alergias solo pueden contener letras y espacios.',
+            'alergias.max' => 'Las alergias no pueden superar los 200 caracteres.',
+
+            'historial_quirurgico.regex' => 'El historial quirúrgico solo puede contener letras y espacios.',
+            'historial_quirurgico.max' => 'El historial quirúrgico no puede superar los 200 caracteres.',
         ]);
 
         if (!$this->validarAnioIdentidad($request->identidad)) {
@@ -80,49 +136,46 @@ class PacienteController extends Controller
 
         return redirect()->route('pacientes.index')->with('success', 'Paciente registrado exitosamente.');
     }
-public function index(Request $request)
-{
-    try {
-        $query = $request->input('search', '');
-        $pacientesQuery = Paciente::query();
 
-        if ($query) {
-            $pacientesQuery->where(function ($q) use ($query) {
-                $q->where('nombre', 'like', "%$query%")
-                  ->orWhere('apellidos', 'like', "%$query%")
-                  ->orWhere('identidad', 'like', "%$query%");
-            });
+    public function index(Request $request)
+    {
+        try {
+            $query = $request->input('search', '');
+            $pacientesQuery = Paciente::query();
+
+            if ($query) {
+                $pacientesQuery->where(function ($q) use ($query) {
+                    $q->where('nombre', 'like', "%$query%")
+                      ->orWhere('apellidos', 'like', "%$query%")
+                      ->orWhere('identidad', 'like', "%$query%");
+                });
+            }
+
+            if ($query) {
+                $pacientes = $pacientesQuery->get();
+                $isSearch = true;
+            } else {
+                $pacientes = $pacientesQuery->paginate(3)->withQueryString();
+                $isSearch = false;
+            }
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'html' => view('pacientes.partials.tabla', compact('pacientes', 'isSearch'))->render(),
+                    'pagination' => $isSearch ? '' : $pacientes->links('pagination::bootstrap-5')->render(),
+                    'total' => $pacientes->count(),
+                    'all' => Paciente::count(),
+                ]);
+            }
+
+            return view('pacientes.index', compact('pacientes', 'isSearch'));
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
+            }
+            abort(500, $e->getMessage());
         }
-
-        if ($query) {
-            $pacientes = $pacientesQuery->get();
-            $isSearch = true;
-        } else {
-            $pacientes = $pacientesQuery->paginate(3)->withQueryString();
-            $isSearch = false;
-        }
-
-        if ($request->ajax()) {
-            return response()->json([
-                'html' => view('pacientes.partials.tabla', compact('pacientes', 'isSearch'))->render(),
-                'pagination' => $isSearch ? '' : $pacientes->links('pagination::bootstrap-5')->render(),
-                'total' => $pacientes->count(),
-                'all' => Paciente::count(),
-            ]);
-        }
-
-        return view('pacientes.index', compact('pacientes', 'isSearch'));
-
-    } catch (\Exception $e) {
-        if ($request->ajax()) {
-            return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
-        }
-        abort(500, $e->getMessage());
     }
-}
-
-
-
 
     public function show($id)
     {
@@ -209,3 +262,4 @@ public function index(Request $request)
         return view('recetas.show', compact('paciente'));
     }
 }
+

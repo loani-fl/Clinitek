@@ -12,6 +12,9 @@ use App\Http\Controllers\DiagnosticoController;
 use App\Http\Controllers\ExamenController;
 use App\Models\Puesto;
 use App\Http\Controllers\RecetaController;
+use App\Http\Controllers\MedicamentoController;
+
+Route::get('/medicamentos/search', [MedicamentoController::class, 'search'])->name('medicamentos.search');
 
 // Página de bienvenida
 Route::get('/', function () {
