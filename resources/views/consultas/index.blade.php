@@ -53,12 +53,28 @@
         z-index: 1;
     }
     .card-header {
-        border-bottom: 3px solid #007BFF;
-        padding-bottom: 0.5rem;
-        margin-bottom: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent !important;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 3px solid #007BFF;
+    display: flex;
+}
+
+.card-header h2 {
+    color: #000 !important;
+    margin: 0 auto;
+}
+
+.card-header .btn {
+    position: absolute;
+    right: 0;
+}
+
+    .card-header h2 {
+        color: #000 !important; /* Forzar negro al título */
     }
     .alert-success-custom {
         background-color: #d4edda;
@@ -106,13 +122,14 @@
         font-size: 0.9rem;
         color: #444;
     }
+
 </style>
 
 <div class="content-wrapper">
     <div class="card custom-card">
 
         <div class="card-header">
-            <h2 class="fw-bold text-black mb-0">Consultas médicas registradas</h2>
+            <h2 class="fw-bold mb-0">Consultas médicas registradas</h2>
             <a href="{{ route('inicio') }}" class="btn btn-light">
                 <i class="bi bi-house-door"></i> Inicio
             </a>
@@ -205,7 +222,6 @@
                         <tr id="sin-resultados" style="display: none;">
                             <td colspan="7" class="text-center fst-italic text-muted">No hay resultados que mostrar</td>
                         </tr>
-
                     </tbody>
                 </table>
             </div>
@@ -289,10 +305,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const estadoCelda = celdas[5]?.querySelector('span.estado-circulo')?.getAttribute('title').toLowerCase() || '';
 
-            const partesFecha = fechaTexto.split('/');
-            const fechaConsulta = partesFecha.length === 3
-              ? `${partesFecha[2]}-${partesFecha[1].padStart(2, '0')}-${partesFecha[0].padStart(2, '0')}`
-              : '';
+            let fechaConsulta = '';
+if (fechaTexto) {
+    const partesFecha = fechaTexto.split('/');
+    if (partesFecha.length === 3) {
+        // Convertir de dd/mm/yyyy a yyyy-mm-dd
+        const dia = partesFecha[0].padStart(2, '0');
+        const mes = partesFecha[1].padStart(2, '0');
+        const anio = partesFecha[2];
+        fechaConsulta = `${anio}-${mes}-${dia}`;
+    }
+}
+
 
             const coincideMedico = medicoSeleccionado === '' || nombreMedico.includes(medicoSeleccionado);
             const coincidePaciente = textoBusqueda === '' || nombrePaciente.startsWith(textoBusqueda);
@@ -310,7 +334,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Mostrar fila "No hay resultados" si no hay nada visible
         if (cantidadVisible === 0) {
             filaSinResultados.style.display = '';
             tabla.appendChild(filaSinResultados);
@@ -330,5 +353,4 @@ document.addEventListener('DOMContentLoaded', function () {
     filtrarTabla();
 });
 </script>
-
 @endsection
