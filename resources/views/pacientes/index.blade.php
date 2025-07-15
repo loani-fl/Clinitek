@@ -22,13 +22,12 @@
 
     .content-wrapper {
         margin-top: 50px;
-     
         margin-left: auto;
         margin-right: auto;
         padding: 1rem;
         position: relative;
-         max-width: 1000px;  /* Igual que el max-width del segundo */
-            width: 100%;        /* Para que la card ocupe todo el ancho disponible */
+        max-width: 1000px;
+        width: 100%;
     }
 
     .custom-card::before {
@@ -55,21 +54,20 @@
         overflow: hidden;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         position: relative;
-          border-radius: 10px;
+        border-radius: 10px;
         z-index: 1;
-         max-width: 1000px;  /* Igual que en el segundo */
-    width: 100%;        /* Que ocupe todo el ancho dentro del contenedor */
+        max-width: 1000px;
+        width: 100%;
     }
 
-   .card-header {
-    background-color: transparent !important;
-    border-bottom: 3px solid #007BFF;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
-    text-align: center;
-    position: relative;
-}
-
+    .card-header {
+        background-color: transparent !important;
+        border-bottom: 3px solid #007BFF;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        text-align: center;
+        position: relative;
+    }
 
     .card-header h3 {
         font-size: 1.8rem;
@@ -102,15 +100,15 @@
 
     .table {
         font-size: 0.5rem;
-        width: 100%;  /* Tabla siempre al 100% del contenedor */
-    border-collapse: collapse; /* Para bordes uniformes */
+        width: 100%;
+        border-collapse: collapse;
     }
+
     .table-responsive {
-    flex-grow: 1;
-    overflow-y: auto;
-   
-    max-width: 100%; /* Para que no exceda la card */
-}
+        flex-grow: 1;
+        overflow-y: auto;
+        max-width: 100%;
+    }
 
     thead tr {
         background-color: #007BFF;
@@ -171,10 +169,9 @@
 
         <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
 
-       <div id="paginacion-container" class="pagination-container">
-    {{ $pacientes->onEachSide(1)->links('pagination::bootstrap-5') }}
-</div>
-
+        <div id="paginacion-container" class="pagination-container">
+            {{ $pacientes->onEachSide(1)->links('pagination::bootstrap-5') }}
+        </div>
     </div>
 </div>
 
@@ -199,35 +196,42 @@ $(document).ready(function () {
             data: { page, search: query },
             success: function(data) {
                 $('#tabla-container').html(data.html);
-                $('#paginacion-container').html(data.pagination ?? '');
+                $('#paginacion-container').html(data.pagination);
                 actualizarMensaje(data.total, data.all, query);
             },
-            error: function() {
-                $('#mensajeResultados').html('Error al cargar los datos.');
+            error: function(xhr) {
+                let msg = 'Error al cargar los datos.';
+                if(xhr.responseJSON && xhr.responseJSON.message) {
+                    msg += ' ' + xhr.responseJSON.message;
+                }
+                $('#mensajeResultados').html(msg);
             }
         });
     }
 
+    // Carga inicial sin filtro
     cargarDatos();
 
+    // Filtrar al escribir
     $('#filtroBusqueda').on('keyup', function () {
         let query = $(this).val();
         cargarDatos(1, query);
     });
 
+    // Paginación con delegación, para capturar clicks en links creados dinámicamente
     $(document).on('click', '.pagination a', function(e) {
         e.preventDefault();
         let url = $(this).attr('href');
-        let page = url.split('page=')[1];
+        let params = new URLSearchParams(url.split('?')[1]);
+        let page = params.get('page') || 1;
         let query = $('#filtroBusqueda').val();
         cargarDatos(page, query);
-        window.history.pushState("", "", url.split('?')[0] + '?page=' + page + (query ? "&search=" + encodeURIComponent(query) : ""));
+
+        // Actualizar URL sin recargar
+        let newUrl = url.split('?')[0] + '?page=' + page;
+        if (query) newUrl += '&search=' + encodeURIComponent(query);
+        window.history.pushState("", "", newUrl);
     });
 });
 </script>
 @endsection
-
-
-
-
-
