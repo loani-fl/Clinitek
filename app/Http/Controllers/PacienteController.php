@@ -80,9 +80,9 @@ class PacienteController extends Controller
 
         return redirect()->route('pacientes.index')->with('success', 'Paciente registrado exitosamente.');
     }
-
-    public function index(Request $request)
-    {
+public function index(Request $request)
+{
+    try {
         $query = $request->input('search', '');
         $pacientesQuery = Paciente::query();
 
@@ -92,24 +92,37 @@ class PacienteController extends Controller
                   ->orWhere('apellidos', 'like', "%$query%")
                   ->orWhere('identidad', 'like', "%$query%");
             });
+        }
+
+        if ($query) {
             $pacientes = $pacientesQuery->get();
+            $isSearch = true;
         } else {
-            $pacientes = $pacientesQuery->paginate(2);
+            $pacientes = $pacientesQuery->paginate(3)->withQueryString();
+            $isSearch = false;
         }
 
         if ($request->ajax()) {
             return response()->json([
-                'html' => view('pacientes.partials.tabla', compact('pacientes'))->render(),
-                'pagination' => ($pacientes instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                    ? view('pagination::bootstrap-5', ['paginator' => $pacientes])->render()
-                    : '',
+                'html' => view('pacientes.partials.tabla', compact('pacientes', 'isSearch'))->render(),
+                'pagination' => $isSearch ? '' : $pacientes->links('pagination::bootstrap-5')->render(),
                 'total' => $pacientes->count(),
                 'all' => Paciente::count(),
             ]);
         }
 
-        return view('pacientes.index', compact('pacientes'));
+        return view('pacientes.index', compact('pacientes', 'isSearch'));
+
+    } catch (\Exception $e) {
+        if ($request->ajax()) {
+            return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
+        }
+        abort(500, $e->getMessage());
     }
+}
+
+
+
 
     public function show($id)
     {

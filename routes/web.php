@@ -67,11 +67,9 @@ Route::patch('/consultas/{consulta}/cambiar-estado', [ConsultaController::class,
 Route::resource('diagnosticos', DiagnosticoController::class);
 
 Route::get('/recetas/create/{consulta}', [RecetaController::class, 'create'])->name('recetas.create');
+Route::post('/recetas/{consulta}', [RecetaController::class, 'store'])->name('recetas.store');
 Route::get('/pacientes/{paciente}/recetas', [PacienteController::class, 'showRecetas'])->name('recetas.show');
 Route::get('/consultas/{id}', [ConsultaController::class, 'show'])->name('consultas.show');
-Route::post('/pacientes/{paciente}/recetas', [RecetaController::class, 'store'])->name('recetas.store');
-
-
 
 // Ruta para mostrar formulario con paciente y consulta
 Route::get('diagnosticos/create/{paciente}/{consulta}', [DiagnosticoController::class, 'create'])->name('diagnosticos.create');
@@ -99,3 +97,7 @@ Route::post('examenes/{paciente}/{consulta}', [ExamenController::class, 'store']
 
 
 Route::post('/consultas/{id}/cambiar-estado', [ConsultaController::class, 'cambiarEstado'])->name('consultas.cambiarEstado');
+
+
+
+
