@@ -7,6 +7,7 @@ use App\Models\Paciente;
 use App\Models\Medico;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ConsultaController extends Controller
 {
@@ -169,8 +170,8 @@ class ConsultaController extends Controller
     }
 
     // 👇 Aquí calculamos la hora más ocupada para este médico y fecha
-    $horaMasOcupada = \DB::table('consultas')
-        ->select('hora', \DB::raw('COUNT(*) as total'))
+    $horaMasOcupada = DB::table('consultas')
+        ->select('hora', DB::raw('COUNT(*) as total'))
         ->where('medico_id', $consulta->medico_id)
         ->where('fecha', $consulta->fecha)
         ->where('hora', '!=', 'inmediata')
@@ -259,6 +260,5 @@ public function cambiarEstado(Request $request, $id)
 
     return redirect()->back()->with('success', 'Estado de la consulta actualizado.');
 }
-
 
 }

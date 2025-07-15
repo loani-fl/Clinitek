@@ -302,8 +302,14 @@
 
 @php
 use Carbon\Carbon;
-$horaFormateada = Carbon::createFromFormat('H:i:s', $consulta->hora)->format('g:i A');
+
+try {
+    $horaFormateada = $consulta->hora ? Carbon::parse($consulta->hora)->format('g:i A') : null;
+} catch (\Exception $e) {
+    $horaFormateada = null;
+}
 @endphp
+
 
 <script>
 // Función para convertir hora 12h a 24h (ej: 2:30 PM -> 14:30:00)
@@ -316,6 +322,7 @@ function hora12a24(hora12) {
     if (periodo === 'AM' && h === 12) h = 0;
     return `${h.toString().padStart(2, '0')}:${minuto}:00`;
 }
+
 
 // Carga especialidad según médico seleccionado
 function actualizarEspecialidad() {
@@ -441,12 +448,4 @@ document.querySelector('form').addEventListener('submit', function(e) {
     }
 });
 </script>
-
-
 @endsection
-
-
-
-
-
-

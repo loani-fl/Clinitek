@@ -108,7 +108,6 @@
   }
 </style>
 
-f
 
 {{-- Barra de navegación fija --}}
 <div class="header d-flex justify-content-between align-items-center px-3 py-2">
