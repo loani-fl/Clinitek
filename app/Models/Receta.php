@@ -19,9 +19,21 @@ class Receta extends Model
         return $this->belongsTo(Consulta::class);
     }
 
+
     // Relación con el diagnóstico
     public function diagnostico()
     {
         return $this->hasOne(Diagnostico::class);
     }
+
+
+    // app/Models/Receta.php
+    public function medicamentos()
+    {
+        return $this->belongsToMany(Medicamento::class, 'medicamento_receta', 'receta_id', 'medicamento_id')
+                    ->withPivot('indicaciones')
+                    ->withTimestamps();
+    }
+
+
 }

@@ -132,7 +132,7 @@
     }
 </style>
 
-<div class="header d-flex justify-content-between align-items-center px-3 py-2">
+<!--<div class="header d-flex justify-content-between align-items-center px-3 py-2">
     <div class="d-flex align-items-center">
         <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto;">
         <div class="fw-bold text-white ms-2" style="font-size: 1.5rem;">Clinitek</div>
@@ -143,7 +143,7 @@
         <a href="{{ route('medicos.create') }}" class="nav-link text-white">Registrar médico</a>
     </div>
 </div>
-
+-->
 <div class="content-wrapper">
     <div class="card custom-card shadow-sm">
         <div class="card-header">

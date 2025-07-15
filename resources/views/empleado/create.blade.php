@@ -110,7 +110,7 @@
 
 
 {{-- Barra de navegación fija --}}
-<div class="header d-flex justify-content-between align-items-center px-3 py-2">
+<!--<div class="header d-flex justify-content-between align-items-center px-3 py-2">
     {{-- Logo y título --}}
     <div class="d-flex align-items-center">
         <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" 
@@ -125,7 +125,7 @@
         <a href="{{ route('pacientes.index') }}" class="nav-link text-white">Registro Pacientes</a>
     </div>
 </div>
-
+-->
 {{-- Contenedor para aplicar el margin-top --}}
 <div class="content-wrapper">
     <div class="card custom-card shadow-sm">
