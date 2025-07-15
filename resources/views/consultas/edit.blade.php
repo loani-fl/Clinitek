@@ -30,21 +30,19 @@
         overflow-x: hidden;
     }
 
-  .custom-card {
-    max-width: 1000px;
-    width: 100%;
-    min-height: 600px; /* NUEVO */
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-bottom: 2rem; /* NUEVO */
-    margin-left: auto;
-    margin-right: auto;
-    position: relative;
-    background-color: #fff;
-    border-radius: 1rem;
-    box-shadow: 0 0.125rem 0.25rem rgb(0 0 0 / 0.075);
-    overflow: hidden;
-}
+    .custom-card {
+        max-width: 1000px;
+        width: 100%;
+        padding-left: 20px;
+        padding-right: 20px;
+        margin-left: auto;
+        margin-right: auto;
+        position: relative;
+        background-color: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 0.125rem 0.25rem rgb(0 0 0 / 0.075);
+        overflow: hidden;
+    }
 
     input, select, textarea {
         max-width: 100%;
@@ -269,7 +267,7 @@
                 @enderror
             </div>
 
-            <div class="col-md-6 mt-4">
+            <div class="col-md-6 mt-3">
                 <label for="motivo" class="@error('motivo') is-invalid @enderror">Motivo de la consulta <span class="text-danger">*</span></label>
                 <textarea name="motivo" maxlength="250" rows="2" required
                     class="form-control form-control-sm @error('motivo') is-invalid @enderror">{{ old('motivo', $consulta->motivo) }}</textarea>
@@ -278,7 +276,7 @@
                 @enderror
             </div>
 
-            <div class="col-md-6 mt-4">
+            <div class="col-md-6 mt-3">
                 <label for="sintomas" class="@error('sintomas') is-invalid @enderror">Síntomas <span class="text-danger">*</span></label>
                 <textarea name="sintomas" maxlength="250" rows="2" required
                     class="form-control form-control-sm @error('sintomas') is-invalid @enderror">{{ old('sintomas', $consulta->sintomas) }}</textarea>
@@ -288,7 +286,7 @@
             </div>
         </div>
 
-        <div class="d-flex justify-content-center gap-3 mt-5 flex-wrap">
+        <div class="d-flex justify-content-center gap-3 mt-2 flex-wrap">
             <button type="submit" class="btn btn-primary d-flex align-items-center" title="Guardar los cambios">
                 <i class="bi bi-pencil-square me-2"></i> Actualizar
             </button>
@@ -305,16 +303,10 @@
 @php
 use Carbon\Carbon;
 
-$horaFormateada = null;
-
-if (!empty($consulta->hora)) {
-    try {
-        $horaFormateada = Carbon::createFromFormat('H:i:s', $consulta->hora)->format('g:i A');
-    } catch (\Exception $e) {
-        $horaFormateada = null; // O un texto como 'Hora inválida'
-    }
-} else {
-    $horaFormateada = null; // Por ejemplo, para consultas "inmediatas"
+try {
+    $horaFormateada = $consulta->hora ? Carbon::parse($consulta->hora)->format('g:i A') : null;
+} catch (\Exception $e) {
+    $horaFormateada = null;
 }
 @endphp
 
@@ -330,6 +322,7 @@ function hora12a24(hora12) {
     if (periodo === 'AM' && h === 12) h = 0;
     return `${h.toString().padStart(2, '0')}:${minuto}:00`;
 }
+
 
 // Carga especialidad según médico seleccionado
 function actualizarEspecialidad() {
@@ -417,8 +410,7 @@ function cargarHorasDisponiblesEditar(horaActual) {
 document.addEventListener('DOMContentLoaded', function() {
     actualizarEspecialidad();
 
- const horaConsulta = "{{ old('hora', $horaFormateada ?? '') }}";
-// 👈 aquí insertamos la hora formateada
+    const horaConsulta = "{{ old('hora', $horaFormateada) }}"; // 👈 aquí insertamos la hora formateada
     cargarHorasDisponiblesEditar(horaConsulta);
 
     document.getElementById('medico').addEventListener('change', function() {
@@ -456,12 +448,4 @@ document.querySelector('form').addEventListener('submit', function(e) {
     }
 });
 </script>
-
-
 @endsection
-
-
-
-
-
-

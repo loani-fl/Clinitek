@@ -7,6 +7,7 @@ use App\Models\Paciente;
 use App\Models\Medico;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ConsultaController extends Controller
 {
@@ -169,8 +170,8 @@ class ConsultaController extends Controller
     }
 
     // 👇 Aquí calculamos la hora más ocupada para este médico y fecha
-    $horaMasOcupada = \DB::table('consultas')
-        ->select('hora', \DB::raw('COUNT(*) as total'))
+    $horaMasOcupada = DB::table('consultas')
+        ->select('hora', DB::raw('COUNT(*) as total'))
         ->where('medico_id', $consulta->medico_id)
         ->where('fecha', $consulta->fecha)
         ->where('hora', '!=', 'inmediata')
@@ -198,54 +199,31 @@ class ConsultaController extends Controller
 public function update(Request $request, $id)
 {
     $validated = $request->validate([
-        'hora' => [
-            'required',
-            function ($attribute, $value, $fail) {
-                if ($value !== 'inmediata' && !preg_match('/^\d{1,2}:\d{2} (AM|PM)$/', $value)) {
-                    $fail('El formato de la hora debe ser h:mm AM/PM (ejemplo: 3:30 PM).');
-                }
-            },
-        ],
         'fecha' => ['required', 'date', 'after_or_equal:today'],
         'medico_id' => ['required', 'exists:medicos,id'],
-        'motivo' => [
-            'required',
-            'string',
-            'max:250',
-            'regex:/^[a-zA-Z0-9\s.,áéíóúÁÉÍÓÚñÑ\-]+$/u'
-        ],
-        'sintomas' => [
-            'required',
-            'string',
-            'max:250',
-            'regex:/^[a-zA-Z0-9\s.,áéíóúÁÉÍÓÚñÑ\-]+$/u'
-        ],
+        'hora' => ['required', 'date_format:g:i A'],  // Formato 12h con AM/PM
+        'motivo' => ['required', 'string', 'max:250', 'regex:/^[a-zA-Z0-9\s.,áéíóúÁÉÍÓÚñÑ\-]+$/u'],
+        'sintomas' => ['required', 'string', 'max:250', 'regex:/^[a-zA-Z0-9\s.,áéíóúÁÉÍÓÚñÑ\-]+$/u'],
     ], [
         'hora.required' => 'Debe seleccionar una hora.',
+        'hora.date_format' => 'El formato de la hora debe ser h:mm AM/PM (ejemplo: 3:30 PM).',
         'motivo.regex' => 'El motivo solo puede contener letras, números, espacios, comas, puntos y guiones.',
         'sintomas.regex' => 'Los síntomas solo pueden contener letras, números, espacios, comas, puntos y guiones.',
     ]);
 
+    // Convertir la hora 12h a formato 24h para guardar en BD
+    $hora24 = Carbon::createFromFormat('g:i A', $validated['hora'])->format('H:i:s');
+
     $consulta = Consulta::findOrFail($id);
+    $consulta->fecha = $validated['fecha'];
+    $consulta->medico_id = $validated['medico_id'];
+    $consulta->hora = $hora24;
+    $consulta->motivo = $validated['motivo'];
+    $consulta->sintomas = $validated['sintomas'];
+    $consulta->save();
 
-    if ($validated['hora'] !== 'inmediata') {
-        $hora24 = \Carbon\Carbon::createFromFormat('g:i A', $validated['hora'])->format('H:i:s');
-    } else {
-        $hora24 = null; // o lo que corresponda en tu lógica para “inmediata”
-    }
-
-    $consulta->update([
-        'fecha'       => $validated['fecha'],
-        'hora'        => $hora24,
-        'medico_id'   => $validated['medico_id'],
-        'motivo'      => $validated['motivo'],
-        'sintomas'    => $validated['sintomas'],
-    ]);
-
-    return redirect()->route('consultas.index')
-        ->with('success', 'Consulta actualizada correctamente.');
+    return redirect()->route('consultas.index')->with('success', 'Consulta actualizada correctamente.');
 }
-
 
 public function show($id)
 {
