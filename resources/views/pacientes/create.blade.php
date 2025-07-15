@@ -40,18 +40,6 @@
         <h2 class="fw-bold text-black mb-0">Registro de paciente</h2>
     </div>
 
-    {{-- Mostrar errores generales --}}
-    @if ($errors->any())
-    <div class="alert alert-danger">
-        <h5><strong>Por favor corrige los siguientes errores:</strong></h5>
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
-
     <form id="formPaciente" action="{{ route('pacientes.store') }}" method="POST" novalidate>
         @csrf
 

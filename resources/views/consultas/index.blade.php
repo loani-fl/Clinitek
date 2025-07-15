@@ -53,12 +53,28 @@
         z-index: 1;
     }
     .card-header {
-        border-bottom: 3px solid #007BFF;
-        padding-bottom: 0.5rem;
-        margin-bottom: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent !important;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 3px solid #007BFF;
+    display: flex;
+}
+
+.card-header h2 {
+    color: #000 !important;
+    margin: 0 auto;
+}
+
+.card-header .btn {
+    position: absolute;
+    right: 0;
+}
+
+    .card-header h2 {
+        color: #000 !important; /* Forzar negro al título */
     }
     .alert-success-custom {
         background-color: #d4edda;
@@ -106,27 +122,14 @@
         font-size: 0.9rem;
         color: #444;
     }
-</style>
 
-<!-- Barra de navegación fija
-<div class="header d-flex justify-content-between align-items-center px-3 py-2">
-    <div class="d-flex align-items-center">
-        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto; margin-right: 6px;">
-        <span class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</span>
-    </div>
-    <div class="d-flex gap-3 flex-wrap">
-        <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
-        <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
-        <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
-    </div>
-</div>
--->
+</style>
 
 <div class="content-wrapper">
     <div class="card custom-card">
 
         <div class="card-header">
-            <h2 class="fw-bold text-black mb-0">Consultas médicas registradas</h2>
+            <h2 class="fw-bold mb-0">Consultas médicas registradas</h2>
             <a href="{{ route('inicio') }}" class="btn btn-light">
                 <i class="bi bi-house-door"></i> Inicio
             </a>
@@ -138,9 +141,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
-
-
-
 
         <div class="card-body">
 
@@ -174,7 +174,7 @@
                         <option value="">-- Todos los Estados --</option>
                         <option value="realizado">Realizado</option>
                         <option value="pendiente">Pendiente</option>
-                        <option value="cancelada">Cancelada</option> <!-- Aquí corrigió a "cancelada" -->
+                        <option value="cancelada">Cancelada</option>
                     </select>
                 </div>
             </div>
@@ -219,10 +219,9 @@
                             </tr>
                         @endforeach
 
-                                                <tr id="sin-resultados" style="display: none;">
+                        <tr id="sin-resultados" style="display: none;">
                             <td colspan="7" class="text-center fst-italic text-muted">No hay resultados que mostrar</td>
                         </tr>
-
                     </tbody>
                 </table>
             </div>
@@ -232,7 +231,7 @@
             <div class="estado-leyenda">
                 <div><span class="estado-circulo estado-realizado"></span> Realizado</div>
                 <div><span class="estado-circulo estado-pendiente"></span> Pendiente</div>
-                <div><span class="estado-circulo estado-cancelado"></span> Cancelada</div> <!-- Texto corregido -->
+                <div><span class="estado-circulo estado-cancelado"></span> Cancelada</div>
             </div>
 
             <div class="mt-4 pagination-container">
@@ -306,8 +305,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const estadoCelda = celdas[5]?.querySelector('span.estado-circulo')?.getAttribute('title').toLowerCase() || '';
 
-            const partesFecha = fechaTexto.split('/');
-            const fechaConsulta = partesFecha.length === 3 ? `${partesFecha[2]}-${partesFecha[1].padStart(2, '0')}-${partesFecha[0].padStart(2, '0')}` : '';
+            let fechaConsulta = '';
+if (fechaTexto) {
+    const partesFecha = fechaTexto.split('/');
+    if (partesFecha.length === 3) {
+        // Convertir de dd/mm/yyyy a yyyy-mm-dd
+        const dia = partesFecha[0].padStart(2, '0');
+        const mes = partesFecha[1].padStart(2, '0');
+        const anio = partesFecha[2];
+        fechaConsulta = `${anio}-${mes}-${dia}`;
+    }
+}
+
 
             const coincideMedico = medicoSeleccionado === '' || nombreMedico.includes(medicoSeleccionado);
             const coincidePaciente = textoBusqueda === '' || nombrePaciente.startsWith(textoBusqueda);
@@ -325,7 +334,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Mostrar fila "No hay resultados" si no hay nada visible
         if (cantidadVisible === 0) {
             filaSinResultados.style.display = '';
             tabla.appendChild(filaSinResultados);
@@ -344,7 +352,5 @@ document.addEventListener('DOMContentLoaded', function () {
 
     filtrarTabla();
 });
-
 </script>
-
 @endsection

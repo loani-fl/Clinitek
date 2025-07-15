@@ -110,7 +110,7 @@
 </style>
 
 <!-- Barra de navegación fija -->
-<div class="header d-flex justify-content-between align-items-center px-3 py-2" 
+<!--<div class="header d-flex justify-content-between align-items-center px-3 py-2" 
      style="background-color: #007BFF; position: fixed; top: 0; left: 0; right: 0; z-index: 1030; height: 56px;">
     <div class="d-flex align-items-center">
         <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" 
@@ -122,7 +122,7 @@
         <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
     </div>
 </div>
-
+-->
 <!-- Formulario más compacto -->
 <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px; z-index:1;">
     <div class="card-header text-center py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
@@ -302,8 +302,14 @@
 
 @php
 use Carbon\Carbon;
-$horaFormateada = Carbon::createFromFormat('H:i:s', $consulta->hora)->format('g:i A');
+
+try {
+    $horaFormateada = $consulta->hora ? Carbon::parse($consulta->hora)->format('g:i A') : null;
+} catch (\Exception $e) {
+    $horaFormateada = null;
+}
 @endphp
+
 
 <script>
 // Función para convertir hora 12h a 24h (ej: 2:30 PM -> 14:30:00)
@@ -316,6 +322,7 @@ function hora12a24(hora12) {
     if (periodo === 'AM' && h === 12) h = 0;
     return `${h.toString().padStart(2, '0')}:${minuto}:00`;
 }
+
 
 // Carga especialidad según médico seleccionado
 function actualizarEspecialidad() {
@@ -441,12 +448,4 @@ document.querySelector('form').addEventListener('submit', function(e) {
     }
 });
 </script>
-
-
 @endsection
-
-
-
-
-
-

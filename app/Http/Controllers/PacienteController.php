@@ -14,20 +14,17 @@ class PacienteController extends Controller
     {
         return view('pacientes.create');
     }
-    
+
     public function createConConsulta($paciente_id, $consulta_id)
     {
         $consulta = Consulta::findOrFail($consulta_id);
-    
+
         if ($consulta->estado !== 'realizada') {
             return redirect()->back()->with('error', 'Antes debe realizarse un diagnóstico para poder crear la orden de examen.');
         }
-    
+
         return view('pacientes.create', compact('paciente_id', 'consulta_id'));
     }
-    
-    
-
 
     private function validarAnioIdentidad($identidad)
     {
@@ -74,62 +71,59 @@ class PacienteController extends Controller
         ], [
             'nombre.required' => 'El nombre es obligatorio.',
             'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
-            'nombre.max' => 'El nombre no puede exceder 50 caracteres.',
+            'nombre.max' => 'El nombre no puede superar los 50 caracteres.',
 
             'apellidos.required' => 'Los apellidos son obligatorios.',
             'apellidos.regex' => 'Los apellidos solo pueden contener letras y espacios.',
-            'apellidos.max' => 'Los apellidos no pueden exceder 50 caracteres.',
+            'apellidos.max' => 'Los apellidos no pueden superar los 50 caracteres.',
 
             'identidad.required' => 'La identidad es obligatoria.',
-            'identidad.digits' => 'La identidad debe contener solo números.',
-            'identidad.regex' => 'La identidad debe comenzar con un código válido (01-18), seguido de (01-28), seguido de un año de 4 dígitos, y respetar la estructura.',
+            'identidad.digits' => 'La identidad debe tener exactamente 13 dígitos.',
+            'identidad.regex' => 'El formato de la identidad no es válido.',
             'identidad.unique' => 'Esta identidad ya está registrada.',
 
             'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
-            'fecha_nacimiento.date' => 'La fecha debe ser válida.',
-            'fecha_nacimiento.before_or_equal' => 'La persona debe tener al menos 21 años.',
-            'fecha_nacimiento.after_or_equal' => 'La persona no puede tener más de 60 años.',
+            'fecha_nacimiento.date' => 'Debe ser una fecha válida.',
+            'fecha_nacimiento.before_or_equal' => 'El paciente debe tener al menos 21 años.',
+            'fecha_nacimiento.after_or_equal' => 'El paciente no puede tener más de 60 años.',
 
             'telefono.required' => 'El teléfono es obligatorio.',
-            'telefono.digits' => 'El teléfono debe tener 8 dígitos.',
-            'telefono.regex' => 'El teléfono debe comenzar con 2, 3, 8 o 9.',
-            'telefono.unique' => 'Este número de teléfono ya está registrado.',
+            'telefono.digits' => 'El teléfono debe tener exactamente 8 dígitos.',
+            'telefono.regex' => 'El teléfono debe iniciar con 2, 3, 8 o 9.',
+            'telefono.unique' => 'Este teléfono ya está registrado.',
 
             'direccion.required' => 'La dirección es obligatoria.',
-            'direccion.max' => 'La dirección no puede exceder 300 caracteres.',
+            'direccion.max' => 'La dirección no puede superar los 300 caracteres.',
 
             'correo.required' => 'El correo electrónico es obligatorio.',
-            'correo.email' => 'El correo debe contener un "@" y un punto "." en el dominio.',
-            'correo.max' => 'El correo no puede exceder 50 caracteres.',
-            'correo.unique' => 'Este correo electrónico ya está registrado.',
-            'correo.regex' => 'El correo debe contener un "@" y un punto "." en el dominio.',
+            'correo.email' => 'Debe ser un correo válido.',
+            'correo.regex' => 'El formato del correo electrónico no es válido.',
+            'correo.unique' => 'Este correo ya está registrado.',
+            'correo.max' => 'El correo no puede superar los 50 caracteres.',
 
-            'tipo_sangre.in' => 'Seleccione un tipo de sangre válido.',
+            'tipo_sangre.in' => 'El tipo de sangre debe ser uno válido (A+, A-, B+, B-, AB+, AB-, O+, O-).',
 
             'genero.required' => 'El género es obligatorio.',
-            'genero.in' => 'Debe seleccionar una opción válida de género.',
+            'genero.in' => 'El género debe ser Femenino, Masculino u Otro.',
 
             'padecimientos.required' => 'Los padecimientos son obligatorios.',
-            'padecimientos.regex' => 'Solo se permiten letras y espacios.',
-            'padecimientos.max' => 'No puede exceder 200 caracteres.',
+            'padecimientos.regex' => 'Los padecimientos solo pueden contener letras y espacios.',
+            'padecimientos.max' => 'Los padecimientos no pueden superar los 200 caracteres.',
 
             'medicamentos.required' => 'Los medicamentos son obligatorios.',
-            'medicamentos.regex' => 'Solo se permiten letras y espacios.',
-            'medicamentos.max' => 'No puede exceder 200 caracteres.',
+            'medicamentos.regex' => 'Los medicamentos solo pueden contener letras y espacios.',
+            'medicamentos.max' => 'Los medicamentos no pueden superar los 200 caracteres.',
 
             'historial_clinico.required' => 'El historial clínico es obligatorio.',
-            'historial_clinico.regex' => 'Solo se permiten letras y espacios.',
-            'historial_clinico.max' => 'No puede exceder 200 caracteres.',
+            'historial_clinico.regex' => 'El historial clínico solo puede contener letras y espacios.',
+            'historial_clinico.max' => 'El historial clínico no puede superar los 200 caracteres.',
 
             'alergias.required' => 'Las alergias son obligatorias.',
-            'alergias.regex' => 'Solo se permiten letras y espacios.',
-            'alergias.max' => 'No puede exceder 200 caracteres.',
+            'alergias.regex' => 'Las alergias solo pueden contener letras y espacios.',
+            'alergias.max' => 'Las alergias no pueden superar los 200 caracteres.',
 
-            'historial_quirurgico.regex' => 'Solo se permiten letras y espacios.',
-           
-            'historial_quirurgico.max' => 'No puede exceder 200 caracteres.',
-
-           
+            'historial_quirurgico.regex' => 'El historial quirúrgico solo puede contener letras y espacios.',
+            'historial_quirurgico.max' => 'El historial quirúrgico no puede superar los 200 caracteres.',
         ]);
 
         if (!$this->validarAnioIdentidad($request->identidad)) {
@@ -142,51 +136,51 @@ class PacienteController extends Controller
 
         return redirect()->route('pacientes.index')->with('success', 'Paciente registrado exitosamente.');
     }
-public function index(Request $request)
-{
-    $query = $request->input('search', '');
 
-    $pacientesQuery = \App\Models\Paciente::query();
+    public function index(Request $request)
+    {
+        try {
+            $query = $request->input('search', '');
+            $pacientesQuery = Paciente::query();
 
-    if ($query) {
-        $pacientesQuery->where(function ($q) use ($query) {
-            $q->where('nombre', 'like', "%$query%")
-              ->orWhere('apellidos', 'like', "%$query%")
-              ->orWhere('identidad', 'like', "%$query%");
-        });
+            if ($query) {
+                $pacientesQuery->where(function ($q) use ($query) {
+                    $q->where('nombre', 'like', "%$query%")
+                      ->orWhere('apellidos', 'like', "%$query%")
+                      ->orWhere('identidad', 'like', "%$query%");
+                });
+            }
 
-        $pacientes = $pacientesQuery->get(); // sin paginar
-    } else {
-        $pacientes = $pacientesQuery->paginate(2);
+            if ($query) {
+                $pacientes = $pacientesQuery->get();
+                $isSearch = true;
+            } else {
+                $pacientes = $pacientesQuery->paginate(3)->withQueryString();
+                $isSearch = false;
+            }
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'html' => view('pacientes.partials.tabla', compact('pacientes', 'isSearch'))->render(),
+                    'pagination' => $isSearch ? '' : $pacientes->links('pagination::bootstrap-5')->render(),
+                    'total' => $pacientes->count(),
+                    'all' => Paciente::count(),
+                ]);
+            }
+
+            return view('pacientes.index', compact('pacientes', 'isSearch'));
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
+            }
+            abort(500, $e->getMessage());
+        }
     }
-
-    if ($request->ajax()) {
-        return response()->json([
-            'html' => view('pacientes.partials.tabla', compact('pacientes'))->render(),
-            'pagination' => ($pacientes instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                ? $pacientes->links('pagination::bootstrap-5')->render()
-                : '',
-            'total' => $pacientes->count(),
-            'all' => \App\Models\Paciente::count(),
-        ]);
-    }
-
-    return view('pacientes.index', compact('pacientes'));
-}
-
-
-
 
     public function show($id)
     {
-        $paciente = Paciente::findOrFail($id);
-        $paciente->load('diagnostico');
-
+        $paciente = Paciente::with(['consultas.recetas', 'diagnostico'])->findOrFail($id);
         return view('pacientes.show', compact('paciente'));
-
-        $paciente = Paciente::with('consultas.receta')->findOrFail($id);
-    return view('pacientes.show', compact('paciente'));
-    
     }
 
     public function edit(Paciente $paciente)
@@ -202,7 +196,6 @@ public function index(Request $request)
             'nombre' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
             'apellidos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
             'genero' => ['required', 'in:Femenino,Masculino,Otro'],
-
             'identidad' => [
                 'required',
                 'digits:13',
@@ -229,69 +222,12 @@ public function index(Request $request)
                 Rule::unique('pacientes', 'correo')->ignore($paciente->id),
                 'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
             ],
-
             'tipo_sangre' => ['nullable', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
             'padecimientos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
             'medicamentos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
             'historial_clinico' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
             'alergias' => ['required', 'regex:/^[\pL\s]+$/u', 'max:200'],
             'historial_quirurgico' => ['nullable', 'regex:/^[\pL\s]*$/u', 'max:200'],
-        ], [
-            'nombre.required' => 'El nombre es obligatorio.',
-            'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
-            'nombre.max' => 'El nombre no puede exceder 50 caracteres.',
-
-            'apellidos.required' => 'Los apellidos son obligatorios.',
-            'apellidos.regex' => 'Los apellidos solo pueden contener letras y espacios.',
-            'apellidos.max' => 'Los apellidos no pueden exceder 50 caracteres.',
-
-            'identidad.required' => 'La identidad es obligatoria.',
-            'identidad.digits' => 'La identidad debe contener solo números.',
-            'identidad.regex' => 'La identidad debe comenzar con un código válido (01-18), seguido de (01-28), seguido de un año de 4 dígitos, y respetar la estructura.',
-            'identidad.unique' => 'Esta identidad ya está registrada para otro paciente.',
-
-            'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
-            'fecha_nacimiento.date' => 'La fecha debe ser válida.',
-            'fecha_nacimiento.before_or_equal' => 'La persona debe tener al menos 21 años.',
-            'fecha_nacimiento.after_or_equal' => 'La persona no puede tener más de 60 años.',
-
-            'telefono.required' => 'El teléfono es obligatorio.',
-            'telefono.digits' => 'El teléfono debe tener 8 dígitos.',
-            'telefono.regex' => 'El teléfono debe comenzar con 2, 3, 8 o 9.',
-            'telefono.unique' => 'Este número de teléfono ya está registrado.',
-
-            'direccion.required' => 'La dirección es obligatoria.',
-            'direccion.max' => 'La dirección no puede exceder 300 caracteres.',
-
-            'correo.required' => 'El correo es obligatorio.',
-            'correo.email' => 'El correo debe contener un "@" y un punto "." en el dominio.',
-
-            'correo.unique' => 'Este correo electrónico ya está registrado.',
-
-
-            'tipo_sangre.in' => 'Seleccione un tipo de sangre válido.',
-
-            'genero.required' => 'El género es obligatorio.',
-            'genero.in' => 'Debe seleccionar una opción válida de género.',
-
-            'padecimientos.required' => 'Los padecimientos son obligatorios.',
-            'padecimientos.regex' => 'Solo se permiten letras y espacios.',
-            'padecimientos.max' => 'No puede exceder 200 caracteres.',
-
-            'medicamentos.required' => 'Los medicamentos son obligatorios.',
-            'medicamentos.regex' => 'Solo se permiten letras y espacios.',
-            'medicamentos.max' => 'No puede exceder 200 caracteres.',
-
-            'historial_clinico.required' => 'El historial clínico es obligatorio.',
-            'historial_clinico.regex' => 'Solo se permiten letras y espacios.',
-            'historial_clinico.max' => 'No puede exceder 200 caracteres.',
-
-            'alergias.required' => 'Las alergias son obligatorias.',
-            'alergias.regex' => 'Solo se permiten letras y espacios.',
-            'alergias.max' => 'No puede exceder 200 caracteres.',
-
-            'historial_quirurgico.regex' => 'Solo se permiten letras y espacios.',
-            'historial_quirurgico.max' => 'No puede exceder 200 caracteres.',
         ]);
 
         if (!$this->validarAnioIdentidad($request->identidad)) {
@@ -326,3 +262,4 @@ public function index(Request $request)
         return view('recetas.show', compact('paciente'));
     }
 }
+

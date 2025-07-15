@@ -19,4 +19,16 @@ class Receta extends Model
     {
         return $this->belongsTo(Consulta::class);
     }
+
+
+    // app/Models/Receta.php
+public function medicamentos()
+{
+    return $this->belongsToMany(Medicamento::class, 'medicamento_receta', 'receta_id', 'medicamento_id')
+                ->withPivot('indicaciones')
+                ->withTimestamps();
+}
+
+
+    
 }

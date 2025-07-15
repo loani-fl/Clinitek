@@ -7,6 +7,8 @@ use App\Models\Puesto;
 use App\Models\Empleado;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+
 
 class EmpleadosController extends Controller
 {
@@ -26,61 +28,30 @@ class EmpleadosController extends Controller
         $departamentosValidos = ['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18'];
 
         $rules = [
-            'nombres' => [
-                'required',
-                'string',
-                'max:50',
-                'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'
+            'nombres' => ['required', 'string', 'max:50', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'],
+            'apellidos' => ['required', 'string', 'max:50', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'],
+            'identidad' => [
+                'required', 'digits:13', 'unique:listaempleados,identidad',
+                function ($attribute, $value, $fail) use ($departamentosValidos) {
+                    $codigoDepartamento = substr($value, 0, 2);
+                    if (!in_array($codigoDepartamento, $departamentosValidos)) {
+                        return $fail('El código del departamento en la identidad no es válido.');
+                    }
+                    $anioNacimiento = substr($value, 4, 4);
+                    $anioActual = date('Y');
+                    if ($anioNacimiento < 1900 || $anioNacimiento > $anioActual) {
+                        return $fail('El año de nacimiento en la identidad no es válido.');
+                    }
+                    $edad = $anioActual - $anioNacimiento;
+                    if ($edad < 18 || $edad > 65) {
+                        return $fail("La edad calculada a partir de la identidad no es válida (debe ser entre 18 y 65 años; edad actual: $edad).");
+                    }
+                }
             ],
-            'apellidos' => [
-                'required',
-                'string',
-                'max:50',
-                'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'
-            ],
-          'identidad' => [
-    'required',
-    'digits:13',
-    'unique:listaempleados,identidad',
-    function ($attribute, $value, $fail) use ($departamentosValidos) {
-        // Validar departamento (primeros 2 dígitos)
-        $codigoDepartamento = substr($value, 0, 2);
-        if (!in_array($codigoDepartamento, $departamentosValidos)) {
-            return $fail('El código del departamento en la identidad no es válido.');
-        }
-
-        // Validar año de nacimiento (posiciones 4 a 7)
-        $anioNacimiento = substr($value, 4, 4);
-        $anioActual = date('Y');
-        if ($anioNacimiento < 1900 || $anioNacimiento > $anioActual) {
-            return $fail('El año de nacimiento en la identidad no es válido.');
-        }
-
-        // Validar edad calculada
-        $edad = $anioActual - $anioNacimiento;
-        if ($edad < 18 || $edad > 65) {
-            return $fail("La edad calculada a partir de la identidad no es válida (debe ser entre 18 y 65 años; edad actual: $edad).");
-        }
-    }
-],
-
-            'telefono' => [
-                'required',
-                'digits:8',
-                'regex:/^[2389][0-9]{7}$/',
-                'unique:listaempleados,telefono'
-            ],
-           'correo' => [
-    'required',
-    'string',
-    'max:30',
-    'email',
-    'unique:listaempleados,correo',
-],
-
+            'telefono' => ['required', 'digits:8', 'regex:/^[2389][0-9]{7}$/', 'unique:listaempleados,telefono'],
+            'correo' => ['required', 'string', 'max:30', 'email', 'unique:listaempleados,correo'],
             'fecha_ingreso' => [
-                'required',
-                'date',
+                'required', 'date',
                 function ($attribute, $value, $fail) use ($anio) {
                     $fecha = Carbon::parse($value);
                     $min = Carbon::createFromDate($anio, 5, 1);
@@ -91,8 +62,7 @@ class EmpleadosController extends Controller
                 },
             ],
             'fecha_nacimiento' => [
-                'required',
-                'date',
+                'required', 'date',
                 function ($attribute, $value, $fail) use ($hace18, $hace65) {
                     $fecha = Carbon::parse($value);
                     if ($fecha->gt($hace18)) {
@@ -103,28 +73,15 @@ class EmpleadosController extends Controller
                     }
                 },
             ],
-            'direccion' => [
-                'required',
-                'string',
-                'max:250',
-                'regex:/^[\pL\pN\s#\/\-\(\)]+$/u',
-            ],
-            'observaciones' => [
-                'required',
-                'string',
-                'max:350',
-                'regex:/^[\pL\pN\s]+$/u',
-            ],
+            'direccion' => ['required', 'string', 'max:250', 'regex:/^[\pL\pN\s#\/\-\(\)]+$/u'],
+            'observaciones' => ['required', 'string', 'max:350', 'regex:/^[\pL\pN\s]+$/u'],
             'genero' => 'required|in:Masculino,Femenino,Otro',
             'estado_civil' => 'nullable|in:Soltero,Casado,Divorciado,Viudo',
             'puesto_id' => 'required|exists:puestos,id',
             'salario' => 'required|numeric|between:0,99999.99',
             'area' => 'required|string|max:50',
             'turno_asignado' => 'required|string|max:50',
-           'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-
-
-
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
 
         $messages = [
@@ -134,28 +91,12 @@ class EmpleadosController extends Controller
             'email' => ':attribute debe ser un correo electrónico válido.',
             'unique' => ':attribute ya está registrado.',
             'date' => ':attribute debe ser una fecha válida.',
-            'before_or_equal' => ':attribute no es válido.',
             'in' => 'El valor seleccionado para :attribute no es válido.',
-            'exists' => 'El valor seleccionado para :attribute es inválido.',
             'numeric' => ':attribute debe ser un número.',
             'between' => ':attribute debe ser un número válido con hasta 2 decimales.',
-            'nombres.required' => 'Los Nombres son obligatorios.',
-            'nombres.regex' => 'Nombres solo debe contener letras y espacios.',
-            'apellidos.required' => 'Los Apellidos son obligatorios.',
-            'apellidos.regex' => 'Apellidos solo debe contener letras y espacios.',
-            'identidad.required' => 'La identidad es obligatoria.',
-            'telefono.required' => 'El Teléfono es obligatorio.',
-            'telefono.regex' => 'El teléfono debe comenzar con 2, 3, 8 o 9 y contener exactamente 8 dígitos numéricos.',
-           'correo.required' => 'El correo es obligatorio.',
-           'correo.email' => 'El correo debe ser un correo válido.',
-           'correo.unique' => 'El correo ya está en uso.',
-            'fecha_nacimiento.before_or_equal' => 'El empleado debe tener al menos 18 años.',
-            'direccion.required' => 'La Dirección es obligatoria.',
-            'observaciones.required' => 'Las Observaciones son obligatorias.',
-            'turno_asignado.required' => 'El turno asignado es obligatorio.',
-            'foto.image' => 'El archivo debe ser una imagen.',
-'foto.mimes' => 'La imagen debe ser en formato JPG, JPEG, PNG o GIF.',
-'foto.max' => 'La imagen no debe pesar más de 2 MB.',
+            'foto.image' => 'La imagen debe ser una imagen válida.',
+            'foto.mimes' => 'La imagen debe ser en formato JPG, JPEG, PNG o GIF.',
+            'foto.max' => 'La imagen no debe pesar más de 2 MB.',
         ];
 
         $attributes = [
@@ -179,35 +120,29 @@ class EmpleadosController extends Controller
         // 1. Validar los datos
         $validated = $request->validate($rules, $messages, $attributes);
 
-        // 2. Buscar el puesto y asignar el área al arreglo validado
+        // 2. Buscar el puesto y asignar el área
         $puesto = Puesto::findOrFail($validated['puesto_id']);
         $validated['area'] = $puesto->area;
 
-        Log::info('Se validó correctamente. Intentando crear empleado...', $validated);
-
         // 3. Manejar foto si existe
         if ($request->hasFile('foto')) {
-            $file = $request->file('foto');
-            $nombreArchivo = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/fotos', $nombreArchivo);
-            $validated['foto'] = 'fotos/' . $nombreArchivo; 
+            $fotoPath = $request->file('foto')->store('fotos_empleados', 'public');
+            $validated['foto'] = $fotoPath; // guarda solo fotos_empleados/archivo.jpg
         }
 
         $validated['estado'] = 'activo';
 
         // 4. Crear el empleado
         $empleado = Empleado::create($validated);
-       // Registrar empleado
-   if ($empleado) {
-        // Rediriges a la ruta de registro o donde quieras
-        return redirect()->route('empleado.index')
-            ->with('success', 'Empleado registrado correctamente.')
-            ->with('clearLocalStorage', true); // <- Esta línea es clave
-    } else {
-        return back()->withErrors('No se pudo registrar el empleado.');
-    }
-    }
 
+        if ($empleado) {
+            return redirect()->route('empleado.index')
+                ->with('success', 'Empleado registrado correctamente.')
+                ->with('clearLocalStorage', true);
+        } else {
+            return back()->withErrors('No se pudo registrar el empleado.');
+        }
+    }
     public function index(Request $request)
     {
         $query = Empleado::with('puesto');
@@ -408,8 +343,8 @@ class EmpleadosController extends Controller
 
     if ($request->hasFile('foto')) {
         // Eliminar foto anterior si existe
-        if ($empleado->foto && \Storage::exists('public/' . $empleado->foto)) {
-            \Storage::delete('public/' . $empleado->foto);
+        if ($empleado->foto && Storage::exists('public/' . $empleado->foto)) {
+            Storage::delete('public/' . $empleado->foto);
         }
 
         // Guardar nueva foto
@@ -435,4 +370,3 @@ class EmpleadosController extends Controller
         return view('empleado.show', compact('empleado'));
     }
 }
-

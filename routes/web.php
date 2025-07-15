@@ -12,6 +12,9 @@ use App\Http\Controllers\DiagnosticoController;
 use App\Http\Controllers\ExamenController;
 use App\Models\Puesto;
 use App\Http\Controllers\RecetaController;
+use App\Http\Controllers\MedicamentoController;
+
+Route::get('/medicamentos/search', [MedicamentoController::class, 'search'])->name('medicamentos.search');
 
 // Página de bienvenida
 Route::get('/', function () {
@@ -97,3 +100,7 @@ Route::post('examenes/{paciente}/{consulta}', [ExamenController::class, 'store']
 
 
 Route::post('/consultas/{id}/cambiar-estado', [ConsultaController::class, 'cambiarEstado'])->name('consultas.cambiarEstado');
+
+
+
+
