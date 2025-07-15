@@ -158,7 +158,7 @@
 @section('content')
 
 <!-- Barra de navegación superior -->
-<div class="header">
+<!--<div class="header">
     <div class="d-flex align-items-center">
         <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto; margin-right: 6px;">
         <span class="fw-bold">Clinitek</span>
@@ -170,7 +170,7 @@
         <a href="{{ route('medicos.create') }}">Registrar médico</a>
     </div>
 </div>
-
+-->
 <!-- Contenedor principal -->
 <div class="custom-card">
 
