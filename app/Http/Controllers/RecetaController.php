@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Receta;
 use App\Models\Consulta;
+use App\Models\Medicamento;
 use App\Models\Paciente;
 use Illuminate\Http\Request;
 
@@ -50,11 +51,23 @@ class RecetaController extends Controller
         ]);
 
         foreach ($request->medicamentos as $med) {
-            $receta->medicamentos()->create([
-                'nombre' => $med['nombre'],
-                'indicacion' => $med['indicacion']
+            // Buscar o crear el medicamento por su nombre
+            $medicamento = Medicamento::firstOrCreate([
+                'nombre' => trim($med['nombre']),
+            ]);
+        
+            // Evitar duplicados dentro de la misma receta
+            $yaExiste = $receta->medicamentos()->where('medicamento_id', $medicamento->id)->exists();
+            if ($yaExiste) {
+                continue; // no lo vuelvas a agregar
+            }
+        
+            // Agregar a la receta con las indicaciones en la tabla pivote
+            $receta->medicamentos()->attach($medicamento->id, [
+                'indicaciones' => $med['indicacion'],
             ]);
         }
+        
     
         return redirect()->route('consultas.show', $consulta->id)
             ->with('success', 'Receta creada correctamente.');
