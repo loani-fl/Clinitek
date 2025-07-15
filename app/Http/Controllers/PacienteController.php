@@ -155,7 +155,7 @@ class PacienteController extends Controller
                 $pacientes = $pacientesQuery->get();
                 $isSearch = true;
             } else {
-                $pacientes = $pacientesQuery->paginate(3)->withQueryString();
+                $pacientes = $pacientesQuery->paginate(3);
                 $isSearch = false;
             }
 
@@ -179,7 +179,7 @@ class PacienteController extends Controller
 
     public function show($id)
     {
-        $paciente = Paciente::with(['diagnostico', 'consultas.receta'])->findOrFail($id);
+        $paciente = Paciente::with(['diagnostico', 'consultas'])->findOrFail($id);
         return view('pacientes.show', compact('paciente'));
     }
 
@@ -259,9 +259,7 @@ class PacienteController extends Controller
 
             'correo.required' => 'El correo es obligatorio.',
             'correo.email' => 'El correo debe contener un "@" y un punto "." en el dominio.',
-
             'correo.unique' => 'Este correo electrónico ya está registrado.',
-
 
             'tipo_sangre.in' => 'Seleccione un tipo de sangre válido.',
 
