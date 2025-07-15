@@ -44,7 +44,10 @@
 <div class="container mt-5">
     <div class="card custom-card">
         <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-            <h5 class="mb-0 fw-bold text-dark" style="font-size: 2rem;">Recetas Médicas de {{ $paciente->nombre }} {{ $paciente->apellidos }}</h5>
+            <h5 class="mb-0 fw-bold text-dark" style="font-size: 2rem;">Recetas médicas de {{ $paciente->nombre }} {{ $paciente->apellidos }}</h5>
+            <a href="{{ route('pacientes.index') }}" class="btn btn-success btn-sm">
+                <i class="bi bi-arrow-left"></i> Regresar
+            </a>
         </div>
 
         <div class="card-body">

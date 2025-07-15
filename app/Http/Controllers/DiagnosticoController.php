@@ -130,4 +130,10 @@ class DiagnosticoController extends Controller
         return redirect()->route('diagnosticos.show', $diagnostico->id)
             ->with('success', 'Diagnóstico actualizado correctamente.');
     }
+    public function index()
+{
+    $diagnosticos = Diagnostico::with('paciente', 'consulta.medico')->get();
+    return view('diagnosticos.index', compact('diagnosticos'));
+}
+
 }

@@ -93,6 +93,7 @@
     </style>
 </head>
 <body>
+    
 <div class="header d-flex justify-content-between align-items-center px-3 py-2">
     <div class="d-flex align-items-center">
         <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto; margin-right: 6px;">
