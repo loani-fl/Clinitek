@@ -19,59 +19,62 @@ class RecetaController extends Controller
 
 
     public function store(Request $request, $pacienteId)
-    {
-      
-        $request->validate([
-            'detalles' => 'required|string|max:500',
-            'medicamentos' => 'required|array|min:1', 
-            'medicamentos.*.nombre' => 'required|string',
-            'medicamentos.*.indicacion' => 'required|string',
-        ], [
-            'detalles.required' => 'Detalles de prescripción es obligatorio.',
-            'detalles.max' => 'Detalles no puede tener más de 500 caracteres.',
-            'medicamentos.required' => 'Debes agregar al menos un medicamento.',
-            'medicamentos.min' => 'Debes agregar al menos un medicamento.',
-            'medicamentos.*.nombre.required' => 'El nombre del medicamento es obligatorio.',
-            'medicamentos.*.indicacion.required' => 'Las indicaciones del medicamento son obligatorias.',
-        ]);
-        
-  
-        $consulta = Consulta::where('paciente_id', $pacienteId)->latest('fecha')->first();
+{
+    $request->validate([
+       'detalles' => 'nullable|string|max:500',
+        'medicamentos' => 'required|array|min:1',
+        'medicamentos.*.nombre' => 'required|string',
+        'medicamentos.*.indicacion' => 'required|string',
+        'medicamentos.*.dosis' => 'required|string',
+        'medicamentos.*.detalles' => 'required|string|max:500',
     
-        if (!$consulta) {
-            return redirect()->back()->withErrors([
-                'consulta' => 'Este paciente no tiene ninguna consulta registrada.'
-            ]);
-        }
-   
-        $receta = Receta::create([
-            'consulta_id' => $consulta->id,
-            'paciente_id' => $pacienteId,
-            'detalles' => $request->detalles,
+
+    ], [
+        'detalles.required' => 'Detalles de prescripción es obligatorio.',
+        'detalles.max' => 'Detalles no puede tener más de 500 caracteres.',
+        'medicamentos.required' => 'Debes agregar al menos un medicamento.',
+        'medicamentos.min' => 'Debes agregar al menos un medicamento.',
+        'medicamentos.*.nombre.required' => 'El nombre del medicamento es obligatorio.',
+        'medicamentos.*.indicacion.required' => 'Las indicaciones del medicamento son obligatorias.',
+        'medicamentos.*.dosis.required' => 'La dosis es obligatoria.',
+        'medicamentos.*.detalles.required' => 'Los detalles de prescripción del medicamento son obligatorios.',
+    ]);
+
+    $consulta = Consulta::where('paciente_id', $pacienteId)->latest('fecha')->first();
+
+    if (!$consulta) {
+        return redirect()->back()->withErrors([
+            'consulta' => 'Este paciente no tiene ninguna consulta registrada.'
+        ]);
+    }
+
+    $receta = Receta::create([
+        'consulta_id' => $consulta->id,
+        'paciente_id' => $pacienteId,
+        'detalles' => $request->detalles,
+    ]);
+
+    foreach ($request->medicamentos as $med) {
+        $medicamento = Medicamento::firstOrCreate([
+            'nombre' => trim($med['nombre']),
         ]);
 
-        foreach ($request->medicamentos as $med) {
-            // Buscar o crear el medicamento por su nombre
-            $medicamento = Medicamento::firstOrCreate([
-                'nombre' => trim($med['nombre']),
-            ]);
-        
-            // Evitar duplicados dentro de la misma receta
-            $yaExiste = $receta->medicamentos()->where('medicamento_id', $medicamento->id)->exists();
-            if ($yaExiste) {
-                continue; // no lo vuelvas a agregar
-            }
-        
-            // Agregar a la receta con las indicaciones en la tabla pivote
-            $receta->medicamentos()->attach($medicamento->id, [
-                'indicaciones' => $med['indicacion'],
-            ]);
+        $yaExiste = $receta->medicamentos()->where('medicamento_id', $medicamento->id)->exists();
+        if ($yaExiste) {
+            continue;
         }
-        
-    
-        return redirect()->route('consultas.show', $consulta->id)
-            ->with('success', 'Receta creada correctamente.');
+
+        $receta->medicamentos()->attach($medicamento->id, [
+            'indicaciones' => $med['indicacion'],
+            'dosis' => $med['dosis'],
+            'detalles' => $med['detalles'],
+        ]);
     }
+
+    return redirect()->route('consultas.show', $consulta->id)
+        ->with('success', 'Receta creada correctamente.');
+}
+
     
 
     public function show($id)
