@@ -340,9 +340,9 @@ $secciones = [
 
                 {{-- Botones centrados --}}
                 <div class="d-flex justify-content-center gap-3 mt-4">
-                    <a href="{{ route('consultas.show', $consulta->id) }}" class="btn btn-imprimir" target="_blank">
-                        <i class="bi bi-printer"></i> Guardar e Imprimir
-                    </a>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Guardar y Ver Orden de Exámenes
+        </button>
                 
                     <button type="button" id="btnLimpiar" class="btn btn-warning">
                         <i class="bi bi-trash"></i> Limpiar

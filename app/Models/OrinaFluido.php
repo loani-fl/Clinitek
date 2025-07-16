@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrinaFluido extends Model
 {
+     protected $table = 'orina_fluidos';
     protected $fillable = [
         'diagnostico_id',
         'examen_general_orina',

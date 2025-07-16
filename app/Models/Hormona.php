@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Hormona extends Model
 {
-    use HasFactory;
+   
+     protected $table = 'hormonas';
 
     protected $fillable = [
         'diagnostico_id',

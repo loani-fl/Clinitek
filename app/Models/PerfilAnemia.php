@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class PerfilAnemia extends Model
 {
      protected $table = 'perfil_anemias';
+     
     protected $fillable = [
         'diagnostico_id',
         'hierro_serico',

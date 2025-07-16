@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PerfilDiabetes extends Model
 {
+     protected $table = 'perfil_diabetes';
     protected $fillable = [
         'diagnostico_id',
         'peptido_c',

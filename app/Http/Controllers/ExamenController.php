@@ -14,6 +14,8 @@ use App\Models\MarcadorTumoral;
 use App\Models\InmunologiaAutoinmunidad;
 use App\Models\OrinaFluido;
 use App\Models\Hormona;
+use App\Models\Examen;
+
 use App\Models\Infeccioso;
 
 class ExamenController extends Controller
@@ -33,117 +35,132 @@ class ExamenController extends Controller
 
     // Guardar orden de exámenes
     public function store(Request $request, $pacienteId, $diagnosticoId)
-    {
-        // Validar que el diagnóstico exista
-        $diagnostico = Diagnostico::findOrFail($diagnosticoId);
+{
+    // Validar que el diagnóstico exista
+    $diagnostico = Diagnostico::findOrFail($diagnosticoId);
 
-        $secciones = [
-            'HEMATOLOGÍA' => Hematologia::class,
-            'PERFIL DIABETES' => PerfilDiabetes::class,
-            'PERFIL DE ANEMIA' => PerfilAnemia::class,
-            'BIOQUÍMICOS' => Bioquimico::class,
-            'MARCADORES TUMORALES' => MarcadorTumoral::class,
-            'INMUNOLOGÍA Y AUTOINMUNIDAD' => InmunologiaAutoinmunidad::class,
-            'ORINA Y FLUIDOS' => OrinaFluido::class,
-            'HORMONAS' => Hormona::class,
-            'INFECCIOSOS' => Infeccioso::class,
-        ];
+    $secciones = [
+        'HEMATOLOGÍA' => Hematologia::class,
+        'PERFIL DIABETES' => PerfilDiabetes::class,
+        'PERFIL DE ANEMIA' => PerfilAnemia::class,
+        'BIOQUÍMICOS' => Bioquimico::class,
+        'MARCADORES TUMORALES' => MarcadorTumoral::class,
+        'INMUNOLOGÍA Y AUTOINMUNIDAD' => InmunologiaAutoinmunidad::class,
+        'ORINA Y FLUIDOS' => OrinaFluido::class,
+        'HORMONAS' => Hormona::class,
+        'INFECCIOSOS' => Infeccioso::class,
+    ];
 
-        // Mapeo de campos especiales si usas abreviaturas
-        $mapaCamposEspeciales = [
-            'tsh' => 'hormona_estimulante_tiroides_tsh',
-            'lh' => 'hormona_luteinizante_lh',
-            'fsh' => 'hormona_foliculo_estimulante_fsh',
-            'beta_hcg' => 'beta_hcg_embarazo',
-        ];
+    $mapaCamposEspeciales = [
+        'tsh' => 'hormona_estimulante_tiroides_tsh',
+        'lh' => 'hormona_luteinizante_lh',
+        'fsh' => 'hormona_foliculo_estimulante_fsh',
+        'beta_hcg' => 'beta_hcg_embarazo',
+    ];
 
-        // Elimina registros antiguos para evitar duplicados
-        foreach ($secciones as $modelo) {
-            $modelo::where('diagnostico_id', $diagnosticoId)->delete();
+    // Elimina registros antiguos para evitar duplicados en tablas específicas
+    foreach ($secciones as $modelo) {
+        $modelo::where('diagnostico_id', $diagnosticoId)->delete();
+    }
+
+    // Elimina exámenes anteriores para este paciente y consulta en tabla 'examenes'
+    Examen::where('paciente_id', $pacienteId)
+        ->where('consulta_id', $diagnostico->consulta_id)
+        ->delete();
+
+    $examenesSeleccionados = $request->input('examenes', []);
+
+    foreach ($secciones as $nombreSeccion => $modeloClase) {
+        $atributos = [];
+
+        $modeloInstancia = new $modeloClase;
+        foreach ($modeloInstancia->getFillable() as $campo) {
+            $atributos[$campo] = false;
         }
 
-        $examenesSeleccionados = $request->input('examenes', []);
+        foreach ($examenesSeleccionados as $examen) {
+            $examenSinSimbolos = preg_replace('/[()\/\-.:\']+/', '', strtolower($examen));
+            $examenNormalizado = \Illuminate\Support\Str::snake($examenSinSimbolos);
 
-        foreach ($secciones as $nombreSeccion => $modeloClase) {
-            $atributos = [];
-
-            // Inicializa todos los campos como false
-            $modeloInstancia = new $modeloClase;
-            foreach ($modeloInstancia->getFillable() as $campo) {
-                $atributos[$campo] = false;
+            if (array_key_exists($examenNormalizado, $mapaCamposEspeciales)) {
+                $campo = $mapaCamposEspeciales[$examenNormalizado];
+            } else {
+                $campo = $examenNormalizado;
             }
 
-            // Marca true para los exámenes seleccionados que correspondan a esta sección
-            foreach ($examenesSeleccionados as $examen) {
-                // Normaliza el nombre del examen para buscar el campo correcto
-                $examenSinSimbolos = preg_replace('/[()\/\-.:\']+/', '', strtolower($examen));
-                $examenNormalizado = \Illuminate\Support\Str::snake($examenSinSimbolos);
-
-                if (array_key_exists($examenNormalizado, $mapaCamposEspeciales)) {
-                    $campo = $mapaCamposEspeciales[$examenNormalizado];
-                } else {
-                    $campo = $examenNormalizado;
-                }
-
-                // Busca coincidencias parciales si no existe el campo exacto
-                if (!array_key_exists($campo, $atributos)) {
-                    foreach ($atributos as $key => $valor) {
-                        if (strpos($key, $campo) !== false) {
-                            $campo = $key;
-                            break;
-                        }
+            if (!array_key_exists($campo, $atributos)) {
+                foreach ($atributos as $key => $valor) {
+                    if (strpos($key, $campo) !== false) {
+                        $campo = $key;
+                        break;
                     }
                 }
-
-                // Si el campo pertenece a esta sección, marcar true
-                if (array_key_exists($campo, $atributos)) {
-                    $atributos[$campo] = true;
-                }
             }
 
-            // Si hay al menos un campo true, guarda el registro
-            if (in_array(true, $atributos, true)) {
-                $atributos['diagnostico_id'] = $diagnosticoId;
-                $modeloClase::create($atributos);
+            if (array_key_exists($campo, $atributos)) {
+                $atributos[$campo] = true;
             }
         }
 
-        return redirect()->route('diagnosticos.show', $diagnosticoId)
-            ->with('success', 'Orden de examen guardada correctamente.');
+        if (in_array(true, $atributos, true)) {
+            $atributos['diagnostico_id'] = $diagnosticoId;
+            $modeloClase::create($atributos);
+        }
     }
+
+    // Guardar en tabla 'examenes' para mostrar listado en la vista show
+    foreach ($examenesSeleccionados as $nombreExamen) {
+        Examen::create([
+            'paciente_id' => $pacienteId,
+            'consulta_id' => $diagnostico->consulta_id,
+            'nombre' => $nombreExamen,
+        ]);
+    }
+
+    return redirect()->route('examenes.show', $diagnosticoId)
+        ->with('success', 'Orden de examen guardada correctamente.');
+}
+
 
     // Mostrar la orden de exámenes guardada para un diagnóstico
-    public function show($diagnosticoId)
-    {
-        $diagnostico = Diagnostico::with('paciente')->findOrFail($diagnosticoId);
+public function show($diagnosticoId)
+{
+    $diagnostico = Diagnostico::with('paciente', 'consulta.medico')->findOrFail($diagnosticoId);
 
-        $modelos = [
-            'HEMATOLOGÍA' => new Hematologia(),
-            'PERFIL DIABETES' => new PerfilDiabetes(),
-            'PERFIL DE ANEMIA' => new PerfilAnemia(),
-            'BIOQUÍMICOS' => new Bioquimico(),
-            'MARCADORES TUMORALES' => new MarcadorTumoral(),
-            'INMUNOLOGÍA Y AUTOINMUNIDAD' => new InmunologiaAutoinmunidad(),
-            'ORINA Y FLUIDOS' => new OrinaFluido(),
-            'HORMONAS' => new Hormona(),
-            'INFECCIOSOS' => new Infeccioso(),
-        ];
+    $paciente = $diagnostico->paciente;
+    $consulta = $diagnostico->consulta;
 
-        $registros = [];
+    $secciones = [
+        'HEMATOLOGÍA' => Hematologia::class,
+        'PERFIL DIABETES' => PerfilDiabetes::class,
+        'PERFIL DE ANEMIA' => PerfilAnemia::class,
+        'BIOQUÍMICOS' => Bioquimico::class,
+        'MARCADORES TUMORALES' => MarcadorTumoral::class,
+        'INMUNOLOGÍA Y AUTOINMUNIDAD' => InmunologiaAutoinmunidad::class,
+        'ORINA Y FLUIDOS' => OrinaFluido::class,
+        'HORMONAS' => Hormona::class,
+        'INFECCIOSOS' => Infeccioso::class,
+    ];
 
-        foreach ($modelos as $seccion => $modelo) {
-            $registro = $modelo->where('diagnostico_id', $diagnosticoId)->first();
+    $datosSecciones = [];
 
-            if ($registro) {
-                $campos = collect($registro->getAttributes())
-                    ->except(['id', 'diagnostico_id', 'created_at', 'updated_at']);
+    foreach ($secciones as $nombreSeccion => $modeloClase) {
+        $registro = $modeloClase::where('diagnostico_id', $diagnosticoId)->first();
 
-                if ($campos->contains(true)) {
-                    $registros[$seccion] = $registro;
-                }
-            }
-        }
 
-        return view('examenes.show', compact('diagnostico', 'registros'));
+        if ($registro) {
+    $campos = collect($registro->getAttributes())
+        ->except(['id', 'diagnostico_id', 'created_at', 'updated_at'])
+        ->toArray();
+    $datosSecciones[$nombreSeccion] = $campos;
+}
+// Si no hay registro, no hagas nada
+
     }
+
+    return view('examenes.show', compact('diagnostico', 'paciente', 'consulta', 'datosSecciones'));
+}
+
+
+
 }

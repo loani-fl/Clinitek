@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Bioquimico extends Model
 {
+     protected $table = 'bioquimicos';
     protected $fillable = [
      'diagnostico_id',
         'urea',

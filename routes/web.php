@@ -61,7 +61,10 @@ Route::get('/horas-ocupadas', [ConsultaController::class, 'horasOcupadas']);
 
 Route::get('/horas-ocupadas', [ConsultahoraController::class, 'horasOcupadas'])->name('horas.ocupadas');
 
+//posible ruta a eliminar
 Route::get('consultas/{id}/edit', [ConsultaController::class, 'edit'])->name('consultas.edit');
+
+
 Route::put('consultas/{id}', [ConsultaController::class, 'update'])->name('consultas.update');
 Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupadas'])->name('consultas.horas.ocupadas');
 Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('consultas.show');
@@ -96,7 +99,7 @@ Route::post('/consultas/{id}/cambiar-estado', [ConsultaController::class, 'cambi
 Route::get('/examenes/create/{paciente}/{consulta}', [ExamenController::class, 'create'])->name('examenes.create');
 
 Route::post('/examenes/store/{paciente}/{diagnostico}', [ExamenController::class, 'store'])->name('examenes.store');
-Route::get('/examenes/{paciente}/{consulta}', [ExamenController::class, 'show'])->name('examenes.show');
+//Route::get('/examenes/{paciente}/{consulta}', [ExamenController::class, 'show'])->name('examenes.show');
 
 
 Route::get('/examenes/{diagnostico}', [ExamenController::class, 'show'])->name('examenes.show');
