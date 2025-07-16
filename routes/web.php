@@ -52,6 +52,7 @@ Route::get('/pacientes/{id}', [PacienteController::class, 'show'])->name('pacien
 Route::get('pacientes/{paciente}/edit', [App\Http\Controllers\PacienteController::class, 'edit'])->name('pacientes.edit');
 Route::put('/pacientes/{paciente}', [PacienteController::class, 'update'])->name('pacientes.update');
 
+
 Route::resource('consultas', ConsultaController::class);
 Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupadas']);
 Route::get('/horas-ocupadas', [App\Http\Controllers\ConsultaController::class, 'horasOcupadas']);
@@ -71,6 +72,8 @@ Route::resource('diagnosticos', DiagnosticoController::class);
 
 Route::get('/recetas/create/{consulta}', [RecetaController::class, 'create'])->name('recetas.create');
 Route::post('/recetas/{consulta}', [RecetaController::class, 'store'])->name('recetas.store');
+Route::post('recetas/{paciente}', [RecetaController::class, 'store'])->name('recetas.store');
+
 Route::get('/pacientes/{paciente}/recetas', [PacienteController::class, 'showRecetas'])->name('recetas.show');
 Route::get('/consultas/{id}', [ConsultaController::class, 'show'])->name('consultas.show');
 
