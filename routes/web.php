@@ -61,7 +61,10 @@ Route::get('/horas-ocupadas', [ConsultaController::class, 'horasOcupadas']);
 
 Route::get('/horas-ocupadas', [ConsultahoraController::class, 'horasOcupadas'])->name('horas.ocupadas');
 
+//posible ruta a eliminar
 Route::get('consultas/{id}/edit', [ConsultaController::class, 'edit'])->name('consultas.edit');
+
+
 Route::put('consultas/{id}', [ConsultaController::class, 'update'])->name('consultas.update');
 Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupadas'])->name('consultas.horas.ocupadas');
 Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('consultas.show');
@@ -90,22 +93,16 @@ Route::put('diagnosticos/{diagnostico}', [DiagnosticoController::class, 'update'
 // Ruta para mostrar detalle del diagnóstico
 Route::get('diagnosticos/{diagnostico}', [DiagnosticoController::class, 'show'])->name('diagnosticos.show');
 
-// Rutas para ExamenController
-Route::get('/pacientes/{paciente}/consultas/{consulta}/examenes/create', [ExamenController::class, 'create'])->name('examenes.create');
-Route::post('/pacientes/{paciente}/consultas/{consulta}/examenes', [ExamenController::class, 'store'])->name('examenes.store');
-
-// prueba show
-Route::get('/examenes/prueba/{consulta}', [ExamenController::class, 'showPrueba'])->name('examenes.show');
-Route::get('/examenes/create/{paciente_id}/{consulta_id}', [ExamenController::class, 'create'])->name('examenes.create');
-Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('consultas.show');
-
-// ejemplo de rutas en web.php para show
-Route::get('examenes/{paciente}/{consulta}', [ExamenController::class, 'show'])->name('examenes.show');
-Route::post('examenes/{paciente}/{consulta}', [ExamenController::class, 'store'])->name('examenes.store');
-
+// Rutas para Estado de consultas
 
 Route::post('/consultas/{id}/cambiar-estado', [ConsultaController::class, 'cambiarEstado'])->name('consultas.cambiarEstado');
 
+// Rutas para ExamenController
+Route::get('/examenes/create/{paciente}/{consulta}', [ExamenController::class, 'create'])->name('examenes.create');
+
+Route::post('/examenes/store/{paciente}/{diagnostico}', [ExamenController::class, 'store'])->name('examenes.store');
+//Route::get('/examenes/{paciente}/{consulta}', [ExamenController::class, 'show'])->name('examenes.show');
 
 
+Route::get('/examenes/{diagnostico}', [ExamenController::class, 'show'])->name('examenes.show');
 

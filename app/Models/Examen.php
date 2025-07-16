@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Examen extends Model
 {
-
+    
     protected $table = 'examens'; // <- Aquí pones el nombre correcto
     protected $fillable = ['paciente_id', 'consulta_id', 'nombre'];
 

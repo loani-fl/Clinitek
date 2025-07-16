@@ -5,80 +5,162 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Paciente;
 use App\Models\Consulta;
+use App\Models\Diagnostico;
+use App\Models\Hematologia;
+use App\Models\PerfilDiabetes;
+use App\Models\PerfilAnemia;
+use App\Models\Bioquimico;
+use App\Models\MarcadorTumoral;
+use App\Models\InmunologiaAutoinmunidad;
+use App\Models\OrinaFluido;
+use App\Models\Hormona;
 use App\Models\Examen;
+
+use App\Models\Infeccioso;
 
 class ExamenController extends Controller
 {
+    // Mostrar formulario para crear orden de exámenes
     public function create($pacienteId, $consultaId)
     {
         $paciente = Paciente::findOrFail($pacienteId);
-        $consulta = Consulta::with('medico')->findOrFail($consultaId);
+        $consulta = Consulta::with('medico', 'diagnostico')->findOrFail($consultaId);
+
+        if (!$consulta->diagnostico) {
+            return redirect()->back()->withErrors('La consulta no tiene diagnóstico asociado.');
+        }
 
         return view('examenes.create', compact('paciente', 'consulta'));
     }
 
-    public function store(Request $request, $pacienteId, $consultaId)
-    {
-        $consulta = Consulta::with('paciente', 'medico', 'examens')->findOrFail($consultaId);
+    // Guardar orden de exámenes
+    public function store(Request $request, $pacienteId, $diagnosticoId)
+{
+    // Validar que el diagnóstico exista
+    $diagnostico = Diagnostico::findOrFail($diagnosticoId);
 
-        // Validar que la consulta esté realizada
-        if ($consulta->estado !== 'realizada') {
-            return back()->withErrors([
-                'estado' => 'Debe finalizar la consulta antes de ordenar exámenes.'
-            ]);
+    $secciones = [
+        'HEMATOLOGÍA' => Hematologia::class,
+        'PERFIL DIABETES' => PerfilDiabetes::class,
+        'PERFIL DE ANEMIA' => PerfilAnemia::class,
+        'BIOQUÍMICOS' => Bioquimico::class,
+        'MARCADORES TUMORALES' => MarcadorTumoral::class,
+        'INMUNOLOGÍA Y AUTOINMUNIDAD' => InmunologiaAutoinmunidad::class,
+        'ORINA Y FLUIDOS' => OrinaFluido::class,
+        'HORMONAS' => Hormona::class,
+        'INFECCIOSOS' => Infeccioso::class,
+    ];
+
+    $mapaCamposEspeciales = [
+        'tsh' => 'hormona_estimulante_tiroides_tsh',
+        'lh' => 'hormona_luteinizante_lh',
+        'fsh' => 'hormona_foliculo_estimulante_fsh',
+        'beta_hcg' => 'beta_hcg_embarazo',
+    ];
+
+    // Elimina registros antiguos para evitar duplicados en tablas específicas
+    foreach ($secciones as $modelo) {
+        $modelo::where('diagnostico_id', $diagnosticoId)->delete();
+    }
+
+    // Elimina exámenes anteriores para este paciente y consulta en tabla 'examenes'
+    Examen::where('paciente_id', $pacienteId)
+        ->where('consulta_id', $diagnostico->consulta_id)
+        ->delete();
+
+    $examenesSeleccionados = $request->input('examenes', []);
+
+    foreach ($secciones as $nombreSeccion => $modeloClase) {
+        $atributos = [];
+
+        $modeloInstancia = new $modeloClase;
+        foreach ($modeloInstancia->getFillable() as $campo) {
+            $atributos[$campo] = false;
         }
-
-        // Validar que se haya seleccionado al menos un examen
-        $request->validate([
-            'examenes' => 'required|array|min:1|max:10'
-        ], [
-            'examenes.required' => 'Debe seleccionar al menos un examen.',
-            'examenes.array' => 'Debe seleccionar al menos un examen.',
-            'examenes.min' => 'Debe seleccionar al menos un examen.'
-        ]);
-
-        // Aquí pones este código:
-        $examenesSeleccionados = $request->input('examenes', []);
 
         foreach ($examenesSeleccionados as $examen) {
-            Examen::create([
-                'paciente_id' => $pacienteId,
-                'consulta_id' => $consultaId,
-                'nombre' => $examen,
-            ]);
+            $examenSinSimbolos = preg_replace('/[()\/\-.:\']+/', '', strtolower($examen));
+            $examenNormalizado = \Illuminate\Support\Str::snake($examenSinSimbolos);
+
+            if (array_key_exists($examenNormalizado, $mapaCamposEspeciales)) {
+                $campo = $mapaCamposEspeciales[$examenNormalizado];
+            } else {
+                $campo = $examenNormalizado;
+            }
+
+            if (!array_key_exists($campo, $atributos)) {
+                foreach ($atributos as $key => $valor) {
+                    if (strpos($key, $campo) !== false) {
+                        $campo = $key;
+                        break;
+                    }
+                }
+            }
+
+            if (array_key_exists($campo, $atributos)) {
+                $atributos[$campo] = true;
+            }
         }
 
-        return view('examenes.show', [
-            'examenes' => collect($examenesSeleccionados)->map(function($nombre) {
-                return (object) ['nombre' => $nombre];
-            }),
-            'consulta_id' => $consultaId,
+        if (in_array(true, $atributos, true)) {
+            $atributos['diagnostico_id'] = $diagnosticoId;
+            $modeloClase::create($atributos);
+        }
+    }
+
+    // Guardar en tabla 'examenes' para mostrar listado en la vista show
+    foreach ($examenesSeleccionados as $nombreExamen) {
+        Examen::create([
             'paciente_id' => $pacienteId,
+            'consulta_id' => $diagnostico->consulta_id,
+            'nombre' => $nombreExamen,
         ]);
     }
 
-    public function show($pacienteId, $consultaId)
-    {
-        $consulta = Consulta::with('paciente', 'medico')->findOrFail($consultaId);
-        $paciente = $consulta->paciente;
-        $medico = $consulta->medico;
-        $examenes = Examen::where('paciente_id', $pacienteId)
-                          ->where('consulta_id', $consultaId)
-                          ->get();
+    return redirect()->route('examenes.show', $diagnosticoId)
+        ->with('success', 'Orden de examen guardada correctamente.');
+}
 
-        $edad = \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age;
 
-        return view('examenes.show', compact('consulta', 'paciente', 'medico', 'examenes', 'edad'));
+    // Mostrar la orden de exámenes guardada para un diagnóstico
+public function show($diagnosticoId)
+{
+    $diagnostico = Diagnostico::with('paciente', 'consulta.medico')->findOrFail($diagnosticoId);
+
+    $paciente = $diagnostico->paciente;
+    $consulta = $diagnostico->consulta;
+
+    $secciones = [
+        'HEMATOLOGÍA' => Hematologia::class,
+        'PERFIL DIABETES' => PerfilDiabetes::class,
+        'PERFIL DE ANEMIA' => PerfilAnemia::class,
+        'BIOQUÍMICOS' => Bioquimico::class,
+        'MARCADORES TUMORALES' => MarcadorTumoral::class,
+        'INMUNOLOGÍA Y AUTOINMUNIDAD' => InmunologiaAutoinmunidad::class,
+        'ORINA Y FLUIDOS' => OrinaFluido::class,
+        'HORMONAS' => Hormona::class,
+        'INFECCIOSOS' => Infeccioso::class,
+    ];
+
+    $datosSecciones = [];
+
+    foreach ($secciones as $nombreSeccion => $modeloClase) {
+        $registro = $modeloClase::where('diagnostico_id', $diagnosticoId)->first();
+
+
+        if ($registro) {
+    $campos = collect($registro->getAttributes())
+        ->except(['id', 'diagnostico_id', 'created_at', 'updated_at'])
+        ->toArray();
+    $datosSecciones[$nombreSeccion] = $campos;
+}
+// Si no hay registro, no hagas nada
+
     }
 
-    // Helper para lista de exámenes disponibles
-    private function getExamenesDisponibles()
-    {
-        return [
-            'Hemograma Completo', 'Glucosa', 'Urea', 'Creatinina',
-            'Ácido Úrico', 'Tolerancia a la Glucosa', 'TSH',
-            'Prolactina', 'Testosterona', 'Estradiol', 'CA125',
-            'CA19-9', 'Beta HCG', 'Cultivo de Orina', 'Examen de Orina'
-        ];
-    }
+    return view('examenes.show', compact('diagnostico', 'paciente', 'consulta', 'datosSecciones'));
+}
+
+
+
 }
