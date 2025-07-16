@@ -21,13 +21,14 @@ class Receta extends Model
     }
 
 
-    // app/Models/Receta.php
-public function medicamentos()
-{
-    return $this->belongsToMany(Medicamento::class, 'medicamento_receta', 'receta_id', 'medicamento_id')
-                ->withPivot('indicaciones')
-                ->withTimestamps();
-}
+    
+    public function medicamentos()
+    {
+        return $this->belongsToMany(Medicamento::class, 'medicamento_receta', 'receta_id', 'medicamento_id')
+                    ->withPivot('indicaciones', 'dosis', 'detalles')
+                    ->withTimestamps();
+    }
+    
 
 
     

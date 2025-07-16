@@ -8,7 +8,7 @@
         border: 1px solid #ccc;
         max-height: 150px;
         overflow-y: auto;
-        width: 100%;
+        width: 35%;
         z-index: 1000;
         display: none;
         cursor: pointer;
@@ -105,6 +105,17 @@
         <p><strong>Fecha:</strong> {{ $consulta->fecha ?? 'Sin fecha' }}</p>
     </div>
 
+    @if ($errors->any())
+    <div style="background-color: #f8d7da; color: #842029; padding: 1rem; margin-bottom: 1rem; border-radius: 6px; border: 1px solid #f5c2c7;">
+        <strong>¡Error!</strong> Hay problemas con los datos ingresados:
+        <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
     <form action="{{ route('recetas.store', ['paciente' => $consulta->paciente->id]) }}" method="POST">
         @csrf
         <input type="hidden" name="consulta_id" value="{{ $consulta->id }}">
@@ -128,15 +139,43 @@
         <div style="margin-bottom: 1rem;">
             <label for="indicacion" style="font-weight: 600;">Indicaciones:</label>
             <select id="indicacion" style="width: 18%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
-                <option value="8 horas">Cada 8 horas</option>
-                <option value="12 horas">Cada 12 horas</option>
-                <option value="24 horas">Cada 24 horas</option>
+                <option value="Cada 8 horas">Cada 8 horas</option>
+                <option value="Cada 12 horas">Cada 12 horas</option>
+                <option value="Cada 24 horas">Cada 24 horas</option>
                 <option value="Una vez al día">Una vez al día</option>
                 <option value="Antes de dormir">Antes de dormir</option>
             </select>
             @error('medicamentos.0.indicacion')
                 <div class="error-message">{{ $message }}</div>
             @enderror
+        </div>
+
+        <!-- Dosis -->
+        <div style="margin-bottom: 1rem;">
+            <label for="dosis" style="font-weight: 600;">Dosis:</label>
+            <input 
+                type="text" 
+                id="dosis" 
+                placeholder="Ejemplo: 500 mg" 
+                style="width: 20%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+            @error('medicamentos.0.dosis')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <!-- Detalles de prescripción (individual) -->
+        <div id="detalles-container" style="margin-bottom: 1rem; display: none;">
+            <label for="detalles" style="display: block; font-weight: 600; margin-bottom: 0.25rem;">
+                Detalles de prescripción:
+            </label>
+            <textarea 
+                id="detalles" 
+                placeholder="Escribe los detalles aquí" 
+                maxlength="500"
+                style="width: 100%; height: 120px; padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px;"></textarea>
+            <div style="text-align: right; font-size: 0.8rem; color: #555;">
+                <span id="charCount">0</span>/500 caracteres
+            </div>
         </div>
 
         <!-- Botón para agregar medicamento -->
@@ -151,6 +190,8 @@
                 <tr>
                     <th>Medicamento</th>
                     <th>Indicaciones</th>
+                    <th>Dosis</th>
+                    <th>Detalles de prescripción</th>
                     <th>Acción</th>
                 </tr>
             </thead>
@@ -162,29 +203,6 @@
         @error('medicamentos')
             <div class="error-message">{{ $message }}</div>
         @enderror
-
-        <!-- Detalles de prescripción -->
-        <div style="margin-top: 1rem;">
-            <label for="detalles" style="display: block; font-weight: 600; margin-bottom: 0.25rem;">
-                Detalles de prescripción:
-            </label>
-
-            <textarea 
-                id="detalles" 
-                name="detalles" 
-                maxlength="500"
-                style="width: 100%; height: 200px; padding: 1rem; border: 1px solid #ccc; border-radius: 8px; background-color: rgba(255, 255, 255, 0.7);"
-                placeholder="Escribe los detalles aquí"
-                oninput="updateCount()">{{ old('detalles') }}</textarea>
-
-            <div style="text-align: right; font-size: 0.8rem; color: #555;">
-                <span id="charCount">0</span>/500 caracteres
-            </div>
-
-            @error('detalles')
-                <div class="error-message">{{ $message }}</div>
-            @enderror
-        </div>
 
         <!-- Firma -->
         <div class="signature-line">Firma del Médico</div>
@@ -216,6 +234,9 @@
     const medicamentoInput = document.getElementById('medicamento');
     const medicamentoList = document.getElementById('medicamento-list');
     const indicacionSelect = document.getElementById('indicacion');
+    const dosisInput = document.getElementById('dosis');
+    const detallesContainer = document.getElementById('detalles-container');
+    const detallesTextarea = document.getElementById('detalles');
     const agregarBtn = document.getElementById('agregar-medicamento');
     const tablaMedicamentos = document.getElementById('tabla-medicamentos').querySelector('tbody');
     const hiddenContainer = document.getElementById('medicamentos-hidden');
@@ -226,6 +247,7 @@
         const texto = medicamentoInput.value.trim();
         if (texto.length === 0) {
             medicamentoList.style.display = 'none';
+            detallesContainer.style.display = 'none';
             return;
         }
         const res = await fetch(`/medicamentos/search?q=${encodeURIComponent(texto)}`);
@@ -234,6 +256,7 @@
         medicamentoList.innerHTML = '';
         if (data.length === 0) {
             medicamentoList.style.display = 'none';
+            detallesContainer.style.display = 'none';
             return;
         }
 
@@ -243,6 +266,10 @@
             div.addEventListener('click', () => {
                 medicamentoInput.value = med;
                 medicamentoList.style.display = 'none';
+                detallesTextarea.value = '';
+                updateCount();
+                detallesContainer.style.display = 'block';
+                dosisInput.value = '';
             });
             medicamentoList.appendChild(div);
         });
@@ -255,15 +282,28 @@
         }
     });
 
-    // Agregar medicamento a tabla y al campo oculto
+    detallesTextarea.addEventListener('input', updateCount);
+
     agregarBtn.addEventListener('click', () => {
         const med = medicamentoInput.value.trim();
         const indicacion = indicacionSelect.value;
+        const dosis = dosisInput.value.trim();
+        const detalles = detallesTextarea.value.trim();
 
         if (!med) {
-            return; // sin alert, validará backend
+            alert('Por favor, ingresa un medicamento.');
+            return;
         }
         if (medicamentosAgregados.has(med.toLowerCase())) {
+            alert('Este medicamento ya fue agregado.');
+            return;
+        }
+        if (!dosis) {
+            alert('Por favor, ingresa la dosis.');
+            return;
+        }
+        if (!detalles) {
+            alert('Por favor, ingresa los detalles de prescripción.');
             return;
         }
 
@@ -281,6 +321,14 @@
         tdInd.textContent = indicacion;
         tr.appendChild(tdInd);
 
+        const tdDosis = document.createElement('td');
+        tdDosis.textContent = dosis;
+        tr.appendChild(tdDosis);
+
+        const tdDetalles = document.createElement('td');
+        tdDetalles.textContent = detalles;
+        tr.appendChild(tdDetalles);
+
         const tdAccion = document.createElement('td');
         const btnRemove = document.createElement('span');
         btnRemove.textContent = 'Eliminar';
@@ -288,8 +336,8 @@
         btnRemove.addEventListener('click', () => {
             tablaMedicamentos.removeChild(tr);
             medicamentosAgregados.delete(med.toLowerCase());
-            const hiddenInput = hiddenContainer.querySelector(`input[data-med="${med.toLowerCase()}"]`);
-            if (hiddenInput) hiddenContainer.removeChild(hiddenInput);
+            const hiddenInputs = hiddenContainer.querySelectorAll(`input[data-med="${med.toLowerCase()}"]`);
+            hiddenInputs.forEach(input => hiddenContainer.removeChild(input));
             if (tablaMedicamentos.rows.length === 0) {
                 document.getElementById('tabla-medicamentos').style.display = 'none';
             }
@@ -299,25 +347,45 @@
 
         tablaMedicamentos.appendChild(tr);
 
-        // Campo oculto para enviar
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = `medicamentos[${medicamentosAgregados.size}][nombre]`;
-        hiddenInput.value = med;
-        hiddenInput.dataset.med = med.toLowerCase();
-        hiddenContainer.appendChild(hiddenInput);
+        const index = medicamentosAgregados.size;
 
-        const hiddenInd = document.createElement('input');
-        hiddenInd.type = 'hidden';
-        hiddenInd.name = `medicamentos[${medicamentosAgregados.size}][indicacion]`;
-        hiddenInd.value = indicacion;
-        hiddenContainer.appendChild(hiddenInd);
+        // Nombre oculto
+        const hiddenNombre = document.createElement('input');
+        hiddenNombre.type = 'hidden';
+        hiddenNombre.name = `medicamentos[${index}][nombre]`;
+        hiddenNombre.value = med;
+        hiddenNombre.dataset.med = med.toLowerCase();
+        hiddenContainer.appendChild(hiddenNombre);
+
+        // Indicacion oculta
+        const hiddenIndicacion = document.createElement('input');
+        hiddenIndicacion.type = 'hidden';
+        hiddenIndicacion.name = `medicamentos[${index}][indicacion]`;
+        hiddenIndicacion.value = indicacion;
+        hiddenContainer.appendChild(hiddenIndicacion);
+
+        // Dosis oculta
+        const hiddenDosis = document.createElement('input');
+        hiddenDosis.type = 'hidden';
+        hiddenDosis.name = `medicamentos[${index}][dosis]`;
+        hiddenDosis.value = dosis;
+        hiddenContainer.appendChild(hiddenDosis);
+
+        // Detalles ocultos
+        const hiddenDetalles = document.createElement('input');
+        hiddenDetalles.type = 'hidden';
+        hiddenDetalles.name = `medicamentos[${index}][detalles]`;
+        hiddenDetalles.value = detalles;
+        hiddenContainer.appendChild(hiddenDetalles);
 
         medicamentosAgregados.add(med.toLowerCase());
 
+        // Limpiar campos
         medicamentoInput.value = '';
         indicacionSelect.selectedIndex = 0;
-        medicamentoList.style.display = 'none';
+        dosisInput.value = '';
+        detallesTextarea.value = '';
+        detallesContainer.style.display = 'none';
     });
 </script>
 @endsection

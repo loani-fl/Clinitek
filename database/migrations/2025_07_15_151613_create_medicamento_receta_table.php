@@ -13,6 +13,8 @@ return new class extends Migration
             $table->foreignId('receta_id')->constrained()->onDelete('cascade');
             $table->foreignId('medicamento_id')->constrained()->onDelete('cascade');
             $table->string('indicaciones', 500);
+            $table->string('dosis', 255);      // agregar dosis
+            $table->string('detalles', 500);   // agregar detalles de prescripción
             $table->timestamps();
 
             $table->unique(['receta_id', 'medicamento_id']); // evitar duplicados en una receta
@@ -24,3 +26,4 @@ return new class extends Migration
         Schema::dropIfExists('medicamento_receta');
     }
 };
+
