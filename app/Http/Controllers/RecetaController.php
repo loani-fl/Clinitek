@@ -71,8 +71,9 @@ class RecetaController extends Controller
         ]);
     }
 
-    return redirect()->route('consultas.show', $consulta->id)
-        ->with('success', 'Receta creada correctamente.');
+    return redirect()->route('recetas.show', $receta->id)
+    ->with('success', 'Receta creada correctamente.');
+
 }
 
 
