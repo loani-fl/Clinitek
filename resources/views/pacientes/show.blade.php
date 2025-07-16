@@ -76,16 +76,12 @@
         <div class="card-header d-flex justify-content-between align-items-center py-2 px-3" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
     <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Expediente medico</h5>
 
-    <div class="dropdown">
-        <button class="btn p-0 border-0" type="button" id="menuDropdown" data-bs-toggle="dropdown"
-                aria-expanded="false" style="font-size: 1.8rem; background: none; color: #000;">
-            &#9776;
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end border rounded shadow-sm" aria-labelledby="menuDropdown" style="min-width: 150px;">
-            <li><a class="dropdown-item text-dark" href="{{ route('diagnosticos.show', $paciente->id ?? 1) }}">Diagnósticos</a></li>
-            <li><a class="dropdown-item text-dark" href="{{ route('recetas.show', $paciente->id ?? 1) }}">Recetas Médicas</a></li>
-        </ul>
-    </div>
+
+            <a href="{{ route('diagnosticos.show', $paciente->id ?? 1) }}"
+               class="btn btn-primary"
+               style="font-size: 1rem;">
+                Ver Diagnósticos
+            </a>
 </div>
 
             <div class="card-body px-4 py-3">
