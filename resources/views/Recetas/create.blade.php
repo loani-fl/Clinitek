@@ -91,7 +91,7 @@
         <span>Especialista en {{ $consulta->medico->especialidad ?? 'Especialidad no disponible' }}</span><br>
         <hr style="border: none; border-top: 3px solid #0056b3; margin: 0 auto 1rem; width: 100%;">
     </div>
-        
+
     @php
         use Carbon\Carbon;
         $edad = $consulta->paciente->fecha_nacimiento
@@ -116,18 +116,20 @@
     </div>
 @endif
 
-    <form action="{{ route('recetas.store', ['paciente' => $consulta->paciente->id]) }}" method="POST">
-        @csrf
+    <form action="{{ route('recetas.store', ['consulta' => $consulta->id]) }}" method="POST">
+
+
+    @csrf
         <input type="hidden" name="consulta_id" value="{{ $consulta->id }}">
 
         <!-- Medicamento con autocompletado -->
         <div style="position: relative; margin-bottom: 1rem;">
             <label for="medicamento" style="font-weight: 600;">Medicamento:</label>
-            <input 
-                type="text" 
-                id="medicamento" 
-                placeholder="Escribe el nombre del medicamento" 
-                autocomplete="off" 
+            <input
+                type="text"
+                id="medicamento"
+                placeholder="Escribe el nombre del medicamento"
+                autocomplete="off"
                 style="width: 35%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
             <div id="medicamento-list"></div>
             @error('medicamentos.0.nombre')
@@ -153,10 +155,10 @@
         <!-- Dosis -->
         <div style="margin-bottom: 1rem;">
             <label for="dosis" style="font-weight: 600;">Dosis:</label>
-            <input 
-                type="text" 
-                id="dosis" 
-                placeholder="Ejemplo: 500 mg" 
+            <input
+                type="text"
+                id="dosis"
+                placeholder="Ejemplo: 500 mg"
                 style="width: 20%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
             @error('medicamentos.0.dosis')
                 <div class="error-message">{{ $message }}</div>
@@ -168,9 +170,9 @@
             <label for="detalles" style="display: block; font-weight: 600; margin-bottom: 0.25rem;">
                 Detalles de prescripción:
             </label>
-            <textarea 
-                id="detalles" 
-                placeholder="Escribe los detalles aquí" 
+            <textarea
+                id="detalles"
+                placeholder="Escribe los detalles aquí"
                 maxlength="500"
                 style="width: 100%; height: 120px; padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px;"></textarea>
             <div style="text-align: right; font-size: 0.8rem; color: #555;">
@@ -179,7 +181,7 @@
         </div>
 
         <!-- Botón para agregar medicamento -->
-        <button type="button" id="agregar-medicamento" 
+        <button type="button" id="agregar-medicamento"
             style="background-color: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; margin-bottom: 1rem;">
             Agregar Medicamento
         </button>
@@ -209,11 +211,11 @@
 
         <!-- Botones -->
         <div style="margin-top: 2rem; display: flex; gap: 1rem;">
-            <a href="{{ route('consultas.show', $consulta->id) }}" 
+            <a href="{{ route('consultas.show', $consulta->id) }}"
                 style="background-color: #808080; color: black; padding: 10px 16px; border-radius: 6px; text-decoration: none;">
                 Imprimir
             </a>
-    
+
             <button type="submit"
                 style="background-color: #007BFF; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">
                 Guardar

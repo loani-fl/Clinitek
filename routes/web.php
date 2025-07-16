@@ -75,9 +75,7 @@ Route::resource('diagnosticos', DiagnosticoController::class);
 
 Route::get('/recetas/create/{consulta}', [RecetaController::class, 'create'])->name('recetas.create');
 Route::post('/recetas/{consulta}', [RecetaController::class, 'store'])->name('recetas.store');
-Route::post('recetas/{paciente}', [RecetaController::class, 'store'])->name('recetas.store');
 Route::get('/recetas/{id}', [RecetaController::class, 'show'])->name('recetas.show');
-
 
 Route::get('/pacientes/{paciente}/recetas', [PacienteController::class, 'showRecetas'])->name('pacientes.recetas');
 Route::get('/consultas/{id}', [ConsultaController::class, 'show'])->name('consultas.show');
@@ -105,4 +103,6 @@ Route::post('/examenes/store/{paciente}/{diagnostico}', [ExamenController::class
 
 
 Route::get('/examenes/{diagnostico}', [ExamenController::class, 'show'])->name('examenes.show');
+Route::get('/ordenes/{id}', [ExamenController::class, 'detalleOrden'])->name('ordenes.detalle');
 
+Route::get('/ordenes/{id}', [ExamenController::class, 'detalleOrden'])->name('ordenes.detalle');

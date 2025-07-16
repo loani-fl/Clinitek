@@ -128,7 +128,25 @@
                 <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto; margin-right: 6px;">
                 <span class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</span>
             </div>
+
+            <!-- Menú desplegable funcional -->
+            <div class="dropdown">
+                <button class="btn btn-outline-light dropdown-toggle" type="button" id="menuMedico" data-bs-toggle="dropdown" aria-expanded="false">
+                    ☰
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuMedico">
+                    <li><a class="dropdown-item" href="{{ route('puestos.create') }}">Crear puesto</a></li>
+                    <li><a class="dropdown-item" href="{{ route('empleado.create') }}">Registrar empleado</a></li>
+                    <li><a class="dropdown-item" href="{{ route('medicos.create') }}">Registrar médico</a></li>
+                    <li><a class="dropdown-item" href="{{ route('consultas.create') }}">Registrar consulta</a></li>
+                    <li><a class="dropdown-item" href="{{ route('pacientes.create') }}">Registrar paciente</a></li>
+                </ul>
+            </div>
+
         </div>
+
+
+
     </div>
 
 
@@ -139,7 +157,7 @@
             <!-- Header con título y botón -->
             <!-- Header con título y botón -->
             <div class="card-header-flex">
-                
+
                 <h5>Detalles de la Consulta</h5>
 <div id="mensaje-error-orden" class="alert alert-danger" style="display:none;" role="alert">
     Debe haber un  diagnóstico para crear la orden de examen.

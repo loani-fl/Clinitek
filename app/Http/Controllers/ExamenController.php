@@ -123,44 +123,49 @@ class ExamenController extends Controller
 
 
     // Mostrar la orden de exámenes guardada para un diagnóstico
-public function show($diagnosticoId)
-{
-    $diagnostico = Diagnostico::with('paciente', 'consulta.medico')->findOrFail($diagnosticoId);
+    public function show($diagnosticoId)
+    {
+        $diagnostico = Diagnostico::with('paciente', 'consulta.medico')->findOrFail($diagnosticoId);
+        $paciente = $diagnostico->paciente;
+        $consulta = $diagnostico->consulta;
 
-    $paciente = $diagnostico->paciente;
-    $consulta = $diagnostico->consulta;
+        // Cargar todas las órdenes (registros en la tabla 'examenes') del paciente agrupadas por consulta
+        $ordenes = \App\Models\Examen::with('consulta')
+            ->where('paciente_id', $paciente->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-    $secciones = [
-        'HEMATOLOGÍA' => Hematologia::class,
-        'PERFIL DIABETES' => PerfilDiabetes::class,
-        'PERFIL DE ANEMIA' => PerfilAnemia::class,
-        'BIOQUÍMICOS' => Bioquimico::class,
-        'MARCADORES TUMORALES' => MarcadorTumoral::class,
-        'INMUNOLOGÍA Y AUTOINMUNIDAD' => InmunologiaAutoinmunidad::class,
-        'ORINA Y FLUIDOS' => OrinaFluido::class,
-        'HORMONAS' => Hormona::class,
-        'INFECCIOSOS' => Infeccioso::class,
-    ];
+        // Traer los datos actuales para mostrar
+        $secciones = [
+            'HEMATOLOGÍA' => Hematologia::class,
+            'PERFIL DIABETES' => PerfilDiabetes::class,
+            'PERFIL DE ANEMIA' => PerfilAnemia::class,
+            'BIOQUÍMICOS' => Bioquimico::class,
+            'MARCADORES TUMORALES' => MarcadorTumoral::class,
+            'INMUNOLOGÍA Y AUTOINMUNIDAD' => InmunologiaAutoinmunidad::class,
+            'ORINA Y FLUIDOS' => OrinaFluido::class,
+            'HORMONAS' => Hormona::class,
+            'INFECCIOSOS' => Infeccioso::class,
+        ];
 
-    $datosSecciones = [];
+        $datosSecciones = [];
 
-    foreach ($secciones as $nombreSeccion => $modeloClase) {
-        $registro = $modeloClase::where('diagnostico_id', $diagnosticoId)->first();
+        foreach ($secciones as $nombreSeccion => $modeloClase) {
+            $registro = $modeloClase::where('diagnostico_id', $diagnosticoId)->first();
+            if ($registro) {
+                $campos = collect($registro->getAttributes())
+                    ->except(['id', 'diagnostico_id', 'created_at', 'updated_at'])
+                    ->toArray();
+                $datosSecciones[$nombreSeccion] = $campos;
+            }
+        }
 
-
-        if ($registro) {
-    $campos = collect($registro->getAttributes())
-        ->except(['id', 'diagnostico_id', 'created_at', 'updated_at'])
-        ->toArray();
-    $datosSecciones[$nombreSeccion] = $campos;
-}
-// Si no hay registro, no hagas nada
-
+        return view('examenes.show', compact('diagnostico', 'paciente', 'consulta', 'datosSecciones', 'ordenes'));
     }
-
-    return view('examenes.show', compact('diagnostico', 'paciente', 'consulta', 'datosSecciones'));
-}
-
-
+    public function detalleOrden($id)
+    {
+        $orden = Examen::with('paciente', 'consulta')->findOrFail($id);
+        return view('ordenes.detalle', compact('orden'));
+    }
 
 }

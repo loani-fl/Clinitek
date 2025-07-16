@@ -225,13 +225,19 @@ public function update(Request $request, $id)
     return redirect()->route('consultas.index')->with('success', 'Consulta actualizada correctamente.');
 }
 
-public function show($id)
-{
-    $consulta = Consulta::with('paciente.recetas', 'medico', 'diagnostico')->findOrFail($id);
-    $paciente = $consulta->paciente;
+    public function show($id)
+    {
+        $consulta = Consulta::with([
+            'paciente',
+            'medico',
+            'diagnostico',
+            'recetas.medicamentos'
+        ])->findOrFail($id);
 
-    return view('consultas.show', compact('consulta', 'paciente'));
-}
+        $paciente = $consulta->paciente;
+
+        return view('consultas.show', compact('consulta', 'paciente'));
+    }
 
 public function horasOcupadas(Request $request)
 {

@@ -322,4 +322,9 @@ class PacienteController extends Controller
 
         return view('recetas.show', compact('paciente', 'recetas'));
     }
+
+
+
+
+
 }
