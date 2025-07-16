@@ -30,7 +30,7 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             // Campos del diagnóstico
-            $table->string('resumen')->nullable();
+            $table->string('titulo')->nullable();
             $table->text('descripcion')->nullable();
             $table->text('tratamiento')->nullable();
             $table->text('observaciones')->nullable();

@@ -12,7 +12,7 @@ class Diagnostico extends Model
     protected $fillable = [
         'paciente_id',
         'consulta_id',
-        'resumen',
+        'titulo',
         'descripcion',
         'tratamiento',
         'observaciones',

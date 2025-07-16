@@ -22,7 +22,7 @@ class DiagnosticoController extends Controller
         $validatedData = $request->validate([
             'paciente_id' => 'required|exists:pacientes,id',
             'consulta_id' => 'required|exists:consultas,id',
-            'resumen' => 'required|string|max:255',
+            'titulo' => 'required|string|max:255',
             'descripcion' => 'required|string|max:400',
             'tratamiento' => 'required|string|max:400',
             'observaciones' => 'nullable|string|max:400',
@@ -31,9 +31,9 @@ class DiagnosticoController extends Controller
             'paciente_id.exists' => 'El paciente seleccionado no es válido.',
             'consulta_id.required' => 'La consulta es obligatoria.',
             'consulta_id.exists' => 'La consulta seleccionada no es válida.',
-            'resumen.required' => 'El resumen es obligatorio.',
-            'resumen.string' => 'El resumen debe ser un texto válido.',
-            'resumen.max' => 'El resumen no puede tener más de 255 caracteres.',
+            'titulo.required' => 'El resumen es obligatorio.',
+            'titulo.string' => 'El resumen debe ser un texto válido.',
+            'titulo.max' => 'El resumen no puede tener más de 255 caracteres.',
             'descripcion.required' => 'La descripción es obligatoria.',
             'descripcion.string' => 'La descripción debe ser un texto válido.',
             'descripcion.max' => 'La descripción no puede tener más de 400 caracteres.',
@@ -74,7 +74,7 @@ class DiagnosticoController extends Controller
 
     {
         $validatedData = $request->validate([
-            'resumen' => [
+            'titulo' => [
                 'required',
                 'string',
                 'max:255',
@@ -99,10 +99,10 @@ class DiagnosticoController extends Controller
                 'regex:/^[a-zA-Z0-9\s,.;]*$/'
             ],
         ], [
-            'resumen.required' => 'El resumen es obligatorio.',
-            'resumen.string' => 'El resumen debe ser un texto válido.',
-            'resumen.max' => 'El resumen no puede tener más de 255 caracteres.',
-            'resumen.regex' => 'El resumen solo puede contener letras, números, espacios, comas, puntos y punto y coma.',
+            'titulo.required' => 'El resumen es obligatorio.',
+            'titulo.string' => 'El resumen debe ser un texto válido.',
+            'titulo.max' => 'El resumen no puede tener más de 255 caracteres.',
+            'titulo.regex' => 'El resumen solo puede contener letras, números, espacios, comas, puntos y punto y coma.',
 
             'descripcion.required' => 'La descripción es obligatoria.',
             'descripcion.string' => 'La descripción debe ser un texto válido.',
@@ -120,7 +120,7 @@ class DiagnosticoController extends Controller
         ]);
 
         $request->session()->put('diagnostico_original', [
-            'resumen' => $diagnostico->resumen,
+            'titulo' => $diagnostico->resumen,
             'descripcion' => $diagnostico->descripcion,
             'tratamiento' => $diagnostico->tratamiento,
             'observaciones' => $diagnostico->observaciones,

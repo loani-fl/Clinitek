@@ -27,7 +27,7 @@ class RecetaController extends Controller
         'medicamentos.*.indicacion' => 'required|string',
         'medicamentos.*.dosis' => 'required|string',
         'medicamentos.*.detalles' => 'required|string|max:500',
-    
+
 
     ], [
         'detalles.required' => 'Detalles de prescripción es obligatorio.',
@@ -75,7 +75,7 @@ class RecetaController extends Controller
         ->with('success', 'Receta creada correctamente.');
 }
 
-    
+
 
     public function show($id)
     {

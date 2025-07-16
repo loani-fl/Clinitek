@@ -81,7 +81,7 @@
         }
     </style>
 
-    <!-- Barra de navegación fija 
+    <!-- Barra de navegación fija
     <div class="header d-flex justify-content-between align-items-center px-3 py-2" style="background-color: #007BFF; position: sticky; top: 0; z-index: 1030;">
         <div class="d-flex align-items-center">
             <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto; margin-right: 6px;">
@@ -117,11 +117,10 @@
 
 
 
-
                 <div class="mb-3">
-                    <label for="resumen" class="form-label">Resumen <span class="text-danger">*</span></label>
-                    <input type="text" name="resumen" id="resumen" class="form-control @error('resumen') is-invalid @enderror" value="{{ old('resumen') }}" required>
-                    @error('resumen')
+                    <label for="titulo" class="form-label">Título <span class="text-danger">*</span></label>
+                    <input type="text" name="titulo" id="titulo" class="form-control @error('titulo') is-invalid @enderror" value="{{ old('titulo') }}" required>
+                    @error('titulo')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
