@@ -9,53 +9,67 @@ use App\Models\Examen;
 
 class ExamenController extends Controller
 {
-  public function create($pacienteId, $consultaId)
-{
-    $paciente = Paciente::findOrFail($pacienteId);
-    $consulta = Consulta::with('medico')->findOrFail($consultaId);
+    public function create($pacienteId, $consultaId)
+    {
+        $paciente = Paciente::findOrFail($pacienteId);
+        $consulta = Consulta::with('medico')->findOrFail($consultaId);
 
-    return view('examenes.create', compact('paciente', 'consulta'));
-}
-public function store(Request $request, $pacienteId, $consultaId)
-{
-    $consulta = Consulta::with('paciente', 'medico', 'examens')->findOrFail($consultaId);
-
-    // Validar que la consulta esté realizada
-    if ($consulta->estado !== 'realizada') {
-        return back()->withErrors([
-            'estado' => 'Debe finalizar la consulta antes de ordenar exámenes.'
-        ]);
+        return view('examenes.create', compact('paciente', 'consulta'));
     }
 
-    // Validar que se haya seleccionado al menos un examen
-    $request->validate([
-        'examenes' => 'required|array|min:1|max:10'
-    ], [
-        'examenes.required' => 'Debe seleccionar al menos un examen.',
-        'examenes.array' => 'Debe seleccionar al menos un examen.',
-        'examenes.min' => 'Debe seleccionar al menos un examen.'
-    ]);
+    public function store(Request $request, $pacienteId, $consultaId)
+    {
+        $consulta = Consulta::with('paciente', 'medico', 'examens')->findOrFail($consultaId);
 
-    // Aquí pones este código:
-    $examenesSeleccionados = $request->input('examenes', []);
+        // Validar que la consulta esté realizada
+        if ($consulta->estado !== 'realizada') {
+            return back()->withErrors([
+                'estado' => 'Debe finalizar la consulta antes de ordenar exámenes.'
+            ]);
+        }
 
-    foreach ($examenesSeleccionados as $examen) {
-        Examen::create([
-            'paciente_id' => $pacienteId,
+        // Validar que se haya seleccionado al menos un examen
+        $request->validate([
+            'examenes' => 'required|array|min:1|max:10'
+        ], [
+            'examenes.required' => 'Debe seleccionar al menos un examen.',
+            'examenes.array' => 'Debe seleccionar al menos un examen.',
+            'examenes.min' => 'Debe seleccionar al menos un examen.'
+        ]);
+
+        // Aquí pones este código:
+        $examenesSeleccionados = $request->input('examenes', []);
+
+        foreach ($examenesSeleccionados as $examen) {
+            Examen::create([
+                'paciente_id' => $pacienteId,
+                'consulta_id' => $consultaId,
+                'nombre' => $examen,
+            ]);
+        }
+
+        return view('examenes.show', [
+            'examenes' => collect($examenesSeleccionados)->map(function($nombre) {
+                return (object) ['nombre' => $nombre];
+            }),
             'consulta_id' => $consultaId,
-            'nombre' => $examen,
+            'paciente_id' => $pacienteId,
         ]);
     }
 
-    return view('examenes.show', [
-        'examenes' => collect($examenesSeleccionados)->map(function($nombre) {
-            return (object) ['nombre' => $nombre];
-        }),
-        'consulta_id' => $consultaId,
-        'paciente_id' => $pacienteId,
-    ]);
-}
+    public function show($pacienteId, $consultaId)
+    {
+        $consulta = Consulta::with('paciente', 'medico')->findOrFail($consultaId);
+        $paciente = $consulta->paciente;
+        $medico = $consulta->medico;
+        $examenes = Examen::where('paciente_id', $pacienteId)
+                          ->where('consulta_id', $consultaId)
+                          ->get();
 
+        $edad = \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age;
+
+        return view('examenes.show', compact('consulta', 'paciente', 'medico', 'examenes', 'edad'));
+    }
 
     // Helper para lista de exámenes disponibles
     private function getExamenesDisponibles()
@@ -68,5 +82,3 @@ public function store(Request $request, $pacienteId, $consultaId)
         ];
     }
 }
-
-

@@ -17,7 +17,7 @@ class RecetaController extends Controller
     }
 
 
-    
+
     public function store(Request $request, $pacienteId)
 {
     $request->validate([

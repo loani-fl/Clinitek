@@ -12,7 +12,6 @@ class Receta extends Model
     protected $fillable = [
         'consulta_id',
         'detalles',
-    
     ];
 
     public function consulta()
@@ -20,16 +19,16 @@ class Receta extends Model
         return $this->belongsTo(Consulta::class);
     }
 
+// Relación con el diagnóstico
+    public function diagnostico()
+    {
+        return $this->hasOne(Diagnostico::class);
+    }
 
-    
-public function medicamentos()
-{
-    return $this->belongsToMany(Medicamento::class, 'medicamento_receta', 'receta_id', 'medicamento_id')
-                ->withPivot('indicaciones', 'dosis', 'detalles')
-                ->withTimestamps();
-}
-
-
-
-    
+    public function medicamentos()
+    {
+        return $this->belongsToMany(Medicamento::class, 'medicamento_receta', 'receta_id', 'medicamento_id')
+                    ->withPivot('indicaciones', 'dosis', 'detalles')
+                    ->withTimestamps();
+    }
 }

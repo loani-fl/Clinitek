@@ -110,7 +110,7 @@
 </style>
 
 <!-- Barra de navegación fija -->
-<div class="header d-flex justify-content-between align-items-center px-3 py-2" 
+<!--<div class="header d-flex justify-content-between align-items-center px-3 py-2" 
      style="background-color: #007BFF; position: fixed; top: 0; left: 0; right: 0; z-index: 1030; height: 56px;">
     <div class="d-flex align-items-center">
         <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" 
@@ -122,7 +122,7 @@
         <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
     </div>
 </div>
-
+-->
 <!-- Formulario más compacto -->
 <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px; z-index:1;">
     <div class="card-header text-center py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
