@@ -172,7 +172,7 @@
                     <label>Filtrar por Estado:</label>
                     <select id="estadoFiltro" class="form-select form-select-sm">
                         <option value="">-- Todos los Estados --</option>
-                        <option value="realizado">Realizado</option>
+                        <option value="realizada">Realizada</option>
                         <option value="pendiente">Pendiente</option>
                         <option value="cancelada">Cancelada</option>
                     </select>
