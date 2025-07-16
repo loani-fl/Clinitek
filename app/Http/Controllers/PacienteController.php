@@ -49,7 +49,6 @@ class PacienteController extends Controller
             'fecha_nacimiento' => [
                 'required',
                 'date',
-                'before_or_equal:' . Carbon::now()->subYears(21)->format('Y-m-d'),
                 'after_or_equal:' . Carbon::now()->subYears(60)->format('Y-m-d'),
             ],
             'telefono' => ['required', 'digits:8', 'regex:/^[2389][0-9]{7}$/', 'unique:pacientes,telefono'],
@@ -84,7 +83,6 @@ class PacienteController extends Controller
 
             'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
             'fecha_nacimiento.date' => 'Debe ser una fecha válida.',
-            'fecha_nacimiento.before_or_equal' => 'El paciente debe tener al menos 21 años.',
             'fecha_nacimiento.after_or_equal' => 'El paciente no puede tener más de 60 años.',
 
             'telefono.required' => 'El teléfono es obligatorio.',
@@ -206,7 +204,6 @@ class PacienteController extends Controller
             'fecha_nacimiento' => [
                 'required',
                 'date',
-                'before_or_equal:' . Carbon::now()->subYears(21)->format('Y-m-d'),
                 'after_or_equal:' . Carbon::now()->subYears(60)->format('Y-m-d'),
             ],
             'telefono' => [
@@ -246,7 +243,6 @@ class PacienteController extends Controller
 
             'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
             'fecha_nacimiento.date' => 'La fecha debe ser válida.',
-            'fecha_nacimiento.before_or_equal' => 'La persona debe tener al menos 21 años.',
             'fecha_nacimiento.after_or_equal' => 'La persona no puede tener más de 60 años.',
 
             'telefono.required' => 'El teléfono es obligatorio.',
