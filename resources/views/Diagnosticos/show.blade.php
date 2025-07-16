@@ -102,7 +102,7 @@
             <p><span class="label">Género:</span> {{ $diagnostico->paciente->genero ?? 'No especificado' }}</p>
 
             <div class="section-title mt-4">Detalles del Diagnóstico</div>
-            <p><span class="label">Resumen:</span><br>{{ $diagnostico->resumen }}</p>
+            <p><span class="label">Título:</span><br>{{ $diagnostico->titulo }}</p>
             <p><span class="label">Descripción:</span><br>{!! nl2br(e($diagnostico->descripcion)) !!}</p>
             <p><span class="label">Tratamiento:</span><br>{!! nl2br(e($diagnostico->tratamiento)) !!}</p>
             <p><span class="label">Observaciones:</span><br>{!! nl2br(e($diagnostico->observaciones)) !!}</p>
