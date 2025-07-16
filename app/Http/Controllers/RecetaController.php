@@ -77,9 +77,10 @@ class RecetaController extends Controller
 
     
 
-    public function show($id)
-    {
-        $paciente = Paciente::with(['consultas.receta', 'diagnostico'])->findOrFail($id);
-        return view('pacientes.show', compact('paciente'));
-    }
+public function show($id)
+{
+    $receta = Receta::with('medicamentos')->findOrFail($id);
+    return view('recetas.show', compact('receta'));
+}
+
 }
