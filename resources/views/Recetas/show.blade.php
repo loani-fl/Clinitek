@@ -46,7 +46,7 @@
                     @foreach($receta->medicamentos as $medicamento)
                         <tr>
                             <td>{{ $medicamento->nombre }}</td>
-                            <td>{{ $medicamento->pivot->indicacion }}</td>
+                            <td>{{ $medicamento->pivot->indicaciones }}</td> {{-- CORREGIDO: plural 'indicaciones' --}}
                             <td>{{ $medicamento->pivot->dosis }}</td>
                             <td>{{ $medicamento->pivot->detalles }}</td>
                         </tr>

@@ -73,8 +73,10 @@ Route::resource('diagnosticos', DiagnosticoController::class);
 Route::get('/recetas/create/{consulta}', [RecetaController::class, 'create'])->name('recetas.create');
 Route::post('/recetas/{consulta}', [RecetaController::class, 'store'])->name('recetas.store');
 Route::post('recetas/{paciente}', [RecetaController::class, 'store'])->name('recetas.store');
+Route::get('/recetas/{id}', [RecetaController::class, 'show'])->name('recetas.show');
 
-Route::get('/pacientes/{paciente}/recetas', [PacienteController::class, 'showRecetas'])->name('recetas.show');
+
+Route::get('/pacientes/{paciente}/recetas', [PacienteController::class, 'showRecetas'])->name('pacientes.recetas');
 Route::get('/consultas/{id}', [ConsultaController::class, 'show'])->name('consultas.show');
 
 // Ruta para mostrar formulario con paciente y consulta
