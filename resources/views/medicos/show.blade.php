@@ -35,15 +35,28 @@
     </style>
 
     <!-- Barra de navegación fija -->
-    <div class="w-100 fixed-top" style="background-color: #007BFF; z-index: 1050; height: 56px;">
-        <div class="d-flex justify-content-between align-items-center px-3" style="height: 56px;">
-            <div class="d-flex align-items-center">
-                <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek"
-                     style="height: 40px; width: auto; margin-right: 6px;">
-                <span class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</span>
-            </div>
+    <!-- Barra de navegación fija -->
+    <div class="header d-flex justify-content-between align-items-center px-3 py-2 fixed-top" style="background-color: #007BFF;">
+        <div class="d-flex align-items-center">
+            <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto;">
+            <div class="fw-bold text-white ms-2" style="font-size: 1.5rem;">Clinitek</div>
+        </div>
+
+        <!-- Menú desplegable funcional -->
+        <div class="dropdown">
+            <button class="btn btn-outline-light dropdown-toggle" type="button" id="menuMedico" data-bs-toggle="dropdown" aria-expanded="false">
+                ☰
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuMedico">
+                <li><a class="dropdown-item" href="{{ route('puestos.create') }}">Crear puesto</a></li>
+                <li><a class="dropdown-item" href="{{ route('empleado.create') }}">Registrar empleado</a></li>
+                <li><a class="dropdown-item" href="{{ route('medicos.create') }}">Registrar médico</a></li>
+                <li><a class="dropdown-item" href="{{ route('consultas.create') }}">Registrar consulta</a></li>
+                <li><a class="dropdown-item" href="{{ route('pacientes.create') }}">Registrar paciente</a></li>
+            </ul>
         </div>
     </div>
+
 
     <!-- Contenedor principal -->
     <div class="container mt-5 pt-3" style="max-width: 1000px;">
@@ -52,9 +65,11 @@
                 <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Detalles del Médico</h5>
             </div>
 
+
+
             <!-- Foto del médico -->
             <div class="text-center my-4">
-                @if (!empty($medico->foto) && file_exists(storage_path('app/public/' . $medico->foto)))
+                @if (!empty($medico->foto))
                     <img src="{{ asset('storage/' . $medico->foto) }}"
                          alt="Foto del médico"
                          class="rounded-circle shadow-sm clickable-img"
@@ -67,6 +82,7 @@
                          style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #0d6efd;"
                          data-bs-toggle="modal" data-bs-target="#fotoModal">
                 @endif
+
                 <div class="mt-3">
                     <strong>Estado:</strong><br>
                     @if($medico->estado == 'Activo' || $medico->estado == 1 || $medico->estado === true)
@@ -76,6 +92,7 @@
                     @endif
                 </div>
             </div>
+
 
             <!-- Información del médico -->
             <div class="card-body px-4 py-3">
@@ -141,4 +158,33 @@
             });
         });
     </script>
+
+    <!-- Modal para mostrar imagen grande -->
+    <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-transparent border-0 position-relative d-flex justify-content-center align-items-center" style="background: rgba(0,0,0,0.7);">
+                <div class="modal-body p-0" style="max-width: 90vw; max-height: 90vh;">
+                    <img src="{{ asset($medico->foto ? 'storage/' . $medico->foto : 'images/default-user.png') }}"
+                         alt="Foto del médico"
+                         style="max-width: 450px; max-height: 450px; object-fit: cover; cursor: pointer;"
+                         id="imagenGrande">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Cerrar modal al hacer clic en la imagen grande
+        document.addEventListener('DOMContentLoaded', function() {
+            const imagenGrande = document.getElementById('imagenGrande');
+            imagenGrande.addEventListener('click', function() {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('fotoModal'));
+                modal.hide();
+            });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
 @endsection

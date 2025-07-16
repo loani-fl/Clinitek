@@ -93,17 +93,27 @@
     </style>
 </head>
 <body>
-    
-<div class="header d-flex justify-content-between align-items-center px-3 py-2">
+
+<div class="header d-flex justify-content-between align-items-center px-3 py-2 fixed-top" style="background-color: #007BFF;">
     <div class="d-flex align-items-center">
-        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto; margin-right: 6px;">
-        <span class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</span>
+        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto;">
+        <div class="fw-bold text-white ms-2" style="font-size: 1.5rem;">Clinitek</div>
     </div>
-    <div class="d-flex gap-3 flex-wrap">
-        <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
-        <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
-        <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
+
+    <div class="dropdown">
+        <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            ☰
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" href="{{ route('puestos.create') }}">Crear puesto</a></li>
+            <li><a class="dropdown-item" href="{{ route('empleado.create') }}">Registrar empleado</a></li>
+            <li><a class="dropdown-item" href="{{ route('medicos.create') }}">Registrar médico</a></li>
+            <li><a class="dropdown-item" href="{{ route('consultas.create') }}">Registrar consulta</a></li>
+            <li><a class="dropdown-item" href="{{ route('pacientes.create') }}">Registrar paciente</a></li>
+        </ul>
     </div>
+</div>
+
 </div>
 <div class="contenedor-principal">
     <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
@@ -173,10 +183,10 @@
                 </tbody>
             </table>
         </div>
-        <div id="mensajeResultados"></div>
+        <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
         <div class="px-3 pb-3">
-            <div class="d-flex justify-content-center">
-                {{ $medicos->onEachSide(1)->links('pagination::bootstrap-5') }}
+            <div class="d-flex justify-content-center" id="paginacion-container">
+                {{ $medicos->onEachSide(1)->links('pagination::bootstrap-4') }}
             </div>
         </div>
     </div>
@@ -184,40 +194,66 @@
 <footer>
     © 2025 Clínitek. Todos los derechos reservados.
 </footer>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    function actualizarMensajeResultados(totalVisibles, filtroVacio) {
-        if (totalVisibles === 0) {
-            $('#mensajeResultados').text('No hay médicos que coincidan con la búsqueda.');
-        } else if (filtroVacio) {
-            $('#mensajeResultados').text('');
-        } else {
-            $('#mensajeResultados').text(`Se encontraron ${totalVisibles} resultado${totalVisibles > 1 ? 's' : ''}.`);
-        }
-    }
-    function aplicarFiltros() {
-        const texto = $('#filtro-medico').val().toLowerCase();
-        const estado = $('#filtro-estado').val();
-        let visibles = 0;
-        $('#tabla-medicos tr').not('#sin-resultados').each(function () {
-            const nombre = $(this).find('.nombre').text().toLowerCase();
-            const especialidad = $(this).find('.especialidad').text().toLowerCase();
-            const identidad = $(this).find('td').eq(2).text().toLowerCase();
-            const estadoActual = $(this).data('estado').toString();
-            const coincideTexto = nombre.includes(texto) || especialidad.includes(texto) || identidad.includes(texto);
-            const coincideEstado = !estado || estado === estadoActual;
-            const visible = coincideTexto && coincideEstado;
-            $(this).toggle(visible);
-            if (visible) {
-                visibles++;
-                $(this).find('td').eq(0).text(visibles);
-            }
-        });
-        $('#sin-resultados').toggle(visibles === 0);
-        actualizarMensajeResultados(visibles, texto === '');
-    }
     $(document).ready(function () {
-        $('#filtro-medico, #filtro-estado').on('input change', aplicarFiltros);
-        aplicarFiltros();
+        function actualizarMensajeResultados(totalVisibles, filtroVacio) {
+            if (totalVisibles === 0 && !filtroVacio) {
+                $('#mensajeResultados').text('No hay médicos que coincidan con la búsqueda.');
+            } else if (filtroVacio) {
+                $('#mensajeResultados').text('');
+            } else {
+                $('#mensajeResultados').text(`Se encontraron ${totalVisibles} resultado${totalVisibles > 1 ? 's' : ''}.`);
+            }
+        }
+
+
+        function cargarDatos(page = 1, filtro = '', estado = '') {
+            $.ajax({
+                url: "{{ route('medicos.index') }}",
+                type: 'GET',
+                data: {
+                    page: page,
+                    search: filtro,
+                    estado: estado
+                },
+                success: function(data) {
+                    $('#tabla-container').html(data.html);
+                    $('#paginacion-container').html(data.pagination);
+                    actualizarMensajeResultados(data.total, filtro === '');
+                },
+                error: function(xhr) {
+                    $('#mensajeResultados').text('Error al cargar los datos.');
+                }
+            });
+        }
+
+        // Carga inicial
+        cargarDatos();
+
+        // Filtrar al escribir o cambiar estado
+        $('#filtro-medico, #filtro-estado').on('input change', function () {
+            let filtro = $('#filtro-medico').val();
+            let estado = $('#filtro-estado').val();
+            cargarDatos(1, filtro, estado);
+        });
+
+        // Paginación con delegación (links dinámicos)
+        $(document).on('click', '.pagination a', function(e) {
+            e.preventDefault();
+            let url = $(this).attr('href');
+            let params = new URLSearchParams(url.split('?')[1]);
+            let page = params.get('page') || 1;
+            let filtro = $('#filtro-medico').val();
+            let estado = $('#filtro-estado').val();
+            cargarDatos(page, filtro, estado);
+
+            // Actualiza la URL en la barra sin recargar
+            let newUrl = url.split('?')[0] + '?page=' + page;
+            if(filtro) newUrl += '&search=' + encodeURIComponent(filtro);
+            if(estado) newUrl += '&estado=' + estado;
+            window.history.pushState("", "", newUrl);
+        });
     });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

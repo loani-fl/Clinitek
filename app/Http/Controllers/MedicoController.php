@@ -129,11 +129,11 @@ class MedicoController extends Controller
             $buscar = $request->buscar;
             $query->where(function ($q) use ($buscar) {
                 $q->where('nombre', 'like', "%{$buscar}%")
-                  ->orWhere('apellidos', 'like', "%{$buscar}%")
-                  ->orWhere('especialidad', 'like', "%{$buscar}%")
-                  ->orWhere('numero_identidad', 'like', "%{$buscar}%")
-                  ->orWhere('correo', 'like', "%{$buscar}%")
-                  ->orWhere('telefono', 'like', "%{$buscar}%");
+                    ->orWhere('apellidos', 'like', "%{$buscar}%")
+                    ->orWhere('especialidad', 'like', "%{$buscar}%")
+                    ->orWhere('numero_identidad', 'like', "%{$buscar}%")
+                    ->orWhere('correo', 'like', "%{$buscar}%")
+                    ->orWhere('telefono', 'like', "%{$buscar}%");
             });
         }
 
@@ -143,6 +143,17 @@ class MedicoController extends Controller
 
         $medicos = $query->orderBy('nombre')->paginate(4)->appends($request->all());
 
+        // Si la petición es AJAX, enviar solo la tabla y paginación en JSON
+        if ($request->ajax()) {
+            $html = view('medicos.partials.tabla', compact('medicos'))->render();
+            $pagination = $medicos->links('pagination::bootstrap-5')->render();
+
+            return response()->json([
+                'html' => $html,
+                'pagination' => $pagination,
+                'total' => $medicos->total(),
+            ]);
+        }
         return view('medicos.index', compact('medicos'));
     }
 
