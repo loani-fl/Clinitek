@@ -27,4 +27,9 @@ class Diagnostico extends Model
     {
         return $this->belongsTo(Consulta::class);
     }
+
+    public function receta()
+    {
+        return $this->belongsTo(Receta::class);
+    }
 }
