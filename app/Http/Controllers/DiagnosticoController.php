@@ -120,7 +120,7 @@ class DiagnosticoController extends Controller
         ]);
 
         $request->session()->put('diagnostico_original', [
-            'titulo' => $diagnostico->resumen,
+            'titulo' => $diagnostico->titulo,
             'descripcion' => $diagnostico->descripcion,
             'tratamiento' => $diagnostico->tratamiento,
             'observaciones' => $diagnostico->observaciones,

@@ -58,16 +58,16 @@
     <input type="hidden" name="consulta_id" value="{{ $diagnostico->consulta_id }}">
 
     <div class="mb-3">
-        <label for="resumen" class="form-label">Resumen <span class="text-danger">*</span></label>
+        <label for="titulo" class="form-label">Título <span class="text-danger">*</span></label>
         <input type="text"
-               name="resumen"
-               id="resumen"
-               class="form-control @error('resumen') is-invalid @enderror"
-               value="{{ old('resumen', $diagnostico->resumen) }}"
+               name="titulo"
+               id="titulo"
+               class="form-control @error('titulo') is-invalid @enderror"
+               value="{{ old('titulo', $diagnostico->titulo) }}"
                maxlength="255"
                title="Debe contener entre 1 y 255 caracteres"
                required>
-        @error('resumen')
+        @error('titulo')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>
@@ -131,7 +131,7 @@
 @php
     // Se usa sesión si está disponible; si no, se usan los datos actuales
     $valoresOriginales = session()->pull('diagnostico_original', [
-        'resumen' => $diagnostico->resumen,
+        'titulo' => $diagnostico->titulo,
         'descripcion' => $diagnostico->descripcion,
         'tratamiento' => $diagnostico->tratamiento,
         'observaciones' => $diagnostico->observaciones,
@@ -142,7 +142,7 @@
     const valoresOriginales = @json($valoresOriginales);
 
     document.getElementById('btnRestablecer').addEventListener('click', function () {
-        document.getElementById('resumen').value = valoresOriginales.resumen;
+        document.getElementById('titulo').value = valoresOriginales.titulo;
         document.getElementById('descripcion').value = valoresOriginales.descripcion;
         document.getElementById('tratamiento').value = valoresOriginales.tratamiento;
         document.getElementById('observaciones').value = valoresOriginales.observaciones;

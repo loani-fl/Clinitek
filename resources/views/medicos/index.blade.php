@@ -116,7 +116,7 @@
 
 </div>
 <div class="contenedor-principal">
-    <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
+    <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 90px;">
         <div class="card-header position-relative py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
             <a href="{{ route('inicio') }}" class="btn btn-light position-absolute end-0 top-50 translate-middle-y me-2">
                 <i class="bi bi-house-door"></i> Inicio
