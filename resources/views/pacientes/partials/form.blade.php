@@ -3,21 +3,10 @@
 @section('content')
 
     <!-- Barra de navegación superior -->
-    <div class="header d-flex justify-content-between align-items-center px-3 py-2" style="background-color: #007BFF; position: sticky; top: 0; z-index: 1030;">
-        <div class="d-flex align-items-center">
-            <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek"
-                 style="height: 40px; width: auto; margin-right: 6px;">
-            <span class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</span>
-        </div>
-        <div class="d-flex gap-3 flex-wrap">
-            <a href="{{ route('puestos.create') }}" class="text-decoration-none text-white fw-semibold">Crear puesto</a>
-            <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
-            <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
-        </div>
-    </div>
+
 
     <style>
-        .custom-card { 
+        .custom-card {
             max-width: 1000px;
             background-color: rgba(255, 255, 255, 0.95);
             border: 1px solid #91cfff;

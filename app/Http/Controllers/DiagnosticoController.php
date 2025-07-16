@@ -58,9 +58,11 @@ class DiagnosticoController extends Controller
 
     public function show(Diagnostico $diagnostico)
     {
+        $consultaId = $diagnostico->consulta_id; // obtienes el id directo
         $diagnostico->load('paciente');
-        return view('diagnosticos.show', compact('diagnostico'));
+        return view('diagnosticos.show', compact('diagnostico', 'consultaId'));
     }
+
 
     public function edit(Diagnostico $diagnostico)
     {
@@ -101,22 +103,22 @@ class DiagnosticoController extends Controller
             'resumen.string' => 'El resumen debe ser un texto válido.',
             'resumen.max' => 'El resumen no puede tener más de 255 caracteres.',
             'resumen.regex' => 'El resumen solo puede contener letras, números, espacios, comas, puntos y punto y coma.',
-    
+
             'descripcion.required' => 'La descripción es obligatoria.',
             'descripcion.string' => 'La descripción debe ser un texto válido.',
             'descripcion.max' => 'La descripción no puede tener más de 400 caracteres.',
             'descripcion.regex' => 'La descripción solo puede contener letras, números, espacios, comas, puntos y punto y coma.',
-    
+
             'tratamiento.required' => 'El tratamiento es obligatorio.',
             'tratamiento.string' => 'El tratamiento debe ser un texto válido.',
             'tratamiento.max' => 'El tratamiento no puede tener más de 400 caracteres.',
             'tratamiento.regex' => 'El tratamiento solo puede contener letras, números, espacios, comas, puntos y punto y coma.',
-    
+
             'observaciones.string' => 'Las observaciones deben ser un texto válido.',
             'observaciones.max' => 'Las observaciones no pueden tener más de 400 caracteres.',
             'observaciones.regex' => 'Las observaciones solo pueden contener letras, números, espacios, comas, puntos y punto y coma.',
         ]);
-       
+
         $request->session()->put('diagnostico_original', [
             'resumen' => $diagnostico->resumen,
             'descripcion' => $diagnostico->descripcion,
@@ -126,7 +128,7 @@ class DiagnosticoController extends Controller
 
         $diagnostico->update($validatedData);
 
-        
+
         return redirect()->route('diagnosticos.show', $diagnostico->id)
             ->with('success', 'Diagnóstico actualizado correctamente.');
     }
