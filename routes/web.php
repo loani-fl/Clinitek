@@ -105,4 +105,3 @@ Route::post('/examenes/store/{paciente}/{diagnostico}', [ExamenController::class
 Route::get('/examenes/{diagnostico}', [ExamenController::class, 'show'])->name('examenes.show');
 Route::get('/ordenes/{id}', [ExamenController::class, 'detalleOrden'])->name('ordenes.detalle');
 
-Route::get('/ordenes/{id}', [ExamenController::class, 'detalleOrden'])->name('ordenes.detalle');

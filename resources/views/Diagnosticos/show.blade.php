@@ -80,9 +80,27 @@
     <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100 mt-4">
         <div class="card-header text-center py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
             <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Detalles del Diagnóstico</h5>
+
+
         </div>
 
-
+        <div class="dropdown mt-3">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="talleresDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1rem;">
+                Más Opciones
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="talleresDropdown" style="min-width: 200px;">
+                <li>
+                    <a class="dropdown-item" href="{{ route('examenes.show', [$diagnostico->paciente->id, $diagnostico->consulta->id]) }}">
+                        Ver orden de examen
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{{ route('recetas.show', $diagnostico->paciente->id) }}">
+                        Recetas médicas
+                    </a>
+                </li>
+            </ul>
+        </div>
                 @if (session('success'))
             <div id="alert-success" class="alert alert-success shadow-sm mt-3" role="alert">
                 {{ session('success') }}
@@ -124,26 +142,6 @@
             <p><span class="label">Observaciones:</span><br>{!! nl2br(e($diagnostico->observaciones)) !!}</p>
 
             <!-- Menú desplegable Talleres de diagnóstico -->
-            <div class="dropdown mt-3">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="talleresDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1rem;">
-                    Más Opciones
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="talleresDropdown" style="min-width: 200px;">
-                    <li>
-                        <a class="dropdown-item" href="{{ route('examenes.show', [$diagnostico->paciente->id, $diagnostico->consulta->id]) }}">
-                            Ver orden de examen
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="{{ route('recetas.show', $diagnostico->paciente->id) }}">
-                            Recetas médicas
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-
-
 
 
             <div class="text-center pt-4">

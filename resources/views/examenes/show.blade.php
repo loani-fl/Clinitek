@@ -71,9 +71,6 @@
         document.addEventListener('DOMContentLoaded', function () {
             const filtroFecha = document.getElementById('filtroFecha');
             const ordenesContainer = document.getElementById('ordenes-container');
-            const modalOrden = document.getElementById('modalOrden');
-            const modalOrdenBody = document.getElementById('modalOrdenBody');
-            const btnImprimir = document.getElementById('btnImprimir');
             let ordenes = Array.from(ordenesContainer.children);
 
             // Filtrar órdenes por fecha
@@ -88,25 +85,29 @@
                 });
             });
 
-            // Evento para abrir modal con detalle de orden
-            ordenes.forEach(div => {
-                div.addEventListener('click', function() {
-                    const ordenId = this.dataset.ordenId;
-                    // Llamada AJAX para obtener detalle orden
-                    fetch(`/ordenes/${ordenId}`)
-                        .then(response => response.text())
-                        .then(html => {
-                            modalOrdenBody.innerHTML = html;
-                        })
-                        .catch(() => {
-                            modalOrdenBody.innerHTML = '<p>Error cargando la orden.</p>';
-                        });
-                });
+            // Modal: carga detalle al abrirse
+            var modalOrden = document.getElementById('modalOrden');
+            modalOrden.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget; // Elemento que disparó el modal
+                var ordenId = button.getAttribute('data-orden-id');
+
+                var modalBody = modalOrden.querySelector('.modal-body');
+                modalBody.innerHTML = 'Cargando...';
+
+                fetch(`/ordenes/${ordenId}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        modalBody.innerHTML = html;
+                    })
+                    .catch(() => {
+                        modalBody.innerHTML = '<p>Error cargando la orden.</p>';
+                    });
             });
 
-            // Botón imprimir abre ventana de impresión con contenido modal
+            // Botón imprimir
+            const btnImprimir = document.getElementById('btnImprimir');
             btnImprimir.addEventListener('click', () => {
-                const contenido = modalOrdenBody.innerHTML;
+                const contenido = modalOrden.querySelector('.modal-body').innerHTML;
                 const ventana = window.open('', '_blank');
                 ventana.document.write('<html><head><title>Imprimir Orden</title>');
                 ventana.document.write('<style>body{font-family: Arial,sans-serif; padding: 20px;} </style>');
@@ -118,6 +119,8 @@
                 ventana.print();
                 ventana.close();
             });
+
+
         });
     </script>
 @endsection

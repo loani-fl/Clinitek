@@ -8,7 +8,33 @@
 
     <hr>
 
-    <p><strong>Nombre del examen:</strong> {{ $orden->nombre ?? 'No especificado' }}</p>
+    @php
+        $categorias = [
+            'hematologia' => 'Hematología',
+            'bioquimico' => 'Bioquímica',
+            'perfil_anemia' => 'Perfil de Anemia',
+            'perfil_diabetes' => 'Perfil de Diabetes',
+            'marcador_tumoral' => 'Marcadores Tumorales',
+            'hormona' => 'Hormonas',
+            'infeccioso' => 'Infecciosos',
+            'orina_fluido' => 'Orina y Fluidos',
+            'inmunologia_autoinmunidad' => 'Inmunología y Autoinmunidad'
+        ];
+    @endphp
+
+    @foreach ($categorias as $clave => $titulo)
+        @if ($orden->$clave)
+            <h5>{{ $titulo }}:</h5>
+            <ul>
+                @foreach ($orden->$clave->toArray() as $campo => $valor)
+                    @if ($valor)
+                        <li>{{ ucwords(str_replace('_', ' ', $campo)) }}</li>
+                    @endif
+                @endforeach
+            </ul>
+        @endif
+    @endforeach
+
 
     {{-- Aquí puedes agregar más campos de tu examen si los tienes --}}
 </div>

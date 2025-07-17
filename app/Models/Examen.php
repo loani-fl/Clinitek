@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Examen extends Model
 {
-    
+
     protected $table = 'examens'; // <- Aquí pones el nombre correcto
     protected $fillable = ['paciente_id', 'consulta_id', 'nombre'];
+
 
     public function paciente() {
         return $this->belongsTo(Paciente::class);
@@ -18,7 +19,6 @@ class Examen extends Model
     public function consulta() {
         return $this->belongsTo(Consulta::class);
     }
-
 
 }
 
