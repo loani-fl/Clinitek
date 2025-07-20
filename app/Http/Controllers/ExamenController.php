@@ -164,24 +164,8 @@ class ExamenController extends Controller
     }
     public function detalleOrden($id)
     {
-
-        $orden = Examen::with([
-            'paciente',
-            'consulta',
-            'hematologia',
-            'bioquimico',
-            'perfil_anemia',
-            'perfil_diabetes',
-            'marcador_tumoral',
-            'hormona',
-            'infeccioso',
-            'orina_fluido',
-            'inmunologia_autoinmunidad',
-        ])->findOrFail($id);
-
+        $orden = Examen::with('paciente', 'consulta')->findOrFail($id);
         return view('ordenes.detalle', compact('orden'));
     }
-
-
 
 }
