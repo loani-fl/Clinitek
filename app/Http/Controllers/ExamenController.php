@@ -123,49 +123,97 @@ class ExamenController extends Controller
 
 
     // Mostrar la orden de exámenes guardada para un diagnóstico
-    public function show($diagnosticoId)
+    public function show($diagnostico_id)
     {
-        $diagnostico = Diagnostico::with('paciente', 'consulta.medico')->findOrFail($diagnosticoId);
-        $paciente = $diagnostico->paciente;
+        $diagnostico = Diagnostico::with('consulta.paciente')->findOrFail($diagnostico_id);
         $consulta = $diagnostico->consulta;
+        $paciente = $consulta->paciente;
 
-        // Cargar todas las órdenes (registros en la tabla 'examenes') del paciente agrupadas por consulta
-        $ordenes = \App\Models\Examen::with('consulta')
+
+
+
+
+    // Obtenemos los exámenes de esa consulta y paciente
+        $examenesSeleccionados = Examen::where('consulta_id', $consulta->id)
             ->where('paciente_id', $paciente->id)
-            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($examen) {
+                return [
+                    'nombre' => $examen->nombre,
+                    'seccion' => $this->getSeccion($examen->nombre),
+                ];
+            });
+
+        // Traer todas las consultas del paciente que tengan exámenes (u órdenes)
+        $ordenesPaciente = Consulta::where('paciente_id', $paciente->id)
+            ->whereHas('examens')  // Solo consultas que tienen exámenes
+            ->orderBy('fecha', 'desc')
             ->get();
 
-        // Traer los datos actuales para mostrar
+        return view('examenes.show', compact('consulta', 'paciente', 'examenesSeleccionados', 'ordenesPaciente'));
+
+    }
+
+
+// Función para obtener la sección a la que pertenece un examen
+    private function getSeccion($nombre)
+    {
+        if (!is_string($nombre)) {
+            return 'OTROS';
+        }
+
         $secciones = [
-            'HEMATOLOGÍA' => Hematologia::class,
-            'PERFIL DIABETES' => PerfilDiabetes::class,
-            'PERFIL DE ANEMIA' => PerfilAnemia::class,
-            'BIOQUÍMICOS' => Bioquimico::class,
-            'MARCADORES TUMORALES' => MarcadorTumoral::class,
-            'INMUNOLOGÍA Y AUTOINMUNIDAD' => InmunologiaAutoinmunidad::class,
-            'ORINA Y FLUIDOS' => OrinaFluido::class,
-            'HORMONAS' => Hormona::class,
-            'INFECCIOSOS' => Infeccioso::class,
+            'HEMATOLOGÍA' => [
+                'hemograma_completo', 'frotis_en_sangre_periferica', 'reticulocitos',
+                'eritrosedimentacion', 'grupo_sanguineo', 'p_coombs_directa',
+                'p_coombs_indirecta', 'plasmodium_gota_gruesa', 'plasmodium_anticuerpos',
+            ],
+            'HORMONAS' => [
+                'hormona_luteinizante_lh', 'hormona_foliculo_estimulante_fsh', 'cortisol',
+                'prolactina', 'testosterona', 'estradiol', 'progesterona', 'beta_hcg_embarazo',
+            ],
+            'ORINA Y FLUIDOS' => [
+                'examen_general_orina', 'cultivo_orina', 'orina_24_horas', 'prueba_embarazo',
+                'liquido_cefalorraquideo', 'liquido_pleural', 'liquido_peritoneal',
+                'liquido_articular', 'espermograma',
+            ],
+            'BIOQUÍMICOS' => [
+                'urea', 'bun', 'creatinina', 'acido_urico', 'glucosa', 'glucosa_post_prandial_2h',
+                'c_tolencia_glucosa_2h', 'c_tolencia_glucosa_4h', 'bilirrubina_total_y_fracciones',
+                'proteinas_totales', 'albumina_globulina', 'electroforesis_proteinas',
+                'cistatina_c_creatinina_tfg', 'diabetes_gestacional',
+            ],
+            'MARCADORES TUMORALES' => [
+                'af_proteina', 'ac_embrionario', 'ca125', 'he4', 'indice_roma', 'ca15_3', 'ca19_9',
+                'ca72_4', 'cyfra_21_1', 'beta_2_microglobulina', 'enolasa_neuroespecifica',
+                'antigeno_prostatico_psa', 'psa_libre',
+            ],
+            'PERFIL DE ANEMIA' => [
+                'hierro_serico', 'capacidad_fijacion_hierro', 'transferrina', 'ferritina',
+                'vitamina_b12', 'acido_folico', 'eritropoyetina', 'haptoglobina',
+                'electroforesis_hemoglobina', 'glucosa_6_fosfato', 'fragilidad_osmotica_hematias',
+            ],
+            'PERFIL DIABETES' => [
+                'peptido_c', 'indice_peptidico', 'insulina', 'homa_ir', 'homa_ir_post_prandial',
+                'fructosamina', 'hemoglobina_glicosilada',
+            ],
+            'INMUNOLOGÍA Y AUTOINMUNIDAD' => [
+                'iga', 'igg', 'igm', 'ige', 'complemento_c3', 'complemento_c4',
+                'vitamina_d', 'ac_antinucleares',
+            ],
+            'INFECCIOSOS' => [
+                'hiv_1_y_2', 'hepatitis_b', 'hepatitis_c', 'sifilis_vdrl_o_rpr', 'citomegalovirus_cmv',
+            ],
+
         ];
 
-        $datosSecciones = [];
-
-        foreach ($secciones as $nombreSeccion => $modeloClase) {
-            $registro = $modeloClase::where('diagnostico_id', $diagnosticoId)->first();
-            if ($registro) {
-                $campos = collect($registro->getAttributes())
-                    ->except(['id', 'diagnostico_id', 'created_at', 'updated_at'])
-                    ->toArray();
-                $datosSecciones[$nombreSeccion] = $campos;
+        foreach ($secciones as $seccion => $tests) {
+            if (in_array(strtolower($nombre), $tests)) {
+                return $seccion;
             }
         }
 
-        return view('examenes.show', compact('diagnostico', 'paciente', 'consulta', 'datosSecciones', 'ordenes'));
-    }
-    public function detalleOrden($id)
-    {
-        $orden = Examen::with('paciente', 'consulta')->findOrFail($id);
-        return view('ordenes.detalle', compact('orden'));
+        return 'OTROS';
     }
 
 }

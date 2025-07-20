@@ -96,13 +96,13 @@ Route::get('diagnosticos/{diagnostico}', [DiagnosticoController::class, 'show'])
 Route::post('/consultas/{id}/cambiar-estado', [ConsultaController::class, 'cambiarEstado'])->name('consultas.cambiarEstado');
 
 // Rutas para ExamenController
+// Crear y almacenar examenes (mantén estas rutas)
 Route::get('/examenes/create/{paciente}/{consulta}', [ExamenController::class, 'create'])->name('examenes.create');
-
 Route::post('/examenes/store/{paciente}/{diagnostico}', [ExamenController::class, 'store'])->name('examenes.store');
-//Route::get('/examenes/{paciente}/{consulta}', [ExamenController::class, 'show'])->name('examenes.show');
 
-
+// Mostrar orden de exámenes por diagnóstico
 Route::get('/examenes/{diagnostico}', [ExamenController::class, 'show'])->name('examenes.show');
-Route::get('/ordenes/{id}', [ExamenController::class, 'detalleOrden'])->name('ordenes.detalle');
 
+
+// Detalle de orden (no cambia)
 Route::get('/ordenes/{id}', [ExamenController::class, 'detalleOrden'])->name('ordenes.detalle');

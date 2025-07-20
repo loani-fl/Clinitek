@@ -130,9 +130,8 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="talleresDropdown" style="min-width: 200px;">
                     <li>
-                        <a class="dropdown-item" href="{{ route('examenes.show', [$diagnostico->paciente->id, $diagnostico->consulta->id]) }}">
-                            Ver orden de examen
-                        </a>
+                        <a href="{{ route('examenes.show', $diagnostico->id) }}">Ver orden de examen</a>
+
                     </li>
                     <li>
                         <a class="dropdown-item" href="{{ route('recetas.show', $diagnostico->paciente->id) }}">
