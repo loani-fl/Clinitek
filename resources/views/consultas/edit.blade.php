@@ -286,6 +286,10 @@
             </div>
         </div>
 
+        <div class="d-flex justify-content-center gap-3 mt-3 mb-4 flex-wrap">
+    <!-- botones -->
+
+
         <div class="d-flex justify-content-center gap-3 mt-2 flex-wrap">
             <button type="submit" class="btn btn-primary d-flex align-items-center" title="Guardar los cambios">
                 <i class="bi bi-pencil-square me-2"></i> Actualizar
@@ -299,7 +303,7 @@
         </div>
     </form>
 </div>
-
+</div>
 @php
 use Carbon\Carbon;
 
