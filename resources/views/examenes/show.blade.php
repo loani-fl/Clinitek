@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="content-wrapper d-flex justify-content-center p-2">
-        <div class="card shadow-sm" style="max-width: 600px; width: 100%;">
+        <div class="card shadow-sm" style="max-width: 1000px; width: 100%;"> {{-- ← Aumentado el ancho --}}
             <div class="card-header d-flex align-items-center gap-2 py-2 px-3">
                 <img src="{{ asset('images/logo2.jpg') }}" alt="Logo" style="height: 40px;">
                 <div>
@@ -65,7 +65,6 @@
                                 <div>
                                     Consulta: {{ \Carbon\Carbon::parse($orden->fecha)->format('d/m/Y') }} - {{ $orden->especialidad }}
                                 </div>
-                                {{-- Asumiendo que tienes diagnóstico para la consulta --}}
                                 @if ($orden->diagnostico)
                                     <a href="{{ route('examenes.show', $orden->diagnostico->id) }}" class="btn btn-sm btn-primary">
                                         Ver
