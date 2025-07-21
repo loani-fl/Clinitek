@@ -16,11 +16,10 @@ class RecetaController extends Controller
         return view('recetas.create', compact('consulta'));
     }
 
-
-
     public function store(Request $request, $pacienteId)
     {
         $request->validate([
+            'consulta_id' => 'required|exists:consultas,id',
             'detalles' => 'nullable|string|max:500',
             'medicamentos' => 'required|array|min:1',
             'medicamentos.*.nombre' => ['required', 'string', 'max:55', 'regex:/^[a-zA-Z0-9\s]+$/'],
@@ -28,6 +27,8 @@ class RecetaController extends Controller
             'medicamentos.*.dosis' => ['required', 'string', 'max:25', 'regex:/^[a-zA-Z0-9\s]+$/'],
             'medicamentos.*.detalles' => ['nullable', 'string', 'max:500', 'regex:/^[a-zA-Z0-9\s]+$/'],
         ], [
+            'consulta_id.required' => 'La receta debe estar vinculada a una consulta.',
+            'consulta_id.exists' => 'La consulta no existe.',
             'medicamentos.required' => 'Debes agregar al menos un medicamento.',
             'medicamentos.min' => 'Debes agregar al menos un medicamento.',
             'medicamentos.*.nombre.required' => 'El nombre del medicamento es obligatorio.',
@@ -42,8 +43,12 @@ class RecetaController extends Controller
             'medicamentos.*.detalles.regex' => 'Solo se admiten letras y números en los detalles.',
         ]);
     
+        // Obtiene la consulta y con ella el paciente correcto
+        $consulta = Consulta::findOrFail($request->consulta_id);
+    
         $receta = Receta::create([
-            'paciente_id' => $pacienteId,
+            'consulta_id' => $consulta->id,
+            'paciente_id' => $consulta->paciente_id,  // Se usa el paciente asociado a la consulta
             'detalles' => $request->detalles,
         ]);
     
@@ -61,18 +66,15 @@ class RecetaController extends Controller
             }
         }
     
-        return redirect()->route('recetas.show', $pacienteId)
+        return redirect()->route('recetas.show', $consulta->paciente_id)
             ->with('success', 'Receta creada correctamente.');
     }
     
-
-
 
     public function show($pacienteId)
     {
         $paciente = Paciente::with(['consultas.recetas'])->findOrFail($pacienteId);
 
-        // Obtener todas las recetas del paciente sin paginación
         $recetas = Receta::whereHas('consulta', function ($query) use ($pacienteId) {
             $query->where('paciente_id', $pacienteId);
         })->with('medicamentos')
@@ -81,5 +83,4 @@ class RecetaController extends Controller
 
         return view('recetas.show', compact('paciente', 'recetas'));
     }
-
 }
