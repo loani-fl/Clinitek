@@ -116,7 +116,8 @@
 
 
     @csrf
-        <input type="hidden" name="consulta_id" value="{{ $consulta->id }}">
+    <input type="hidden" name="consulta_id" value="{{ $consulta->id }}">
+
 
         <!-- Medicamento con autocompletado -->
         <div style="position: relative; margin-bottom: 1rem;">
@@ -369,7 +370,7 @@
 
         const tdAccion = document.createElement('td');
         const btnRemove = document.createElement('span');
-        btnRemove.textContent = 'Eliminar';
+        btnRemove.textContent = 'Borrar';
         btnRemove.className = 'btn-remove';
         btnRemove.addEventListener('click', () => {
             tablaMedicamentos.removeChild(tr);
