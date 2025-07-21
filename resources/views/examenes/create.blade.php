@@ -338,21 +338,20 @@ $secciones = [
                     @endforeach
                 </div>
 
-                {{-- Botones centrados --}}
-                <div class="d-flex justify-content-center gap-3 mt-4">
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-save"></i> Guardar y Ver Orden de Exámenes
-        </button>
-                
-                    <button type="button" id="btnLimpiar" class="btn btn-warning">
-                        <i class="bi bi-trash"></i> Limpiar
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-plus-circle"></i> Volver
-                    </button>
-                </div>
+  {{-- Botones centrados --}}
+<div class="d-flex justify-content-center gap-3 mt-4">
+    <button type="submit" class="btn btn-primary">
+        <i class="bi bi-save"></i> Guardar e imprimir
+    </button>
 
-            </form>
+    <button type="button" id="btnLimpiar" class="btn btn-warning">
+        <i class="bi bi-trash"></i> Limpiar
+    </button>
+
+<a href="{{ route('consultas.show', $consulta->diagnostico->id) }}" class="btn btn-success">
+    <i class="bi bi-arrow-left-circle"></i> Regresar
+</a>
+
 
         </div>
     </div>
