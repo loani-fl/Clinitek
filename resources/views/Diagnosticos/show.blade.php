@@ -129,12 +129,25 @@
 
             <div class="card-body px-4 py-3">
 
-                <div class="section-title">Información del Paciente</div>
-                <p><span class="label">Nombre Completo:</span> {{ $diagnostico->paciente->nombre }} {{ $diagnostico->paciente->apellidos }}</p>
-                <p><span class="label">Edad:</span> {{ \Carbon\Carbon::parse($diagnostico->paciente->fecha_nacimiento)->age }} años</p>
-                <p><span class="label">Identidad:</span> {{ $diagnostico->paciente->identidad }}</p>
-                <p><span class="label">Teléfono:</span> {{ $diagnostico->paciente->telefono ?? 'No especificado' }}</p>
-                <p><span class="label">Género:</span> {{ $diagnostico->paciente->genero ?? 'No especificado' }}</p>
+            <div class="section-title">Información del Paciente</div>
+<div class="row">
+    <div class="col-md-4 mb-2">
+        <p><span class="label">Nombre Completo:</span><br> {{ $diagnostico->paciente->nombre }} {{ $diagnostico->paciente->apellidos }}</p>
+    </div>
+    <div class="col-md-4 mb-2">
+        <p><span class="label">Edad:</span><br> {{ \Carbon\Carbon::parse($diagnostico->paciente->fecha_nacimiento)->age }} años</p>
+    </div>
+    <div class="col-md-4 mb-2">
+        <p><span class="label">Identidad:</span><br> {{ $diagnostico->paciente->identidad }}</p>
+    </div>
+    <div class="col-md-4 mb-2">
+        <p><span class="label">Teléfono:</span><br> {{ $diagnostico->paciente->telefono ?? 'No especificado' }}</p>
+    </div>
+    <div class="col-md-4 mb-2">
+        <p><span class="label">Género:</span><br> {{ $diagnostico->paciente->genero ?? 'No especificado' }}</p>
+    </div>
+</div>
+
 
                 <div class="section-title mt-4">Detalles del Diagnóstico</div>
                 <p><span class="label">Título:</span><br>{{ $diagnostico->titulo }}</p>
@@ -142,6 +155,36 @@
                 <p><span class="label">Tratamiento:</span><br>{!! nl2br(e($diagnostico->tratamiento)) !!}</p>
                 <p><span class="label">Observaciones:</span><br>{!! nl2br(e($diagnostico->observaciones)) !!}</p>
 
+                <hr class="my-4">
+
+                @php use Illuminate\Support\Str; @endphp
+
+<hr class="my-4">
+<h6 class="border-bottom pb-1 mb-3" style="font-size: 0.95rem;">Diagnósticos anteriores del paciente</h6>
+
+@if ($diagnosticosAnteriores->isEmpty())
+    <p class="text-muted" style="font-size: 0.85rem;">No hay diagnósticos anteriores registrados para este paciente.</p>
+@else
+    <div class="accordion" id="diagnosticosAnterioresAccordion">
+        @foreach ($diagnosticosAnteriores as $d)
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-{{ $d->id }}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ $d->id }}" aria-expanded="false" aria-controls="collapse-{{ $d->id }}" style="font-size: 0.85rem;">
+                        {{ $d->created_at->format('d/m/Y') }} — {{ Str::limit($d->titulo, 50) }}
+                    </button>
+                </h2>
+                <div id="collapse-{{ $d->id }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ $d->id }}" data-bs-parent="#diagnosticosAnterioresAccordion">
+                    <div class="accordion-body" style="font-size: 0.85rem;">
+                        <p><strong>Título:</strong><br>{{ $d->titulo }}</p>
+                        <p><strong>Descripción:</strong><br>{!! nl2br(e($d->descripcion)) !!}</p>
+                        <p><strong>Tratamiento:</strong><br>{!! nl2br(e($d->tratamiento)) !!}</p>
+                        <p><strong>Observaciones:</strong><br>{!! nl2br(e($d->observaciones)) !!}</p>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+@endif
 
 
 
