@@ -42,13 +42,31 @@
 
         <!-- Información paciente y consulta -->
         <div class="mb-4 p-3 bg-light rounded shadow-sm">
-            <h5 class="fw-semibold mb-3">Información del Paciente y Consulta</h5>
-            <p><strong>Nombre Completo:</strong> {{ $diagnostico->paciente->nombre }} {{ $diagnostico->paciente->apellidos }}</p>
-            <p><strong>Edad:</strong> {{ \Carbon\Carbon::parse($diagnostico->paciente->fecha_nacimiento)->age }} años</p>
-            <p><strong>Identidad:</strong> {{ $diagnostico->paciente->identidad }}</p>
-            <p><strong>Fecha de Consulta:</strong> {{ \Carbon\Carbon::parse($diagnostico->consulta->fecha)->format('d/m/Y') }}</p>
-            <p><strong>Doctor que atendió:</strong> {{ $diagnostico->consulta->medico->nombre }} {{ $diagnostico->consulta->medico->apellidos }}</p>
+    <h5 class="fw-semibold mb-3">Información del Paciente y Consulta</h5>
+    <div class="row mb-2">
+        <div class="col-md-4 mb-2">
+            <strong>Nombre Completo:</strong><br>
+            {{ $diagnostico->paciente->nombre }} {{ $diagnostico->paciente->apellidos }}
         </div>
+        <div class="col-md-4 mb-2">
+            <strong>Edad:</strong><br>
+            {{ \Carbon\Carbon::parse($diagnostico->paciente->fecha_nacimiento)->age }} años
+        </div>
+        <div class="col-md-4 mb-2">
+            <strong>Identidad:</strong><br>
+            {{ $diagnostico->paciente->identidad }}
+        </div>
+        <div class="col-md-4 mb-2">
+            <strong>Fecha de Consulta:</strong><br>
+            {{ \Carbon\Carbon::parse($diagnostico->consulta->fecha)->format('d/m/Y') }}
+        </div>
+        <div class="col-md-4 mb-2">
+            <strong>Doctor que atendió:</strong><br>
+            {{ $diagnostico->consulta->medico->nombre }} {{ $diagnostico->consulta->medico->apellidos }}
+        </div>
+    </div>
+</div>
+
 
         <form id="formDiagnostico" action="{{ route('diagnosticos.update', $diagnostico->id) }}" method="POST" novalidate>
     @csrf
