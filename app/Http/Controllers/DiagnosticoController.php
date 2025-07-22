@@ -58,10 +58,20 @@ class DiagnosticoController extends Controller
 
     public function show(Diagnostico $diagnostico)
     {
-        $consultaId = $diagnostico->consulta_id; // obtienes el id directo
+        $consultaId = $diagnostico->consulta_id;
+    
+        // Cargar paciente relacionado
         $diagnostico->load('paciente');
-        return view('diagnosticos.show', compact('diagnostico', 'consultaId'));
+    
+        // Obtener otros diagnósticos del mismo paciente, excluyendo el actual
+        $diagnosticosAnteriores = Diagnostico::where('paciente_id', $diagnostico->paciente_id)
+                                    ->where('id', '!=', $diagnostico->id)
+                                    ->orderByDesc('created_at')
+                                    ->get();
+    
+        return view('diagnosticos.show', compact('diagnostico', 'consultaId', 'diagnosticosAnteriores'));
     }
+    
 
 
     public function edit(Diagnostico $diagnostico)
@@ -75,34 +85,34 @@ class DiagnosticoController extends Controller
     {
         $validatedData = $request->validate([
             'titulo' => [
-                'required',
-                'string',
-                'max:255',
-                'regex:/^[a-zA-Z0-9\s,.;]+$/'
-            ],
-            'descripcion' => [
-                'required',
-                'string',
-                'max:400',
-                'regex:/^[a-zA-Z0-9\s,.;]+$/'
-            ],
-            'tratamiento' => [
-                'required',
-                'string',
-                'max:400',
-                'regex:/^[a-zA-Z0-9\s,.;]+$/'
-            ],
-            'observaciones' => [
-                'nullable',
-                'string',
-                'max:400',
-                'regex:/^[a-zA-Z0-9\s,.;]*$/'
-            ],
+                  'required',
+                    'string',
+                    'max:255',
+                    'regex:/^[a-zA-Z0-9\s,.;]/'
+                ],
+                'descripcion' => [
+                    'required',
+                    'string',
+                    'max:400',
+                    'regex:/^[a-zA-Z0-9\s,.;]/'
+                ],
+                'tratamiento' => [
+                    'required',
+                    'string',
+                    'max:400',
+                    'regex:/^[a-zA-Z0-9\s,.;]/'
+                ],
+                'observaciones' => [
+                    'nullable',
+                    'string',
+                    'max:400',
+                    'regex:/^[a-zA-Z0-9\s,.;]/'
+                ],
         ], [
             'titulo.required' => 'El resumen es obligatorio.',
             'titulo.string' => 'El resumen debe ser un texto válido.',
             'titulo.max' => 'El resumen no puede tener más de 255 caracteres.',
-            'titulo.regex' => 'El resumen solo puede contener letras, números, espacios, comas, puntos y punto y coma.',
+            'titulo.regex' => 'El titulo solo puede contener letras, números, espacios, comas, puntos y punto y coma.',
 
             'descripcion.required' => 'La descripción es obligatoria.',
             'descripcion.string' => 'La descripción debe ser un texto válido.',

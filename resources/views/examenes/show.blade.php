@@ -6,7 +6,7 @@
             <div class="card-header d-flex align-items-center gap-2 py-2 px-3">
                 <img src="{{ asset('images/logo2.jpg') }}" alt="Logo" style="height: 40px;">
                 <div>
-                    <h6 class="mb-0">Laboratorio Clínico Honduras</h6>
+                    <h6 class="mb-0">Laboratorio clínico Honduras</h6>
                     <small class="text-muted" style="font-size: 0.75rem;">Orden de Exámenes</small>
                 </div>
             </div>
