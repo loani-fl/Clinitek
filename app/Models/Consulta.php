@@ -52,9 +52,6 @@ class Consulta extends Model
         return $this->hasMany(Receta::class);
     }
 
-    public function examenes()
-{
-    return $this->hasMany(Examen::class);
-}
+
 
 }

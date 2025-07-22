@@ -26,6 +26,12 @@
         border-collapse: collapse;
         margin-top: 1rem;
     }
+    table td {
+    white-space: normal !important;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
     th, td {
         border: 1px solid #ccc;
         padding: 0.5rem;
@@ -105,37 +111,31 @@
         <p><strong>Fecha:</strong> {{ $consulta->fecha ?? 'Sin fecha' }}</p>
     </div>
 
-    @if ($errors->any())
-    <div style="background-color: #f8d7da; color: #842029; padding: 1rem; margin-bottom: 1rem; border-radius: 6px; border: 1px solid #f5c2c7;">
-        <strong>¡Error!</strong> Hay problemas con los datos ingresados:
-        <ul style="margin-top: 0.5rem; margin-bottom: 0;">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
 
     <form action="{{ route('recetas.store', ['consulta' => $consulta->id]) }}" method="POST">
 
 
     @csrf
-        <input type="hidden" name="consulta_id" value="{{ $consulta->id }}">
+    <input type="hidden" name="consulta_id" value="{{ $consulta->id }}">
+
 
         <!-- Medicamento con autocompletado -->
         <div style="position: relative; margin-bottom: 1rem;">
-            <label for="medicamento" style="font-weight: 600;">Medicamento:</label>
-            <input
-                type="text"
-                id="medicamento"
-                placeholder="Escribe el nombre del medicamento"
-                autocomplete="off"
-                style="width: 35%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
-            <div id="medicamento-list"></div>
-            @error('medicamentos.0.nombre')
-                <div class="error-message">{{ $message }}</div>
-            @enderror
-        </div>
+    <label for="medicamento" style="font-weight: 600;">Medicamento:</label>
+    <input
+        type="text"
+        id="medicamento"
+        name="medicamentos[0][nombre]"
+        maxlength="55"
+        placeholder="Escribe el nombre del medicamento"
+        autocomplete="off"
+        style="width: 35%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;"
+        value="{{ old('medicamentos.0.nombre') }}">
+    <div id="medicamento-list"></div>
+    @error('medicamentos.0.nombre')
+        <small class="text-danger">{{ $message }}</small>
+    @enderror
+</div>
 
         <!-- Indicaciones -->
         <div style="margin-bottom: 1rem;">
@@ -144,7 +144,7 @@
                 <option value="Cada 8 horas">Cada 8 horas</option>
                 <option value="Cada 12 horas">Cada 12 horas</option>
                 <option value="Cada 24 horas">Cada 24 horas</option>
-                <option value="Una vez al día">Una vez al día</option>
+                <option value="Una vez al día">Cada 6 horas</option>
                 <option value="Antes de dormir">Antes de dormir</option>
             </select>
             @error('medicamentos.0.indicacion')
@@ -154,16 +154,18 @@
 
         <!-- Dosis -->
         <div style="margin-bottom: 1rem;">
-            <label for="dosis" style="font-weight: 600;">Dosis:</label>
-            <input
-                type="text"
-                id="dosis"
-                placeholder="Ejemplo: 500 mg"
-                style="width: 20%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
-            @error('medicamentos.0.dosis')
-                <div class="error-message">{{ $message }}</div>
-            @enderror
-        </div>
+    <label for="dosis" style="font-weight: 600;">Dosis:</label>
+    <input
+        type="text"
+        id="dosis"
+        maxlength="25"
+        placeholder="Ejemplo: 500 mg"
+        style="width: 20%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+    @error('medicamentos.0.dosis')
+        <div class="error-message">{{ $message }}</div>
+    @enderror
+</div>
+
 
         <!-- Detalles de prescripción (individual) -->
         <div id="detalles-container" style="margin-bottom: 1rem; display: none;">
@@ -231,8 +233,7 @@
         const count = document.getElementById('charCount');
         count.textContent = detalles.value.length;
     }
-    document.addEventListener('DOMContentLoaded', updateCount);
-
+    document.addEventListener('DOMContentLoaded', () => {
     const medicamentoInput = document.getElementById('medicamento');
     const medicamentoList = document.getElementById('medicamento-list');
     const indicacionSelect = document.getElementById('indicacion');
@@ -244,38 +245,72 @@
     const hiddenContainer = document.getElementById('medicamentos-hidden');
     const medicamentosAgregados = new Set();
 
-    // Autocompletado
-    medicamentoInput.addEventListener('input', async () => {
-        const texto = medicamentoInput.value.trim();
+    function updateCount() {
+        const detalles = detallesTextarea;
+        const count = document.getElementById('charCount');
+        count.textContent = detalles.value.length;
+    }
+    updateCount();
+    detallesTextarea.addEventListener('input', updateCount);
+
+    // Función que busca y muestra sugerencias
+    async function fetchSugerencias(texto) {
         if (texto.length === 0) {
             medicamentoList.style.display = 'none';
-            detallesContainer.style.display = 'none';
             return;
         }
-        const res = await fetch(`/medicamentos/search?q=${encodeURIComponent(texto)}`);
-        const data = await res.json();
-
-        medicamentoList.innerHTML = '';
-        if (data.length === 0) {
-            medicamentoList.style.display = 'none';
-            detallesContainer.style.display = 'none';
-            return;
-        }
-
-        data.forEach(med => {
-            const div = document.createElement('div');
-            div.textContent = med;
-            div.addEventListener('click', () => {
-                medicamentoInput.value = med;
+        try {
+            const res = await fetch(`/medicamentos/search?q=${encodeURIComponent(texto)}`);
+            if (!res.ok) {
                 medicamentoList.style.display = 'none';
-                detallesTextarea.value = '';
-                updateCount();
-                detallesContainer.style.display = 'block';
-                dosisInput.value = '';
+                return;
+            }
+            const data = await res.json();
+            medicamentoList.innerHTML = '';
+            if (data.length === 0) {
+                medicamentoList.style.display = 'none';
+                return;
+            }
+            data.forEach(med => {
+                const div = document.createElement('div');
+                div.textContent = med;
+                div.addEventListener('click', () => {
+                    medicamentoInput.value = med;
+                    medicamentoList.style.display = 'none';
+                    detallesContainer.style.display = 'block';
+                    updateCount();
+                    dosisInput.value = '';
+                    medicamentoInput.focus();
+                });
+                medicamentoList.appendChild(div);
             });
-            medicamentoList.appendChild(div);
-        });
-        medicamentoList.style.display = 'block';
+            medicamentoList.style.display = 'block';
+        } catch (error) {
+            medicamentoList.style.display = 'none';
+            console.error('Error al obtener sugerencias:', error);
+        }
+    }
+
+    medicamentoInput.addEventListener('input', () => {
+        const texto = medicamentoInput.value.trim();
+
+        // Mostrar detalles si hay texto
+        if (texto.length > 0) {
+            detallesContainer.style.display = 'block';
+        } else {
+            detallesContainer.style.display = 'none';
+            detallesTextarea.value = '';
+            updateCount();
+            medicamentoList.style.display = 'none';
+            return;
+        }
+
+        fetchSugerencias(texto);
+    });
+
+    medicamentoInput.addEventListener('focus', () => {
+        const texto = medicamentoInput.value.trim();
+        fetchSugerencias(texto);
     });
 
     document.addEventListener('click', (e) => {
@@ -283,8 +318,6 @@
             medicamentoList.style.display = 'none';
         }
     });
-
-    detallesTextarea.addEventListener('input', updateCount);
 
     agregarBtn.addEventListener('click', () => {
         const med = medicamentoInput.value.trim();
@@ -317,29 +350,36 @@
 
         const tdMed = document.createElement('td');
         tdMed.textContent = med;
+        tdMed.style.wordBreak = 'break-word'; // Para evitar que distorsione la tabla
         tr.appendChild(tdMed);
 
         const tdInd = document.createElement('td');
         tdInd.textContent = indicacion;
+        tdInd.style.wordBreak = 'break-word';
         tr.appendChild(tdInd);
 
         const tdDosis = document.createElement('td');
         tdDosis.textContent = dosis;
+        tdDosis.style.wordBreak = 'break-word';
         tr.appendChild(tdDosis);
 
         const tdDetalles = document.createElement('td');
         tdDetalles.textContent = detalles;
+        tdDetalles.style.wordBreak = 'break-word';
         tr.appendChild(tdDetalles);
 
         const tdAccion = document.createElement('td');
         const btnRemove = document.createElement('span');
-        btnRemove.textContent = 'Eliminar';
+        btnRemove.textContent = 'Borrar';
         btnRemove.className = 'btn-remove';
         btnRemove.addEventListener('click', () => {
             tablaMedicamentos.removeChild(tr);
             medicamentosAgregados.delete(med.toLowerCase());
+
+            // Eliminar inputs ocultos asociados
             const hiddenInputs = hiddenContainer.querySelectorAll(`input[data-med="${med.toLowerCase()}"]`);
             hiddenInputs.forEach(input => hiddenContainer.removeChild(input));
+
             if (tablaMedicamentos.rows.length === 0) {
                 document.getElementById('tabla-medicamentos').style.display = 'none';
             }
@@ -351,7 +391,8 @@
 
         const index = medicamentosAgregados.size;
 
-        // Nombre oculto
+        // Crear inputs ocultos para enviar el formulario
+
         const hiddenNombre = document.createElement('input');
         hiddenNombre.type = 'hidden';
         hiddenNombre.name = `medicamentos[${index}][nombre]`;
@@ -359,21 +400,18 @@
         hiddenNombre.dataset.med = med.toLowerCase();
         hiddenContainer.appendChild(hiddenNombre);
 
-        // Indicacion oculta
         const hiddenIndicacion = document.createElement('input');
         hiddenIndicacion.type = 'hidden';
         hiddenIndicacion.name = `medicamentos[${index}][indicacion]`;
         hiddenIndicacion.value = indicacion;
         hiddenContainer.appendChild(hiddenIndicacion);
 
-        // Dosis oculta
         const hiddenDosis = document.createElement('input');
         hiddenDosis.type = 'hidden';
         hiddenDosis.name = `medicamentos[${index}][dosis]`;
         hiddenDosis.value = dosis;
         hiddenContainer.appendChild(hiddenDosis);
 
-        // Detalles ocultos
         const hiddenDetalles = document.createElement('input');
         hiddenDetalles.type = 'hidden';
         hiddenDetalles.name = `medicamentos[${index}][detalles]`;
@@ -388,6 +426,14 @@
         dosisInput.value = '';
         detallesTextarea.value = '';
         detallesContainer.style.display = 'none';
+
+        // Dar foco para seguir escribiendo y mostrar sugerencias si empieza a escribir
+        medicamentoInput.focus();
+        medicamentoList.style.display = 'none'; // reset lista hasta que escriba algo
     });
+});
+
 </script>
+
+
 @endsection
