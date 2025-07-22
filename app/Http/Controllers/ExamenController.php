@@ -36,6 +36,7 @@ class ExamenController extends Controller
     // Guardar orden de exámenes
     public function store(Request $request, $pacienteId, $diagnosticoId)
 {
+
     // Validar que el diagnóstico exista
     $diagnostico = Diagnostico::findOrFail($diagnosticoId);
 

@@ -19,6 +19,7 @@ class DiagnosticoController extends Controller
 
     public function store(Request $request)
     {
+
         $validatedData = $request->validate([
             'paciente_id' => 'required|exists:pacientes,id',
             'consulta_id' => 'required|exists:consultas,id',
@@ -59,19 +60,19 @@ class DiagnosticoController extends Controller
     public function show(Diagnostico $diagnostico)
     {
         $consultaId = $diagnostico->consulta_id;
-    
+
         // Cargar paciente relacionado
         $diagnostico->load('paciente');
-    
+
         // Obtener otros diagnósticos del mismo paciente, excluyendo el actual
         $diagnosticosAnteriores = Diagnostico::where('paciente_id', $diagnostico->paciente_id)
                                     ->where('id', '!=', $diagnostico->id)
                                     ->orderByDesc('created_at')
                                     ->get();
-    
+
         return view('diagnosticos.show', compact('diagnostico', 'consultaId', 'diagnosticosAnteriores'));
     }
-    
+
 
 
     public function edit(Diagnostico $diagnostico)

@@ -54,7 +54,7 @@
         border-bottom: 3px solid #007BFF;
     }
 
-   
+
 
     .patient-data-grid {
         background: transparent;
@@ -89,7 +89,7 @@
         align-items: center;
     }
 
-    
+
 
     .btn-imprimir {
         background-color: rgb(97, 98, 99);
@@ -264,54 +264,55 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('examenes.store', [$paciente->id, $consulta->diagnostico->id ?? 0]) }}" target="_blank">
-                @csrf
+            <form method="POST" action="{{ route('examenes.store', [$paciente->id, $consulta->diagnostico->id ?? 0]) }}">
+
+            @csrf
 
                @php
 $secciones = [
     'HEMATOLOGÍA' => [
-        'hemograma_completo', 'frotis_en_sangre_periferica', 'reticulocitos', 'eritrosedimentacion', 
-        'grupo_sanguineo', 'p_coombs_directa', 'p_coombs_indirecta', 'plasmodium_gota_gruesa', 
+        'hemograma_completo', 'frotis_en_sangre_periferica', 'reticulocitos', 'eritrosedimentacion',
+        'grupo_sanguineo', 'p_coombs_directa', 'p_coombs_indirecta', 'plasmodium_gota_gruesa',
         'plasmodium_anticuerpos'
     ],
 
     'HORMONAS' => [
-        'hormona_luteinizante_lh', 'hormona_foliculo_estimulante_fsh', 'cortisol', 'prolactina', 
+        'hormona_luteinizante_lh', 'hormona_foliculo_estimulante_fsh', 'cortisol', 'prolactina',
         'testosterona', 'estradiol', 'progesterona', 'beta_hcg_embarazo'
     ],
 
     'ORINA Y FLUIDOS' => [
-        'examen_general_orina', 'cultivo_orina', 'orina_24_horas', 'prueba_embarazo', 
-        'liquido_cefalorraquideo', 'liquido_pleural', 'liquido_peritoneal', 'liquido_articular', 
+        'examen_general_orina', 'cultivo_orina', 'orina_24_horas', 'prueba_embarazo',
+        'liquido_cefalorraquideo', 'liquido_pleural', 'liquido_peritoneal', 'liquido_articular',
         'espermograma'
     ],
 
     'BIOQUÍMICOS' => [
-        'urea', 'bun', 'creatinina', 'acido_urico', 'glucosa', 'glucosa_post_prandial_2h', 
-        'c_tolencia_glucosa_2h', 'c_tolencia_glucosa_4h', 'bilirrubina_total_y_fracciones', 
-        'proteinas_totales', 'albumina_globulina', 'electroforesis_proteinas', 
+        'urea', 'bun', 'creatinina', 'acido_urico', 'glucosa', 'glucosa_post_prandial_2h',
+        'c_tolencia_glucosa_2h', 'c_tolencia_glucosa_4h', 'bilirrubina_total_y_fracciones',
+        'proteinas_totales', 'albumina_globulina', 'electroforesis_proteinas',
         'cistatina_c_creatinina_tfg', 'diabetes_gestacional'
     ],
 
     'MARCADORES TUMORALES' => [
-        'af_proteina', 'ac_embrionario', 'ca125', 'he4', 'indice_roma', 'ca15_3', 'ca19_9', 
-        'ca72_4', 'cyfra_21_1', 'beta_2_microglobulina', 'enolasa_neuroespecifica', 
+        'af_proteina', 'ac_embrionario', 'ca125', 'he4', 'indice_roma', 'ca15_3', 'ca19_9',
+        'ca72_4', 'cyfra_21_1', 'beta_2_microglobulina', 'enolasa_neuroespecifica',
         'antigeno_prostatico_psa', 'psa_libre'
     ],
 
     'PERFIL DE ANEMIA' => [
-        'hierro_serico', 'capacidad_fijacion_hierro', 'transferrina', 'ferritina', 'vitamina_b12', 
-        'acido_folico', 'eritropoyetina', 'haptoglobina', 'electroforesis_hemoglobina', 
+        'hierro_serico', 'capacidad_fijacion_hierro', 'transferrina', 'ferritina', 'vitamina_b12',
+        'acido_folico', 'eritropoyetina', 'haptoglobina', 'electroforesis_hemoglobina',
         'glucosa_6_fosfato', 'fragilidad_osmotica_hematias'
     ],
 
     'PERFIL DIABETES' => [
-        'peptido_c', 'indice_peptidico', 'insulina', 'homa_ir', 'homa_ir_post_prandial', 
+        'peptido_c', 'indice_peptidico', 'insulina', 'homa_ir', 'homa_ir_post_prandial',
         'fructosamina', 'hemoglobina_glicosilada'
     ],
 
     'INMUNOLOGÍA Y AUTOINMUNIDAD' => [
-        'iga', 'igg', 'igm', 'ige', 'complemento_c3', 'complemento_c4', 'vitamina_d', 
+        'iga', 'igg', 'igm', 'ige', 'complemento_c3', 'complemento_c4', 'vitamina_d',
         'ac_antinucleares'
     ],
 

@@ -42,21 +42,21 @@ class RecetaController extends Controller
             'medicamentos.*.detalles.max' => 'Los detalles no deben superar los 500 caracteres.',
             'medicamentos.*.detalles.regex' => 'Solo se admiten letras y números en los detalles.',
         ]);
-    
+
         // Obtiene la consulta y con ella el paciente correcto
         $consulta = Consulta::findOrFail($request->consulta_id);
-    
+
         $receta = Receta::create([
             'consulta_id' => $consulta->id,
             'paciente_id' => $consulta->paciente_id,  // Se usa el paciente asociado a la consulta
             'detalles' => $request->detalles,
         ]);
-    
+
         foreach ($request->medicamentos as $med) {
             $medicamento = Medicamento::firstOrCreate([
                 'nombre' => trim($med['nombre']),
             ]);
-    
+
             if (!$receta->medicamentos()->where('medicamento_id', $medicamento->id)->exists()) {
                 $receta->medicamentos()->attach($medicamento->id, [
                     'indicaciones' => $med['indicacion'],
@@ -65,11 +65,11 @@ class RecetaController extends Controller
                 ]);
             }
         }
-    
+
         return redirect()->route('recetas.show', $consulta->paciente_id)
             ->with('success', 'Receta creada correctamente.');
     }
-    
+
 
     public function show($pacienteId)
     {
