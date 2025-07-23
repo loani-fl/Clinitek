@@ -39,6 +39,13 @@
     </style>
 
     <div class="custom-card">
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    @endif
+
         <h2 class="mb-3">Historial de Recetas de {{ $paciente->nombre }} {{ $paciente->apellidos }}</h2>
 
         {{-- Filtro por fecha --}}
@@ -100,3 +107,16 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    setTimeout(() => {
+        const alert = document.querySelector('.alert-dismissible');
+        if (alert) {
+            alert.classList.remove('show');
+            alert.classList.add('fade');
+            setTimeout(() => alert.remove(), 300);
+        }
+    }, 3000); // Oculta el mensaje después de 4 segundos
+</script>
+@endpush
