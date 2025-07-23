@@ -158,7 +158,7 @@
             <!-- Header con título y botón -->
             <div class="card-header-flex">
 
-                <h5>Detalles de la Ccnsulta</h5>
+                <h5>Detalles de la consulta</h5>
 <div id="mensaje-error-orden" class="alert alert-danger" style="display:none;" role="alert">
     Debe haber un  diagnóstico para crear la orden de examen.
 </div>

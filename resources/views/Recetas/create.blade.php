@@ -93,10 +93,11 @@
     <h2 class="text-center text-xl font-bold">CLINITEK</h2>
 
     <div class="text-center mb-2">
-        <strong>Dr. {{ $consulta->medico->nombre ?? 'Nombre no disponible' }}</strong><br>
-        <span>Especialista en {{ $consulta->medico->especialidad ?? 'Especialidad no disponible' }}</span><br>
-        <hr style="border: none; border-top: 3px solid #0056b3; margin: 0 auto 1rem; width: 100%;">
-    </div>
+    <strong>Dr. {{ $consulta->medico->nombre ?? 'Nombre' }} {{ $consulta->medico->apellidos ?? 'no disponible' }}</strong><br>
+    <span>Especialista en {{ $consulta->medico->especialidad ?? 'Especialidad no disponible' }}</span><br>
+    <hr style="border: none; border-top: 3px solid #0056b3; margin: 0 auto 1rem; width: 100%;">
+</div>
+
 
     @php
         use Carbon\Carbon;
@@ -132,9 +133,11 @@
         style="width: 35%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;"
         value="{{ old('medicamentos.0.nombre') }}">
     <div id="medicamento-list"></div>
-    @error('medicamentos.0.nombre')
-        <small class="text-danger">{{ $message }}</small>
-    @enderror
+    <div id="error-medicamento" class="error-message"></div>
+@error('medicamentos.0.nombre')
+    <small class="text-danger">{{ $message }}</small>
+@enderror
+
 </div>
 
         <!-- Indicaciones -->
@@ -161,6 +164,8 @@
         maxlength="25"
         placeholder="Ejemplo: 500 mg"
         style="width: 20%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+        <div id="error-dosis" class="error-message"></div>
+
     @error('medicamentos.0.dosis')
         <div class="error-message">{{ $message }}</div>
     @enderror
@@ -180,6 +185,8 @@
             <div style="text-align: right; font-size: 0.8rem; color: #555;">
                 <span id="charCount">0</span>/500 caracteres
             </div>
+            <div id="error-detalles" class="error-message"></div>
+
         </div>
 
         <!-- Botón para agregar medicamento -->
@@ -325,22 +332,33 @@
         const dosis = dosisInput.value.trim();
         const detalles = detallesTextarea.value.trim();
 
+            // Limpiar errores anteriores
+        document.getElementById('error-medicamento').textContent = '';
+        document.getElementById('error-dosis').textContent = '';
+        document.getElementById('error-detalles').textContent = '';
+
+        let error = false;
+
         if (!med) {
-            alert('Por favor, ingresa un medicamento.');
-            return;
+            document.getElementById('error-medicamento').textContent = 'Por favor, ingresa un medicamento.';
+            error = true;
+        } else if (medicamentosAgregados.has(med.toLowerCase())) {
+            document.getElementById('error-medicamento').textContent = 'Este medicamento ya fue agregado.';
+            error = true;
         }
-        if (medicamentosAgregados.has(med.toLowerCase())) {
-            alert('Este medicamento ya fue agregado.');
-            return;
-        }
+
         if (!dosis) {
-            alert('Por favor, ingresa la dosis.');
-            return;
+            document.getElementById('error-dosis').textContent = 'Por favor, ingresa la dosis.';
+            error = true;
         }
+
         if (!detalles) {
-            alert('Por favor, ingresa los detalles de prescripción.');
-            return;
+            document.getElementById('error-detalles').textContent = 'Por favor, ingresa los detalles de prescripción.';
+            error = true;
         }
+
+        if (error) return;
+
 
         if (document.getElementById('tabla-medicamentos').style.display === 'none') {
             document.getElementById('tabla-medicamentos').style.display = 'table';
