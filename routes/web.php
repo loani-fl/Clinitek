@@ -94,6 +94,8 @@ Route::get('diagnosticos/{diagnostico}', [DiagnosticoController::class, 'show'])
 // Rutas para Estado de consultas
 
 Route::post('/consultas/{id}/cambiar-estado', [ConsultaController::class, 'cambiarEstado'])->name('consultas.cambiarEstado');
+Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('consultas.show');
+
 
 // Rutas para ExamenController
 Route::get('/examenes/create/{paciente}/{consulta}', [ExamenController::class, 'create'])->name('examenes.create');
