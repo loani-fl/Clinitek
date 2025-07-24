@@ -19,11 +19,10 @@ class DiagnosticoController extends Controller
 
     public function store(Request $request)
     {
-
         $validatedData = $request->validate([
             'paciente_id' => 'required|exists:pacientes,id',
             'consulta_id' => 'required|exists:consultas,id',
-            'titulo' => 'required|string|max:255',
+            'titulo' => 'required|string|max:60',
             'descripcion' => 'required|string|max:400',
             'tratamiento' => 'required|string|max:400',
             'observaciones' => 'nullable|string|max:400',
@@ -34,15 +33,11 @@ class DiagnosticoController extends Controller
             'consulta_id.exists' => 'La consulta seleccionada no es válida.',
             'titulo.required' => 'El resumen es obligatorio.',
             'titulo.string' => 'El resumen debe ser un texto válido.',
-            'titulo.max' => 'El resumen no puede tener más de 255 caracteres.',
             'descripcion.required' => 'La descripción es obligatoria.',
             'descripcion.string' => 'La descripción debe ser un texto válido.',
-            'descripcion.max' => 'La descripción no puede tener más de 400 caracteres.',
             'tratamiento.required' => 'El tratamiento es obligatorio.',
             'tratamiento.string' => 'El tratamiento debe ser un texto válido.',
-            'tratamiento.max' => 'El tratamiento no puede tener más de 400 caracteres.',
             'observaciones.string' => 'Las observaciones deben ser un texto válido.',
-            'observaciones.max' => 'Las observaciones no pueden tener más de 400 caracteres.',
         ]);
 
         $diagnostico = Diagnostico::create($validatedData);
@@ -60,20 +55,14 @@ class DiagnosticoController extends Controller
     public function show(Diagnostico $diagnostico)
     {
         $consultaId = $diagnostico->consulta_id;
-
-        // Cargar paciente relacionado
-        $diagnostico->load('paciente');
-
-        // Obtener otros diagnósticos del mismo paciente, excluyendo el actual
-        $diagnosticosAnteriores = Diagnostico::where('paciente_id', $diagnostico->paciente_id)
-                                    ->where('id', '!=', $diagnostico->id)
-                                    ->orderByDesc('created_at')
-                                    ->get();
-
-        return view('diagnosticos.show', compact('diagnostico', 'consultaId', 'diagnosticosAnteriores'));
+    
+        // Cargar relaciones necesarias
+        $diagnostico->load('paciente', 'consulta');
+    
+        return view('diagnosticos.show', compact('diagnostico', 'consultaId'));
     }
-
-
+    
+    
 
     public function edit(Diagnostico $diagnostico)
     {
@@ -82,71 +71,60 @@ class DiagnosticoController extends Controller
     }
 
     public function update(Request $request, Diagnostico $diagnostico)
-
-    {
-        $validatedData = $request->validate([
-            'titulo' => [
-                  'required',
-                    'string',
-                    'max:255',
-                    'regex:/^[a-zA-Z0-9\s,.;]/'
-                ],
-                'descripcion' => [
-                    'required',
-                    'string',
-                    'max:400',
-                    'regex:/^[a-zA-Z0-9\s,.;]/'
-                ],
-                'tratamiento' => [
-                    'required',
-                    'string',
-                    'max:400',
-                    'regex:/^[a-zA-Z0-9\s,.;]/'
-                ],
-                'observaciones' => [
-                    'nullable',
-                    'string',
-                    'max:400',
-                    'regex:/^[a-zA-Z0-9\s,.;]/'
-                ],
-        ], [
-            'titulo.required' => 'El resumen es obligatorio.',
-            'titulo.string' => 'El resumen debe ser un texto válido.',
-            'titulo.max' => 'El resumen no puede tener más de 255 caracteres.',
-            'titulo.regex' => 'El titulo solo puede contener letras, números, espacios, comas, puntos y punto y coma.',
-
-            'descripcion.required' => 'La descripción es obligatoria.',
-            'descripcion.string' => 'La descripción debe ser un texto válido.',
-            'descripcion.max' => 'La descripción no puede tener más de 400 caracteres.',
-            'descripcion.regex' => 'La descripción solo puede contener letras, números, espacios, comas, puntos y punto y coma.',
-
-            'tratamiento.required' => 'El tratamiento es obligatorio.',
-            'tratamiento.string' => 'El tratamiento debe ser un texto válido.',
-            'tratamiento.max' => 'El tratamiento no puede tener más de 400 caracteres.',
-            'tratamiento.regex' => 'El tratamiento solo puede contener letras, números, espacios, comas, puntos y punto y coma.',
-
-            'observaciones.string' => 'Las observaciones deben ser un texto válido.',
-            'observaciones.max' => 'Las observaciones no pueden tener más de 400 caracteres.',
-            'observaciones.regex' => 'Las observaciones solo pueden contener letras, números, espacios, comas, puntos y punto y coma.',
-        ]);
-
-        $request->session()->put('diagnostico_original', [
-            'titulo' => $diagnostico->titulo,
-            'descripcion' => $diagnostico->descripcion,
-            'tratamiento' => $diagnostico->tratamiento,
-            'observaciones' => $diagnostico->observaciones,
-        ]);
-
-        $diagnostico->update($validatedData);
-
-
-        return redirect()->route('diagnosticos.show', $diagnostico->id)
-            ->with('success', 'Diagnóstico actualizado correctamente.');
-    }
-    public function index()
 {
-    $diagnosticos = Diagnostico::with('paciente', 'consulta.medico')->get();
-    return view('diagnosticos.index', compact('diagnosticos'));
+    $validatedData = $request->validate([
+        'titulo' => [
+            'required',
+            'string',
+            'max:60',
+            'regex:/^[a-zA-Z0-9\s,.;:ñÑáéíóúÁÉÍÓÚüÜ-]*$/'
+        ],
+        'descripcion' => [
+        'required',
+        'string',
+        'max:400',
+        'regex:/^[a-zA-Z0-9\s%°#áéíóúÁÉÍÓÚñÑüÜ]*$/'
+        ],
+        'tratamiento' => [
+            'required',
+            'string',
+            'max:400',
+            'regex:/^[a-zA-Z0-9\s,.;:ñÑáéíóúÁÉÍÓÚüÜ-]*$/'
+        ],
+        'observaciones' => [
+            'nullable',
+            'string',
+            'max:400',
+            'regex:/^[a-zA-Z0-9\s,.;:ñÑáéíóúÁÉÍÓÚüÜ-]*$/'
+        ],
+    ], [
+        'titulo.required' => 'El resumen es obligatorio.',
+        'titulo.string' => 'El resumen debe ser un texto válido.',
+        'titulo.regex' => 'El título solo puede contener letras, números, espacios, comas, puntos, punto y coma, dos puntos, guiones y letras con tilde o ñ.',
+
+        'descripcion.required' => 'La descripción es obligatoria.',
+        'descripcion.string' => 'La descripción debe ser un texto válido.',
+        'descripcion.regex' => 'La descripción solo puede contener letras, números, espacios, comas, puntos, punto y coma, dos puntos, guiones y letras con tilde o ñ.',
+
+        'tratamiento.required' => 'El tratamiento es obligatorio.',
+        'tratamiento.string' => 'El tratamiento debe ser un texto válido.',
+        'tratamiento.regex' => 'El tratamiento solo puede contener letras, números, espacios, comas, puntos, punto y coma, dos puntos, guiones y letras con tilde o ñ.',
+
+        'observaciones.string' => 'Las observaciones deben ser un texto válido.',
+        'observaciones.regex' => 'Las observaciones solo pueden contener letras, números, espacios, comas, puntos, punto y coma, dos puntos, guiones y letras con tilde o ñ.',
+    ]);
+
+    $request->session()->put('diagnostico_original', [
+        'titulo' => $diagnostico->titulo,
+        'descripcion' => $diagnostico->descripcion,
+        'tratamiento' => $diagnostico->tratamiento,
+        'observaciones' => $diagnostico->observaciones,
+    ]);
+
+    $diagnostico->update($validatedData);
+
+    return redirect()->route('diagnosticos.show', $diagnostico->id)
+        ->with('success', 'Diagnóstico actualizado correctamente.');
 }
 
 }
