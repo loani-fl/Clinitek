@@ -163,55 +163,13 @@
     Debe haber un  diagnóstico para crear la orden de examen.
 </div>
 
-
-                <div class="d-flex align-items-center gap-2">
-
-                    <!-- Botón Crear diagnóstico -->
-                    <a href="{{ route('diagnosticos.create', [$consulta->paciente->id, $consulta->id]) }}"
-                       class="btn btn-primary btn-sm px-3 shadow-sm d-inline-flex align-items-center gap-1"
-                       title="Crear diagnóstico">
-                        <i class="bi bi-journal-medical"></i> Crear diagnóstico
-                    </a>
-
-                    <!-- Menú desplegable Opciones -->
-                    <div class="dropdown">
-                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownOpciones" data-bs-toggle="dropdown" aria-expanded="false">
-                            Opciones
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownOpciones">
-                        <li>
-                        @if ($consulta->diagnostico)
-                            <a class="dropdown-item" href="{{ route('diagnosticos.edit', $consulta->diagnostico->id) }}">
-                                Editar Diagnóstico
-                            </a>
-                        @else
-                            <a class="dropdown-item disabled" href="#" tabindex="-1" aria-disabled="true">
-                                No hay diagnóstico para editar
-                            </a>
-                        @endif
-
-                        </li>
-
-
-                            <li>
-                            <a href="{{ route('recetas.create', $consulta->id) }}">Crear receta médica</a>
-
-                            </li>
-@php
-    $puedeCrearOrden = $consulta->estado === 'realizada';
-@endphp
-
-<li>
-    <a href="{{ $puedeCrearOrden ? route('examenes.create', [$consulta->paciente->id, $consulta->id]) : '#' }}"
-       class="crear-orden" data-estado="{{ $puedeCrearOrden ? '1' : '0' }}">
-       Crear Orden de Examen
-    </a>
-</li>
-
-                        </ul>
+                @if(session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
                     </div>
+                @endif
 
-                </div>
+
             </div>
 
 
@@ -223,19 +181,7 @@
                     <p><strong>Nombre:</strong><br>{{ $consulta->paciente->nombre ?? '' }}</p>
                     <p><strong>Apellidos:</strong><br>{{ $consulta->paciente->apellidos ?? '' }}</p>
                     <p><strong>Identidad:</strong><br>{{ $consulta->paciente->identidad ?? 'No disponible' }}</p>
-
-                    <p><strong>Fecha de Nacimiento:</strong><br>{{ $consulta->paciente->fecha_nacimiento ? \Carbon\Carbon::parse($consulta->paciente->fecha_nacimiento)->format('d/m/Y') : 'No especificado' }}</p>
                     <p><strong>Teléfono:</strong><br>{{ $consulta->paciente->telefono ?? 'No especificado' }}</p>
-                    <p><strong>Correo:</strong><br>{{ $consulta->paciente->correo ?? 'No especificado' }}</p>
-
-                    <p>
-                        <strong>Género:</strong><br>
-                        <span class="badge
-                        {{ ($consulta->paciente->genero ?? '') === 'Masculino' ? 'bg-primary' :
-                            (($consulta->paciente->genero ?? '') === 'Femenino' ? 'bg-warning text-dark' : 'bg-info') }}">
-                        {{ $consulta->paciente->genero ?? 'No especificado' }}
-                    </span>
-                    </p>
                     <p><strong>Tipo de Sangre:</strong><br>{{ $consulta->paciente->tipo_sangre ?? 'No especificado' }}</p>
                     <p><strong>Dirección:</strong><br><span style="white-space: pre-line;">{{ $consulta->paciente->direccion ?? 'No especificado' }}</span></p>
                 </div>
@@ -268,6 +214,42 @@
                     <p><strong>Alergias:</strong><br><span style="white-space: pre-line;">{{ $consulta->paciente->alergias ?? 'Sin información.' }}</span></p>
                     <p><strong>Observaciones:</strong><br><span style="white-space: pre-line;">{{ $consulta->observaciones ?? 'Sin observaciones.' }}</span></p>
                 </div>
+                <!-- Acciones relacionadas -->
+                <!-- Acciones Médicas -->
+                <div class="section-title mt-4">Acciones Médicas</div>
+
+                <div class="d-flex justify-content-center gap-3 mb-4">
+                    @if ($consulta->diagnostico)
+                        <a href="{{ route('diagnosticos.edit', $consulta->diagnostico->id) }}"
+                           class="btn btn-outline-warning btn-sm mx-1 d-inline-flex align-items-center gap-1 shadow-sm">
+                            <i class="bi bi-pencil-square"></i> Editar Diagnóstico
+                        </a>
+                    @else
+                        <a href="{{ route('diagnosticos.create', [$consulta->paciente->id, $consulta->id]) }}"
+                           class="btn btn-outline-primary btn-sm mx-1 d-inline-flex align-items-center gap-1 shadow-sm">
+                            <i class="bi bi-journal-plus"></i> Crear Diagnóstico
+                        </a>
+                    @endif
+
+                    @php
+                        $tieneDiagnostico = $consulta->diagnostico !== null;
+                    @endphp
+
+
+                        <a href="{{ $tieneReceta ? '#' : ($tieneDiagnostico ? route('recetas.create', $consulta->id) : '#') }}"
+                           class="btn btn-outline-success btn-sm mx-1 d-inline-flex align-items-center gap-1 shadow-sm"
+                           style="{{ $tieneReceta || !$tieneDiagnostico ? 'pointer-events:none; opacity:0.6;' : '' }}"
+                           title="{{ !$tieneDiagnostico ? 'Debe crear un diagnóstico primero' : ($tieneReceta ? 'Receta creada' : '') }}">
+                            <i class="bi bi-capsule"></i> {{ $tieneReceta ? 'Receta creada' : 'Crear Receta' }}
+                        </a>
+
+                    <a href="{{ $tieneDiagnostico ? route('examenes.create', [$consulta->paciente->id, $consulta->id]) : '#' }}"
+                       class="btn btn-outline-info btn-sm d-inline-flex align-items-center gap-1 shadow-sm boton-inactivo"
+                       style="{{ $tieneDiagnostico ? '' : 'pointer-events:none; opacity:0.6;' }}"
+                       title="{{ $tieneDiagnostico ? '' : 'Debe crear un diagnóstico primero' }}">
+                        <i class="bi bi-flask"></i> Crear Exámenes
+                    </a>
+                </div>
 
                 <div class="text-center pt-4">
                     <a href="{{ route('consultas.index') }}" class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2" style="font-size: 0.85rem;">
@@ -279,25 +261,3 @@
         </div>
     </div>
 @endsection
-
-@if(!$puedeCrearOrden)
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const link = document.querySelector('a.crear-orden');
-    const mensaje = document.getElementById('mensaje-error-orden');
-
-    link.addEventListener('click', function(e) {
-        if(this.dataset.estado === '0') {
-            e.preventDefault();
-            // Mostrar mensaje
-            mensaje.style.display = 'block';
-
-            // Ocultar después de 5 segundos
-            setTimeout(() => {
-                mensaje.style.display = 'none';
-            }, 5000);
-        }
-    });
-});
-</script>
-@endif

@@ -1,84 +1,166 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="content-wrapper d-flex justify-content-center p-2">
-        <div class="card shadow-sm" style="max-width: 1000px; width: 100%;"> {{-- ← Aumentado el ancho --}}
-            <div class="card-header d-flex align-items-center gap-2 py-2 px-3">
-                <img src="{{ asset('images/logo2.jpg') }}" alt="Logo" style="height: 40px;">
-                <div>
-                    <h6 class="mb-0">Laboratorio clínico Honduras</h6>
-                    <small class="text-muted" style="font-size: 0.75rem;">Orden de Exámenes</small>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #e8f4fc;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #007BFF;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1100;
+            padding: 0.5rem 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        .content-wrapper {
+            margin-top: 60px;
+        }
+        .custom-card::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2200px;
+            height: 2200px;
+            background-image: url('/images/logo2.jpg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.1;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .custom-card {
+            max-width: 1000px;
+            background-color: #fff;
+            margin: 40px auto 60px auto;
+            border-radius: 1.5rem;
+            padding: 1rem 2rem;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .card-header {
+            background-color: transparent !important;
+            border-bottom: 3px solid #007BFF;
+        }
+        .patient-data-grid .row > div {
+            display: flex;
+            align-items: center;
+        }
+        .underline-field {
+            border-bottom: 1px solid #000;
+            min-height: 1.4rem;
+            line-height: 1.4rem;
+            padding-left: 4px;
+            padding-right: 4px;
+            font-size: 0.95rem;
+            flex: 1;
+            user-select: none;
+        }
+        .section-title {
+            font-size: 1.1rem;
+            margin: 0 0 0.7rem;
+            color: rgb(6, 11, 17);
+            font-weight: 700;
+            line-height: 1.4rem;
+        }
+        .secciones-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.3rem 0.10rem;
+            margin-top: 0.3rem;
+        }
+        .examenes-grid label {
+            font-size: 0.85rem;
+            line-height: 1rem;
+        }
+    </style>
+
+    <div class="content-wrapper">
+        <div class="card custom-card shadow-sm">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center">
+                        <img src="{{ asset('images/logo2.jpg') }}" alt="Logo Clinitek" style="height: 60px; width: auto;">
+                        <div style="font-size: 1rem; font-weight: 700; color: #555;">
+                            Laboratorio Clínico Honduras
+                        </div>
+                    </div>
+                    <div class="col-md-9 text-center" style="transform: translateX(30%);">
+                        <h4 class="mb-0" style="font-size: 1.2rem; font-weight: 600; color: #333; line-height: 1.3;">
+                            ORDEN DE EXÁMENES REGISTRADA
+                        </h4>
+                    </div>
                 </div>
             </div>
-
-            <div class="card-body p-2">
-                {{-- Datos del paciente --}}
-                <h6 class="border-bottom pb-1 mb-2" style="font-size: 0.9rem;">Datos del Paciente</h6>
-                <div class="row gx-1 gy-1 mb-2" style="font-size: 0.85rem;">
-                    <div class="col-12 col-md-4"><strong>Nombre:</strong> {{ $paciente->nombre }} {{ $paciente->apellidos }}</div>
-                    <div class="col-6 col-md-4"><strong>Identidad:</strong> {{ $paciente->identidad }}</div>
-                    <div class="col-6 col-md-4"><strong>Edad:</strong> {{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }} años</div>
-                </div>
-                <div class="row gx-1 gy-1 mb-3" style="font-size: 0.85rem;">
-                    <div class="col-6 col-md-4"><strong>Fecha Consulta:</strong> {{ \Carbon\Carbon::parse($consulta->fecha)->format('d/m/Y') }}</div>
-                    <div class="col-6 col-md-8"><strong>Médico:</strong> {{ $consulta->medico->nombre ?? '' }} {{ $consulta->medico->apellidos ?? '' }}</div>
-                </div>
-
-                {{-- Exámenes seleccionados --}}
-                <h6 class="border-bottom pb-1 mb-2" style="font-size: 0.9rem;">Exámenes Solicitados</h6>
-                @php
-                    $secciones = [
-                        'HEMATOLOGÍA', 'HORMONAS', 'ORINA Y FLUIDOS', 'BIOQUÍMICOS',
-                        'MARCADORES TUMORALES', 'PERFIL DE ANEMIA', 'PERFIL DIABETES',
-                        'INMUNOLOGÍA Y AUTOINMUNIDAD', 'INFECCIOSOS'
-                    ];
-                @endphp
-
-                @foreach ($secciones as $seccion)
-                    @php
-                        $examenesFiltrados = collect($examenesSeleccionados)
-                            ->filter(fn($e) => strtoupper($e['seccion']) === strtoupper($seccion));
-                    @endphp
-
-                    @if ($examenesFiltrados->isNotEmpty())
-                        <div class="mb-1">
-                            <h6 class="text-primary fw-semibold mb-1" style="font-size: 0.85rem;">{{ $seccion }}</h6>
-                            <ul class="list-unstyled small mb-0" style="font-size: 0.8rem; padding-left: 15px;">
-                                @foreach ($examenesFiltrados as $examen)
-                                    <li>• {{ ucwords(str_replace('_', ' ', $examen['nombre'])) }}</li>
-                                @endforeach
-                            </ul>
+            <div class="card-body">
+                <div class="section-title">DATOS DEL PACIENTE</div>
+                <div class="patient-data-grid mb-4">
+                    <div class="row">
+                        <div class="col-md-8 mb-2 d-flex align-items-center">
+                            <strong class="me-2">Nombres - Apellidos:</strong>
+                            <div class="underline-field no-select">
+                                {{ $paciente->nombre }} {{ $paciente->apellidos }}
+                            </div>
                         </div>
-                    @endif
-                @endforeach
+                        <div class="col-md-4 mb-2 d-flex align-items-center">
+                            <strong class="me-2">Fecha:</strong>
+                            <div class="underline-field no-select">
+                                {{ \Carbon\Carbon::parse($consulta->fecha)->format('d/m/Y') }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-2 d-flex align-items-center">
+                            <strong class="me-2">Identidad:</strong>
+                            <div class="underline-field no-select">
+                                {{ $paciente->identidad }}
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-2 d-flex align-items-center">
+                            <strong class="me-2">Edad:</strong>
+                            <div class="underline-field no-select">
+                                {{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }} años
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-2 d-flex align-items-center">
+                            <strong class="me-2">Médico Solicitante:</strong>
+                            <div class="underline-field no-select">
+                                {{ $consulta->medico->nombre ?? '' }} {{ $consulta->medico->apellidos ?? '' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                {{-- Lista de órdenes anteriores --}}
-                <hr>
-                <h6 class="border-bottom pb-1 mb-2" style="font-size: 0.9rem;">Órdenes anteriores del paciente</h6>
+                <div class="section-title">EXÁMENES SOLICITADOS</div>
+                <div class="secciones-container">
+                    @foreach ($secciones as $tituloSeccion => $examenes)
+                        <div class="seccion">
+                            <div class="section-title">{{ $tituloSeccion }}</div>
+                            <div class="examenes-grid">
+                                @foreach($examenes as $examen)
+                                    <label>
+                                        <input type="checkbox" checked disabled>
+                                        {{ $examen['nombre'] }}
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
 
-                @if ($ordenesPaciente->isEmpty())
-                    <p class="text-muted" style="font-size: 0.85rem;">No hay órdenes de exámenes anteriores.</p>
-                @else
-                    <ul class="list-group" style="max-height: 200px; overflow-y: auto; font-size: 0.85rem;">
-                        @foreach ($ordenesPaciente as $orden)
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    Consulta: {{ \Carbon\Carbon::parse($orden->fecha)->format('d/m/Y') }} - {{ $orden->especialidad }}
-                                </div>
-                                @if ($orden->diagnostico)
-                                    <a href="{{ route('examenes.show', $orden->diagnostico->id) }}" class="btn btn-sm btn-primary">
-                                        Ver
-                                    </a>
-                                @else
-                                    <span class="text-muted small">Sin diagnóstico</span>
-                                @endif
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
 
-                <div class="text-center mt-3">
-                    <a href="{{ route('pacientes.index') }}" class="btn btn-sm btn-secondary px-3 py-1">Volver</a>
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <a href="{{ route('consultas.index') }}" class="btn btn-success">
+                        <i class="bi bi-arrow-left-circle"></i> Regresar
+                    </a>
                 </div>
             </div>
         </div>

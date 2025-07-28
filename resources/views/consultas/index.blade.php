@@ -131,8 +131,8 @@
             <i class="bi bi-house-door"></i> Inicio
         </a>
 
-        <a href="{{ route('empleado.create') }}" class="btn btn-primary">
-            <i class="bi bi-person-plus"></i> Registrar empleado
+        <a href="{{ route('consultas.create') }}" class="btn btn-primary">
+            <i class="bi bi-person-plus"></i> Registrar consulta
         </a>
     </div>
 </div>
@@ -220,6 +220,31 @@
                                 <td>
                                     <a href="{{ route('consultas.show', $consulta->id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
                                     <a href="{{ route('consultas.edit', $consulta->id) }}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                                    @if($consulta->diagnostico)
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Más
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('diagnosticos.show', $consulta->diagnostico->id) }}">
+                                                        <i class="bi bi-file-medical"></i> Ver Diagnóstico
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('recetas.show', $consulta->id) }}">
+                                                        <i class="bi bi-capsule"></i> Ver Recetas
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('examenes.show', $consulta->diagnostico->id) }}">
+                                                        <i class="bi bi-file-earmark-medical"></i> Ver Exámenes
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    @endif
+
                                 </td>
                             </tr>
                         @endforeach

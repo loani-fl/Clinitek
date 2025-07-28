@@ -227,19 +227,17 @@ public function update(Request $request, $id)
 
     public function show($id)
     {
-        $consulta = Consulta::with([
-            'paciente',
-            'medico',
-            'diagnostico',
-            'recetas.medicamentos'
-        ])->findOrFail($id);
-
+        $consulta = Consulta::with(['paciente', 'medico', 'diagnostico', 'recetas'])->findOrFail($id);
         $paciente = $consulta->paciente;
 
-        return view('consultas.show', compact('consulta', 'paciente'));
+        // Verificar si ya hay receta creada
+        $tieneReceta = $consulta->recetas->isNotEmpty();
+
+        return view('consultas.show', compact('consulta', 'paciente', 'tieneReceta'));
     }
 
-public function horasOcupadas(Request $request)
+
+    public function horasOcupadas(Request $request)
 {
     $medicoId = $request->query('medico_id');
     $fecha = $request->query('fecha');

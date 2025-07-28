@@ -48,21 +48,21 @@ class DiagnosticoController extends Controller
             $consulta->save();
         }
 
-        return redirect()->route('diagnosticos.show', $diagnostico->id)
+        return redirect()->route('consultas.show', $diagnostico->id)
             ->with('success', 'Diagnóstico creado correctamente.');
     }
 
     public function show(Diagnostico $diagnostico)
     {
         $consultaId = $diagnostico->consulta_id;
-    
+
         // Cargar relaciones necesarias
         $diagnostico->load('paciente', 'consulta');
-    
+
         return view('diagnosticos.show', compact('diagnostico', 'consultaId'));
     }
-    
-    
+
+
 
     public function edit(Diagnostico $diagnostico)
     {

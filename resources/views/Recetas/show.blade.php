@@ -3,120 +3,180 @@
 @section('content')
     <style>
         .custom-card {
-            max-width: 1000px;
-            background-color: #fff;
-            border-color: #91cfff;
-            margin: 2rem auto;
-            padding: 1rem;
-            border: 1px solid #91cfff;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            background-color: #fffefc;
+            padding: 2.5rem 3rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(150, 150, 150, 0.1);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            max-width: 900px;
+            margin: 3rem auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #4a4a4a;
+        }
+        .custom-card::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 900px;
+            height: 900px;
+            background-image: url('{{ asset("images/barra.png") }}');
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
+            opacity: 0.04;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .custom-card > * {
+            position: relative;
+            z-index: 1;
         }
 
-        .section-title {
-            font-size: 1.5rem;
+        h2 {
+            color: #7f9cf5; /* azul pastel */
             font-weight: 700;
-            color: #0d6efd;
-            margin-bottom: 1rem;
-            border-bottom: 3px solid #0d6efd;
-            padding-bottom: 0.25rem;
-        }
-
-        .receta-card {
-            border: 1px solid #ced4da;
-            border-radius: 8px;
             margin-bottom: 1.5rem;
-            padding: 1rem;
-            background-color: #f8f9fa;
-        }
-        td {
-            white-space: normal !important;  /* Permite saltos de línea */
-            word-break: break-word;            /* Rompe palabras largas para evitar desbordes */
-            max-width: 400px;                  /* Limita el ancho máximo de la celda */
-            vertical-align: top;               /* Alinea el texto arriba */
+            border-bottom: 4px solid #b3bef5;
+            padding-bottom: 0.35rem;
+            font-size: 2rem;
         }
 
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.8rem 3rem;
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+            color: #606060; /* gris suave para texto */
+        }
+        .info-grid p {
+            margin: 0;
+            line-height: 1.4;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #a1a9e8; /* gris-azul suave */
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 0.5rem;
+            font-size: 1rem;
+            color: #505050;
+            box-shadow: 0 6px 12px rgb(0 0 0 / 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #fafbff; /* azul muy pálido */
+        }
+        thead tr {
+            background-color: #dbe1ff; /* azul pastel claro */
+            color: #555a85;
+        }
+        th, td {
+            padding: 1rem 1.2rem;
+            text-align: left;
+            vertical-align: top;
+        }
+        tbody tr {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgb(0 0 0 / 0.07);
+            transition: background-color 0.3s ease;
+        }
+        tbody tr:hover {
+            background-color: #f1f4ff; /* azul pálido */
+        }
+        tbody tr td:first-child {
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+        }
+        tbody tr td:last-child {
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 3rem;
+            background-color: #b3bef5; /* azul pastel */
+            color: #404366;
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgb(179 190 245 / 0.4);
+            transition: background-color 0.3s ease;
+        }
+        .btn-back:hover {
+            background-color: #9ba7e8; /* azul un poco más intenso */
+            color: #2c2e4a;
+            box-shadow: 0 7px 20px rgb(156 166 232 / 0.6);
+        }
     </style>
 
     <div class="custom-card">
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-    @endif
+        <h2>Receta Médica #{{ $receta->id }}</h2>
 
-        <h2 class="mb-3">Historial de Recetas de {{ $paciente->nombre }} {{ $paciente->apellidos }}</h2>
-
-        {{-- Filtro por fecha --}}
-        <form method="GET" class="mb-4">
-            <div class="row g-2 align-items-end">
-                <div class="col-md-4">
-                    <label for="fecha" class="form-label">Buscar por fecha:</label>
-                    <input type="date" name="fecha" id="fecha" value="{{ request('fecha') }}" class="form-control">
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
-                    <a href="{{ route('recetas.show', $paciente->id) }}" class="btn btn-secondary btn-sm">Limpiar</a>
-                </div>
+        <div class="info-grid">
+            <div>
+                <span class="info-label">Paciente</span>
+                {{ $receta->consulta->paciente->nombre }} {{ $receta->consulta->paciente->apellidos }}
             </div>
-        </form>
-
-        @forelse($recetas as $receta)
-            @if(!request('fecha') || $receta->created_at->toDateString() === request('fecha'))
-                <div class="receta-card">
-                    <p><strong>Receta #:</strong> {{ $receta->id }}</p>
-                    <p><strong>Fecha:</strong> {{ $receta->created_at->format('d/m/Y') }}</p>
-
-                    @if($receta->medicamentos->isEmpty())
-                        <p><em>No hay medicamentos registrados.</em></p>
-                    @else
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped mt-2">
-                                <thead class="table-primary">
-                                <tr>
-                                    <th>Medicamento</th>
-                                    <th>Indicaciones</th>
-                                    <th>Dosis</th>
-                                    <th>Detalles</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                @foreach($receta->medicamentos as $medicamento)
-                                    <tr>
-                                        <td>{{ $medicamento->nombre }}</td>
-                                        <td>{{ $medicamento->pivot->indicaciones }}</td>
-                                        <td>{{ $medicamento->pivot->dosis }}</td>
-                                        <td>{{ $medicamento->pivot->detalles }}</td>
-                                    </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @endif
-                </div>
-            @endif
-        @empty
-            <p>No hay recetas registradas para este paciente.</p>
-        @endforelse
-
-        <div class="text-center mt-4">
-            <a href="{{ route('pacientes.index') }}" class="btn btn-success btn-sm px-4">
-                <i class="bi bi-arrow-left"></i> Regresar
-            </a>
+            <div>
+                <span class="info-label">Edad</span>
+                @php
+                    $edad = $receta->consulta->paciente->fecha_nacimiento
+                        ? \Carbon\Carbon::parse($receta->consulta->paciente->fecha_nacimiento)->age
+                        : 'N/A';
+                @endphp
+                {{ $edad }} años
+            </div>
+            <div>
+                <span class="info-label">Fecha</span>
+                {{ $receta->created_at->format('d/m/Y') }}
+            </div>
+            <div>
+                <span class="info-label">Médico</span>
+                Dr. {{ $receta->consulta->medico->nombre ?? 'No disponible' }} {{ $receta->consulta->medico->apellidos ?? '' }}
+            </div>
+            <div>
+                <span class="info-label">Especialidad</span>
+                {{ $receta->consulta->medico->especialidad ?? 'No especificada' }}
+            </div>
         </div>
+
+        @if($receta->medicamentos->isEmpty())
+            <p><em>No hay medicamentos registrados.</em></p>
+        @else
+            <table>
+                <thead>
+                <tr>
+                    <th>Medicamento</th>
+                    <th>Indicaciones</th>
+                    <th>Dosis</th>
+                    <th>Detalles</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($receta->medicamentos as $med)
+                    <tr>
+                        <td>{{ $med->nombre }}</td>
+                        <td>{{ $med->pivot->indicaciones }}</td>
+                        <td>{{ $med->pivot->dosis }}</td>
+                        <td>{{ $med->pivot->detalles ?? '-' }}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        @endif
+
+        <a href="{{ route('consultas.show', $receta->consulta->id) }}" class="btn-back">← Regresar </a>
     </div>
 @endsection
-
-@push('scripts')
-<script>
-    setTimeout(() => {
-        const alert = document.querySelector('.alert-dismissible');
-        if (alert) {
-            alert.classList.remove('show');
-            alert.classList.add('fade');
-            setTimeout(() => alert.remove(), 300);
-        }
-    }, 3000); // Oculta el mensaje después de 4 segundos
-</script>
-@endpush
