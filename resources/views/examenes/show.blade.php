@@ -80,6 +80,10 @@
         .examenes-grid label {
             font-size: 0.85rem;
             line-height: 1rem;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
         }
     </style>
 
@@ -147,7 +151,11 @@
                             <div class="examenes-grid">
                                 @foreach($examenes as $examen)
                                     <label>
-                                        <input type="checkbox" checked disabled>
+                                        <input
+                                            type="checkbox"
+                                            disabled
+                                            @if(in_array($examen['nombre'], array_column($examenesSeleccionados ?? [], 'nombre'))) checked @endif
+                                        >
                                         {{ $examen['nombre'] }}
                                     </label>
                                 @endforeach
@@ -155,7 +163,6 @@
                         </div>
                     @endforeach
                 </div>
-
 
                 <div class="d-flex justify-content-center gap-3 mt-4">
                     <a href="{{ route('consultas.index') }}" class="btn btn-success">
