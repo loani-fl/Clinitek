@@ -160,13 +160,13 @@
                                 <td>{{ $consulta->medico->nombre ?? 'Sin asignar' }}</td>
                                 <td>
                                     <!-- Ver Diagnóstico -->
-                                    <a href="{{ route('diagnosticos.show', ['diagnostico' => $consulta->diagnostico->id, 'origen' => 'pacientes.show', 'paciente_id' => $paciente->id]) }}"
+                                    <!-- Ver Diagnóstico -->
+                                    <a href="{{ $consulta->diagnostico ? route('diagnosticos.show', ['diagnostico' => $consulta->diagnostico->id, 'origen' => 'pacientes.show', 'paciente_id' => $paciente->id]) : '#' }}"
                                        class="btn btn-sm btn-outline-primary shadow-sm"
                                        title="Ver diagnóstico"
                                        @if(!$consulta->diagnostico) onclick="alert('No hay diagnóstico disponible'); return false;" @endif>
                                         <i class="bi bi-journal-medical"></i>
                                     </a>
-
 
                                     <!-- Ver Receta -->
                                     <a href="{{ route('recetas.show', ['id' => $consulta->id, 'origen' => 'pacientes.show', 'paciente_id' => $paciente->id]) }}"
@@ -176,12 +176,13 @@
                                     </a>
 
                                     <!-- Ver Exámenes -->
-
-                                    <a href="{{ route('examenes.show', ['diagnostico' => $consulta->diagnostico->id, 'origen' => 'pacientes.show', 'paciente_id' => $paciente->id]) }}"
+                                    <a href="{{ $consulta->diagnostico ? route('examenes.show', ['diagnostico' => $consulta->diagnostico->id, 'origen' => 'pacientes.show', 'paciente_id' => $paciente->id]) : '#' }}"
                                        class="btn btn-sm btn-outline-danger"
-                                       title="Ver exámenes">
+                                       title="Ver exámenes"
+                                       @if(!$consulta->diagnostico) onclick="alert('No hay orden de examen disponible'); return false;" @endif>
                                         <i class="bi bi-file-earmark-medical"></i>
                                     </a>
+
                                 </td>
 
                             </tr>

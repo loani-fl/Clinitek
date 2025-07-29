@@ -82,19 +82,6 @@
             <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Detalles del diagnóstico</h5>
         </div>
 
-        <div class="dropdown mt-3">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="talleresDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1rem;">
-                Más Opciones
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="talleresDropdown" style="min-width: 200px;">
-                <li>
-                    <a class="dropdown-item" href="{{ route('examenes.show', $diagnostico->id) }}">Ver orden de examen</a>
-                </li>
-                <li>
-                    <a class="dropdown-item" href="{{ route('recetas.show', $diagnostico->paciente->id) }}">Recetas médicas</a>
-                </li>
-            </ul>
-        </div>
 
         @if (session('success'))
             <div id="alert-success" class="alert alert-success shadow-sm mt-3" role="alert">
