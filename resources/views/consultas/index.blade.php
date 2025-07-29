@@ -227,8 +227,9 @@
                                             </button>
                                             <ul class="dropdown-menu">
                                                 <li>
-                                                    <a class="dropdown-item" href="{{ route('diagnosticos.show', $consulta->diagnostico->id) }}">
-                                                        <i class="bi bi-file-medical"></i> Ver Diagnóstico
+                                                    <a class="dropdown-item"
+                                                       href="{{ route('diagnosticos.show', ['diagnostico' => $consulta->diagnostico->id, 'origen' => 'consultas.index']) }}">
+                                                        <i class="bi bi-journal-medical"></i> Ver Diagnóstico
                                                     </a>
                                                 </li>
                                                 <li>
@@ -241,6 +242,7 @@
                                                         <i class="bi bi-file-earmark-medical"></i> Ver Exámenes
                                                     </a>
                                                 </li>
+
                                             </ul>
                                         </div>
                                     @endif

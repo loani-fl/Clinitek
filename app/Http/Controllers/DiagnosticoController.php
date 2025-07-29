@@ -59,9 +59,14 @@ class DiagnosticoController extends Controller
         // Cargar relaciones necesarias
         $diagnostico->load('paciente', 'consulta');
 
-        return view('diagnosticos.show', compact('diagnostico', 'consultaId'));
-    }
+        // Obtener el parámetro 'origen' desde la URL, por defecto 'consultas.index'
+        $origen = request()->query('origen', 'consultas.index');
 
+        // Si el origen es el expediente del paciente, también espera el ID del paciente para el link
+        $pacienteId = request()->query('paciente_id', null);
+
+        return view('diagnosticos.show', compact('diagnostico', 'consultaId', 'origen', 'pacienteId'));
+    }
 
 
     public function edit(Diagnostico $diagnostico)
