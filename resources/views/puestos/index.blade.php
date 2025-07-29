@@ -60,14 +60,19 @@
     width: 100%;        /* Que ocupe todo el ancho dentro del contenedor */
     }
 
-   .card-header {
+.card-header {
     background-color: transparent !important;
     border-bottom: 3px solid #007BFF;
     padding-bottom: 0.5rem;
     margin-bottom: 1rem;
-    text-align: center;
-    position: relative;
+    /* Elimina text-align y position absolute */
+    /* text-align: center; */
+    /* position: relative; */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
+
 
 
     .card-header h3 {
@@ -77,13 +82,7 @@
         margin: 0;
     }
 
-    .btn-inicio {
-        position: absolute;
-        top: 50%;
-        right: 1rem;
-        transform: translateY(-50%);
-        font-size: 0.9rem;
-    }
+  
 
     .d-flex.filter-container {
         justify-content: flex-start;
@@ -147,9 +146,19 @@
 <div class="content-wrapper">
     <div class="card custom-card shadow-sm">
         <div class="card-header">
-            <h5 class="mb-0 text-dark text-center" style="font-size: 2.25rem; font-weight: bold;">Lista de puestos</h5>
-            <a href="{{ route('inicio') }}" class="btn btn-light btn-inicio">
+            <!-- Botón Inicio a la izquierda -->
+            <a href="{{ route('inicio') }}" class="btn btn-light me-3">
                 <i class="bi bi-house-door"></i> Inicio
+            </a>
+
+            <!-- Título centrado y que ocupe espacio central -->
+            <h5 class="mb-0 text-dark flex-grow-1 text-center" style="font-size: 2.25rem; font-weight: bold;">
+                Lista de puestos
+            </h5>
+
+            <!-- Botón Registrar puesto a la derecha -->
+            <a href="{{ route('puestos.create') }}" class="btn btn-primary ms-3">
+                <i class="bi bi-plus-circle"></i> Registrar puesto
             </a>
         </div>
 
@@ -163,9 +172,10 @@
 
         <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
 
-      {{ $puestos->onEachSide(1)->links('pagination::bootstrap-5') }}
+        {{ $puestos->onEachSide(1)->links('pagination::bootstrap-5') }}
     </div>
 </div>
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
