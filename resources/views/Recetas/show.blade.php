@@ -180,10 +180,24 @@
                         <td>{{ $med->pivot->detalles ?? '-' }}</td>
                     </tr>
                 @endforeach
-            </tbody>
-        </table>
-    @endif
+                </tbody>
+            </table>
+        @endif
+        <div class="text-center pt-4">
+            @if(request()->query('origen') === 'pacientes.show' && request()->query('paciente_id'))
+                <a href="{{ route('pacientes.show', request()->query('paciente_id')) }}"
+                   class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2"
+                   style="font-size: 0.85rem;">
+                    <i class="bi bi-arrow-left"></i> Regresar
+                </a>
+            @else
+                <a href="{{ route('consultas.index') }}"
+                   class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2"
+                   style="font-size: 0.85rem;">
+                    <i class="bi bi-arrow-left"></i> Regresar
+                </a>
+            @endif
+        </div>
 
-    <a href="{{ route('consultas.show', $receta->consulta->id) }}" class="btn-back">← Regresar </a>
-</div>
+    </div>
 @endsection

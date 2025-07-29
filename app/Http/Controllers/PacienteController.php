@@ -177,14 +177,13 @@ class PacienteController extends Controller
 
     public function show($id)
     {
-        $paciente = Paciente::with(['diagnostico', 'consultas'])->findOrFail($id);
+        $paciente = Paciente::with(['diagnostico', 'consultas' => function($query) {
+            $query->where('estado', 'realizada');  // Ajusta 'estado' y 'realizada' según tu esquema
+        }])->findOrFail($id);
+
         return view('pacientes.show', compact('paciente'));
     }
 
-    public function edit(Paciente $paciente)
-    {
-        return view('pacientes.edit', compact('paciente'));
-    }
 
     public function update(Request $request, Paciente $paciente)
     {

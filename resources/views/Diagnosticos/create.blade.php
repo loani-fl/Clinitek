@@ -81,15 +81,6 @@
         }
     </style>
 
-    <!-- Barra de navegación fija
-    <div class="header d-flex justify-content-between align-items-center px-3 py-2" style="background-color: #007BFF; position: sticky; top: 0; z-index: 1030;">
-        <div class="d-flex align-items-center">
-            <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto; margin-right: 6px;">
-            <span class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</span>
-        </div>
-    </div>
-    -->
-
     <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100 mt-4 position-relative" style="z-index:1;">
         <div class="card-header text-center py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
             <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Registro de Diagnóstico</h5>
@@ -100,64 +91,83 @@
             <!-- Información paciente y consulta -->
             <div class="mb-4 p-3 bg-light rounded shadow-sm">
                 <h5 class="fw-semibold mb-3">Información del Paciente y Consulta</h5>
-                <p><strong>Nombre Completo:</strong> {{ $paciente->nombre }} {{ $paciente->apellidos }}</p>
-                <p><strong>Edad:</strong> {{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }} años</p>
-                <p><strong>Identidad:</strong> {{ $paciente->identidad }}</p>
-                <p><strong>Fecha de Consulta:</strong> {{ \Carbon\Carbon::parse($consulta->fecha)->format('d/m/Y') }}</p>
-                <p><strong>Doctor que atendió:</strong> {{ $consulta->medico->nombre }} {{ $consulta->medico->apellidos }}</p>
 
+                <div class="row gx-3 gy-2">
+                    <div class="col-md-4">
+                        <p class="mb-1"><strong>Nombre Completo:</strong></p>
+                        <p class="mb-0">{{ $paciente->nombre }} {{ $paciente->apellidos }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="mb-1"><strong>Edad:</strong></p>
+                        <p class="mb-0">{{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }} años</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="mb-1"><strong>Identidad:</strong></p>
+                        <p class="mb-0">{{ $paciente->identidad }}</p>
+                    </div>
+
+                    <div class="col-md-4">
+                        <p class="mb-1"><strong>Fecha de Consulta:</strong></p>
+                        <p class="mb-0">{{ \Carbon\Carbon::parse($consulta->fecha)->format('d/m/Y') }}</p>
+                    </div>
+                    <div class="col-md-8">
+                        <p class="mb-1"><strong>Doctor que atendió:</strong></p>
+                        <p class="mb-0">{{ $consulta->medico->nombre }} {{ $consulta->medico->apellidos }}</p>
+                    </div>
+                </div>
             </div>
 
             <form action="{{ route('diagnosticos.store') }}" method="POST" novalidate>
                 @csrf
 
                 <input type="hidden" name="paciente_id" value="{{ $paciente->id }}">
-                <!-- ✅ Campo oculto para la consulta -->
                 <input type="hidden" name="consulta_id" value="{{ $consulta->id }}">
 
+                <div class="row gx-3 gy-3">
+                    <div class="col-md-6">
+                        <label for="titulo" class="form-label">Título <span class="text-danger">*</span></label>
+                        <input type="text" name="titulo" id="titulo" class="form-control @error('titulo') is-invalid @enderror" value="{{ old('titulo') }}" required>
+                        @error('titulo')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
+                    <div class="col-md-6">
+                        <label for="descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
+                        <textarea name="descripcion" id="descripcion" rows="4" class="form-control @error('descripcion') is-invalid @enderror" required>{{ old('descripcion') }}</textarea>
+                        @error('descripcion')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
-                <div class="mb-3">
-                    <label for="titulo" class="form-label">Título <span class="text-danger">*</span></label>
-                    <input type="text" name="titulo" id="titulo" class="form-control @error('titulo') is-invalid @enderror" value="{{ old('titulo') }}" required>
-                    @error('titulo')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <div class="col-md-6">
+                        <label for="tratamiento" class="form-label">Tratamiento <span class="text-danger">*</span></label>
+                        <textarea name="tratamiento" id="tratamiento" rows="4" class="form-control @error('tratamiento') is-invalid @enderror" required>{{ old('tratamiento') }}</textarea>
+                        @error('tratamiento')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="observaciones" class="form-label">Observaciones (Opcionales)</label>
+                        <textarea name="observaciones" id="observaciones" rows="4" class="form-control @error('observaciones') is-invalid @enderror">{{ old('observaciones') }}</textarea>
+                        @error('observaciones')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
-                    <textarea name="descripcion" id="descripcion" rows="5" class="form-control @error('descripcion') is-invalid @enderror" required>{{ old('descripcion') }}</textarea>
-                    @error('descripcion')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label for="tratamiento" class="form-label">Tratamiento <span class="text-danger">*</span></label>
-                    <textarea name="tratamiento" id="tratamiento" rows="4" class="form-control @error('tratamiento') is-invalid @enderror" required>{{ old('tratamiento') }}</textarea>
-                    @error('tratamiento')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label for="observaciones" class="form-label">Observaciones (Opcionales) <span class="text-danger"></span></label>
-                    <textarea name="observaciones" id="observaciones" rows="3" class="form-control @error('observaciones') is-invalid @enderror" required>{{ old('observaciones') }}</textarea>
-                    @error('observaciones')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="d-flex justify-content-center gap-3 mt-4">
-                    <button type="submit" class="btn btn-primary">
+                <div class="d-flex justify-content-center gap-3 mt-4 align-items-center">
+                    <button type="submit" class="btn btn-primary btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2" style="font-size: 0.85rem;">
                         <i class="bi bi-plus-circle"></i> Guardar Diagnóstico
                     </button>
-                    <a href="{{ route('consultas.index') }}" class="btn btn-secondary">
+                    <a href="{{ route('consultas.show', $consulta->id) }}"
+                       class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2"
+                       style="font-size: 0.85rem;">
                         <i class="bi bi-arrow-left"></i> Regresar
                     </a>
-
                 </div>
+
             </form>
         </div>
     </div>
