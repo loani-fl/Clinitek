@@ -80,6 +80,10 @@
         .examenes-grid label {
             font-size: 0.85rem;
             line-height: 1rem;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
         }
     </style>
 
@@ -147,7 +151,11 @@
                             <div class="examenes-grid">
                                 @foreach($examenes as $examen)
                                     <label>
-                                        <input type="checkbox" checked disabled>
+                                        <input
+                                            type="checkbox"
+                                            disabled
+                                            @if($examen['seleccionado']) checked @endif
+                                        >
                                         {{ $examen['nombre'] }}
                                     </label>
                                 @endforeach
