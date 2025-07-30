@@ -108,3 +108,13 @@ Route::get('/examenes/{diagnostico}', [ExamenController::class, 'show'])->name('
 Route::get('/ordenes/{id}', [ExamenController::class, 'detalleOrden'])->name('ordenes.detalle');
 
 Route::get('/ordenes/{id}', [ExamenController::class, 'detalleOrden'])->name('ordenes.detalle');
+
+
+
+//RAYOS X
+
+use App\Http\Controllers\OrdenRayosXController;
+
+Route::get('/rayosx/create', [OrdenRayosXController::class, 'create'])->name('rayosx.create');
+Route::post('/rayosx/store', [OrdenRayosXController::class, 'store'])->name('rayosx.store');
+

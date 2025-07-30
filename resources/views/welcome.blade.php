@@ -139,11 +139,14 @@
                 <p class="feature-desc">Atención inmediata y profesional las 24 horas para situaciones críticas y urgentes.</p>
             </article>
 
-            <article class="feature-card">
-                <i class="bi bi-x-diamond feature-icon" title="Rayos X"></i>
-                <h3 class="feature-title">Rayos X</h3>
-                <p class="feature-desc">Servicio de imágenes diagnósticas con equipos modernos para mayor precisión.</p>
-            </article>
+         <a href="{{ route('rayosx.create') }}" style="text-decoration: none; color: inherit;">
+    <article class="feature-card" role="button" aria-label="Abrir formulario de Orden de Rayos X">
+        <i class="bi bi-x-diamond feature-icon" title="Rayos X"></i>
+        <h3 class="feature-title">Rayos X</h3>
+        <p class="feature-desc">Servicio de imágenes diagnósticas con equipos modernos para mayor precisión.</p>
+    </article>
+</a>
+
 
             <a href="{{ route('medicos.index') }}" style="text-decoration: none; color: inherit;">
     <article class="feature-card">

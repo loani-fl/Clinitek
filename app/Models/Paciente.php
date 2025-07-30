@@ -46,4 +46,10 @@ public function recetas()
     return $this->hasManyThrough(Receta::class, Consulta::class);
 }
 
+public function diagnosticos()
+{
+    return $this->hasMany(Diagnostico::class);
+}
+
+
 }

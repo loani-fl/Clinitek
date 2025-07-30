@@ -32,4 +32,10 @@ class Diagnostico extends Model
     {
         return $this->belongsTo(Receta::class);
     }
+
+    public function rayosxOrder()
+{
+    return $this->hasOne(RayosxOrder::class);
+}
+
 }
