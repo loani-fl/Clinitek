@@ -154,7 +154,7 @@
                                         <input
                                             type="checkbox"
                                             disabled
-                                            @if(in_array($examen['nombre'], array_column($examenesSeleccionados ?? [], 'nombre'))) checked @endif
+                                            @if($examen['seleccionado']) checked @endif
                                         >
                                         {{ $examen['nombre'] }}
                                     </label>

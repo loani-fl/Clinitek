@@ -29,7 +29,10 @@ class ExamenController extends Controller
             return redirect()->back()->withErrors('La consulta no tiene diagnóstico asociado.');
         }
 
-        return view('examenes.create', compact('paciente', 'consulta'));
+        // Obtener exámenes seleccionados del request anterior (si existe)
+        $examenesSeleccionados = old('examenes', []);
+
+        return view('examenes.create', compact('paciente', 'consulta', 'examenesSeleccionados'));
     }
 
     // Guardar orden de exámenes
@@ -112,7 +115,7 @@ class ExamenController extends Controller
             ]);
         }
 
-        return redirect()->route('consultas.show', $diagnosticoId)
+        return redirect()->route('consultas.show', $diagnostico->consulta_id)
             ->with('success', 'Orden de examen guardada correctamente.');
     }
 
@@ -124,10 +127,14 @@ class ExamenController extends Controller
         $consulta = $diagnostico->consulta;
         $paciente = $consulta->paciente;
 
-        // Exámenes seleccionados en la orden guardada
+        // Exámenes seleccionados en la orden guardada (normalizados)
         $examenesSeleccionados = Examen::where('consulta_id', $consulta->id)
-                                       ->pluck('nombre')
-                                       ->toArray();
+            ->pluck('nombre')
+            ->map(function($nombre) {
+                $nombreSinSimbolos = preg_replace('/[()\/.:\'\-]+/', '', strtolower($nombre));
+                return \Illuminate\Support\Str::snake($nombreSinSimbolos);
+            })
+            ->toArray();
 
         // Definición completa de secciones y sus exámenes
         $todosExamenes = [
@@ -179,14 +186,17 @@ class ExamenController extends Controller
         foreach ($todosExamenes as $seccion => $examenes) {
             $listaExamenes = [];
             foreach ($examenes as $examen) {
+                $examenSinSimbolos = preg_replace('/[()\/.:\'\-]+/', '', strtolower($examen));
+                $examenNormalizado = \Illuminate\Support\Str::snake($examenSinSimbolos);
                 $listaExamenes[] = [
                     'nombre' => $examen,
-                    'seleccionado' => in_array($examen, $examenesSeleccionados),
+                    'seleccionado' => in_array($examenNormalizado, $examenesSeleccionados),
                 ];
             }
             $secciones[$seccion] = $listaExamenes;
         }
 
-        return view('examenes.show', compact('paciente', 'consulta', 'secciones'));
+        // También pasamos $examenesSeleccionados para la vista
+        return view('examenes.show', compact('paciente', 'consulta', 'secciones', 'examenesSeleccionados'));
     }
 }
