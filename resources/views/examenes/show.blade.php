@@ -80,6 +80,10 @@
         .examenes-grid label {
             font-size: 0.85rem;
             line-height: 1rem;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
         }
     </style>
 
@@ -147,7 +151,11 @@
                             <div class="examenes-grid">
                                 @foreach($examenes as $examen)
                                     <label>
-                                        <input type="checkbox" checked disabled>
+                                        <input
+                                            type="checkbox"
+                                            disabled
+                                            @if($examen['seleccionado']) checked @endif
+                                        >
                                         {{ $examen['nombre'] }}
                                     </label>
                                 @endforeach
@@ -157,11 +165,25 @@
                 </div>
 
 
-                <div class="d-flex justify-content-center gap-3 mt-4">
-                    <a href="{{ route('consultas.index') }}" class="btn btn-success">
-                        <i class="bi bi-arrow-left-circle"></i> Regresar
-                    </a>
+
+                <div class="text-center pt-4">
+                    @if(request()->query('origen') === 'pacientes.show' && request()->query('paciente_id'))
+                        <a href="{{ route('pacientes.show', request()->query('paciente_id')) }}"
+                           class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2"
+                           style="font-size: 0.85rem;">
+                            <i class="bi bi-arrow-left"></i> Regresar
+                        </a>
+                    @else
+                        <a href="{{ route('consultas.index') }}"
+                           class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2"
+                           style="font-size: 0.85rem;">
+                            <i class="bi bi-arrow-left"></i> Regresar
+                        </a>
+                    @endif
                 </div>
+
+
+            </div>
             </div>
         </div>
     </div>
