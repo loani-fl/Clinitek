@@ -121,11 +121,14 @@
 
     <main>
         <section class="features" aria-label="Servicios de la clínica">
+
+            <a href="{{ route('farmacias.create') }}" style="text-decoration: none; color: inherit;">
             <article class="feature-card">
                 <i class="bi bi-bag-heart feature-icon" title="Farmacia"></i>
                 <h3 class="feature-title">Farmacia</h3>
                 <p class="feature-desc">Contamos con farmacia equipada con medicamentos y productos de alta calidad para tu bienestar.</p>
             </article>
+            </a>
 
             <article class="feature-card">
             <i class="bi bi-eyedropper feature-icon" title="Laboratorio"></i>

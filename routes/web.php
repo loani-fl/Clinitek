@@ -13,6 +13,8 @@ use App\Http\Controllers\ExamenController;
 use App\Models\Puesto;
 use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\MedicamentoController;
+use App\Http\Controllers\FarmaciaController;
+
 
 Route::get('/medicamentos/search', [MedicamentoController::class, 'search'])->name('medicamentos.search');
 
@@ -108,3 +110,6 @@ Route::get('/examenes/{diagnostico}', [ExamenController::class, 'show'])->name('
 Route::get('/ordenes/{id}', [ExamenController::class, 'detalleOrden'])->name('ordenes.detalle');
 
 Route::get('/ordenes/{id}', [ExamenController::class, 'detalleOrden'])->name('ordenes.detalle');
+
+// Rutas para farmacia
+Route::resource('farmacias', FarmaciaController::class);
