@@ -232,8 +232,11 @@ public function update(Request $request, $id)
 
         // Verificar si ya hay receta creada
         $tieneReceta = $consulta->recetas->isNotEmpty();
+        $tieneExamen = $consulta->examens->isNotEmpty(); // true si hay exámenes
 
-        return view('consultas.show', compact('consulta', 'paciente', 'tieneReceta'));
+
+
+        return view('consultas.show', compact('consulta', 'paciente', 'tieneReceta','tieneExamen'));
     }
 
 

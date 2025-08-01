@@ -124,33 +124,69 @@
                 <input type="hidden" name="consulta_id" value="{{ $consulta->id }}">
 
                 <div class="row gx-3 gy-3">
+                    {{-- Título --}}
                     <div class="col-md-6">
-                        <label for="titulo" class="form-label">Título <span class="text-danger">*</span></label>
-                        <input type="text" name="titulo" id="titulo" class="form-control @error('titulo') is-invalid @enderror" value="{{ old('titulo') }}" required>
+                        <label for="titulo" class="form-label">Resumen <span class="text-danger">*</span></label>
+                        <input
+                            type="text"
+                            name="titulo"
+                            id="titulo"
+                            class="form-control @error('titulo') is-invalid @enderror"
+                            value="{{ old('titulo') }}"
+                            maxlength="60"
+                            pattern="^[a-zA-Z0-9\s,.;:ñÑáéíóúÁÉÍÓÚüÜ-]*$"
+                            required
+                        >
                         @error('titulo')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
+                    {{-- Descripción --}}
                     <div class="col-md-6">
                         <label for="descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
-                        <textarea name="descripcion" id="descripcion" rows="4" class="form-control @error('descripcion') is-invalid @enderror" required>{{ old('descripcion') }}</textarea>
+                        <textarea
+                            name="descripcion"
+                            id="descripcion"
+                            class="form-control @error('descripcion') is-invalid @enderror"
+                            rows="4"
+                            maxlength="400"
+                            pattern="^[a-zA-Z0-9\s%°#áéíóúÁÉÍÓÚñÑüÜ]*$"
+                            required
+                        >{{ old('descripcion') }}</textarea>
                         @error('descripcion')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
+                    {{-- Tratamiento --}}
                     <div class="col-md-6">
                         <label for="tratamiento" class="form-label">Tratamiento <span class="text-danger">*</span></label>
-                        <textarea name="tratamiento" id="tratamiento" rows="4" class="form-control @error('tratamiento') is-invalid @enderror" required>{{ old('tratamiento') }}</textarea>
+                        <textarea
+                            name="tratamiento"
+                            id="tratamiento"
+                            class="form-control @error('tratamiento') is-invalid @enderror"
+                            rows="4"
+                            maxlength="400"
+                            pattern="^[a-zA-Z0-9\s,.;:ñÑáéíóúÁÉÍÓÚüÜ-]*$"
+                            required
+                        >{{ old('tratamiento') }}</textarea>
                         @error('tratamiento')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
+                    {{-- Observaciones (Opcional) --}}
                     <div class="col-md-6">
-                        <label for="observaciones" class="form-label">Observaciones (Opcionales)</label>
-                        <textarea name="observaciones" id="observaciones" rows="4" class="form-control @error('observaciones') is-invalid @enderror">{{ old('observaciones') }}</textarea>
+                        <label for="observaciones" class="form-label">Observaciones(Opcional)</label>
+                        <textarea
+                            name="observaciones"
+                            id="observaciones"
+                            class="form-control @error('observaciones') is-invalid @enderror"
+                            rows="4"
+                            maxlength="400"
+                            pattern="^[a-zA-Z0-9\s,.;:ñÑáéíóúÁÉÍÓÚüÜ-]*$"
+                        >{{ old('observaciones') }}</textarea>
                         @error('observaciones')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -171,4 +207,24 @@
             </form>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Solo letras, números, espacios, puntos y comas
+            const regexPermitido = /^[a-zA-Z0-9\sñÑáéíóúÁÉÍÓÚüÜ.,]*$/;
+
+            const campos = ['titulo', 'tratamiento', 'observaciones'];
+
+            campos.forEach(function (campoId) {
+                const input = document.getElementById(campoId);
+                if (input) {
+                    input.addEventListener('input', function () {
+                        if (!regexPermitido.test(input.value)) {
+                            input.value = input.value.replace(/[^a-zA-Z0-9\sñÑáéíóúÁÉÍÓÚüÜ.,]/g, '');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
 @endsection

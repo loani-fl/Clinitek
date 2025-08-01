@@ -243,12 +243,15 @@
                             <i class="bi bi-capsule"></i> {{ $tieneReceta ? 'Receta creada' : 'Crear Receta' }}
                         </a>
 
-                    <a href="{{ $tieneDiagnostico ? route('examenes.create', [$consulta->paciente->id, $consulta->id]) : '#' }}"
-                       class="btn btn-outline-info btn-sm d-inline-flex align-items-center gap-1 shadow-sm boton-inactivo"
-                       style="{{ $tieneDiagnostico ? '' : 'pointer-events:none; opacity:0.6;' }}"
-                       title="{{ $tieneDiagnostico ? '' : 'Debe crear un diagnóstico primero' }}">
-                        <i class="bi bi-flask"></i> Crear Exámenes
-                    </a>
+                        <a href="{{ ($tieneDiagnostico && !$tieneExamen) ? route('examenes.create', [$consulta->paciente->id, $consulta->id]) : '#' }}"
+                           class="btn btn-outline-info btn-sm d-inline-flex align-items-center gap-1 shadow-sm boton-inactivo"
+                           style="{{ (!$tieneDiagnostico || $tieneExamen) ? 'pointer-events:none; opacity:0.6;' : '' }}"
+                           title="{{ !$tieneDiagnostico ? 'Debe crear un diagnóstico primero' : ($tieneExamen ? 'Examen creado' : 'Crear Exámenes') }}">
+                            <i class="bi bi-flask"></i> {{ $tieneExamen ? 'Examen creado' : 'Crear Exámenes' }}
+                        </a>
+
+
+
                 </div>
 
                 <div class="text-center pt-4">
