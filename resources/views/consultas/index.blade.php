@@ -68,11 +68,6 @@
     margin: 0 auto;
 }
 
-.card-header .btn {
-    position: absolute;
-    right: 0;
-}
-
     .card-header h2 {
         color: #000 !important; /* Forzar negro al título */
     }
@@ -128,12 +123,22 @@
 <div class="content-wrapper">
     <div class="card custom-card">
 
-        <div class="card-header">
-            <h2 class="fw-bold mb-0">Consultas médicas registradas</h2>
-            <a href="{{ route('inicio') }}" class="btn btn-light">
-                <i class="bi bi-house-door"></i> Inicio
-            </a>
-        </div>
+    <div class="card-header d-flex align-items-center justify-content-between">
+    <h2 class="fw-bold mb-0 text-start flex-grow-1">Consultas médicas registradas</h2>
+
+    <div class="d-flex gap-2">
+        <a href="{{ route('inicio') }}" class="btn btn-light">
+            <i class="bi bi-house-door"></i> Inicio
+        </a>
+
+        <a href="{{ route('consultas.create') }}" class="btn btn-primary">
+            <i class="bi bi-person-plus"></i> Registrar consulta
+        </a>
+    </div>
+</div>
+
+
+
 
         @if(session('success'))
             <div id="mensaje-exito" class="alert alert-success alert-dismissible fade show alert-success-custom">
@@ -215,6 +220,33 @@
                                 <td>
                                     <a href="{{ route('consultas.show', $consulta->id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
                                     <a href="{{ route('consultas.edit', $consulta->id) }}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                                    @if($consulta->diagnostico)
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Más
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                       href="{{ route('diagnosticos.show', ['diagnostico' => $consulta->diagnostico->id, 'origen' => 'consultas.index']) }}">
+                                                        <i class="bi bi-journal-medical"></i> Ver Diagnóstico
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('recetas.show', $consulta->id) }}">
+                                                        <i class="bi bi-capsule"></i> Ver Recetas
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('examenes.show', $consulta->diagnostico->id) }}">
+                                                        <i class="bi bi-file-earmark-medical"></i> Ver Exámenes
+                                                    </a>
+                                                </li>
+
+                                            </ul>
+                                        </div>
+                                    @endif
+
                                 </td>
                             </tr>
                         @endforeach

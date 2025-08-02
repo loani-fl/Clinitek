@@ -112,20 +112,23 @@
                 Registros
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="{{ route('puestos.create') }}">Registrar Puesto</a></li>
-                <li><a class="dropdown-item" href="{{ route('empleado.create') }}">Registrar Empleado</a></li>
-                <li><a class="dropdown-item" href="{{ route('pacientes.create') }}">Registrar Paciente</a></li>
+                <li><a class="dropdown-item" href="{{ route('puestos.index') }}">Registrar Puesto</a></li>
+                <li><a class="dropdown-item" href="{{ route('empleado.index') }}">Registrar Empleado</a></li>
+                <li><a class="dropdown-item" href="{{ route('pacientes.index') }}">Registrar Paciente</a></li>
             </ul>
         </div>
     </header>
 
     <main>
         <section class="features" aria-label="Servicios de la clínica">
+
+            <a href="{{ route('farmacias.create') }}" style="text-decoration: none; color: inherit;">
             <article class="feature-card">
                 <i class="bi bi-bag-heart feature-icon" title="Farmacia"></i>
                 <h3 class="feature-title">Farmacia</h3>
                 <p class="feature-desc">Contamos con farmacia equipada con medicamentos y productos de alta calidad para tu bienestar.</p>
             </article>
+            </a>
 
             <article class="feature-card">
             <i class="bi bi-eyedropper feature-icon" title="Laboratorio"></i>
@@ -145,7 +148,7 @@
                 <p class="feature-desc">Servicio de imágenes diagnósticas con equipos modernos para mayor precisión.</p>
             </article>
 
-            <a href="{{ route('medicos.create') }}" style="text-decoration: none; color: inherit;">
+            <a href="{{ route('medicos.index') }}" style="text-decoration: none; color: inherit;">
     <article class="feature-card">
         <i class="bi bi-heart-pulse feature-icon" title="Medicina Especializada"></i>
         <h3 class="feature-title">Medicina con Especialidades</h3>
@@ -154,7 +157,7 @@
 </a>
 
 
-          <a href="{{ route('consultas.create') }}" style="text-decoration: none; color: inherit;">
+          <a href="{{ route('consultas.index') }}" style="text-decoration: none; color: inherit;">
             <article class="feature-card">
                 <i class="bi bi-journal-medical feature-icon" title="Consultas"></i>
                 <h3 class="feature-title">Consultas</h3>

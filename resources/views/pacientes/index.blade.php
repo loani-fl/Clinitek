@@ -153,12 +153,28 @@
 
 <div class="content-wrapper">
     <div class="card custom-card shadow-sm">
-        <div class="card-header">
-            <h5 class="mb-0 text-dark text-center" style="font-size: 2.25rem; font-weight: bold;">Listado de pacientes</h5>
-            <a href="{{ route('inicio') }}" class="btn btn-light btn-inicio">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            
+            <!-- Botón Inicio a la izquierda -->
+            <a href="{{ route('inicio') }}" class="btn btn-light me-3">
                 <i class="bi bi-house-door"></i> Inicio
             </a>
+            
+            <!-- Título centrado y que tome todo el espacio disponible -->
+            <h2 class="fw-bold mb-0 flex-grow-1 text-center">Listado de pacientes</h2>
+            
+            <!-- Botón Registrar paciente a la derecha -->
+            <a href="{{ route('pacientes.create') }}" class="btn btn-primary ms-3">
+                <i class="bi bi-person-plus"></i> Registrar paciente
+            </a>
+            
         </div>
+            
+
+
+
+
+
 
         <div class="d-flex filter-container">
             <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por nombre, apellido o identidad">

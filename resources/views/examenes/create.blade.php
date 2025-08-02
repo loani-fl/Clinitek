@@ -378,12 +378,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 4000);
     }
 
+
     // Botón Limpiar
-    btnLimpiar.addEventListener('click', function() {
-        checkboxes.forEach(cb => cb.checked = false);
-        maxExamenesError.style.display = 'none';
-        minExamenesError.style.display = 'none';
-    });
+    if (btnLimpiar) {
+        btnLimpiar.addEventListener('click', function() {
+            checkboxes.forEach(cb => cb.checked = false);
+            maxExamenesError.style.display = 'none';
+            minExamenesError.style.display = 'none';
+        });
+    }
 
     // Limitar selección a máximo 15
     checkboxes.forEach(cb => {
@@ -413,19 +416,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Validar en "Guardar e Imprimir"
-    btnGuardarImprimir.addEventListener('click', e => {
-        const seleccionados = document.querySelectorAll('input[name="examenes[]"]:checked').length;
-        if (seleccionados === 0) {
-            e.preventDefault(); // evita abrir nueva pestaña
-            mostrarMensaje(minExamenesError);
-            return;
-        }
-        if (seleccionados > maxSeleccion) {
-            e.preventDefault();
-            mostrarMensaje(maxExamenesError);
-        }
-        // Si pasa la validación, abrirá normalmente
-    });
+    if (btnGuardarImprimir) {
+        btnGuardarImprimir.addEventListener('click', e => {
+            const seleccionados = document.querySelectorAll('input[name="examenes[]"]:checked').length;
+            if (seleccionados === 0) {
+                e.preventDefault(); // evita abrir nueva pestaña
+                mostrarMensaje(minExamenesError);
+                return;
+            }
+            if (seleccionados > maxSeleccion) {
+                e.preventDefault();
+                mostrarMensaje(maxExamenesError);
+            }
+            // Si pasa la validación, abrirá normalmente
+        });
+    }
 });
 
 </script>

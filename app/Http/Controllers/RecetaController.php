@@ -10,9 +10,17 @@ use Illuminate\Http\Request;
 
 class RecetaController extends Controller
 {
-    public function create(Consulta $consulta)
+    public function create($consulta_id)
     {
-        $consulta->load(['medico', 'paciente']);
+        $consulta = Consulta::with('diagnostico')->findOrFail($consulta_id);
+
+        if (!$consulta->diagnostico) {
+            // Redirige con mensaje de error si no hay diagnóstico
+            return redirect()->route('consultas.show', $consulta_id)
+                ->with('error', 'No puede crear receta sin un diagnóstico previo.');
+        }
+
+        // Aquí sigue el flujo normal si hay diagnóstico
         return view('recetas.create', compact('consulta'));
     }
 
@@ -66,21 +74,22 @@ class RecetaController extends Controller
             }
         }
 
-        return redirect()->route('recetas.show', $consulta->paciente_id)
+        return redirect()->route('consultas.show', $consulta->paciente_id)
             ->with('success', 'Receta creada correctamente.');
     }
 
 
     public function show($pacienteId)
     {
-        $paciente = Paciente::with(['consultas.recetas'])->findOrFail($pacienteId);
+        $paciente = Paciente::findOrFail($pacienteId);
 
-        $recetas = Receta::whereHas('consulta', function ($query) use ($pacienteId) {
+        $receta = Receta::whereHas('consulta', function ($query) use ($pacienteId) {
             $query->where('paciente_id', $pacienteId);
-        })->with('medicamentos')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        })->with('medicamentos', 'consulta.paciente') // carga consulta y paciente relacionado
+        ->orderBy('created_at', 'desc')
+            ->firstOrFail();
 
-        return view('recetas.show', compact('paciente', 'recetas'));
+        return view('recetas.show', compact('paciente', 'receta'));
     }
+
 }

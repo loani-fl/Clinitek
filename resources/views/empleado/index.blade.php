@@ -176,11 +176,11 @@
                 ☰
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                <li><a class="dropdown-item" href="{{ route('puestos.create') }}">Crear puesto</a></li>
-                <li><a class="dropdown-item" href="{{ route('empleado.create') }}">Registrar empleado</a></li>
-                <li><a class="dropdown-item" href="{{ route('medicos.create') }}">Registrar médico</a></li>
-                <li><a class="dropdown-item" href="{{ route('consultas.create') }}">Registrar consulta</a></li>
-                <li><a class="dropdown-item" href="{{ route('pacientes.create') }}">Registrar paciente</a></li>
+                <li><a class="dropdown-item" href="{{ route('puestos.index') }}">Crear puesto</a></li>
+                <li><a class="dropdown-item" href="{{ route('empleado.index') }}">Registrar empleado</a></li>
+                <li><a class="dropdown-item" href="{{ route('medicos.index') }}">Registrar médico</a></li>
+                <li><a class="dropdown-item" href="{{ route('consultas.index') }}">Registrar consulta</a></li>
+                <li><a class="dropdown-item" href="{{ route('pacientes.index') }}">Registrar paciente</a></li>
             </ul>
         </div>
     </div>
@@ -188,13 +188,19 @@
 <!-- Contenedor principal -->
 <div class="contenedor-principal">
     <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
-        <!-- Único encabezado -->
-        <div class="card-header position-relative py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-            <a href="{{ route('inicio') }}" class="btn btn-light position-absolute end-0 top-50 translate-middle-y me-2">
-                <i class="bi bi-house-door"></i> Inicio
-            </a>
-            <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Lista de empleados</h5>
-        </div>
+    <div class="card-header d-flex justify-content-between align-items-center py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
+    <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Lista de empleados</h5>
+
+    <div>
+        <a href="{{ route('inicio') }}" class="btn btn-light me-2">
+            <i class="bi bi-house-door"></i> Inicio
+        </a>
+        <a href="{{ route('empleado.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Registrar empleado
+        </a>
+    </div>
+</div>
+
 
         <!-- Formulario filtro sin submit normal -->
         <div class="px-3 py-2 mt-4">

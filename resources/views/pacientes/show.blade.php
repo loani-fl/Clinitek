@@ -73,16 +73,10 @@
     <!-- Contenedor principal -->
     <div class="container mt-5 pt-3" style="max-width: 1000px;">
         <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100 mt-4">
-        <div class="card-header d-flex justify-content-between align-items-center py-2 px-3" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-    <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Expediente medico</h5>
+            <div class="card-header py-2 px-3" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
+                <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Expediente médico</h5>
+            </div>
 
-
-            <a href="{{ route('diagnosticos.show', $paciente->id ?? 1) }}"
-               class="btn btn-primary"
-               style="font-size: 1rem;">
-                Ver Diagnósticos
-            </a>
-</div>
 
             <div class="card-body px-4 py-3">
 
@@ -134,6 +128,8 @@
                         <strong>Historial Quirúrgico:</strong><br>
                         <p class="text-break" style="white-space: pre-line;">{!! nl2br(e($paciente->historial_quirurgico ?? 'No especificado')) !!}</p>
                     </div>
+
+
                 </div>
 
 
@@ -142,15 +138,69 @@
 
             </div>
 
-                <div class="text-center pt-4">
-                    <a href="{{ route('pacientes.index') }}"
-                       class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2"
-                       style="font-size: 0.85rem;">
-                        <i class="bi bi-arrow-left"></i> Regresar
-                    </a>
-                </div>
+            <!-- Consultas Registradas -->
+            <div class="section-title mt-5">Consultas Registradas</div>
 
+            @if($paciente->consultas->isEmpty())
+                <p class="text-muted">No hay consultas registradas para este paciente.</p>
+            @else
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle text-center">
+                        <thead class="table-primary">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Médico Asignado</th>
+                            <th>Opciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($paciente->consultas as $consulta)
+                            <tr>
+                                <td>{{ \Carbon\Carbon::parse($consulta->fecha)->format('d/m/Y') }}</td>
+                                <td>{{ $consulta->medico->nombre ?? 'Sin asignar' }}</td>
+                                <td>
+                                    <!-- Ver Diagnóstico -->
+                                    <!-- Ver Diagnóstico -->
+                                    <a href="{{ $consulta->diagnostico ? route('diagnosticos.show', ['diagnostico' => $consulta->diagnostico->id, 'origen' => 'pacientes.show', 'paciente_id' => $paciente->id]) : '#' }}"
+                                       class="btn btn-sm btn-outline-primary shadow-sm"
+                                       title="Ver diagnóstico"
+                                       @if(!$consulta->diagnostico) onclick="alert('No hay diagnóstico disponible'); return false;" @endif>
+                                        <i class="bi bi-journal-medical"></i>
+                                    </a>
+
+                                    <!-- Ver Receta -->
+                                    <a href="{{ route('recetas.show', ['id' => $consulta->id, 'origen' => 'pacientes.show', 'paciente_id' => $paciente->id]) }}"
+                                       class="btn btn-sm btn-outline-success"
+                                       title="Ver receta médica">
+                                        <i class="bi bi-prescription2"></i>
+                                    </a>
+
+                                    <!-- Ver Exámenes -->
+                                    <a href="{{ $consulta->diagnostico ? route('examenes.show', ['diagnostico' => $consulta->diagnostico->id, 'origen' => 'pacientes.show', 'paciente_id' => $paciente->id]) : '#' }}"
+                                       class="btn btn-sm btn-outline-danger"
+                                       title="Ver exámenes"
+                                       @if(!$consulta->diagnostico) onclick="alert('No hay orden de examen disponible'); return false;" @endif>
+                                        <i class="bi bi-file-earmark-medical"></i>
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+
+            <div class="text-center pt-4">
+                <a href="{{ route('pacientes.index') }}"
+                   class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2"
+                   style="font-size: 0.85rem;">
+                    <i class="bi bi-arrow-left"></i> Regresar
+                </a>
             </div>
+
         </div>
-    </div>
+        </div>
+
 @endsection
