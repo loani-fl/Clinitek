@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Receta;
 use App\Models\Consulta;
 use App\Models\Medicamento;
-use App\Models\Paciente;
 use Illuminate\Http\Request;
 
 class RecetaController extends Controller
@@ -15,16 +14,14 @@ class RecetaController extends Controller
         $consulta = Consulta::with('diagnostico')->findOrFail($consulta_id);
 
         if (!$consulta->diagnostico) {
-            // Redirige con mensaje de error si no hay diagnóstico
             return redirect()->route('consultas.show', $consulta_id)
                 ->with('error', 'No puede crear receta sin un diagnóstico previo.');
         }
 
-        // Aquí sigue el flujo normal si hay diagnóstico
         return view('recetas.create', compact('consulta'));
     }
 
-    public function store(Request $request, $pacienteId)
+    public function store(Request $request, $consulta_id)
     {
         $request->validate([
             'consulta_id' => 'required|exists:consultas,id',
@@ -51,12 +48,11 @@ class RecetaController extends Controller
             'medicamentos.*.detalles.regex' => 'Solo se admiten letras y números en los detalles.',
         ]);
 
-        // Obtiene la consulta y con ella el paciente correcto
         $consulta = Consulta::findOrFail($request->consulta_id);
 
         $receta = Receta::create([
             'consulta_id' => $consulta->id,
-            'paciente_id' => $consulta->paciente_id,  // Se usa el paciente asociado a la consulta
+            'paciente_id' => $consulta->paciente_id,
             'detalles' => $request->detalles,
         ]);
 
@@ -74,22 +70,15 @@ class RecetaController extends Controller
             }
         }
 
-        return redirect()->route('consultas.show', $consulta->paciente_id)
+        return redirect()->route('recetas.show', $receta->id)
             ->with('success', 'Receta creada correctamente.');
     }
 
-
-    public function show($pacienteId)
+    public function show($id)
     {
-        $paciente = Paciente::findOrFail($pacienteId);
+        $receta = Receta::with('consulta.paciente', 'consulta.medico', 'medicamentos')
+            ->findOrFail($id);
 
-        $receta = Receta::whereHas('consulta', function ($query) use ($pacienteId) {
-            $query->where('paciente_id', $pacienteId);
-        })->with('medicamentos', 'consulta.paciente') // carga consulta y paciente relacionado
-        ->orderBy('created_at', 'desc')
-            ->firstOrFail();
-
-        return view('recetas.show', compact('paciente', 'receta'));
+        return view('recetas.show', compact('receta'));
     }
-
 }
