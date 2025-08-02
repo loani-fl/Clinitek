@@ -14,7 +14,7 @@ class ConsultaController extends Controller
     // Mostrar la lista de consultas
     public function index()
     {
-        $consultas = Consulta::with('paciente', 'medico')->orderBy('fecha', 'desc')->paginate(10);
+        $consultas = Consulta::with('paciente', 'medico')->orderBy('fecha', 'desc')->paginate(4);
         $medicos = Medico::orderBy('nombre')->get();
 
         return view('consultas.index', compact('consultas', 'medicos'));

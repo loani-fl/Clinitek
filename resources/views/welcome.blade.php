@@ -162,6 +162,16 @@
             </article>
             </a>
 
+                <!-- Sección añadida dentro del grid de features -->
+        <a href="{{ route('pago.create') }}" style="text-decoration: none; color: inherit;">
+            <article class="feature-card">
+                <i class="bi bi-cash-coin feature-icon" title="Pago"></i>
+                <h3 class="feature-title">Pago</h3>
+                <p class="feature-desc">Realiza el pago de tus servicios de forma segura con tarjeta o efectivo.</p>
+            </article>
+        </a>
+
+
         </section>
     </main>
 
