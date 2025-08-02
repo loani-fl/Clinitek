@@ -11,6 +11,7 @@ class Receta extends Model
 
     protected $fillable = [
         'consulta_id',
+        'paciente_id', // ✅ nuevo
         'detalles',
     ];
 
