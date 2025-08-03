@@ -121,11 +121,14 @@
 
     <main>
         <section class="features" aria-label="Servicios de la clínica">
+
+            <a href="{{ route('farmacias.create') }}" style="text-decoration: none; color: inherit;">
             <article class="feature-card">
                 <i class="bi bi-bag-heart feature-icon" title="Farmacia"></i>
                 <h3 class="feature-title">Farmacia</h3>
                 <p class="feature-desc">Contamos con farmacia equipada con medicamentos y productos de alta calidad para tu bienestar.</p>
             </article>
+            </a>
 
             <article class="feature-card">
             <i class="bi bi-eyedropper feature-icon" title="Laboratorio"></i>
@@ -164,6 +167,16 @@
                 <p class="feature-desc">Consultas médicas personalizadas para un diagnóstico y tratamiento adecuados.</p>
             </article>
             </a>
+
+                <!-- Sección añadida dentro del grid de features -->
+        <a href="{{ route('pago.create') }}" style="text-decoration: none; color: inherit;">
+            <article class="feature-card">
+                <i class="bi bi-cash-coin feature-icon" title="Pago"></i>
+                <h3 class="feature-title">Pago</h3>
+                <p class="feature-desc">Realiza el pago de tus servicios de forma segura con tarjeta o efectivo.</p>
+            </article>
+        </a>
+
 
         </section>
     </main>

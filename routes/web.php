@@ -13,6 +13,8 @@ use App\Http\Controllers\ExamenController;
 use App\Models\Puesto;
 use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\MedicamentoController;
+use App\Http\Controllers\FarmaciaController;
+
 
 Route::get('/medicamentos/search', [MedicamentoController::class, 'search'])->name('medicamentos.search');
 
@@ -109,10 +111,7 @@ Route::get('/ordenes/{id}', [ExamenController::class, 'detalleOrden'])->name('or
 
 Route::get('/ordenes/{id}', [ExamenController::class, 'detalleOrden'])->name('ordenes.detalle');
 
-
-
-//RAYOS X
-
+// RAYOS X
 use App\Http\Controllers\OrdenRayosXController;
 
 Route::prefix('rayosx')->group(function () {
@@ -121,3 +120,11 @@ Route::prefix('rayosx')->group(function () {
     Route::post('/store', [OrdenRayosXController::class, 'store'])->name('rayosx.store');
     Route::get('/{orden}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
 });
+
+// Rutas para pago
+Route::get('/pago/create', [App\Http\Controllers\PagoController::class, 'create'])->name('pago.create');
+Route::post('/pago', [App\Http\Controllers\PagoController::class, 'store'])->name('pago.store');
+Route::get('/pago/{pago}', [App\Http\Controllers\PagoController::class, 'show'])->name('pago.show');
+
+// Rutas para farmacia
+Route::resource('farmacias', FarmaciaController::class);

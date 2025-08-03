@@ -114,14 +114,23 @@
     </div>
 </div>
 
-</div>
 <div class="contenedor-principal">
     <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 90px;">
-        <div class="card-header position-relative py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-            <a href="{{ route('inicio') }}" class="btn btn-light position-absolute end-0 top-50 translate-middle-y me-2">
-                <i class="bi bi-house-door"></i> Inicio
-            </a>
-            <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Listado de Médicos</h5>
+        <div class="card-header py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">
+                    Listado de Médicos
+                </h5>
+
+                <div class="d-flex gap-2">
+                    <a href="{{ route('inicio') }}" class="btn btn-light">
+                        <i class="bi bi-house-door"></i> Inicio
+                    </a>
+                    <a href="{{ route('medicos.create') }}" class="btn btn-primary">
+                        <i class="bi bi-person-plus"></i> Registrar Médico
+                    </a>
+                </div>
+            </div>
         </div>
         <div class="row px-3 py-2">
             <div class="col-md-4 mb-2 mb-md-0">
