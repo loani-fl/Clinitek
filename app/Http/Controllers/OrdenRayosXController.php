@@ -28,9 +28,16 @@ class OrdenRayosXController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'diagnostico_id' => 'required|exists:diagnosticos,id',
-            'examenes' => 'required|array|min:1|max:5',
-        ]);
+    'diagnostico_id' => 'required|exists:diagnosticos,id',
+    'examenes' => 'required|array|min:1|max:5',
+], [
+    'diagnostico_id.required' => 'Debe seleccionar un diagnóstico antes de guardar.',
+    'diagnostico_id.exists' => 'El diagnóstico seleccionado no es válido.',
+    'examenes.required' => 'Debe seleccionar al menos un examen de Rayos X.',
+    'examenes.min' => 'Debe seleccionar al menos un examen de Rayos X.',
+    'examenes.max' => 'No puede seleccionar más de 5 exámenes de Rayos X.',
+]);
+
 
         // Evitar duplicados por diagnóstico
         if (RayosxOrder::where('diagnostico_id', $request->diagnostico_id)->exists()) {
