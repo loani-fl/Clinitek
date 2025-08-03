@@ -115,10 +115,9 @@ Route::get('/ordenes/{id}', [ExamenController::class, 'detalleOrden'])->name('or
 
 use App\Http\Controllers\OrdenRayosXController;
 
-Route::get('/rayosx/create', [OrdenRayosXController::class, 'create'])->name('rayosx.create');
-Route::post('/rayosx/store', [OrdenRayosXController::class, 'store'])->name('rayosx.store');
-
-
-Route::get('/rayosx', [OrdenRayosXController::class, 'index'])->name('rayosx.index');
-Route::get('/rayosx/{orden}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
-
+Route::prefix('rayosx')->group(function () {
+    Route::get('/', [OrdenRayosXController::class, 'index'])->name('rayosx.index');
+    Route::get('/create', [OrdenRayosXController::class, 'create'])->name('rayosx.create');
+    Route::post('/store', [OrdenRayosXController::class, 'store'])->name('rayosx.store');
+    Route::get('/{orden}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
+});

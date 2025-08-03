@@ -81,6 +81,12 @@ class RayosxOrder extends Model
     return $examenes;
 }
 
+public function examenes()
+{
+    return $this->hasMany(RayosxOrderExamen::class);
+}
+
+
 }
 
 

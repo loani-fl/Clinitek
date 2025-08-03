@@ -201,32 +201,36 @@
 
             <form method="POST" action="{{ route('rayosx.store') }}" id="formOrden">
                 @csrf
+<div class="mb-4 row align-items-center">
+    <label for="diagnostico_id" class="col-md-3 col-form-label fw-bold text-end">
+        Seleccione Diagnóstico
+    </label>
+    <div class="col-md-5">
+        @if($diagnosticos->isEmpty())
+            <div class="alert alert-warning" role="alert">
+                No hay diagnósticos realizados disponibles.
+            </div>
+        @else
+            <select name="diagnostico_id" id="diagnostico_id" class="form-select form-select-sm" required>
+                <option value="" disabled {{ old('diagnostico_id') ? '' : 'selected' }}>-- Seleccione un diagnóstico --</option>
+                @foreach($diagnosticos as $diagnostico)
+                    @if($diagnostico->consulta)
+                        <option value="{{ $diagnostico->id }}"
+                            data-nombre="{{ $diagnostico->paciente->nombre }} {{ $diagnostico->paciente->apellidos }}"
+                            data-identidad="{{ $diagnostico->paciente->identidad }}"
+                            data-fecha="{{ \Carbon\Carbon::parse($diagnostico->created_at)->format('d/m/Y') }}"
+                            data-edad="{{ \Carbon\Carbon::parse($diagnostico->paciente->fecha_nacimiento)->age }}"
+                            data-medico="{{ $diagnostico->consulta->medico->nombre ?? '' }} {{ $diagnostico->consulta->medico->apellidos ?? '' }}"
+                            {{ old('diagnostico_id') == $diagnostico->id ? 'selected' : '' }}>
+                            {{ $diagnostico->paciente->nombre }} {{ $diagnostico->paciente->apellidos }} - Diagnóstico #{{ $diagnostico->id }}
+                        </option>
+                    @endif
+                @endforeach
+            </select>
+        @endif
+    </div>
+</div>
 
-                {{-- Select para elegir diagnóstico --}}
-                <div class="mb-4 row align-items-center">
-                    <label for="diagnostico_id" class="col-md-3 col-form-label fw-bold text-end">
-                        Seleccione Diagnóstico
-                    </label>
-                    <div class="col-md-5">
-                        <select name="diagnostico_id" id="diagnostico_id" class="form-select form-select-sm" required>
-                            <option value="" disabled {{ old('diagnostico_id') ? '' : 'selected' }}>-- Seleccione un diagnóstico --</option>
-                            @foreach($diagnosticos as $diagnostico)
-                                @if($diagnostico->consulta)
-                                    <option value="{{ $diagnostico->id }}"
-                                        data-nombre="{{ $diagnostico->paciente->nombre }} {{ $diagnostico->paciente->apellidos }}"
-                                        data-identidad="{{ $diagnostico->paciente->identidad }}"
-                                        data-fecha="{{ \Carbon\Carbon::parse($diagnostico->created_at)->format('d/m/Y') }}"
-                                        data-edad="{{ \Carbon\Carbon::parse($diagnostico->paciente->fecha_nacimiento)->age }}"
-                                        data-medico="{{ $diagnostico->consulta->medico->nombre ?? '' }} {{ $diagnostico->consulta->medico->apellidos ?? '' }}"
-                                        {{ old('diagnostico_id') == $diagnostico->id ? 'selected' : '' }}
-                                    >
-                                        {{ $diagnostico->paciente->nombre }} {{ $diagnostico->paciente->apellidos }} - Diagnóstico #{{ $diagnostico->id }}
-                                    </option>
-                                @endif
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
 
                 {{-- Datos dinámicos del paciente y diagnóstico --}}
                 <div class="section-title">DATOS DEL PACIENTE </div>
@@ -349,9 +353,10 @@
                         <i class="bi bi-trash"></i> Limpiar
                     </button>
 
-                    <a href="{{ route('diagnosticos.index') }}" class="btn btn-success">
-                        <i class="bi bi-arrow-left-circle"></i> Regresar
-                    </a>
+                   <a href="{{ route('rayosx.index') }}" class="btn btn-success">
+    <i class="bi bi-arrow-left-circle"></i> Regresar
+</a>
+
                 </div>
             </form>
         </div>
