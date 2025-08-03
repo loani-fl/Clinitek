@@ -181,6 +181,7 @@
                 <li><a class="dropdown-item" href="{{ route('medicos.index') }}">Registrar médico</a></li>
                 <li><a class="dropdown-item" href="{{ route('consultas.index') }}">Registrar consulta</a></li>
                 <li><a class="dropdown-item" href="{{ route('pacientes.index') }}">Registrar paciente</a></li>
+                <li><a class="dropdown-item" href="{{ route('pacientes.index') }}">Registrar Farmacia</a></li>
             </ul>
         </div>
     </div>
@@ -188,18 +189,31 @@
 <!-- Contenedor principal -->
 <div class="contenedor-principal">
     <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
-    <div class="card-header d-flex justify-content-between align-items-center py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-    <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Lista de empleados</h5>
+        <div class="card-header py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
+            <div class="d-flex justify-content-between align-items-center w-100">
+                
+                {{-- Botón Inicio a la izquierda --}}
+                <div>
+                    <a href="{{ route('inicio') }}" class="btn btn-light me-2">
+                        <i class="bi bi-house-door"></i> Inicio
+                    </a>
+                </div>
+                
+                {{-- Título centrado --}}
+                <div class="flex-grow-1 text-center">
+                    <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Lista de empleados</h5>
+                </div>
+                
+                {{-- Botón Registrar a la derecha --}}
+                <div>
+                    <a href="{{ route('empleado.create') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Registrar empleado
+                    </a>
+                </div>
+                
+            </div>
+        </div>
 
-    <div>
-        <a href="{{ route('inicio') }}" class="btn btn-light me-2">
-            <i class="bi bi-house-door"></i> Inicio
-        </a>
-        <a href="{{ route('empleado.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Registrar empleado
-        </a>
-    </div>
-</div>
 
 
         <!-- Formulario filtro sin submit normal -->

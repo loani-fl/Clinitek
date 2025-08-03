@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('descuento', 5, 2)->nullable();
             $table->string('foto')->nullable();
             $table->string('pagina_web', 100)->nullable(); // ⬅️ Campo para la página web
+            $table->string('estado')->default('Activo');
             $table->timestamps();
         });
     }

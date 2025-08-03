@@ -12,29 +12,37 @@ class FarmaciaController extends Controller
      */
     public function index(Request $request)
     {
-
-        // Obtener la consulta base
         $query = Farmacia::query();
-
-        // Filtro de búsqueda (nombre o ubicación)
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
+    
+        if ($request->filled('filtro')) {
+            $search = $request->filtro;
             $query->where(function($q) use ($search) {
                 $q->where('nombre', 'like', "%{$search}%")
-                    ->orWhere('ubicacion', 'like', "%{$search}%");
+                  ->orWhere('ubicacion', 'like', "%{$search}%");
             });
         }
-
-        // Obtener resultados paginados, 10 por página
-        $farmacias = $query->orderBy('nombre')->paginate(10);
-
-        // Mantener el parámetro de búsqueda en la paginación
-        $farmacias->appends($request->only('search'));
-
-        // Retornar la vista con las farmacias
+    
+        if ($request->filled('estado')) {
+            $query->where('estado', $request->estado);
+        }
+    
+        $farmacias = $query->orderBy('nombre')->paginate(2);
+    
+        $farmacias->appends($request->only('filtro', 'estado'));
+    
+        if ($request->ajax()) {
+            $html = view('farmacias.partials.tabla', compact('farmacias'))->render();
+    
+            return response()->json([
+                'html' => $html,
+                'total' => $farmacias->total(),
+                'all' => Farmacia::count(),
+            ]);
+        }
+    
         return view('farmacias.index', compact('farmacias'));
     }
-
+    
 
 
     /**
@@ -153,16 +161,18 @@ class FarmaciaController extends Controller
 
         Farmacia::create($data);
 
-        return redirect()->route('farmacias.create')->with('success', 'Farmacia registrada exitosamente.');
+        return redirect()->route('farmacias.index')->with('success', 'Farmacia registrada exitosamente.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+
+    public function show(Farmacia $farmacia)
     {
-        //
+        return view('farmacias.show', compact('farmacia'));
     }
+
 
     /**
      * Show the form for editing the specified resource.
