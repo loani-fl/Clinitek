@@ -122,18 +122,23 @@
 
 <div class="content-wrapper">
     <div class="card custom-card">
+    <div class="card-header justify-content-center align-items-center">
+    <div class="d-flex justify-content-between align-items-center w-100">
+        <div>
+            <a href="{{ route('inicio') }}" class="btn btn-light">
+                <i class="bi bi-house-door"></i> Inicio
+            </a>
+        </div>
 
-    <div class="card-header d-flex align-items-center justify-content-between">
-    <h2 class="fw-bold mb-0 text-start flex-grow-1">Consultas médicas registradas</h2>
+        <div class="text-center flex-grow-1">
+            <h2 class="fw-bold mb-0">Consultas médicas registradas</h2>
+        </div>
 
-    <div class="d-flex gap-2">
-        <a href="{{ route('inicio') }}" class="btn btn-light">
-            <i class="bi bi-house-door"></i> Inicio
-        </a>
-
-        <a href="{{ route('consultas.create') }}" class="btn btn-primary">
-            <i class="bi bi-person-plus"></i> Registrar consulta
-        </a>
+        <div>
+            <a href="{{ route('consultas.create') }}" class="btn btn-primary">
+                <i class="bi bi-person-plus"></i> Registrar consulta
+            </a>
+        </div>
     </div>
 </div>
 

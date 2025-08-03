@@ -39,7 +39,7 @@
 
     <div class="custom-card">
         <div class="mb-4 text-center" style="border-bottom: 3px solid #007BFF;">
-            <h2 class="fw-bold text-black mb-0">Registrar Farmacia Asociada</h2>
+            <h2 class="fw-bold text-black mb-0">Registrar farmacia asociada</h2>
         </div>
 
         <form action="{{ route('farmacias.store') }}" method="POST" enctype="multipart/form-data" novalidate>
