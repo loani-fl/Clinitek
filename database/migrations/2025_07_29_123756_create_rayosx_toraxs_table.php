@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+   Schema::create('rayosx_toraxs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('rayosx_order_id')->constrained('rayosx_orders')->onDelete('cascade');
+            $table->boolean('torax_pa')->default(false);
+            $table->boolean('torax_pa_lat')->default(false);
+            $table->boolean('costillas')->default(false);
+            $table->boolean('esternon')->default(false);
+            $table->text('otros')->nullable();
+            $table->timestamps();
+        });
+
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('rayosx_toraxs');
+    }
+};

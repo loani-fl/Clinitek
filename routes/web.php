@@ -111,11 +111,20 @@ Route::get('/ordenes/{id}', [ExamenController::class, 'detalleOrden'])->name('or
 
 Route::get('/ordenes/{id}', [ExamenController::class, 'detalleOrden'])->name('ordenes.detalle');
 
+// RAYOS X
+use App\Http\Controllers\OrdenRayosXController;
+
+Route::prefix('rayosx')->group(function () {
+    Route::get('/', [OrdenRayosXController::class, 'index'])->name('rayosx.index');
+    Route::get('/create', [OrdenRayosXController::class, 'create'])->name('rayosx.create');
+    Route::post('/store', [OrdenRayosXController::class, 'store'])->name('rayosx.store');
+    Route::get('/{orden}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
+});
+
 // Rutas para pago
 Route::get('/pago/create', [App\Http\Controllers\PagoController::class, 'create'])->name('pago.create');
 Route::post('/pago', [App\Http\Controllers\PagoController::class, 'store'])->name('pago.store');
 Route::get('/pago/{pago}', [App\Http\Controllers\PagoController::class, 'show'])->name('pago.show');
-
 
 // Rutas para farmacia
 Route::resource('farmacias', FarmaciaController::class);
