@@ -50,6 +50,37 @@ class RayosxOrder extends Model
     {
         return $this->hasOne(RayosxEstudiosEspeciales::class);
     }
+
+    public function getAllExamenes()
+{
+    $examenes = [];
+
+    $secciones = [
+        'cabeza' => 'RayosxCabeza',
+        'torax' => 'RayosxTorax',
+        'abdomen' => 'RayosxAbdomen',
+        'extremidadSuperior' => 'RayosxExtremidadSuperior',
+        'extremidadInferior' => 'RayosxExtremidadInferior',
+        'columnaPelvis' => 'RayosxColumnaPelvis',
+        'estudiosEspeciales' => 'RayosxEstudiosEspeciales',
+    ];
+
+    foreach ($secciones as $relacion => $modelo) {
+        if ($this->$relacion) {
+            foreach ($this->$relacion->getAttributes() as $campo => $valor) {
+                if (in_array($campo, ['id', 'rayosx_order_id', 'created_at', 'updated_at'])) {
+                    continue;
+                }
+                if ($valor) {
+                    $examenes[] = ucwords(str_replace('_', ' ', $campo));
+                }
+            }
+        }
+    }
+
+    return $examenes;
+}
+
 }
 
 

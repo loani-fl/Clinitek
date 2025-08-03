@@ -118,3 +118,7 @@ use App\Http\Controllers\OrdenRayosXController;
 Route::get('/rayosx/create', [OrdenRayosXController::class, 'create'])->name('rayosx.create');
 Route::post('/rayosx/store', [OrdenRayosXController::class, 'store'])->name('rayosx.store');
 
+
+Route::get('/rayosx', [OrdenRayosXController::class, 'index'])->name('rayosx.index');
+Route::get('/rayosx/{orden}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
+
