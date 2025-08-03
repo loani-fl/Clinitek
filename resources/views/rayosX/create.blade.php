@@ -189,15 +189,7 @@
                 </div>
             @endif
 
-            @if ($errors->any())
-                <div class="alert alert-danger mb-3">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+       
 
             <form method="POST" action="{{ route('rayosx.store') }}" id="formOrden">
                 @csrf
@@ -263,7 +255,17 @@
                     </div>
                 </div>
 
-                <div id="mensajesEmergentes" style="margin-top: 1rem; min-height: 40px;"></div>
+<div id="mensajesEmergentes" style="margin-top: 1rem; min-height: 40px;">
+    @if ($errors->any())
+        <div class="alert-custom alert-error" id="erroresLaravel">
+            <ul style="margin: 0; padding-left: 1.2rem;">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+</div>
 
                 {{-- Secciones con checkboxes para estudios de Rayos X --}}
                 @php
@@ -470,6 +472,23 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
     });
+
 });
+
+ document.addEventListener('DOMContentLoaded', function() {
+        const erroresDiv = document.getElementById('erroresLaravel');
+        if (erroresDiv) {
+            // Mostrar el div y luego ocultarlo después de 4 segundos (4000 ms)
+            setTimeout(() => {
+                // Opcional: animación para ocultar (desvanecer)
+                erroresDiv.style.transition = 'opacity 0.7s ease';
+                erroresDiv.style.opacity = '0';
+                // Luego de la transición, ocultamos el div para que no ocupe espacio
+                setTimeout(() => {
+                    erroresDiv.style.display = 'none';
+                }, 700);
+            }, 4000);
+        }
+    });
 </script>
 @endsection
