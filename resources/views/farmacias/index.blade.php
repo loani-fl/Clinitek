@@ -73,9 +73,8 @@
         text-align: center;
     }
 
-    /* Botones de acción personalizados */
     .btn-ver {
-        border: 2px solid #85bfff; /* Azul claro */
+        border: 2px solid #85bfff;
         color: #0856b3;
         background-color: white;
     }
@@ -85,7 +84,7 @@
     }
 
     .btn-editar {
-        border: 2px solid #ffcc00; /* Amarillo */
+        border: 2px solid #ffcc00;
         color: #996600;
         background-color: white;
     }
@@ -93,7 +92,6 @@
         background-color: #fff8cc;
         color: #996600;
     }
-
 </style>
 @endpush
 
@@ -113,7 +111,7 @@
 
             <div style="flex: 1; display: flex; justify-content: flex-end;">
                 <a href="{{ route('farmacias.create') }}" class="btn btn-primary btn-sm d-flex align-items-center gap-1" style="white-space: nowrap;">
-                    <i class="bi bi-plus-circle"></i> Registrar
+                    <i class="bi bi-plus-circle"></i> Registrar farmacia
                 </a>
             </div>
         </div>
@@ -127,17 +125,13 @@
         @endif
 
         <div class="px-3 py-2 mt-3">
-            <form id="formFiltro" onsubmit="return false;">
-                <div class="d-flex gap-2">
-                    <input type="text" name="filtro" id="inputFiltro" class="form-control" 
-                        placeholder="Buscar por nombre o ubicación" value="{{ request('filtro') }}">
-                    <select name="estado" id="selectEstado" class="form-select" style="min-width: 160px;">
-                        <option value="">Todos los estados</option>
-                        <option value="Activo" {{ request('estado') == 'Activo' ? 'selected' : '' }}>Activa</option>
-                        <option value="Inactivo" {{ request('estado') == 'Inactivo' ? 'selected' : '' }}>Inactiva</option>
-                    </select>
-                </div>
-            </form>
+        <form id="formFiltro" onsubmit="return false;">
+        <div class="d-flex gap-2">
+            <input type="text" name="filtro" id="inputFiltro" class="form-control w-50"
+                placeholder="Buscar por nombre o ubicación" value="{{ request('filtro') }}">
+        </div>
+</form>
+
         </div>
 
         <div id="tabla-container">
@@ -161,15 +155,15 @@ $(document).ready(function () {
         }
     }
 
-    function cargarDatos(page = 1, filtro = '', estado = '') {
+    function cargarDatos(page = 1, filtro = '') {
         $.ajax({
             url: "{{ route('farmacias.index') }}",
             type: 'GET',
-            data: { page, filtro, estado },
+            data: { page, filtro },
             success: function(data) {
                 $('#tabla-container').html(data.html);
                 actualizarMensaje(data.total, data.all, filtro);
-                window.history.pushState("", "", `?page=${page}&filtro=${encodeURIComponent(filtro)}&estado=${encodeURIComponent(estado)}`);
+                window.history.pushState("", "", `?page=${page}&filtro=${encodeURIComponent(filtro)}`);
             },
             error: function(xhr) {
                 let msg = 'No se encontraron resultados.';
@@ -178,7 +172,6 @@ $(document).ready(function () {
                 }
                 $('#mensajeResultados').html(msg);
             }
-
         });
     }
 
@@ -186,16 +179,9 @@ $(document).ready(function () {
     $('#inputFiltro').on('input', function () {
         clearTimeout(timeout);
         let filtro = $(this).val();
-        let estado = $('#selectEstado').val();
         timeout = setTimeout(() => {
-            cargarDatos(1, filtro, estado);
+            cargarDatos(1, filtro);
         }, 500);
-    });
-
-    $('#selectEstado').on('change', function () {
-        let filtro = $('#inputFiltro').val();
-        let estado = $(this).val();
-        cargarDatos(1, filtro, estado);
     });
 
     $(document).on('click', '.pagination a', function(e) {
@@ -203,8 +189,7 @@ $(document).ready(function () {
         let url = $(this).attr('href');
         let page = url.split('page=')[1];
         let filtro = $('#inputFiltro').val();
-        let estado = $('#selectEstado').val();
-        cargarDatos(page, filtro, estado);
+        cargarDatos(page, filtro);
     });
 });
 </script>

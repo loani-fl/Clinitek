@@ -32,7 +32,6 @@
             <th>Teléfono</th>
             <th>Ubicación</th>
             <th>Descuento</th>
-            <th>Estado</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -44,11 +43,7 @@
                 <td>{{ $farmacia->telefono }}</td>
                 <td>{{ $farmacia->ubicacion }}</td>
                 <td>{{ $farmacia->descuento ?? '—' }}%</td>
-                <td>
-                    <span class="badge bg-{{ $farmacia->estado === 'Activo' ? 'success' : 'danger' }}">
-                        {{ $farmacia->estado }}
-                    </span>
-                </td>
+    
                 <td>
                     <a href="{{ route('farmacias.show', $farmacia) }}" class="btn btn-ver btn-sm" title="Ver">
                         <i class="bi bi-eye"></i>
