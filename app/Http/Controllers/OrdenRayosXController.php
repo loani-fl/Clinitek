@@ -162,13 +162,14 @@ class OrdenRayosXController extends Controller
             $orden = RayosxOrder::create([
                 'diagnostico_id' => $diagnostico_id,
                 'paciente_id' => $paciente_id,
-                 'paciente_tipo' => $paciente_tipo,
+                'paciente_tipo' => $paciente_tipo,
                 'fecha' => $request->fecha,
                 'edad' => $edad,
                 'identidad' => $identidad,
                 'nombres' => $nombres,
                 'apellidos' => $apellidos,
                 'datos_clinicos' => $request->datos_clinicos,
+                'estado' => 'Pendiente', // añadido desde main
             ]);
 
             $examenes = collect($request->examenes)
@@ -361,5 +362,13 @@ class OrdenRayosXController extends Controller
             'mensaje' => 'Paciente creado correctamente',
             'paciente' => $paciente,
         ]);
+    }
+
+    public function marcarRealizado(RayosxOrder $orden)
+    {
+        $orden->estado = 'Realizado';
+        $orden->save();
+
+        return redirect()->route('rayosx.index')->with('success', 'Orden marcada como realizada.');
     }
 }
