@@ -120,6 +120,33 @@
 
         {{-- Campos de tarjeta --}}
         <div id="tarjetaCampos" class="{{ old('metodo_pago') == 'tarjeta' ? '' : 'hidden' }}">
+            @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+
+
+             <!-- Datos del paciente -->
+            @if($paciente)
+                <div class="grid-3-cols" style="margin-bottom: 1rem;">
+                    <div>
+                        <label>Nombre del paciente</label>
+                        <input type="text" value="{{ $paciente->nombre }}" readonly class="form-control">
+                    </div>
+                    <div>
+                        <label>Apellidos</label>
+                        <input type="text" value="{{ $paciente->apellidos }}" readonly class="form-control">
+                    </div>
+                    <div>
+                        <label>Identidad</label>
+                        <input type="text" value="{{ $paciente->identidad }}" readonly class="form-control">
+                    </div>
+                </div>
+            @endif
+
             
             <!-- Fila 1: Nombre del Titular, Número de Tarjeta y CVV -->
             <div class="grid-3-cols">
@@ -201,6 +228,8 @@
                 <strong>Pago pendiente:</strong> El pago se realizará en efectivo. El recibo se entregará al momento de cancelar.
             </div>
         </div>
+        <input type="hidden" name="consulta_id" value="{{ $consulta->id ?? '' }}">
+
 
         <div class="text-center pt-4" style="margin-top: 2rem;">
             <div id="btnContainer" class="d-flex justify-content-center gap-2"></div>
@@ -219,15 +248,15 @@ function mostrarCamposPago() {
     const btnContainer = document.getElementById('btnContainer');
     btnContainer.innerHTML = '';
 
-    const btnRegresar = document.createElement('a');
-    btnRegresar.href = '{{ route("inicio") }}';
-    btnRegresar.id = 'btnRegresar';
-    btnRegresar.className = 'btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2';
-    btnRegresar.style.fontSize = '0.85rem';
-    btnRegresar.innerHTML = '<i class="bi bi-arrow-left"></i> Regresar';
-    btnContainer.appendChild(btnRegresar);
-
     if (metodo === 'tarjeta') {
+        const btnRegresar = document.createElement('a');
+        btnRegresar.href = '{{ route("inicio") }}';
+        btnRegresar.id = 'btnRegresar';
+        btnRegresar.className = 'btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2';
+        btnRegresar.style.fontSize = '0.85rem';
+        btnRegresar.innerHTML = '<i class="bi bi-arrow-left"></i> Regresar';
+        btnContainer.appendChild(btnRegresar);
+
         const btnGuardar = document.createElement('button');
         btnGuardar.type = 'submit';
         btnGuardar.id = 'btnGuardar';
@@ -236,28 +265,37 @@ function mostrarCamposPago() {
         btnGuardar.innerHTML = '<i class="bi bi-plus-circle"></i> Guardar';
         btnContainer.appendChild(btnGuardar);
     }
+
+    if (metodo === 'efectivo') {
+        const btnGuardarEfectivo = document.createElement('a');
+        btnGuardarEfectivo.href = '{{ route("consultas.index") }}';
+        btnGuardarEfectivo.id = 'btnGuardarEfectivo';
+        btnGuardarEfectivo.className = 'btn btn-primary btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2';
+        btnGuardarEfectivo.style.fontSize = '0.85rem';
+        btnGuardarEfectivo.innerHTML = '<i class="bi bi-check-circle"></i> Guardar';
+        btnContainer.appendChild(btnGuardarEfectivo);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
     mostrarCamposPago();
-
-    const metodoPago = document.getElementById('metodo_pago').value;
-    const btnGuardar = document.getElementById('btnGuardar');
-    const btnRegresar = document.getElementById('btnRegresar');
-
-    if (metodoPago !== 'tarjeta') {
-        btnGuardar?.classList.add('hidden');
-    }
-
-    if (metodoPago !== 'efectivo') {
-        btnRegresar?.classList.add('hidden');
-    }
 
     const fechaInput = document.querySelector('input[name="fecha"]');
     if (fechaInput) {
         fechaInput.removeAttribute('disabled');
         fechaInput.setAttribute('readonly', true);
     }
+
+    // Auto-llenar descripción si servicio es consulta médica
+    const servicioSelect = document.getElementById('servicio');
+    const descripcionInput = document.querySelector('input[name="descripcion_servicio"]');
+    servicioSelect.addEventListener('change', function () {
+        if (this.value === 'consulta_medica') {
+            descripcionInput.value = "Pago por consulta médica";
+        } else if (descripcionInput.value === "Pago por consulta médica") {
+            descripcionInput.value = "";
+        }
+    });
 
     // Validaciones de inputs (tu lógica previa)
     document.querySelector('input[name="cantidad"]').addEventListener('input', function () {

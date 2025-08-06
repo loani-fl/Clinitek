@@ -288,7 +288,7 @@
             <div class="d-flex justify-content-center gap-3 mt-4 mb-4">
 
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Registrar
+                    <i class="bi bi-plus-circle"></i> Registrar y Pagar
                 </button>
                 <button type="button" id="btnLimpiar" class="btn btn-warning">
                     <i class="bi bi-trash"></i> Limpiar
