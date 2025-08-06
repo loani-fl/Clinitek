@@ -14,7 +14,7 @@ use App\Models\Puesto;
 use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\MedicamentoController;
 use App\Http\Controllers\FarmaciaController;
-
+use App\Http\Controllers\PagoController;
 
 Route::get('/medicamentos/search', [MedicamentoController::class, 'search'])->name('medicamentos.search');
 
@@ -72,6 +72,8 @@ Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupad
 Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('consultas.show');
 Route::patch('/consultas/{consulta}/cancelar', [ConsultaController::class, 'cancelar'])->name('consultas.cancelar');
 Route::patch('/consultas/{consulta}/cambiar-estado', [ConsultaController::class, 'cambiarEstado'])->name('consultas.cambiarEstado');
+Route::get('/pago/create', [PagoController::class, 'create'])->name('pago.create');
+
 
 Route::resource('diagnosticos', DiagnosticoController::class);
 
