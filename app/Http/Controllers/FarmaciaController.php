@@ -11,39 +11,33 @@ class FarmaciaController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        $query = Farmacia::query();
-    
-        if ($request->filled('filtro')) {
-            $search = $request->filtro;
-            $query->where(function($q) use ($search) {
-                $q->where('nombre', 'like', "%{$search}%")
-                  ->orWhere('ubicacion', 'like', "%{$search}%");
-            });
-        }
-    
-        if ($request->filled('estado')) {
-            $query->where('estado', $request->estado);
-        }
-    
-        $farmacias = $query->orderBy('nombre')->paginate(2);
-    
-        $farmacias->appends($request->only('filtro', 'estado'));
-    
-        if ($request->ajax()) {
-            $html = view('farmacias.partials.tabla', compact('farmacias'))->render();
-    
-            return response()->json([
-                'html' => $html,
-                'total' => $farmacias->total(),
-                'all' => Farmacia::count(),
-            ]);
-        }
-    
-        return view('farmacias.index', compact('farmacias'));
-    }
-    
+{
+    $query = Farmacia::query();
 
+    if ($request->filled('filtro')) {
+        $search = $request->filtro;
+        $query->where(function($q) use ($search) {
+            $q->where('nombre', 'like', "%{$search}%")
+              ->orWhere('ubicacion', 'like', "%{$search}%");
+        });
+    }
+
+    $farmacias = $query->orderBy('nombre')->paginate(2);
+
+    $farmacias->appends($request->only('filtro'));
+
+    if ($request->ajax()) {
+        $html = view('farmacias.partials.tabla', compact('farmacias'))->render();
+
+        return response()->json([
+            'html' => $html,
+            'total' => $farmacias->total(),
+            'all' => Farmacia::count(),
+        ]);
+    }
+
+    return view('farmacias.index', compact('farmacias'));
+}
 
     /**
      * Show the form for creating a new resource.
@@ -69,6 +63,7 @@ class FarmaciaController extends Controller
                 'required',
                 'string',
                 'max:255',
+                'regex:/^([^,]+,\s*){2}[^,]+$/',
             ],
             'telefono' => [
                 'required',
@@ -116,6 +111,8 @@ class FarmaciaController extends Controller
             'ubicacion.required' => 'La ubicación es obligatoria.',
             'ubicacion.string' => 'La ubicación debe ser texto válido.',
             'ubicacion.max' => 'La ubicación no debe superar los 255 caracteres.',
+            'ubicacion.regex' => 'Debe incluir ciudad, departamento y país',
+
 
             // TELÉFONO
             'telefono.required' => 'El teléfono es obligatorio.',

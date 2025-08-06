@@ -17,5 +17,11 @@ class Pago extends Model
         'cvv',
         'cantidad',
         'fecha',
+        'consulta_id',
     ];
+
+    public function consulta()
+    {
+        return $this->belongsTo(\App\Models\Consulta::class, 'consulta_id');
+    }
 }

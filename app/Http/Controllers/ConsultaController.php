@@ -44,6 +44,7 @@ class ConsultaController extends Controller
 
     public function store(Request $request)
 {
+    
     $horaInput = trim($request->input('hora'));
     $esInmediata = $horaInput === 'inmediata';
 
@@ -124,7 +125,22 @@ class ConsultaController extends Controller
         'estado' => 'pendiente',
     ]);
 
-    return redirect()->route('consultas.index')->with('success', 'Consulta registrada correctamente.');
+    $consulta = Consulta::create([
+        'paciente_id' => $validated['paciente_id'],
+        'fecha' => $validated['fecha'],
+        'hora' => $esInmediata ? null : $hora24,
+        'especialidad' => $especialidad,
+        'medico_id' => $validated['medico_id'],
+        'motivo' => $validated['motivo'],
+        'sintomas' => $validated['sintomas'],
+        'total_pagar' => $esInmediata ? $validated['total_pagar'] : 0,
+        'estado' => 'pendiente',
+    ]);
+    
+    return redirect()->route('pago.create', ['consulta_id' => $consulta->id])
+                 ->with('success', 'Consulta registrada correctamente.');
+
+    
 }
 
     // Mostrar el formulario para editar consulta

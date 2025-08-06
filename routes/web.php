@@ -14,7 +14,7 @@ use App\Models\Puesto;
 use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\MedicamentoController;
 use App\Http\Controllers\FarmaciaController;
-
+use App\Http\Controllers\PagoController;
 
 Route::get('/medicamentos/search', [MedicamentoController::class, 'search'])->name('medicamentos.search');
 
@@ -72,6 +72,8 @@ Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupad
 Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('consultas.show');
 Route::patch('/consultas/{consulta}/cancelar', [ConsultaController::class, 'cancelar'])->name('consultas.cancelar');
 Route::patch('/consultas/{consulta}/cambiar-estado', [ConsultaController::class, 'cambiarEstado'])->name('consultas.cambiarEstado');
+Route::get('/pago/create', [PagoController::class, 'create'])->name('pago.create');
+
 
 Route::resource('diagnosticos', DiagnosticoController::class);
 
@@ -119,6 +121,8 @@ Route::prefix('rayosx')->group(function () {
     Route::get('/create', [OrdenRayosXController::class, 'create'])->name('rayosx.create');
     Route::post('/store', [OrdenRayosXController::class, 'store'])->name('rayosx.store');
     Route::get('/{orden}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
+
+   Route::patch('/{orden}/realizar', [OrdenRayosXController::class, 'marcarRealizado'])->name('rayosx.marcarRealizado');
 });
 
 // Rutas para pago

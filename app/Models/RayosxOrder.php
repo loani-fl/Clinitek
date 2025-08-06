@@ -6,17 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class RayosxOrder extends Model
 {
-    protected $fillable = [
-        'diagnostico_id',
-        'paciente_id',
-        'fecha',
-        'edad',
-        'identidad',
-        'nombres',
-        'apellidos',
-        'medico_solicitante',
-          'paciente_tipo',
-    ];
+  protected $fillable = [
+    'diagnostico_id',
+    'paciente_id',
+    'fecha',
+    'edad',
+    'identidad',
+    'nombres',
+    'apellidos',
+    'medico_solicitante',
+    'paciente_tipo',
+    'estado',
+];
+
 
     public function diagnostico()
     {

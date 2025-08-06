@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Consulta;
 use App\Models\Pago;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -19,10 +20,30 @@ class PagoController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        return view('pago.create');
+    public function create(Request $request)
+{
+    $consulta_id = $request->query('consulta_id');
+
+    if ($consulta_id) {
+        // Buscar la consulta con su paciente relacionado
+        $consulta = Consulta::with('paciente')->find($consulta_id);
+
+        if ($consulta && $consulta->paciente) {
+            $paciente = $consulta->paciente;
+        } else {
+            $paciente = null;
+        }
+    } else {
+        $consulta = null;
+        $paciente = null;
     }
+
+    return view('pago.create', compact('consulta', 'paciente'));
+}
+
+
+    
+
 
     /**
      * Store a newly created resource in storage.
@@ -80,16 +101,26 @@ class PagoController extends Controller
             $pago->fecha_expiracion = $request->fecha_expiracion;
             $pago->cvv = $request->cvv;
         }
-    
+        $pago->consulta_id = $request->consulta_id; // Asignar el id de la consulta para la relación
+
         $pago->save();
     
         return redirect()->route('pago.show', $pago->id);
     }
     
     public function show(Pago $pago)
-    {
-        return view('pago.show', compact('pago'));
+{
+    $paciente = null;
+
+    if ($pago->consulta) {
+        $paciente = $pago->consulta->paciente;
     }
+
+    return view('pago.show', compact('pago', 'paciente'));
+}
+
+
+    
 
     /**
      * Show the form for editing the specified resource.

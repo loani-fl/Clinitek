@@ -70,12 +70,6 @@
                         No disponible
                     @endif
                 </div>
-                <div class="col-md-4">
-                    <strong>Estado:</strong><br>
-                    <span class="badge bg-{{ $farmacia->estado === 'Activo' ? 'success' : 'danger' }}">
-                        {{ $farmacia->estado }}
-                    </span>
-                </div>
             </div>
 
             <div class="row gy-3 mt-3">
