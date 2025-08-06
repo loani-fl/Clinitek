@@ -159,4 +159,18 @@ Route::post('/rayosx/descripcion-guardar', [OrdenRayosXController::class, 'guard
 
 
     //OOTRAS
-    
+    Route::get('/rayosx', [OrdenRayosXController::class, 'index'])->name('rayosx.index');
+Route::get('/rayosx/create', [OrdenRayosXController::class, 'create'])->name('rayosx.create');
+Route::post('/rayosx', [OrdenRayosXController::class, 'store'])->name('rayosx.store');
+Route::get('/rayosx/{id}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
+Route::get('/rayosx/{id}/edit', [OrdenRayosXController::class, 'edit'])->name('rayosx.edit');
+Route::put('/rayosx/{id}', [OrdenRayosXController::class, 'update'])->name('rayosx.update');
+Route::delete('/rayosx/{id}', [OrdenRayosXController::class, 'destroy'])->name('rayosx.destroy');
+
+
+Route::post('/pacientes/rayosx/store', [App\Http\Controllers\PacienteRayosXController::class, 'storePacienteRayosX'])->name('pacientes.rayosx.store');
+Route::post('pacientes/rayosx/store', [PacienteRayosXController::class, 'store'])->name('pacientes.rayosx.store');
+
+
+
+Route::post('/rayosx/descripcion/guardar', [OrdenRayosXController::class, 'guardarDescripcion'])->name('rayosx.descripcion.guardar');

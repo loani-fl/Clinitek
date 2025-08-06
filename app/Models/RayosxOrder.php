@@ -8,13 +8,14 @@ class RayosxOrder extends Model
 {
     protected $fillable = [
         'diagnostico_id',
-        'paciente_id', // <-- agregado
+        'paciente_id',
         'fecha',
         'edad',
         'identidad',
         'nombres',
         'apellidos',
-        'medico_solicitante'
+        'medico_solicitante',
+          'paciente_tipo',
     ];
 
     public function diagnostico()
@@ -22,18 +23,23 @@ class RayosxOrder extends Model
         return $this->belongsTo(Diagnostico::class);
     }
 
-    public function paciente()
+    public function pacienteClinica()
     {
-        return $this->belongsTo(Paciente::class);
+        return $this->belongsTo(Paciente::class, 'paciente_id');
     }
 
-    // ... tus relaciones hasOne existentes ...
+    public function pacienteRayosX()
+    {
+        return $this->belongsTo(PacienteRayosX::class, 'paciente_id');
+    }
 
     public function examenes()
     {
         return $this->hasMany(RayosxOrderExamen::class);
     }
 
+       
+    
     public function getAllExamenes()
     {
         // mantiene tu función existente (sin cambios)
@@ -64,4 +70,6 @@ class RayosxOrder extends Model
 
         return $examenes;
     }
+
+    
 }

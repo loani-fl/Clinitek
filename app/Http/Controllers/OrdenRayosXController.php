@@ -3,180 +3,363 @@
 namespace App\Http\Controllers;
 
 use App\Models\Paciente;
-use Illuminate\Support\Facades\DB;
-
 use App\Models\Diagnostico;
 use App\Models\RayosxOrder;
 use App\Models\RayosxOrderExamen;
+use App\Models\PacienteRayosX;
 use Illuminate\Http\Request;
-use App\Models\PacienteRayosX; // <- agregar
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 
 class OrdenRayosXController extends Controller
 {
     /**
-     * Mostrar formulario de creación.
-     */
-public function create(Request $request)
-{
-    // Pacientes de la clínica
-    $pacientesClinica = Paciente::orderBy('nombre')->get();
-
-    // Pacientes creados solo para Rayos X
-    $pacientesRayosX = PacienteRayosX::orderBy('nombre')->get();
-
-    // Pasamos ambas colecciones a la vista
-    // (la vista las unirá en el select)
-    return view('rayosX.create', [
-        'pacientesClinica' => $pacientesClinica,
-        'pacientesRayosX' => $pacientesRayosX,
-        // opcional: mantener selección enviada por query (ej: seleccion=rayosx-12)
-        'seleccion' => $request->query('seleccion')
-    ]);
-}
-
-
-    /**
-     * Guardar nueva orden de Rayos X.
-     */
-    public function store(Request $request)
-{
-    
-    $request->validate([
-        'seleccion' => 'required',
-        'fecha' => 'required|date',
-      
-        'examenes' => 'required|array|min:1|max:10',
-    ], [
-        'seleccion.required' => 'Debe seleccionar un diagnóstico o paciente.',
-        'fecha.required' => 'La fecha es obligatoria.',
-      
-        'examenes.required' => 'Debe seleccionar al menos un examen.',
-    ]);
-
-    $diagnostico_id = null;
-    $paciente_id = null;
-    $paciente_tipo = null; // 'clinica' o 'rayosx'
-
-    if (str_starts_with($request->seleccion, 'diagnostico-')) {
-        $diagnostico_id = (int) str_replace('diagnostico-', '', $request->seleccion);
-    } elseif (str_starts_with($request->seleccion, 'clinica-')) {
-        $paciente_id = (int) str_replace('clinica-', '', $request->seleccion);
-        $paciente_tipo = 'clinica';
-    } elseif (str_starts_with($request->seleccion, 'rayosx-')) {
-        $paciente_id = (int) str_replace('rayosx-', '', $request->seleccion);
-        $paciente_tipo = 'rayosx';
-    }
-
-    // Validar existencia según tipo
-    if ($diagnostico_id && !Diagnostico::find($diagnostico_id)) {
-        return back()->with('error', 'El diagnóstico seleccionado no existe.');
-    }
-    if ($paciente_tipo === 'clinica' && !Paciente::find($paciente_id)) {
-        return back()->with('error', 'El paciente de la clínica seleccionado no existe.');
-    }
-    if ($paciente_tipo === 'rayosx' && !PacienteRayosX::find($paciente_id)) {
-        return back()->with('error', 'El paciente para Rayos X seleccionado no existe.');
-    }
-
-    // Si quieres guardar en la orden datos del paciente (identidad/edad/nombres)
-    // puedes obtener los datos según el tipo:
-    $identidad = null;
-    $edad = null;
-    $nombres = null;
-    $apellidos = null;
-
-    if ($paciente_tipo === 'clinica') {
-        $p = Paciente::find($paciente_id);
-        $identidad = $p->identidad ?? null;
-        $edad = $p->edad ?? null;
-        $nombres = $p->nombre ?? null;
-        $apellidos = $p->apellidos ?? null;
-    } elseif ($paciente_tipo === 'rayosx') {
-        $p = PacienteRayosX::find($paciente_id);
-        $identidad = $p->identidad ?? null;
-        $edad = $p->edad ?? null;
-        $nombres = $p->nombre ?? null;
-        $apellidos = $p->apellidos ?? null;
-    } else {
-        // si es diagnóstico y la UI espera rellenar manualmente, usa request values
-        $identidad = $request->identidad;
-        $edad = $request->edad;
-        $nombres = $request->nombres;
-        $apellidos = $request->apellidos;
-    }
-
-    // Crear la orden
-    $orden = RayosxOrder::create([
-        'diagnostico_id' => $diagnostico_id,
-        // guardamos paciente_id numérico (si quieres distinguir tipos, añade columna paciente_tipo)
-        'paciente_id' => $paciente_id,
-        'fecha' => $request->fecha,
-        'edad' => $edad,
-        'identidad' => $identidad,
-        'nombres' => $nombres,
-        'apellidos' => $apellidos,
-      
-        // si necesitas saber el tipo del paciente, añade 'paciente_tipo' => $paciente_tipo
-    ]);
-
-    foreach ($request->examenes as $examen) {
-        RayosxOrderExamen::create([
-            'rayosx_order_id' => $orden->id,
-            'examen' => $examen,
-        ]);
-    }
-
-    return redirect()->route('rayosx.index')->with('success', 'Orden de Rayos X creada correctamente.');
-}
-
-    /**
-     * Listar órdenes.
+     * Mostrar listado paginado.
      */
     public function index()
     {
-        $ordenes = RayosxOrder::with(['diagnostico.paciente', 'paciente'])
+        $ordenes = RayosxOrder::with(['diagnostico', 'pacienteClinica', 'pacienteRayosX', 'examenes'])
             ->latest()
-            ->paginate(10);
+            ->paginate(12);
 
         return view('rayosX.index', compact('ordenes'));
     }
 
     /**
-     * Mostrar una orden.
+     * Mostrar formulario de creación.
      */
-    public function show($id)
-{
-    $orden = RayosxOrder::with(['diagnostico.paciente', 'diagnostico.consulta.medico', 'examenes'])->findOrFail($id);
+    public function create(Request $request)
+    {
+        $pacientesClinica = Paciente::orderBy('nombre')->get();
+        $pacientesRayosX = PacienteRayosX::orderBy('nombre')->get();
+        $diagnosticos = Diagnostico::orderBy('id','desc')->get();
 
-    return view('rayosx.show', compact('orden'));
-}
+        $examenes = [
+            'craneo' => 'Cráneo',
+            'waters' => 'Waters',
+            'conductos_auditivos' => 'Conductos Auditivos',
+            'cavum' => 'Cavum',
+            'senos_paranasales' => 'Senos Paranasales',
+            'silla_turca' => 'Silla Turca',
+            'huesos_nasales' => 'Huesos Nasales',
+            'atm_tm' => 'ATM - TM',
+            'mastoides' => 'Mastoides',
+            'mandibula' => 'Mandíbula',
+            'torax_pa' => 'Tórax PA',
+            'torax_pa_lat' => 'Tórax PA Lateral',
+            'costillas' => 'Costillas',
+            'esternon' => 'Esternón',
+            'abdomen_simple' => 'Abdomen Simple',
+            'abdomen_agudo' => 'Abdomen Agudo',
+            'clavicula' => 'Clavícula',
+            'hombro' => 'Hombro',
+            'humero' => 'Húmero',
+            'codo' => 'Codo',
+            'antebrazo' => 'Antebrazo',
+            'muneca' => 'Muñeca',
+            'mano' => 'Mano',
+            'cadera' => 'Cadera',
+            'femur' => 'Fémur',
+            'rodilla' => 'Rodilla',
+            'tibia' => 'Tibia',
+            'pie' => 'Pie',
+            'calcaneo' => 'Calcáneo',
+            'cervical' => 'Cervical',
+            'dorsal' => 'Dorsal',
+            'lumbar' => 'Lumbar',
+            'sacro_coxis' => 'Sacro Coxis',
+            'pelvis' => 'Pelvis',
+            'escoliosis' => 'Escoliosis',
+            'arteriograma' => 'Arteriograma',
+            'histerosalpingograma' => 'Histerosalpingograma',
+            'colecistograma' => 'Colecistograma',
+            'fistulograma' => 'Fistulograma',
+            'artrograma' => 'Artrógama',
+        ];
 
-public function guardarDescripcion(Request $request)
+        return view('rayosX.create', [
+            'pacientesClinica' => $pacientesClinica,
+            'pacientesRayosX' => $pacientesRayosX,
+            'diagnosticos' => $diagnosticos,
+            'seleccion' => $request->query('seleccion'),
+            'examenes' => $examenes,
+            'paciente_tipo' => null, // corregido para evitar variable no definida
+        ]);
+    }
+
+    /**
+     * Guardar nueva orden.
+     */
+    public function store(Request $request)
     {
         $request->validate([
-            'examen' => 'required|string',
-            'descripcion' => 'required|string',
-            'paciente' => 'required|string',
+            'seleccion' => ['required', 'string'],
+            'fecha' => ['required','date'],
+            'examenes' => ['required','array','min:1','max:10'],
+            'examenes.*' => ['string'],
+            'nombres' => [Rule::requiredIf(fn() => $request->seleccion === 'manual'), 'nullable', 'string', 'max:255'],
+            'apellidos' => [Rule::requiredIf(fn() => $request->seleccion === 'manual'), 'nullable', 'string', 'max:255'],
+            'identidad' => [Rule::requiredIf(fn() => $request->seleccion === 'manual'), 'nullable', 'digits:13', 'string', 'max:13'],
+            'edad' => ['nullable','integer','min:0','max:150'],
+            'datos_clinicos' => ['nullable','string'],
+        ], [
+            'seleccion.required' => 'Debe seleccionar diagnóstico o paciente.',
+            'fecha.required' => 'La fecha es obligatoria.',
+            'examenes.required' => 'Seleccione al menos un examen.',
+            'examenes.max' => 'No puede seleccionar más de 10 exámenes.'
         ]);
 
-        $examen = $request->examen;
-        $descripcion = $request->descripcion;
-        $pacienteSeleccionado = $request->paciente;
+        $diagnostico_id = null;
+        $paciente_id = null;
+        $paciente_tipo = null;
+
+        if (str_starts_with($request->seleccion, 'diagnostico-')) {
+            $diagnostico_id = (int) str_replace('diagnostico-', '', $request->seleccion);
+        } elseif (str_starts_with($request->seleccion, 'clinica-')) {
+            $paciente_id = (int) str_replace('clinica-', '', $request->seleccion);
+            $paciente_tipo = 'clinica';
+        } elseif (str_starts_with($request->seleccion, 'rayosx-')) {
+            $paciente_id = (int) str_replace('rayosx-', '', $request->seleccion);
+            $paciente_tipo = 'rayosx';
+        } elseif ($request->seleccion === 'manual') {
+            // manual, no id
+        } else {
+            return back()->withInput()->with('error', 'Selección inválida.');
+        }
+
+        if ($diagnostico_id && !Diagnostico::find($diagnostico_id)) {
+            return back()->withInput()->with('error', 'Diagnóstico no encontrado.');
+        }
+        if ($paciente_tipo === 'clinica' && !Paciente::find($paciente_id)) {
+            return back()->withInput()->with('error', 'Paciente (clínica) no encontrado.');
+        }
+        if ($paciente_tipo === 'rayosx' && !PacienteRayosX::find($paciente_id)) {
+            return back()->withInput()->with('error', 'Paciente (Rayos X) no encontrado.');
+        }
+
+        $identidad = $request->identidad ?? null;
+        $edad = $request->edad ?? null;
+        $nombres = $request->nombres ?? null;
+        $apellidos = $request->apellidos ?? null;
+
+        if ($paciente_tipo === 'clinica') {
+            $p = Paciente::find($paciente_id);
+            $identidad = $p->identidad ?? $identidad;
+            $edad = $p->edad ?? $edad;
+            $nombres = $p->nombre ?? $nombres;
+            $apellidos = $p->apellidos ?? $apellidos;
+        } elseif ($paciente_tipo === 'rayosx') {
+            $p = PacienteRayosX::find($paciente_id);
+            $identidad = $p->identidad ?? $identidad;
+            $edad = $p->edad ?? $edad;
+            $nombres = $p->nombre ?? $nombres;
+            $apellidos = $p->apellidos ?? $apellidos;
+        }
+
+        DB::beginTransaction();
+        try {
+            $orden = RayosxOrder::create([
+                'diagnostico_id' => $diagnostico_id,
+                'paciente_id' => $paciente_id,
+                 'paciente_tipo' => $paciente_tipo,
+                'fecha' => $request->fecha,
+                'edad' => $edad,
+                'identidad' => $identidad,
+                'nombres' => $nombres,
+                'apellidos' => $apellidos,
+                'datos_clinicos' => $request->datos_clinicos,
+            ]);
+
+            $examenes = collect($request->examenes)
+                ->map(fn($e) => ['examen' => $e, 'created_at' => now(), 'updated_at' => now()])
+                ->toArray();
+
+            if (method_exists($orden, 'examenes')) {
+                $orden->examenes()->createMany(array_map(fn($x) => ['examen' => $x['examen']], $examenes));
+            } else {
+                foreach ($request->examenes as $ex) {
+                    RayosxOrderExamen::create([
+                        'rayosx_order_id' => $orden->id,
+                        'examen' => $ex,
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('rayosx.index')->with('success', 'Orden creada correctamente.');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return back()->withInput()->with('error', 'Error al guardar la orden: ' . $th->getMessage());
+        }
+    }
+
+    /**
+     * Mostrar una orden (con relaciones).
+     */
+    public function show($id)
+    {
+        $orden = RayosxOrder::with(['diagnostico', 'pacienteClinica', 'pacienteRayosX', 'examenes'])->findOrFail($id);
+        return view('rayosX.show', compact('orden'));
+    }
+
+    /**
+     * Método para recibir descripciones por examen desde el frontend.
+     */
+    public function guardarDescripcion(Request $request)
+    {
+        \Log::info('guardarDescripcion recibida:', $request->all());
+
+        $validated = $request->validate([
+            'examen' => 'required|string',
+            'descripcion' => 'required|string|max:10000',
+            'orden_id' => 'nullable|integer|exists:rayosx_orders,id',
+            'paciente' => 'nullable|string',
+        ]);
+
+        $examen = $validated['examen'];
+        $descripcion = $validated['descripcion'];
+
+        if (!empty($validated['orden_id'])) {
+            $clavePaciente = 'orden-' . $validated['orden_id'];
+        } elseif (!empty($validated['paciente'])) {
+            $clavePaciente = $validated['paciente'];
+        } else {
+            return response()->json(['success' => false, 'message' => 'No se especificó identificador de paciente/orden.'], 422);
+        }
 
         try {
-            // Ejemplo simple usando tabla rayosx_descripciones (crear migración)
             DB::table('rayosx_descripciones')->updateOrInsert(
-                ['paciente' => $pacienteSeleccionado, 'examen' => $examen],
-                ['descripcion' => $descripcion, 'updated_at' => now()]
+                ['paciente' => $clavePaciente, 'examen' => $examen],
+                ['descripcion' => $descripcion, 'updated_at' => now(), 'created_at' => now()]
             );
 
-            return response()->json(['success' => true]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al guardar la descripción: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['success' => true, 'message' => 'Descripción guardada correctamente.']);
+        } catch (\Throwable $e) {
+            \Log::error('guardarDescripcion error: '.$e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error al guardar descripción.'], 500);
         }
+    }
+
+    /**
+     * Eliminar orden.
+     */
+    public function destroy($id)
+    {
+        $orden = RayosxOrder::findOrFail($id);
+        $orden->delete();
+        return redirect()->route('rayosx.index')->with('success', 'Orden eliminada.');
+    }
+
+    /**
+     * Editar orden.
+     */
+    public function edit($id)
+    {
+        $orden = RayosxOrder::with('examenes')->findOrFail($id);
+        $pacientesClinica = Paciente::orderBy('nombre')->get();
+        $pacientesRayosX = PacienteRayosX::orderBy('nombre')->get();
+        $diagnosticos = Diagnostico::orderBy('id','desc')->get();
+
+        return view('rayosX.edit', compact('orden','pacientesClinica','pacientesRayosX','diagnosticos'));
+    }
+
+    /**
+     * Actualizar orden.
+     */
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'fecha' => 'required|date',
+            'examenes' => 'required|array|min:1|max:10',
+            'examenes.*' => 'string',
+        ]);
+
+        $orden = RayosxOrder::findOrFail($id);
+
+        DB::beginTransaction();
+        try {
+            $orden->update([
+                'fecha' => $request->fecha,
+                'datos_clinicos' => $request->datos_clinicos,
+            ]);
+
+            if (method_exists($orden, 'examenes')) {
+                $orden->examenes()->delete();
+                foreach ($request->examenes as $ex) {
+                    $orden->examenes()->create(['examen' => $ex]);
+                }
+            } else {
+                RayosxOrderExamen::where('rayosx_order_id', $orden->id)->delete();
+                foreach ($request->examenes as $ex) {
+                    RayosxOrderExamen::create(['rayosx_order_id' => $orden->id, 'examen' => $ex]);
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('rayosx.show', $orden->id)->with('success', 'Orden actualizada.');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return back()->withInput()->with('error', 'Error al actualizar: ' . $th->getMessage());
+        }
+    }
+
+    /**
+     * Guardar paciente Rayos X.
+     */
+    public function storePacienteRayosX(Request $request)
+    {
+        $departamentosValidos = ['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19'];
+
+        $rules = [
+            'nombre' => ['required', 'string', 'max:50', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'],
+            'apellidos' => ['required', 'string', 'max:50', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'],
+            // aquí aseguramos la tabla de migración: 'pacientes_rayosxs'
+            'identidad' => [
+                'required',
+                'digits:13',
+                'unique:pacientes_rayosxs,identidad',
+                function ($attribute, $value, $fail) use ($departamentosValidos) {
+                    $codigoDepartamento = substr($value, 0, 2);
+                    if (!in_array($codigoDepartamento, $departamentosValidos)) {
+                        return $fail('El código del departamento en la identidad no es válido.');
+                    }
+                    $anioNacimiento = substr($value, 4, 4);
+                    $anioActual = date('Y');
+                    if ($anioNacimiento < 1900 || $anioNacimiento > $anioActual) {
+                        return $fail('El año de nacimiento en la identidad no es válido.');
+                    }
+                    $edad = $anioActual - $anioNacimiento;
+                    if ($edad < 18 || $edad > 65) {
+                        return $fail("La edad calculada a partir de la identidad no es válida (debe ser entre 18 y 65 años; edad actual: $edad).");
+                    }
+                }
+            ],
+            'telefono' => ['required', 'digits:8', 'regex:/^[2389][0-9]{7}$/', 'unique:pacientes_rayosxs,telefono'],
+            'fecha_nacimiento' => ['required', 'date', 'before:today'],
+            'fecha_orden' => ['required', 'date', 'before_or_equal:today'],
+        ];
+
+        $messages = [
+            'nombre.required' => 'El nombre es obligatorio.',
+            'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+            'apellidos.required' => 'Los apellidos son obligatorios.',
+            'apellidos.regex' => 'Los apellidos solo pueden contener letras y espacios.',
+            'identidad.required' => 'La identidad es obligatoria.',
+            'identidad.unique' => 'La identidad ya existe en la base de datos.',
+            'telefono.required' => 'El teléfono es obligatorio.',
+            'telefono.unique' => 'El teléfono ya está registrado.',
+            'telefono.regex' => 'El teléfono debe iniciar con 2, 3, 8 o 9 y contener 8 dígitos.',
+        ];
+
+        $validated = $request->validate($rules, $messages);
+
+        $paciente = PacienteRayosX::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'mensaje' => 'Paciente creado correctamente',
+            'paciente' => $paciente,
+        ]);
     }
 }

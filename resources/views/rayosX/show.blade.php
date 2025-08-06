@@ -1,261 +1,116 @@
 @extends('layouts.app')
 
 @section('content')
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
 <style>
-    body {
-        background-color: #e8f4fc;
-        margin: 0;
-        padding: 0;
-    }
-    .content-wrapper {
-        margin-top: 60px;
-    }
-    .custom-card::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 2200px;
-        height: 2200px;
-        background-image: url('/images/logo2.jpg');
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        opacity: 0.1;
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-        z-index: 0;
-    }
-    .custom-card {
-        max-width: 1000px;
-        background-color: #fff;
-        margin: 40px auto 60px auto; 
-        border-radius: 1.5rem;
-        padding: 1rem 2rem;
-        position: relative;
-        overflow: hidden;
-        z-index: 1;
-    }
-    .card-header {
-        background-color: transparent !important;
-        border-bottom: 3px solid #007BFF;
-    }
-    .patient-data-grid {
-        background: transparent;
-        box-shadow: none;
-        border-radius: 0;
-        padding: 0;
-        margin-bottom: 2rem;
-    }
-    .patient-data-grid strong {
-        color: rgb(3, 12, 22);
-        font-weight: 600;
-    }
-    .underline-field {
-        border-bottom: 1px solid #000;
-        min-height: 1.4rem;
-        line-height: 1.4rem;
-        padding-left: 4px;
-        padding-right: 4px;
-        font-size: 0.95rem;
-        flex: 1;
-        user-select: none;
-    }
-    .patient-data-grid .row > div {
-        display: flex;
-        align-items: center;
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        border: none;
     }
     .section-title {
-        font-size: 1.1rem;
-        margin: 0 0 0.7rem;
-        color: rgb(6, 11, 17);
-        font-weight: 700;
-        line-height: 1.4rem;
+        font-weight: bold;
+        color: #0d6efd;
+        margin-top: 15px;
     }
-    .secciones-container {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1.3rem 0.10rem;
-        margin-top: 0.3rem;
+    .form-check-label {
+        font-weight: 500;
     }
-    .seccion {
-        padding: 0;
-    }
-    .examenes-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 0.15rem;
-    }
-    .examenes-grid label {
-        font-size: 0.85rem;
-        line-height: 1rem;
-        user-select: none;
-    }
-    .btn {
-        padding: 0.40rem 0.5rem;
+    .description-box {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        padding: 8px;
+        border-radius: 6px;
         font-size: 0.95rem;
-        line-height: 1.2;
-    }
-    .btn-success {
-        margin-top: 1.5rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
+        margin-top: 5px;
     }
 </style>
 
-<div class="content-wrapper">
-    <div class="card custom-card shadow-sm">
-        <div class="card-header text-center">
-            <h4 class="mb-0" style="font-weight: 600; color: #333;">
-                ORDEN DE RAYOS X #{{ $orden->id }}
-            </h4>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Detalle de Orden de Rayos X</h5>
+            <a href="{{ route('rayosx.index') }}" class="btn btn-light btn-sm">← Volver</a>
         </div>
-
         <div class="card-body">
 
-        @php
-    $examenesSeleccionados = $orden->examenes->pluck('examen')->toArray();
-@endphp
-
-
-            @if ($orden->diagnostico)
-                {{-- Datos del paciente y diagnóstico --}}
-                <div class="section-title">DATOS DEL PACIENTE</div>
-
-                <div class="patient-data-grid mb-4">
-                    <div class="row">
-                        <div class="col-md-8 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Paciente:</strong>
-                            <div class="underline-field no-select">
-                                {{ $orden->diagnostico?->paciente?->nombre ?? 'Paciente no disponible' }} 
-                                {{ $orden->diagnostico?->paciente?->apellidos ?? '' }}
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Fecha Diagnóstico:</strong>
-                            <div class="underline-field no-select">
-                                {{ \Carbon\Carbon::parse($orden->diagnostico?->created_at)->format('d/m/Y') ?? 'Fecha no disponible' }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-4 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Identidad:</strong>
-                            <div class="underline-field no-select">
-                                {{ $orden->diagnostico?->paciente?->identidad ?? 'N/D' }}
-                            </div>
-                        </div>
-                        <div class="col-md-2 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Edad:</strong>
-                            <div class="underline-field no-select">
-                                {{ $orden->diagnostico?->paciente?->fecha_nacimiento ? \Carbon\Carbon::parse($orden->diagnostico->paciente->fecha_nacimiento)->age . ' años' : 'N/D' }}
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Médico Solicitante:</strong>
-                            <div class="underline-field no-select">
-                                {{ $orden->diagnostico?->consulta?->medico?->nombre ?? '' }} 
-                                {{ $orden->diagnostico?->consulta?->medico?->apellidos ?? '' }}
-                            </div>
-                        </div>
-                    </div>
+            {{-- Datos del paciente / diagnóstico --}}
+            <h6 class="section-title">Datos del Paciente</h6>
+            <div class="row mb-3">
+                <div class="col-md-4"><strong>Nombre:</strong>
+                    @if ($orden->nombres || $orden->apellidos)
+                        {{ $orden->nombres }} {{ $orden->apellidos }}
+                    @elseif ($orden->pacienteClinica)
+                        {{ $orden->pacienteClinica->nombre }} {{ $orden->pacienteClinica->apellidos }}
+                    @elseif ($orden->pacienteRayosX)
+                        {{ $orden->pacienteRayosX->nombre }} {{ $orden->pacienteRayosX->apellidos }}
+                    @else
+                        N/A
+                    @endif
                 </div>
-            @else
-                <div class="alert alert-warning">
-                    No se encontró el diagnóstico asociado a esta orden.
+                <div class="col-md-3"><strong>Identidad:</strong>
+                    @if ($orden->identidad)
+                        {{ $orden->identidad }}
+                    @elseif ($orden->pacienteClinica)
+                        {{ $orden->pacienteClinica->identidad }}
+                    @elseif ($orden->pacienteRayosX)
+                        {{ $orden->pacienteRayosX->identidad }}
+                    @else
+                        N/A
+                    @endif
+                </div>
+                <div class="col-md-2"><strong>Edad:</strong> {{ $orden->edad ?? 'N/A' }}</div>
+                <div class="col-md-3"><strong>Fecha:</strong> {{ \Carbon\Carbon::parse($orden->fecha)->format('d/m/Y') }}</div>
+            </div>
+
+            @if($orden->diagnostico)
+                <div class="mb-3">
+                    <strong>Diagnóstico asociado:</strong> {{ $orden->diagnostico->descripcion ?? 'N/A' }}
                 </div>
             @endif
 
-            {{-- Exámenes seleccionados (checkboxes deshabilitados y marcados solo si están seleccionados) --}}
-            @php
-            $secciones = [
-                'Rayos X Cabeza' => [
-                    'craneo' => 'Cráneo',
-                    'waters' => 'Waters',
-                    'conductos_auditivos' => 'Conductos Auditivos',
-                    'cavum' => 'Cavum',
-                    'senos_paranasales' => 'Senos Paranasales',
-                    'silla_turca' => 'Silla Turca',
-                    'huesos_nasales' => 'Huesos Nasales',
-                    'atm_tm' => 'ATM - TM',
-                    'mastoides' => 'Mastoides',
-                    'mandibula' => 'Mandíbula',
-                ],
-                'Rayos X Tórax' => [
-                    'torax_pa' => 'Tórax PA',
-                    'torax_pa_lat' => 'Tórax PA Lateral',
-                    'costillas' => 'Costillas',
-                    'esternon' => 'Esternón',
-                ],
-                'Rayos X Abdomen' => [
-                    'abdomen_simple' => 'Abdomen Simple',
-                    'abdomen_agudo' => 'Abdomen Agudo',
-                ],
-                'Rayos X Extremidad Superior' => [
-                    'clavicula' => 'Clavícula',
-                    'hombro' => 'Hombro',
-                    'humero' => 'Húmero',
-                    'codo' => 'Codo',
-                    'antebrazo' => 'Antebrazo',
-                    'muneca' => 'Muñeca',
-                    'mano' => 'Mano',
-                ],
-                'Rayos X Extremidad Inferior' => [
-                    'cadera' => 'Cadera',
-                    'femur' => 'Fémur',
-                    'rodilla' => 'Rodilla',
-                    'tibia' => 'Tibia',
-                    'pie' => 'Pie',
-                    'calcaneo' => 'Calcáneo',
-                ],
-                'Rayos X Columna y Pelvis' => [
-                    'cervical' => 'Cervical',
-                    'dorsal' => 'Dorsal',
-                    'lumbar' => 'Lumbar',
-                    'sacro_coxis' => 'Sacro Coxis',
-                    'pelvis' => 'Pelvis',
-                    'escoliosis' => 'Escoliosis',
-                ],
-                'Rayos X Estudios Especiales' => [
-                    'arteriograma' => 'Arteriograma',
-                    'histerosalpingograma' => 'Histerosalpingograma',
-                    'colecistograma' => 'Colecistograma',
-                    'fistulograma' => 'Fistulograma',
-                    'artrograma' => 'Artrógama',
-                ],
-            ];
-            $examenesSeleccionados = $orden->examenes->pluck('examen')->toArray();
-            @endphp
+            @if($orden->datos_clinicos)
+                <div class="mb-3">
+                    <strong>Datos clínicos:</strong> {{ $orden->datos_clinicos }}
+                </div>
+            @endif
 
-            <div class="section-title">ESTUDIOS SOLICITADOS</div>
-
-            <div class="secciones-container">
-                @foreach($secciones as $titulo => $examenes)
-                    <div class="seccion">
-                        <div class="section-title">{{ $titulo }}</div>
-                        <div class="examenes-grid">
-                            @foreach($examenes as $key => $label)
-                                <label>
-                                    <input type="checkbox" disabled
-                                        @if(in_array($key, $examenesSeleccionados))
-                                            checked
-                                        @endif
-                                    >
-                                    {{ $label }}
-                                </label>
-                            @endforeach
+            {{-- Lista de exámenes --}}
+            <h6 class="section-title">Exámenes solicitados</h6>
+            <div class="row">
+                @forelse($orden->examenes as $examen)
+                    <div class="col-md-4 mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" checked disabled>
+                            <label class="form-check-label">{{ $examen->examen }}</label>
                         </div>
-                    </div>
-                @endforeach
-            </div>
+                        @php
+                            // Obtener nombre completo paciente para buscar descripción
+                            $pacienteNombre = trim(
+                                ($orden->nombres && $orden->apellidos)
+                                    ? $orden->nombres . ' ' . $orden->apellidos
+                                    : ($orden->pacienteClinica
+                                        ? $orden->pacienteClinica->nombre . ' ' . $orden->pacienteClinica->apellidos
+                                        : ($orden->pacienteRayosX
+                                            ? $orden->pacienteRayosX->nombre . ' ' . $orden->pacienteRayosX->apellidos
+                                            : '')
+                                    )
+                            );
 
-            <a href="{{ route('rayosx.index') }}" class="btn btn-success">
-                <i class="bi bi-arrow-left-circle"></i> Regresar
-            </a>
+                            $descripcion = DB::table('rayosx_descripciones')
+                                ->where('paciente', $pacienteNombre)
+                                ->where('examen', $examen->examen)
+                                ->value('descripcion');
+                        @endphp
+                        @if($descripcion)
+                            <div class="description-box">
+                                {{ $descripcion }}
+                            </div>
+                        @endif
+                    </div>
+                @empty
+                    <p class="text-muted">No hay exámenes registrados para esta orden.</p>
+                @endforelse
+            </div>
 
         </div>
     </div>
