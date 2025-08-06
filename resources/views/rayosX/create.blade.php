@@ -4,6 +4,7 @@
 
 <style>
     /* Estilos específicos para la sección paciente según tu última vista */
+    
     .section-title {
         font-weight: 600;
         font-size: 1.1rem;
@@ -106,151 +107,173 @@
     </div>
 @endif
 
-    {{-- Mostrar errores validación arriba --}}
-    @if ($errors->any())
-        <div id="backend-errors" class="alert alert-danger mb-4">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    {{-- Selección paciente con botón para crear paciente nuevo solo Rayos X --}}
-    <div class="mb-4 row align-items-center">
-        <label for="paciente_id" class="col-md-3 col-form-label fw-bold text-end">Seleccione Paciente</label>
-        <div class="col-md-6">
-            <div class="patient-select-wrapper">
-
-                <select id="paciente_id" name="seleccion" class="form-select" required>
-                    <option value="" selected disabled>-- Seleccione un paciente --</option>
-
-                    {{-- Pacientes Clínica --}}
-                    @foreach($pacientesClinica as $paciente)
-                        <option
-                            value="clinica-{{ $paciente->id }}"
-                            data-nombre="{{ $paciente->nombre }} {{ $paciente->apellidos }}"
-                            data-identidad="{{ $paciente->identidad }}"
-                            data-fecha_nacimiento="{{ $paciente->fecha_nacimiento }}"
-                            data-edad="{{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }}"
-                            data-datos_clinicos="{{ e($paciente->datos_clinicos ?? '') }}"
-                            {{ (old('seleccion') == "clinica-{$paciente->id}") ? 'selected' : '' }}
-                        >
-                            {{ $paciente->nombre }} {{ $paciente->apellidos }} - {{ $paciente->identidad }} (Clínica)
-                        </option>
-                    @endforeach
-
-                    {{-- Pacientes Rayos X --}}
-                    @foreach($pacientesRayosX as $paciente)
-                        <option
-                            value="rayosx-{{ $paciente->id }}"
-                            data-nombre="{{ $paciente->nombre }} {{ $paciente->apellidos }}"
-                            data-identidad="{{ $paciente->identidad }}"
-                            data-fecha_nacimiento="{{ $paciente->fecha_nacimiento }}"
-                            data-edad="{{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }}"
-                            data-datos_clinicos="{{ e($paciente->datos_clinicos ?? '') }}"
-                            {{ (old('seleccion') == "rayosx-{$paciente->id}") ? 'selected' : '' }}
-                        >
-                            {{ $paciente->nombre }} {{ $paciente->apellidos }} - {{ $paciente->identidad }} (Rayos X)
-                        </option>
-                    @endforeach
-                </select>
-
-                <a href="{{ route('pacientes.rayosx.create') }}" class="btn btn-outline-primary" title="Registrar paciente nuevo para Rayos X">
-                    Registrar Paciente
-                </a>
-            </div>
-        </div>
+{{-- Mostrar errores validación arriba --}}
+@if ($errors->any())
+    <div id="backend-errors" class="alert alert-danger mb-4">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
     </div>
+@endif
 
-    {{-- Datos del paciente como texto subrayado --}}
-    <div id="datosPaciente" class="patient-data-grid mb-4" style="display:none;">
-        <div class="section-title">DATOS DEL PACIENTE</div>
+{{-- Selección paciente con botón para crear paciente nuevo solo Rayos X --}}
+<div class="mb-4 row align-items-center">
+    <label for="paciente_id" class="col-md-3 col-form-label fw-bold text-end">Seleccione Paciente</label>
+    <div class="col-md-6">
+        <div class="patient-select-wrapper">
 
-        <div class="row">
-            <div class="col-md-6 mb-2 d-flex align-items-center">
-                <strong class="me-2">Nombre completo:</strong>
-                <div class="underline-field no-select" id="dp-nombre"></div>
-            </div>
-            <div class="col-md-6 mb-2 d-flex align-items-center">
-                <strong class="me-2">Identidad:</strong>
-                <div class="underline-field no-select" id="dp-identidad"></div>
-            </div>
-        </div>
+            <select id="paciente_id" name="seleccion" class="form-select" required>
+                <option value="" selected disabled>-- Seleccione un paciente --</option>
 
-        <div class="row">
-            <div class="col-md-4 mb-2 d-flex align-items-center">
-                <strong class="me-2">Edad:</strong>
-                <div class="underline-field no-select" id="dp-edad"></div>
-            </div>
-            <div class="col-md-4 mb-2 d-flex align-items-center">
-                <strong class="me-2">Fecha Nacimiento:</strong>
-                <div class="underline-field no-select" id="dp-fecha-nac"></div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Fecha de la orden (IMPORTANTE) --}}
-    <div class="mb-4 row align-items-center">
-        <label for="fecha" class="col-md-3 col-form-label fw-bold text-end">Fecha de la orden</label>
-        <div class="col-md-6">
-            <input type="date"
-                id="fecha"
-                name="fecha"
-                class="form-control @error('fecha') is-invalid @enderror"
-                value="{{ old('fecha', date('Y-m-d')) }}"
-                required>
-            @error('fecha')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
-    </div>
-
-    {{-- Datos clínicos (si vienen del paciente) --}}
-    <div class="mb-4 row align-items-center" id="datosClinicosContainer" style="display:none;">
-        <label for="datos_clinicos" class="col-md-3 col-form-label fw-bold text-end">Datos Clínicos</label>
-        <div class="col-md-6">
-            <textarea name="datos_clinicos" id="datos_clinicos" rows="3" class="form-control">{{ old('datos_clinicos') }}</textarea>
-        </div>
-    </div>
-
-    {{-- Sección de exámenes --}}
-    <div class="section-title">EXÁMENES</div>
-    <div class="row">
-        @foreach($examenes as $clave => $nombre)
-            <div class="col-md-3 mb-2">
-                <div class="form-check">
-                    <input
-                        class="form-check-input"
-                        type="checkbox"
-                        name="examenes[]"
-                        value="{{ $clave }}"
-                        id="examen_{{ $clave }}"
-                        {{ (is_array(old('examenes')) && in_array($clave, old('examenes'))) ? 'checked' : '' }}
+                {{-- Pacientes Clínica --}}
+                @foreach($pacientesClinica as $paciente)
+                    <option
+                        value="clinica-{{ $paciente->id }}"
+                        data-nombre="{{ $paciente->nombre }} {{ $paciente->apellidos }}"
+                        data-identidad="{{ $paciente->identidad }}"
+                        data-fecha_nacimiento="{{ $paciente->fecha_nacimiento }}"
+                        data-edad="{{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }}"
+                        data-datos_clinicos="{{ e($paciente->datos_clinicos ?? '') }}"
+                        {{ (old('seleccion') == "clinica-{$paciente->id}") ? 'selected' : '' }}
                     >
-                    <label class="form-check-label" for="examen_{{ $clave }}">
-                        {{ $nombre }}
-                    </label>
+                        {{ $paciente->nombre }} {{ $paciente->apellidos }} - {{ $paciente->identidad }} (Clínica)
+                    </option>
+                @endforeach
+
+                {{-- Pacientes Rayos X --}}
+                @foreach($pacientesRayosX as $paciente)
+                    <option
+                        value="rayosx-{{ $paciente->id }}"
+                        data-nombre="{{ $paciente->nombre }} {{ $paciente->apellidos }}"
+                        data-identidad="{{ $paciente->identidad }}"
+                        data-fecha_nacimiento="{{ $paciente->fecha_nacimiento }}"
+                        data-edad="{{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }}"
+                        data-datos_clinicos="{{ e($paciente->datos_clinicos ?? '') }}"
+                        {{ (old('seleccion') == "rayosx-{$paciente->id}") ? 'selected' : '' }}
+                    >
+                        {{ $paciente->nombre }} {{ $paciente->apellidos }} - {{ $paciente->identidad }} (Rayos X)
+                    </option>
+                @endforeach
+            </select>
+
+            <a href="{{ route('pacientes.rayosx.create') }}" class="btn btn-outline-primary" title="Registrar paciente nuevo para Rayos X">
+                Registrar Paciente
+            </a>
+        </div>
+    </div>
+</div>
+
+{{-- Datos del paciente como texto subrayado --}}
+<div id="datosPaciente" class="patient-data-grid mb-4" style="display:none;">
+    <div class="section-title">DATOS DEL PACIENTE</div>
+
+    <div class="row">
+        <div class="col-md-6 mb-2 d-flex align-items-center">
+            <strong class="me-2">Nombre completo:</strong>
+            <div class="underline-field no-select" id="dp-nombre"></div>
+        </div>
+        <div class="col-md-6 mb-2 d-flex align-items-center">
+            <strong class="me-2">Identidad:</strong>
+            <div class="underline-field no-select" id="dp-identidad"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-2 d-flex align-items-center">
+            <strong class="me-2">Edad:</strong>
+            <div class="underline-field no-select" id="dp-edad"></div>
+        </div>
+        <div class="col-md-4 mb-2 d-flex align-items-center">
+            <strong class="me-2">Fecha Nacimiento:</strong>
+            <div class="underline-field no-select" id="dp-fecha-nac"></div>
+        </div>
+    </div>
+</div>
+
+{{-- Fecha de la orden (IMPORTANTE) --}}
+<div class="mb-4 row align-items-center">
+    <label for="fecha" class="col-md-3 col-form-label fw-bold text-end">Fecha de la orden</label>
+    <div class="col-md-6">
+        <input type="date"
+            id="fecha"
+            name="fecha"
+            class="form-control @error('fecha') is-invalid @enderror"
+            value="{{ old('fecha', date('Y-m-d')) }}"
+            required>
+        @error('fecha')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+</div>
+
+{{-- Datos clínicos (si vienen del paciente) --}}
+<div class="mb-4 row align-items-center" id="datosClinicosContainer" style="display:none;">
+    <label for="datos_clinicos" class="col-md-3 col-form-label fw-bold text-end">Datos Clínicos</label>
+    <div class="col-md-6">
+        <textarea name="datos_clinicos" id="datos_clinicos" rows="3" class="form-control">{{ old('datos_clinicos') }}</textarea>
+    </div>
+</div>
+
+{{-- Sección de exámenes --}}
+<div class="section-title d-flex justify-content-between align-items-center">
+    <span>EXÁMENES</span>
+
+    {{-- Botón Registrar a la par (puedes moverlo donde quieras) --}}
+    <button type="submit" class="btn btn-primary btn-sm">
+        Registrar Orden
+    </button>
+</div>
+
+<div class="container px-5">
+    <div class="row">
+        @foreach($secciones as $titulo => $examenesSeccion)
+            <div class="col-md-3 mb-4">
+                <div class="seccion h-100">
+                    <h5 class="fw-bold text-primary">{{ $titulo }}</h5>
+                    <div class="row">
+                        @foreach($examenesSeccion as $clave)
+                            <div class="col-12 mb-2">
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        name="examenes[]"
+                                        value="{{ $clave }}"
+                                        id="examen_{{ $clave }}"
+                                        {{ (is_array(old('examenes')) && in_array($clave, old('examenes'))) ? 'checked' : '' }}
+                                    >
+                                    <label class="form-check-label" for="examen_{{ $clave }}">
+                                        {{ $examenes[$clave] ?? ucfirst(str_replace('_', ' ', $clave)) }}
+                                    </label>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         @endforeach
     </div>
+</div>
 
-    {{-- Botones --}}
-    <div class="d-flex justify-content-center gap-3 mt-4">
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-save"></i> Guardar Orden
-        </button>
 
-        <button type="button" id="btnLimpiar" class="btn btn-warning">
-            <i class="bi bi-trash"></i> Limpiar
-        </button>
 
-        <a href="{{ route('rayosx.index') }}" class="btn btn-success">
-            <i class="bi bi-arrow-left-circle"></i> Regresar
-        </a>
-    </div>
+{{-- Botones --}}
+<div class="d-flex justify-content-center gap-3 mt-4">
+    <button type="submit" class="btn btn-primary">
+        <i class="bi bi-save"></i> Guardar Orden
+    </button>
+
+    <button type="button" id="btnLimpiar" class="btn btn-warning">
+        <i class="bi bi-trash"></i> Limpiar
+    </button>
+
+    <a href="{{ route('rayosx.index') }}" class="btn btn-success">
+        <i class="bi bi-arrow-left-circle"></i> Regresar
+    </a>
+</div>
+
 
 </form>
 

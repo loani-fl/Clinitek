@@ -17,6 +17,8 @@ class RayosxOrder extends Model
     'medico_solicitante',
     'paciente_tipo',
     'estado',
+      'medico_radiologo_id',
+        'medico_analista_id',
 ];
 
 
@@ -72,6 +74,17 @@ class RayosxOrder extends Model
 
         return $examenes;
     }
+    public function medicoAnalista()
+    {
+        return $this->belongsTo(Medico::class, 'medico_analista_id');
+    }
+
+    public function medicoRadiologo()
+    {
+        return $this->belongsTo(Medico::class, 'medico_radiologo_id');
+    }
+
+  
 
     
 }

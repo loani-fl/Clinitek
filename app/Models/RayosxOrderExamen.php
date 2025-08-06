@@ -12,6 +12,10 @@ class RayosxOrderExamen extends Model
     protected $fillable = [
         'rayosx_order_id',
         'examen',
+        'examen_codigo',
+        'descripcion',
+        'imagen_path',
+
     ];
 
     public function orden()

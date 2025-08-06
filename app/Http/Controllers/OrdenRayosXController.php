@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Medico;
+use App\Models\RayosxOrderExamen;
 use App\Models\Paciente;
 use App\Models\Diagnostico;
 use App\Models\RayosxOrder;
-use App\Models\RayosxOrderExamen;
+use Illuminate\Support\Facades\Storage;
 use App\Models\PacienteRayosX;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -30,63 +31,94 @@ class OrdenRayosXController extends Controller
      * Mostrar formulario de creación.
      */
     public function create(Request $request)
-    {
-        $pacientesClinica = Paciente::orderBy('nombre')->get();
-        $pacientesRayosX = PacienteRayosX::orderBy('nombre')->get();
-        $diagnosticos = Diagnostico::orderBy('id','desc')->get();
+{
+    $pacientesClinica = Paciente::orderBy('nombre')->get();
+    $pacientesRayosX = PacienteRayosX::orderBy('nombre')->get();
+    $diagnosticos = Diagnostico::orderBy('id', 'desc')->get();
 
-        $examenes = [
-            'craneo' => 'Cráneo',
-            'waters' => 'Waters',
-            'conductos_auditivos' => 'Conductos Auditivos',
-            'cavum' => 'Cavum',
-            'senos_paranasales' => 'Senos Paranasales',
-            'silla_turca' => 'Silla Turca',
-            'huesos_nasales' => 'Huesos Nasales',
-            'atm_tm' => 'ATM - TM',
-            'mastoides' => 'Mastoides',
-            'mandibula' => 'Mandíbula',
-            'torax_pa' => 'Tórax PA',
-            'torax_pa_lat' => 'Tórax PA Lateral',
-            'costillas' => 'Costillas',
-            'esternon' => 'Esternón',
-            'abdomen_simple' => 'Abdomen Simple',
-            'abdomen_agudo' => 'Abdomen Agudo',
-            'clavicula' => 'Clavícula',
-            'hombro' => 'Hombro',
-            'humero' => 'Húmero',
-            'codo' => 'Codo',
-            'antebrazo' => 'Antebrazo',
-            'muneca' => 'Muñeca',
-            'mano' => 'Mano',
-            'cadera' => 'Cadera',
-            'femur' => 'Fémur',
-            'rodilla' => 'Rodilla',
-            'tibia' => 'Tibia',
-            'pie' => 'Pie',
-            'calcaneo' => 'Calcáneo',
-            'cervical' => 'Cervical',
-            'dorsal' => 'Dorsal',
-            'lumbar' => 'Lumbar',
-            'sacro_coxis' => 'Sacro Coxis',
-            'pelvis' => 'Pelvis',
-            'escoliosis' => 'Escoliosis',
-            'arteriograma' => 'Arteriograma',
-            'histerosalpingograma' => 'Histerosalpingograma',
-            'colecistograma' => 'Colecistograma',
-            'fistulograma' => 'Fistulograma',
-            'artrograma' => 'Artrógama',
-        ];
+    // Define las secciones con los exámenes agrupados
+    $secciones = [
+        'CABEZA' => [
+            'craneo', 'waters', 'conductos_auditivos', 'cavum',
+            'senos_paranasales', 'silla_turca', 'huesos_nasales',
+            'atm_tm', 'mastoides', 'mandibula',
+        ],
+        'TÓRAX' => [
+            'torax_pa', 'torax_pa_lat', 'costillas', 'esternon',
+        ],
+        'ABDOMEN' => [
+            'abdomen_simple', 'abdomen_agudo',
+        ],
+        'EXTREMIDAD SUPERIOR' => [
+            'clavicula', 'hombro', 'humero', 'codo',
+            'antebrazo', 'muneca', 'mano',
+        ],
+        'EXTREMIDAD INFERIOR' => [
+            'cadera', 'femur', 'rodilla', 'tibia',
+            'pie', 'calcaneo',
+        ],
+        'COLUMNA Y PELVIS' => [
+            'cervical', 'dorsal', 'lumbar', 'sacro_coxis', 'pelvis', 'escoliosis',
+        ],
+        'ESTUDIOS ESPECIALES' => [
+            'arteriograma', 'histerosalpingograma', 'colecistograma', 'fistulograma', 'artrograma',
+        ],
+    ];
 
-        return view('rayosX.create', [
-            'pacientesClinica' => $pacientesClinica,
-            'pacientesRayosX' => $pacientesRayosX,
-            'diagnosticos' => $diagnosticos,
-            'seleccion' => $request->query('seleccion'),
-            'examenes' => $examenes,
-            'paciente_tipo' => null, // corregido para evitar variable no definida
-        ]);
-    }
+    $examenes = [
+        'craneo' => 'Cráneo',
+        'waters' => 'Waters',
+        'conductos_auditivos' => 'Conductos Auditivos',
+        'cavum' => 'Cavum',
+        'senos_paranasales' => 'Senos Paranasales',
+        'silla_turca' => 'Silla Turca',
+        'huesos_nasales' => 'Huesos Nasales',
+        'atm_tm' => 'ATM - TM',
+        'mastoides' => 'Mastoides',
+        'mandibula' => 'Mandíbula',
+        'torax_pa' => 'Tórax PA',
+        'torax_pa_lat' => 'Tórax PA Lateral',
+        'costillas' => 'Costillas',
+        'esternon' => 'Esternón',
+        'abdomen_simple' => 'Abdomen Simple',
+        'abdomen_agudo' => 'Abdomen Agudo',
+        'clavicula' => 'Clavícula',
+        'hombro' => 'Hombro',
+        'humero' => 'Húmero',
+        'codo' => 'Codo',
+        'antebrazo' => 'Antebrazo',
+        'muneca' => 'Muñeca',
+        'mano' => 'Mano',
+        'cadera' => 'Cadera',
+        'femur' => 'Fémur',
+        'rodilla' => 'Rodilla',
+        'tibia' => 'Tibia',
+        'pie' => 'Pie',
+        'calcaneo' => 'Calcáneo',
+        'cervical' => 'Cervical',
+        'dorsal' => 'Dorsal',
+        'lumbar' => 'Lumbar',
+        'sacro_coxis' => 'Sacro Coxis',
+        'pelvis' => 'Pelvis',
+        'escoliosis' => 'Escoliosis',
+        'arteriograma' => 'Arteriograma',
+        'histerosalpingograma' => 'Histerosalpingograma',
+        'colecistograma' => 'Colecistograma',
+        'fistulograma' => 'Fistulograma',
+        'artrograma' => 'Artrógama',
+    ];
+
+    return view('rayosX.create', [
+        'pacientesClinica' => $pacientesClinica,
+        'pacientesRayosX' => $pacientesRayosX,
+        'diagnosticos' => $diagnosticos,
+        'seleccion' => $request->query('seleccion'),
+        'examenes' => $examenes,
+        'secciones' => $secciones,
+        'paciente_tipo' => null,
+    ]);
+}
+
 
     /**
      * Guardar nueva orden.
@@ -188,7 +220,8 @@ class OrdenRayosXController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('rayosx.index')->with('success', 'Orden creada correctamente.');
+return redirect()->route('rayosx.analisis', $orden->id)->with('success', 'Orden creada correctamente, ahora puede analizarla.');
+
         } catch (\Throwable $th) {
             DB::rollBack();
             return back()->withInput()->with('error', 'Error al guardar la orden: ' . $th->getMessage());
@@ -371,4 +404,102 @@ class OrdenRayosXController extends Controller
 
         return redirect()->route('rayosx.index')->with('success', 'Orden marcada como realizada.');
     }
+
+public function analisis(RayosxOrder $orden)
+{
+    $orden->load(['examenes', 'pacienteClinica', 'pacienteRayosX']);
+    $medicosRadiologos = Medico::where('especialidad', 'Radiología')->get();
+
+    // Mismos nombres legibles que en create()
+    $examenes = [
+        'craneo' => 'Cráneo',
+        'waters' => 'Waters',
+        'conductos_auditivos' => 'Conductos Auditivos',
+        'cavum' => 'Cavum',
+        'senos_paranasales' => 'Senos Paranasales',
+        'silla_turca' => 'Silla Turca',
+        'huesos_nasales' => 'Huesos Nasales',
+        'atm_tm' => 'ATM - TM',
+        'mastoides' => 'Mastoides',
+        'mandibula' => 'Mandíbula',
+        'torax_pa' => 'Tórax PA',
+        'torax_pa_lat' => 'Tórax PA Lateral',
+        'costillas' => 'Costillas',
+        'esternon' => 'Esternón',
+        'abdomen_simple' => 'Abdomen Simple',
+        'abdomen_agudo' => 'Abdomen Agudo',
+        'clavicula' => 'Clavícula',
+        'hombro' => 'Hombro',
+        'humero' => 'Húmero',
+        'codo' => 'Codo',
+        'antebrazo' => 'Antebrazo',
+        'muneca' => 'Muñeca',
+        'mano' => 'Mano',
+        'cadera' => 'Cadera',
+        'femur' => 'Fémur',
+        'rodilla' => 'Rodilla',
+        'tibia' => 'Tibia',
+        'pie' => 'Pie',
+        'calcaneo' => 'Calcáneo',
+        'cervical' => 'Cervical',
+        'dorsal' => 'Dorsal',
+        'lumbar' => 'Lumbar',
+        'sacro_coxis' => 'Sacro Coxis',
+        'pelvis' => 'Pelvis',
+        'escoliosis' => 'Escoliosis',
+        'arteriograma' => 'Arteriograma',
+        'histerosalpingograma' => 'Histerosalpingograma',
+        'colecistograma' => 'Colecistograma',
+        'fistulograma' => 'Fistulograma',
+        'artrograma' => 'Artrógama',
+    ];
+
+    return view('rayosx.analisis', compact('orden', 'medicosRadiologos', 'examenes'));
+}
+
+
+
+
+public function guardarAnalisis(Request $request, RayosxOrder $orden)
+{
+    $validated = $request->validate([
+        'medico_analista_id' => 'required|exists:medicos,id',
+        'examenes' => 'nullable|array',
+        'examenes.*.descripcion' => 'nullable|string|max:10000',
+        'examenes.*.imagen' => 'nullable|image|max:5120', // 5MB max
+    ]);
+
+    // Actualizar médico analista
+    $orden->medico_analista_id = $validated['medico_analista_id'];
+    $orden->save();
+
+    if (!empty($validated['examenes'])) {
+        foreach ($validated['examenes'] as $examenId => $datos) {
+            $examen = $orden->examenes()->find($examenId);
+            if (!$examen) continue;
+
+            if (isset($datos['descripcion'])) {
+                $examen->descripcion = $datos['descripcion'];
+            }
+
+            if (isset($datos['imagen']) && $datos['imagen'] instanceof \Illuminate\Http\UploadedFile) {
+                // Elimina imagen anterior si existe
+                if ($examen->imagen) {
+                    Storage::disk('public')->delete($examen->imagen);
+                }
+
+                // Guardar nueva imagen
+                $ruta = $datos['imagen']->store('rayosx_examenes', 'public');
+                $examen->imagen = $ruta;
+            }
+
+            $examen->save();
+        }
+    }
+
+    return redirect()->route('rayosx.show', $orden->id)
+                     ->with('success', 'Análisis guardado correctamente.');
+}
+
+
 }

@@ -178,3 +178,13 @@ Route::post('pacientes/rayosx/store', [PacienteRayosXController::class, 'store']
 
 
 Route::post('/rayosx/descripcion/guardar', [OrdenRayosXController::class, 'guardarDescripcion'])->name('rayosx.descripcion.guardar');
+
+//ANALISIS ;
+
+Route::get('rayosx/{orden}/analisis', [OrdenRayosXController::class, 'analisis'])->name('rayosx.analisis');
+Route::post('rayosx/{orden}/analisis', [OrdenRayosXController::class, 'guardarAnalisis'])->name('rayosx.analisis.guardar');
+Route::put('/rayosx/{orden}/guardar-analisis', [OrdenRayosXController::class, 'guardarAnalisis'])->name('rayosx.guardarAnalisis');
+
+
+
+Route::get('/rayosx/{id}/analizar', [OrdenRayosXController::class, 'analizar'])->name('rayosx.analizar');
