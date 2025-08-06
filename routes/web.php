@@ -121,6 +121,8 @@ Route::prefix('rayosx')->group(function () {
     Route::get('/create', [OrdenRayosXController::class, 'create'])->name('rayosx.create');
     Route::post('/store', [OrdenRayosXController::class, 'store'])->name('rayosx.store');
     Route::get('/{orden}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
+
+   Route::patch('/{orden}/realizar', [OrdenRayosXController::class, 'marcarRealizado'])->name('rayosx.marcarRealizado');
 });
 
 // Rutas para pago

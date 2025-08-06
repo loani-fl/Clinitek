@@ -47,6 +47,7 @@ class OrdenRayosXController extends Controller
         $orden = RayosxOrder::create([
             'diagnostico_id' => $request->diagnostico_id,
             'fecha' => now(),
+             'estado' => 'Pendiente', // 👈 Siempre pendiente al crear
         ]);
 
         foreach (array_keys($request->examenes) as $examenKey) {
@@ -72,4 +73,12 @@ class OrdenRayosXController extends Controller
 
         return view('rayosX.show', compact('orden', 'examenesSeleccionados', 'diagnosticos'));
     }
+    public function marcarRealizado(RayosxOrder $orden)
+{
+    $orden->estado = 'Realizado';
+    $orden->save();
+
+    return redirect()->route('rayosx.index')->with('success', 'Orden marcada como realizada.');
+}
+
 }

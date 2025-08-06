@@ -8,7 +8,7 @@ class RayosxOrder extends Model
 {
     protected $fillable = [
         'diagnostico_id', 'fecha', 'edad', 'identidad',
-        'nombres', 'apellidos', 'medico_solicitante'
+        'nombres', 'apellidos', 'medico_solicitante', 'estado'
     ];
 
     public function diagnostico()
