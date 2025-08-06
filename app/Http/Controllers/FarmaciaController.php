@@ -63,6 +63,7 @@ class FarmaciaController extends Controller
                 'required',
                 'string',
                 'max:255',
+                'regex:/^([^,]+,\s*){2}[^,]+$/',
             ],
             'telefono' => [
                 'required',
@@ -110,6 +111,8 @@ class FarmaciaController extends Controller
             'ubicacion.required' => 'La ubicación es obligatoria.',
             'ubicacion.string' => 'La ubicación debe ser texto válido.',
             'ubicacion.max' => 'La ubicación no debe superar los 255 caracteres.',
+            'ubicacion.regex' => 'Debe incluir ciudad, departamento y país',
+
 
             // TELÉFONO
             'telefono.required' => 'El teléfono es obligatorio.',

@@ -141,7 +141,7 @@
                         maxlength="255"
                         class="form-control @error('ubicacion') is-invalid @enderror"
                         style="resize: vertical;"
-                        placeholder="Dirección o referencia">{{ old('ubicacion') }}</textarea>
+                        placeholder="Ciudad, Departamento, País">{{ old('ubicacion') }}</textarea>
                     @error('ubicacion')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
