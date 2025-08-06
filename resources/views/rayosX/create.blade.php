@@ -4,7 +4,6 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
-    /* ... (tu CSS actual) ... */
     body {
         background-color: #e8f4fc;
         margin: 0;
@@ -59,7 +58,7 @@
         margin-bottom: 2rem;
     }
     .patient-data-grid strong {
-        color:rgb(3, 12, 22);
+        color: rgb(3, 12, 22);
         font-weight: 600;
     }
     .underline-field {
@@ -152,6 +151,67 @@
     .d-flex.justify-content-center.gap-3.mt-4 {
         margin-top: 2rem !important;
     }
+
+    /* Botón para registrar paciente nuevo junto al select */
+    .patient-select-wrapper {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    /* Select más grande y con mejor padding */
+.select-large {
+    min-width: 460px;      /* ancho mayor */
+    max-width: 720px;      /* evita que se extienda demasiado */
+    width: 100%;           /* ocupa el espacio disponible dentro del contenedor flexible */
+    font-size: 1rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(0,0,0,0.12);
+    box-shadow: 0 2px 6px rgba(3, 12, 22, 0.04);
+}
+
+/* Wrapper: hace una fila con gap y que el select ocupe todo el espacio restante */
+.patient-select-wrapper {
+    display: flex;
+    gap: 0.6rem;
+    width: 50%;
+    align-items: center;
+}
+
+/* Botón estilizado con gradiente y sombra */
+.boton-rayos {
+    background: linear-gradient(90deg, #0d6efd 0%, #0a58ca 100%);
+    color: #fff;
+    border: none;
+    padding: 0.45rem 0.9rem;
+    border-radius: 0.6rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease;
+    box-shadow: 0 6px 18px rgba(13, 110, 253, 0.14);
+}
+
+/* Hover / focus */
+.boton-rayos:hover, .boton-rayos:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(13, 110, 253, 0.18);
+    text-decoration: none;
+    color: #fff;
+}
+
+/* Si quieres un estado deshabilitado visual */
+.boton-rayos.boton-inactivo {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* Ajustes al icono */
+.icon-rayos svg { display:block; margin-right:0.15rem; }
+
 </style>
 
 <div class="content-wrapper">
@@ -189,42 +249,83 @@
                 </div>
             @endif
 
-       
-
             <form method="POST" action="{{ route('rayosx.store') }}" id="formOrden">
                 @csrf
-<div class="mb-4 row align-items-center">
-    <label for="diagnostico_id" class="col-md-3 col-form-label fw-bold text-end">
-        Seleccione Diagnóstico
-    </label>
-    <div class="col-md-5">
-        @if($diagnosticos->isEmpty())
-            <div class="alert alert-warning" role="alert">
-                No hay diagnósticos realizados disponibles.
-            </div>
-        @else
-            <select name="diagnostico_id" id="diagnostico_id" class="form-select form-select-sm" required>
-                <option value="" disabled {{ old('diagnostico_id') ? '' : 'selected' }}>-- Seleccione un diagnóstico --</option>
-                @foreach($diagnosticos as $diagnostico)
-                    @if($diagnostico->consulta)
-                        <option value="{{ $diagnostico->id }}"
-                            data-nombre="{{ $diagnostico->paciente->nombre }} {{ $diagnostico->paciente->apellidos }}"
-                            data-identidad="{{ $diagnostico->paciente->identidad }}"
-                            data-fecha="{{ \Carbon\Carbon::parse($diagnostico->created_at)->format('d/m/Y') }}"
-                            data-edad="{{ \Carbon\Carbon::parse($diagnostico->paciente->fecha_nacimiento)->age }}"
-                            data-medico="{{ $diagnostico->consulta->medico->nombre ?? '' }} {{ $diagnostico->consulta->medico->apellidos ?? '' }}"
-                            {{ old('diagnostico_id') == $diagnostico->id ? 'selected' : '' }}>
-                            {{ $diagnostico->paciente->nombre }} {{ $diagnostico->paciente->apellidos }} - Diagnóstico #{{ $diagnostico->id }}
-                        </option>
-                    @endif
-                @endforeach
-            </select>
-        @endif
-    </div>
+                
+                {{-- Selección paciente con botón para crear paciente nuevo solo Rayos X --}}
+                <div class="mb-4 row align-items-center">
+                    <label for="paciente_id" class="col-md-3 col-form-label fw-bold text-end">
+                        Seleccione Paciente
+                    </label>
+                    <div class="col-md-5">
+                        @php
+                            $hasAny = (isset($pacientesClinica) && $pacientesClinica->isNotEmpty()) || (isset($pacientesRayosX) && $pacientesRayosX->isNotEmpty());
+                        @endphp
+
+                        @if(!$hasAny)
+                            <div class="alert alert-warning" role="alert">
+                                No hay pacientes disponibles.
+                            </div>
+                        @else
+                            <div class="patient-select-wrapper">
+             {{-- $pacientesClinica y $pacientesRayosX vienen del controlador --}}
+<div class="patient-select-wrapper" style="align-items:center; width:80%;">
+    {{-- Select grande --}}
+    <select name="seleccion" id="paciente_id" class="form-select select-large" required>
+        <option value="" disabled {{ old('seleccion') || ($seleccion ?? null) ? '' : 'selected' }}>
+            -- Seleccione un paciente o diagnóstico --
+        </option>
+
+        <optgroup label="Pacientes internos">
+            @foreach($pacientesClinica as $p)
+                @php $val = 'clinica-' . $p->id; @endphp
+                <option value="{{ $val }}"
+                    data-identidad="{{ $p->identidad }}"
+                    data-fecha_nacimiento="{{ $p->fecha_nacimiento }}"
+                    {{ (old('seleccion') == $val || (isset($seleccion) && $seleccion == $val)) ? 'selected' : '' }}>
+                    {{ $p->nombre }} {{ $p->apellidos }} - {{ $p->identidad }}
+                </option>
+            @endforeach
+        </optgroup>
+
+        <optgroup label="Pacientes externos">
+            @foreach($pacientesRayosX as $p)
+                @php $val = 'rayosx-' . $p->id; @endphp
+                <option value="{{ $val }}"
+                    data-identidad="{{ $p->identidad }}"
+                    data-fecha_nacimiento="{{ $p->fecha_nacimiento }}"
+                    {{ (old('seleccion') == $val || (isset($seleccion) && $seleccion == $val)) ? 'selected' : '' }}>
+                    {{ $p->nombre }} {{ $p->apellidos }} - {{ $p->identidad }} (externo)
+                </option>
+            @endforeach
+        </optgroup>
+    </select>
+
+    {{-- Botón bonito a la derecha (alineado) --}}
+    <a href="{{ route('pacientes.rayosx.create') }}"
+       class="btn boton-rayos d-inline-flex align-items-center gap-2 shadow-sm"
+       title="Registrar paciente nuevo para Rayos X">
+        {{-- Ícono SVG estilizado tipo rayos X --}}
+        <span class="icon-rayos" aria-hidden="true" style="display:inline-flex;align-items:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- simple stylized 'ray' / detector figure -->
+                <path d="M3 6 L21 6" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M6 10 L18 4" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M6 14 L18 20" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+                <circle cx="8" cy="8" r="1.2" fill="white"/>
+                <circle cx="16" cy="16" r="1.2" fill="white"/>
+            </svg>
+        </span>
+        <span>Registrar Paciente</span>
+    </a>
 </div>
 
+                            </div>
+                        @endif
+                    </div>
+                </div>
 
-                {{-- Datos dinámicos del paciente y diagnóstico --}}
+                {{-- Datos dinámicos del paciente --}}
                 <div class="section-title">DATOS DEL PACIENTE </div>
 
                 <div class="patient-data-grid mb-4" id="datosPaciente" style="display:none;">
@@ -234,8 +335,8 @@
                             <div class="underline-field no-select" id="pacienteNombre"></div>
                         </div>
                         <div class="col-md-4 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Fecha Diagnóstico:</strong>
-                            <div class="underline-field no-select" id="fechaDiagnostico"></div>
+                            <strong class="me-2">Fecha Nacimiento:</strong>
+                            <div class="underline-field no-select" id="fechaNacimiento"></div>
                         </div>
                     </div>
 
@@ -244,28 +345,40 @@
                             <strong class="me-2">Identidad:</strong>
                             <div class="underline-field no-select" id="pacienteIdentidad"></div>
                         </div>
-                        <div class="col-md-2 mb-2 d-flex align-items-center">
+                          <div class="col-md-2 mb-2 d-flex align-items-center">
                             <strong class="me-2">Edad:</strong>
                             <div class="underline-field no-select" id="pacienteEdad"></div>
-                        </div>
-                        <div class="col-md-6 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Médico Solicitante:</strong>
-                            <div class="underline-field no-select" id="medicoSolicitante"></div>
                         </div>
                     </div>
                 </div>
 
-<div id="mensajesEmergentes" style="margin-top: 1rem; min-height: 40px;">
-    @if ($errors->any())
-        <div class="alert-custom alert-error" id="erroresLaravel">
-            <ul style="margin: 0; padding-left: 1.2rem;">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+                <div id="mensajesEmergentes" style="margin-top: 1rem; min-height: 40px;">
+                    @if ($errors->any())
+                        <div class="alert-custom alert-error" id="erroresLaravel">
+                            <ul style="margin: 0; padding-left: 1.2rem;">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="mb-4 row align-items-center">
+    <label for="fecha" class="col-md-3 col-form-label fw-bold text-end">Fecha de la orden</label>
+    <div class="col-md-5">
+        <input type="date" 
+               id="fecha" 
+               name="fecha" 
+               class="form-control @error('fecha') is-invalid @enderror" 
+               value="{{ old('fecha') }}" 
+               required>
+        @error('fecha')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
 </div>
+
 
                 {{-- Secciones con checkboxes para estudios de Rayos X --}}
                 @php
@@ -355,10 +468,9 @@
                         <i class="bi bi-trash"></i> Limpiar
                     </button>
 
-                   <a href="{{ route('rayosx.index') }}" class="btn btn-success">
-    <i class="bi bi-arrow-left-circle"></i> Regresar
-</a>
-
+                    <a href="{{ route('rayosx.index') }}" class="btn btn-success">
+                        <i class="bi bi-arrow-left-circle"></i> Regresar
+                    </a>
                 </div>
             </form>
         </div>
@@ -375,7 +487,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnLimpiar = document.getElementById('btnLimpiar');
     const checkboxes = document.querySelectorAll('input[type="checkbox"][name^="examenes"]');
     const form = document.getElementById('formOrden');
-    const selectDiagnostico = document.getElementById('diagnostico_id');
+    const selectPaciente = document.getElementById('paciente_id');
     const mensajesContainer = document.getElementById('mensajesEmergentes');
 
     btnLimpiar.addEventListener('click', () => {
@@ -383,22 +495,32 @@ document.addEventListener('DOMContentLoaded', function() {
         limpiarMensajes();
     });
 
-    // Mostrar datos del diagnóstico seleccionado
+    // Mostrar datos del paciente seleccionado
     const datosDiv = document.getElementById('datosPaciente');
     const pacienteNombre = document.getElementById('pacienteNombre');
     const pacienteIdentidad = document.getElementById('pacienteIdentidad');
-    const fechaDiagnostico = document.getElementById('fechaDiagnostico');
+    const fechaNacimiento = document.getElementById('fechaNacimiento');
     const pacienteEdad = document.getElementById('pacienteEdad');
-    const medicoSolicitante = document.getElementById('medicoSolicitante');
 
-    selectDiagnostico.addEventListener('change', function() {
+    function calcularEdad(fecha) {
+        const hoy = new Date();
+        const nacimiento = new Date(fecha);
+        let edad = hoy.getFullYear() - nacimiento.getFullYear();
+        const m = hoy.getMonth() - nacimiento.getMonth();
+        if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
+            edad--;
+        }
+        return edad;
+    }
+
+    selectPaciente.addEventListener('change', function() {
         const option = this.options[this.selectedIndex];
-        if(this.value){
-            pacienteNombre.textContent = option.getAttribute('data-nombre');
+        if (this.value) {
+            pacienteNombre.textContent = option.text;
             pacienteIdentidad.textContent = option.getAttribute('data-identidad');
-            fechaDiagnostico.textContent = option.getAttribute('data-fecha');
-            pacienteEdad.textContent = option.getAttribute('data-edad') + ' años';
-            medicoSolicitante.textContent = option.getAttribute('data-medico');
+            const fechaNac = option.getAttribute('data-fecha_nacimiento');
+            fechaNacimiento.textContent = fechaNac ? new Date(fechaNac).toLocaleDateString() : '';
+            pacienteEdad.textContent = fechaNac ? calcularEdad(fechaNac) + ' años' : '';
             datosDiv.style.display = 'block';
         } else {
             datosDiv.style.display = 'none';
@@ -406,15 +528,10 @@ document.addEventListener('DOMContentLoaded', function() {
         limpiarMensajes();
     });
 
-    // Cargar datos paciente automáticamente si hay diagnóstico seleccionado al cargar la página
-    if (selectDiagnostico.value) {
-        const option = selectDiagnostico.options[selectDiagnostico.selectedIndex];
-        pacienteNombre.textContent = option.getAttribute('data-nombre');
-        pacienteIdentidad.textContent = option.getAttribute('data-identidad');
-        fechaDiagnostico.textContent = option.getAttribute('data-fecha');
-        pacienteEdad.textContent = option.getAttribute('data-edad') + ' años';
-        medicoSolicitante.textContent = option.getAttribute('data-medico');
-        datosDiv.style.display = 'block';
+    // Si hay paciente seleccionado al cargar, mostrar sus datos
+    if (selectPaciente.value) {
+        const event = new Event('change');
+        selectPaciente.dispatchEvent(event);
     }
 
     // Función para mostrar mensajes en el div mensajesEmergentes
@@ -455,10 +572,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         limpiarMensajes();
 
-        if (!selectDiagnostico.value) {
+        if (!selectPaciente.value) {
             e.preventDefault();
-            mostrarMensaje('Debe seleccionar un diagnóstico antes de guardar.', 'error');
-            selectDiagnostico.focus();
+            mostrarMensaje('Debe seleccionar un paciente antes de guardar.', 'error');
+            selectPaciente.focus();
             return;
         }
         if (checkedCount === 0) {
@@ -473,22 +590,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-});
-
- document.addEventListener('DOMContentLoaded', function() {
-        const erroresDiv = document.getElementById('erroresLaravel');
-        if (erroresDiv) {
-            // Mostrar el div y luego ocultarlo después de 4 segundos (4000 ms)
+    // Desvanecer mensajes de error de Laravel después de 4 segundos
+    const erroresDiv = document.getElementById('erroresLaravel');
+    if (erroresDiv) {
+        setTimeout(() => {
+            erroresDiv.style.transition = 'opacity 0.7s ease';
+            erroresDiv.style.opacity = '0';
             setTimeout(() => {
-                // Opcional: animación para ocultar (desvanecer)
-                erroresDiv.style.transition = 'opacity 0.7s ease';
-                erroresDiv.style.opacity = '0';
-                // Luego de la transición, ocultamos el div para que no ocupe espacio
-                setTimeout(() => {
-                    erroresDiv.style.display = 'none';
-                }, 700);
-            }, 4000);
-        }
-    });
+                erroresDiv.style.display = 'none';
+            }, 700);
+        }, 4000);
+    }
+});
 </script>
 @endsection

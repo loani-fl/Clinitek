@@ -38,4 +38,5 @@ class Diagnostico extends Model
     return $this->hasOne(RayosxOrder::class);
 }
 
+
 }

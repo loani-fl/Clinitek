@@ -128,3 +128,24 @@ Route::get('/pago/{pago}', [App\Http\Controllers\PagoController::class, 'show'])
 
 // Rutas para farmacia
 Route::resource('farmacias', FarmaciaController::class);
+
+
+//NUEVO
+
+// Mostrar formulario para crear paciente solo para Rayos X
+Route::get('/pacientes/rayosx/create', [App\Http\Controllers\PacienteRayosXController::class, 'create'])
+    ->name('pacientes.rayosx.create');
+
+// Guardar paciente nuevo para Rayos X
+Route::post('/pacientes/rayosx/store', [App\Http\Controllers\PacienteRayosXController::class, 'store'])
+    ->name('pacientes.rayosx.store');
+
+
+//validar identidad
+
+use App\Http\Controllers\PacienteRayosXController;
+
+Route::get('/pacientes/validar-identidad/{identidad}', [PacienteRayosXController::class, 'validarIdentidad'])->name('pacientes.validarIdentidad');
+// rutas/web.php (ejemplo)
+Route::get('pacientes/rayosx/create', [PacienteRayosXController::class, 'create'])->name('pacientes.rayosx.create');
+Route::post('pacientes/rayosx/store', [PacienteRayosXController::class, 'store'])->name('pacientes.rayosx.store');
