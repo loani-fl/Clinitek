@@ -50,7 +50,7 @@
         margin-bottom: 2rem;
     }
     .patient-data-grid strong {
-        color:rgb(3, 12, 22);
+        color: rgb(3, 12, 22);
         font-weight: 600;
     }
     .underline-field {
@@ -116,46 +116,59 @@
 
         <div class="card-body">
 
-            {{-- Datos del paciente y diagnóstico --}}
-            <div class="section-title">DATOS DEL PACIENTE</div>
+        @php
+    $examenesSeleccionados = $orden->examenes->pluck('examen')->toArray();
+@endphp
 
-            <div class="patient-data-grid mb-4">
-                <div class="row">
-                    <div class="col-md-8 mb-2 d-flex align-items-center">
-                        <strong class="me-2">Paciente:</strong>
-                        <div class="underline-field no-select">
-                            {{ $orden->diagnostico->paciente->nombre }} {{ $orden->diagnostico->paciente->apellidos }}
+
+            @if ($orden->diagnostico)
+                {{-- Datos del paciente y diagnóstico --}}
+                <div class="section-title">DATOS DEL PACIENTE</div>
+
+                <div class="patient-data-grid mb-4">
+                    <div class="row">
+                        <div class="col-md-8 mb-2 d-flex align-items-center">
+                            <strong class="me-2">Paciente:</strong>
+                            <div class="underline-field no-select">
+                                {{ $orden->diagnostico?->paciente?->nombre ?? 'Paciente no disponible' }} 
+                                {{ $orden->diagnostico?->paciente?->apellidos ?? '' }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2 d-flex align-items-center">
+                            <strong class="me-2">Fecha Diagnóstico:</strong>
+                            <div class="underline-field no-select">
+                                {{ \Carbon\Carbon::parse($orden->diagnostico?->created_at)->format('d/m/Y') ?? 'Fecha no disponible' }}
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-2 d-flex align-items-center">
-                        <strong class="me-2">Fecha Diagnóstico:</strong>
-                        <div class="underline-field no-select">
-                            {{ \Carbon\Carbon::parse($orden->diagnostico->created_at)->format('d/m/Y') }}
+
+                    <div class="row">
+                        <div class="col-md-4 mb-2 d-flex align-items-center">
+                            <strong class="me-2">Identidad:</strong>
+                            <div class="underline-field no-select">
+                                {{ $orden->diagnostico?->paciente?->identidad ?? 'N/D' }}
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-2 d-flex align-items-center">
+                            <strong class="me-2">Edad:</strong>
+                            <div class="underline-field no-select">
+                                {{ $orden->diagnostico?->paciente?->fecha_nacimiento ? \Carbon\Carbon::parse($orden->diagnostico->paciente->fecha_nacimiento)->age . ' años' : 'N/D' }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-2 d-flex align-items-center">
+                            <strong class="me-2">Médico Solicitante:</strong>
+                            <div class="underline-field no-select">
+                                {{ $orden->diagnostico?->consulta?->medico?->nombre ?? '' }} 
+                                {{ $orden->diagnostico?->consulta?->medico?->apellidos ?? '' }}
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="row">
-                    <div class="col-md-4 mb-2 d-flex align-items-center">
-                        <strong class="me-2">Identidad:</strong>
-                        <div class="underline-field no-select">
-                            {{ $orden->diagnostico->paciente->identidad }}
-                        </div>
-                    </div>
-                    <div class="col-md-2 mb-2 d-flex align-items-center">
-                        <strong class="me-2">Edad:</strong>
-                        <div class="underline-field no-select">
-                            {{ \Carbon\Carbon::parse($orden->diagnostico->paciente->fecha_nacimiento)->age }} años
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-2 d-flex align-items-center">
-                        <strong class="me-2">Médico Solicitante:</strong>
-                        <div class="underline-field no-select">
-                            {{ $orden->diagnostico->consulta->medico->nombre ?? '' }} {{ $orden->diagnostico->consulta->medico->apellidos ?? '' }}
-                        </div>
-                    </div>
+            @else
+                <div class="alert alert-warning">
+                    No se encontró el diagnóstico asociado a esta orden.
                 </div>
-            </div>
+            @endif
 
             {{-- Exámenes seleccionados (checkboxes deshabilitados y marcados solo si están seleccionados) --}}
             @php

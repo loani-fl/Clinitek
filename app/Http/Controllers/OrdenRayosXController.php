@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Paciente;
+use Illuminate\Support\Facades\DB;
+
 use App\Models\Diagnostico;
 use App\Models\RayosxOrder;
 use App\Models\RayosxOrderExamen;
@@ -143,10 +145,38 @@ public function create(Request $request)
      * Mostrar una orden.
      */
     public function show($id)
-    {
-        $orden = RayosxOrder::with(['examenes', 'diagnostico.paciente', 'paciente'])
-            ->findOrFail($id);
+{
+    $orden = RayosxOrder::with(['diagnostico.paciente', 'diagnostico.consulta.medico', 'examenes'])->findOrFail($id);
 
-        return view('rayosX.show', compact('orden'));
+    return view('rayosx.show', compact('orden'));
+}
+
+public function guardarDescripcion(Request $request)
+    {
+        $request->validate([
+            'examen' => 'required|string',
+            'descripcion' => 'required|string',
+            'paciente' => 'required|string',
+        ]);
+
+        $examen = $request->examen;
+        $descripcion = $request->descripcion;
+        $pacienteSeleccionado = $request->paciente;
+
+        try {
+            // Ejemplo simple usando tabla rayosx_descripciones (crear migración)
+            DB::table('rayosx_descripciones')->updateOrInsert(
+                ['paciente' => $pacienteSeleccionado, 'examen' => $examen],
+                ['descripcion' => $descripcion, 'updated_at' => now()]
+            );
+
+            return response()->json(['success' => true]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al guardar la descripción: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

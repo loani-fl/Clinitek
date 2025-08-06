@@ -149,3 +149,14 @@ Route::get('/pacientes/validar-identidad/{identidad}', [PacienteRayosXController
 // rutas/web.php (ejemplo)
 Route::get('pacientes/rayosx/create', [PacienteRayosXController::class, 'create'])->name('pacientes.rayosx.create');
 Route::post('pacientes/rayosx/store', [PacienteRayosXController::class, 'store'])->name('pacientes.rayosx.store');
+
+
+Route::get('rayosx/{id}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
+
+// ORDEN
+Route::post('/rayosx/descripcion-guardar', [OrdenRayosXController::class, 'guardarDescripcion'])
+    ->name('rayosx.descripcion.guardar');
+
+
+    //OOTRAS
+    

@@ -154,8 +154,16 @@
                     @forelse($ordenes as $orden)
                         <tr>
                             <td>{{ $orden->id }}</td>
-                            <td>{{ $orden->diagnostico->paciente->nombre ?? 'N/A' }} {{ $orden->diagnostico->paciente->apellidos ?? '' }}</td>
-                            <td>{{ $orden->diagnostico->descripcion ?? 'N/A' }}</td>
+                            <td>
+                                {{ 
+                                    $orden->diagnostico && $orden->diagnostico->paciente
+                                        ? $orden->diagnostico->paciente->nombre . ' ' . $orden->diagnostico->paciente->apellidos
+                                        : (($orden->nombres ?? '') . ' ' . ($orden->apellidos ?? ''))
+                                }}
+                            </td>
+                            <td>
+                                {{ $orden->diagnostico->descripcion ?? ($orden->diagnostico_descripcion ?? 'Sin diagnóstico') }}
+                            </td>
                             <td>{{ \Carbon\Carbon::parse($orden->fecha)->format('d/m/Y') }}</td>
                             <td>
                                 <a href="{{ route('rayosx.show', $orden->id) }}" class="btn btn-sm btn-info">

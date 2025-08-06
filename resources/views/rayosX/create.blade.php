@@ -249,239 +249,236 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('rayosx.store') }}" id="formOrden">
-                @csrf
-                
-                {{-- Selección paciente con botón para crear paciente nuevo solo Rayos X --}}
-                <div class="mb-4 row align-items-center">
-                    <label for="paciente_id" class="col-md-3 col-form-label fw-bold text-end">
-                        Seleccione Paciente
-                    </label>
-                    <div class="col-md-5">
-                        @php
-                            $hasAny = (isset($pacientesClinica) && $pacientesClinica->isNotEmpty()) || (isset($pacientesRayosX) && $pacientesRayosX->isNotEmpty());
-                        @endphp
+          <form method="POST" action="{{ route('rayosx.store') }}" id="formOrden">
+    @csrf
 
-                        @if(!$hasAny)
-                            <div class="alert alert-warning" role="alert">
-                                No hay pacientes disponibles.
-                            </div>
-                        @else
-                            <div class="patient-select-wrapper">
-             {{-- $pacientesClinica y $pacientesRayosX vienen del controlador --}}
-<div class="patient-select-wrapper" style="align-items:center; width:80%;">
-    {{-- Select grande --}}
-    <select name="seleccion" id="paciente_id" class="form-select select-large" required>
-        <option value="" disabled {{ old('seleccion') || ($seleccion ?? null) ? '' : 'selected' }}>
-            -- Seleccione un paciente o diagnóstico --
-        </option>
+    {{-- Selección paciente con botón para crear paciente nuevo solo Rayos X --}}
+    <div class="mb-4 row align-items-center">
+        <label for="paciente_id" class="col-md-3 col-form-label fw-bold text-end">
+            Seleccione Paciente
+        </label>
+        <div class="col-md-5">
+            @php
+                $hasAny = (isset($pacientesClinica) && $pacientesClinica->isNotEmpty()) || (isset($pacientesRayosX) && $pacientesRayosX->isNotEmpty());
+            @endphp
 
-        <optgroup label="Pacientes internos">
-            @foreach($pacientesClinica as $p)
-                @php $val = 'clinica-' . $p->id; @endphp
-                <option value="{{ $val }}"
-                    data-identidad="{{ $p->identidad }}"
-                    data-fecha_nacimiento="{{ $p->fecha_nacimiento }}"
-                    {{ (old('seleccion') == $val || (isset($seleccion) && $seleccion == $val)) ? 'selected' : '' }}>
-                    {{ $p->nombre }} {{ $p->apellidos }} - {{ $p->identidad }}
-                </option>
-            @endforeach
-        </optgroup>
-
-        <optgroup label="Pacientes externos">
-            @foreach($pacientesRayosX as $p)
-                @php $val = 'rayosx-' . $p->id; @endphp
-                <option value="{{ $val }}"
-                    data-identidad="{{ $p->identidad }}"
-                    data-fecha_nacimiento="{{ $p->fecha_nacimiento }}"
-                    {{ (old('seleccion') == $val || (isset($seleccion) && $seleccion == $val)) ? 'selected' : '' }}>
-                    {{ $p->nombre }} {{ $p->apellidos }} - {{ $p->identidad }} (externo)
-                </option>
-            @endforeach
-        </optgroup>
-    </select>
-
-    {{-- Botón bonito a la derecha (alineado) --}}
-    <a href="{{ route('pacientes.rayosx.create') }}"
-       class="btn boton-rayos d-inline-flex align-items-center gap-2 shadow-sm"
-       title="Registrar paciente nuevo para Rayos X">
-        {{-- Ícono SVG estilizado tipo rayos X --}}
-        <span class="icon-rayos" aria-hidden="true" style="display:inline-flex;align-items:center;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <!-- simple stylized 'ray' / detector figure -->
-                <path d="M3 6 L21 6" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-                <path d="M6 10 L18 4" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-                <path d="M6 14 L18 20" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-                <circle cx="8" cy="8" r="1.2" fill="white"/>
-                <circle cx="16" cy="16" r="1.2" fill="white"/>
-            </svg>
-        </span>
-        <span>Registrar Paciente</span>
-    </a>
-</div>
-
-                            </div>
-                        @endif
-                    </div>
+            @if(!$hasAny)
+                <div class="alert alert-warning" role="alert">
+                    No hay pacientes disponibles.
                 </div>
+            @else
+                <div class="patient-select-wrapper" style="align-items:center; width:80%;">
+                    <select name="seleccion" id="paciente_id" class="form-select select-large" required>
+                        <option value="" disabled {{ old('seleccion') || ($seleccion ?? null) ? '' : 'selected' }}>
+                            -- Seleccione un paciente o diagnóstico --
+                        </option>
 
-                {{-- Datos dinámicos del paciente --}}
-                <div class="section-title">DATOS DEL PACIENTE </div>
+                        <optgroup label="Pacientes internos">
+                            @foreach($pacientesClinica as $p)
+                                @php $val = 'clinica-' . $p->id; @endphp
+                                <option value="{{ $val }}"
+                                    data-identidad="{{ $p->identidad }}"
+                                    data-fecha_nacimiento="{{ $p->fecha_nacimiento }}"
+                                    {{ (old('seleccion') == $val || (isset($seleccion) && $seleccion == $val)) ? 'selected' : '' }}>
+                                    {{ $p->nombre }} {{ $p->apellidos }} - {{ $p->identidad }}
+                                </option>
+                            @endforeach
+                        </optgroup>
 
-                <div class="patient-data-grid mb-4" id="datosPaciente" style="display:none;">
-                    <div class="row">
-                        <div class="col-md-8 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Paciente:</strong>
-                            <div class="underline-field no-select" id="pacienteNombre"></div>
-                        </div>
-                        <div class="col-md-4 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Fecha Nacimiento:</strong>
-                            <div class="underline-field no-select" id="fechaNacimiento"></div>
-                        </div>
-                    </div>
+                        <optgroup label="Pacientes externos">
+                            @foreach($pacientesRayosX as $p)
+                                @php $val = 'rayosx-' . $p->id; @endphp
+                                <option value="{{ $val }}"
+                                    data-identidad="{{ $p->identidad }}"
+                                    data-fecha_nacimiento="{{ $p->fecha_nacimiento }}"
+                                    {{ (old('seleccion') == $val || (isset($seleccion) && $seleccion == $val)) ? 'selected' : '' }}>
+                                    {{ $p->nombre }} {{ $p->apellidos }} - {{ $p->identidad }} (externo)
+                                </option>
+                            @endforeach
+                        </optgroup>
+                    </select>
 
-                    <div class="row">
-                        <div class="col-md-4 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Identidad:</strong>
-                            <div class="underline-field no-select" id="pacienteIdentidad"></div>
-                        </div>
-                          <div class="col-md-2 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Edad:</strong>
-                            <div class="underline-field no-select" id="pacienteEdad"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="mensajesEmergentes" style="margin-top: 1rem; min-height: 40px;">
-                    @if ($errors->any())
-                        <div class="alert-custom alert-error" id="erroresLaravel">
-                            <ul style="margin: 0; padding-left: 1.2rem;">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                </div>
-
-                <div class="mb-4 row align-items-center">
-    <label for="fecha" class="col-md-3 col-form-label fw-bold text-end">Fecha de la orden</label>
-    <div class="col-md-5">
-        <input type="date" 
-               id="fecha" 
-               name="fecha" 
-               class="form-control @error('fecha') is-invalid @enderror" 
-               value="{{ old('fecha') }}" 
-               required>
-        @error('fecha')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
-</div>
-
-
-                {{-- Secciones con checkboxes para estudios de Rayos X --}}
-                @php
-                $secciones = [
-                    'Rayos X Cabeza' => [
-                        'craneo' => 'Cráneo',
-                        'waters' => 'Waters',
-                        'conductos_auditivos' => 'Conductos Auditivos',
-                        'cavum' => 'Cavum',
-                        'senos_paranasales' => 'Senos Paranasales',
-                        'silla_turca' => 'Silla Turca',
-                        'huesos_nasales' => 'Huesos Nasales',
-                        'atm_tm' => 'ATM - TM',
-                        'mastoides' => 'Mastoides',
-                        'mandibula' => 'Mandíbula',
-                    ],
-                    'Rayos X Tórax' => [
-                        'torax_pa' => 'Tórax PA',
-                        'torax_pa_lat' => 'Tórax PA Lateral',
-                        'costillas' => 'Costillas',
-                        'esternon' => 'Esternón',
-                    ],
-                    'Rayos X Abdomen' => [
-                        'abdomen_simple' => 'Abdomen Simple',
-                        'abdomen_agudo' => 'Abdomen Agudo',
-                    ],
-                    'Rayos X Extremidad Superior' => [
-                        'clavicula' => 'Clavícula',
-                        'hombro' => 'Hombro',
-                        'humero' => 'Húmero',
-                        'codo' => 'Codo',
-                        'antebrazo' => 'Antebrazo',
-                        'muneca' => 'Muñeca',
-                        'mano' => 'Mano',
-                    ],
-                    'Rayos X Extremidad Inferior' => [
-                        'cadera' => 'Cadera',
-                        'femur' => 'Fémur',
-                        'rodilla' => 'Rodilla',
-                        'tibia' => 'Tibia',
-                        'pie' => 'Pie',
-                        'calcaneo' => 'Calcáneo',
-                    ],
-                    'Rayos X Columna y Pelvis' => [
-                        'cervical' => 'Cervical',
-                        'dorsal' => 'Dorsal',
-                        'lumbar' => 'Lumbar',
-                        'sacro_coxis' => 'Sacro Coxis',
-                        'pelvis' => 'Pelvis',
-                        'escoliosis' => 'Escoliosis',
-                    ],
-                    'Rayos X Estudios Especiales' => [
-                        'arteriograma' => 'Arteriograma',
-                        'histerosalpingograma' => 'Histerosalpingograma',
-                        'colecistograma' => 'Colecistograma',
-                        'fistulograma' => 'Fistulograma',
-                        'artrograma' => 'Artrógama',
-                    ],
-                ];
-                @endphp
-
-                <div class="secciones-container">
-                    @foreach($secciones as $titulo => $examenes)
-                        <div class="seccion">
-                            <div class="section-title">{{ $titulo }}</div>
-                            <div class="examenes-grid">
-                                @foreach($examenes as $key => $label)
-                                    <label>
-                                        <input type="checkbox" name="examenes[{{ $key }}]"
-                                            value="1"
-                                            {{ old('examenes.' . $key) ? 'checked' : '' }}>
-                                        {{ $label }}
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-
-                {{-- Botones --}}
-                <div class="d-flex justify-content-center gap-3 mt-4">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save"></i> Guardar Orden
-                    </button>
-
-                    <button type="button" id="btnLimpiar" class="btn btn-warning">
-                        <i class="bi bi-trash"></i> Limpiar
-                    </button>
-
-                    <a href="{{ route('rayosx.index') }}" class="btn btn-success">
-                        <i class="bi bi-arrow-left-circle"></i> Regresar
+                    <a href="{{ route('pacientes.rayosx.create') }}"
+                       class="btn boton-rayos d-inline-flex align-items-center gap-2 shadow-sm"
+                       title="Registrar paciente nuevo para Rayos X">
+                        <span class="icon-rayos" aria-hidden="true" style="display:inline-flex;align-items:center;">
+                            <!-- svg -->
+                        </span>
+                        <span>Registrar Paciente</span>
                     </a>
                 </div>
-            </form>
+            @endif
         </div>
     </div>
 
-    {{-- Mensaje emergente máximo 5 seleccionados --}}
-    <div id="alertMax" class="alert-custom alert-error" style="display:none;">
-        Solo puede seleccionar un máximo de 5 Rayos X.
+    {{-- Datos dinámicos del paciente --}}
+    <div class="section-title">DATOS DEL PACIENTE </div>
+
+    <div class="patient-data-grid mb-4" id="datosPaciente" style="display:none;">
+        <div class="row">
+            <div class="col-md-8 mb-2 d-flex align-items-center">
+                <strong class="me-2">Paciente:</strong>
+                <div class="underline-field no-select" id="pacienteNombre"></div>
+            </div>
+            <div class="col-md-4 mb-2 d-flex align-items-center">
+                <strong class="me-2">Fecha Nacimiento:</strong>
+                <div class="underline-field no-select" id="fechaNacimiento"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-2 d-flex align-items-center">
+                <strong class="me-2">Identidad:</strong>
+                <div class="underline-field no-select" id="pacienteIdentidad"></div>
+            </div>
+            <div class="col-md-2 mb-2 d-flex align-items-center">
+                <strong class="me-2">Edad:</strong>
+                <div class="underline-field no-select" id="pacienteEdad"></div>
+            </div>
+        </div>
     </div>
+
+    <div id="mensajesEmergentes" style="margin-top: 1rem; min-height: 40px;">
+        @if ($errors->any())
+            <div class="alert-custom alert-error" id="erroresLaravel">
+                <ul style="margin: 0; padding-left: 1.2rem;">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+    </div>
+
+    <div class="mb-4 row align-items-center">
+        <label for="fecha" class="col-md-3 col-form-label fw-bold text-end">Fecha de la orden</label>
+        <div class="col-md-5">
+            <input type="date" 
+                   id="fecha" 
+                   name="fecha" 
+                   class="form-control @error('fecha') is-invalid @enderror" 
+                   value="{{ old('fecha') }}" 
+                   required>
+            @error('fecha')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    {{-- Secciones con checkboxes para estudios de Rayos X --}}
+    @php
+    $secciones = [
+        'Rayos X Cabeza' => [
+            'craneo' => 'Cráneo',
+            'waters' => 'Waters',
+            'conductos_auditivos' => 'Conductos Auditivos',
+            'cavum' => 'Cavum',
+            'senos_paranasales' => 'Senos Paranasales',
+            'silla_turca' => 'Silla Turca',
+            'huesos_nasales' => 'Huesos Nasales',
+            'atm_tm' => 'ATM - TM',
+            'mastoides' => 'Mastoides',
+            'mandibula' => 'Mandíbula',
+        ],
+        'Rayos X Tórax' => [
+            'torax_pa' => 'Tórax PA',
+            'torax_pa_lat' => 'Tórax PA Lateral',
+            'costillas' => 'Costillas',
+            'esternon' => 'Esternón',
+        ],
+        'Rayos X Abdomen' => [
+            'abdomen_simple' => 'Abdomen Simple',
+            'abdomen_agudo' => 'Abdomen Agudo',
+        ],
+        'Rayos X Extremidad Superior' => [
+            'clavicula' => 'Clavícula',
+            'hombro' => 'Hombro',
+            'humero' => 'Húmero',
+            'codo' => 'Codo',
+            'antebrazo' => 'Antebrazo',
+            'muneca' => 'Muñeca',
+            'mano' => 'Mano',
+        ],
+        'Rayos X Extremidad Inferior' => [
+            'cadera' => 'Cadera',
+            'femur' => 'Fémur',
+            'rodilla' => 'Rodilla',
+            'tibia' => 'Tibia',
+            'pie' => 'Pie',
+            'calcaneo' => 'Calcáneo',
+        ],
+        'Rayos X Columna y Pelvis' => [
+            'cervical' => 'Cervical',
+            'dorsal' => 'Dorsal',
+            'lumbar' => 'Lumbar',
+            'sacro_coxis' => 'Sacro Coxis',
+            'pelvis' => 'Pelvis',
+            'escoliosis' => 'Escoliosis',
+        ],
+        'Rayos X Estudios Especiales' => [
+            'arteriograma' => 'Arteriograma',
+            'histerosalpingograma' => 'Histerosalpingograma',
+            'colecistograma' => 'Colecistograma',
+            'fistulograma' => 'Fistulograma',
+            'artrograma' => 'Artrógama',
+        ],
+    ];
+    @endphp
+
+    <div class="secciones-container">
+        @foreach($secciones as $titulo => $examenes)
+            <div class="seccion mb-3">
+                <div class="section-title fw-bold mb-2">{{ $titulo }}</div>
+                <div class="examenes-grid">
+                    @foreach($examenes as $key => $label)
+                        <div class="examen-item mb-2" data-examen-key="{{ $key }}">
+                            <label style="font-weight: normal; cursor: pointer;">
+                                <input type="checkbox" name="examenes[{{ $key }}]"
+                                    value="1"
+                                    {{ old('examenes.' . $key) ? 'checked' : '' }}>
+                                {{ $label }}
+                            </label>
+
+                            <textarea
+                                name="descripciones[{{ $key }}]"
+                                placeholder="Descripción para {{ $label }}"
+                                style="display: {{ old('examenes.' . $key) ? 'block' : 'none' }}; margin-top: 0.3rem; width: 80%; resize: vertical;"
+                                rows="2"
+                            >{{ old('descripciones.' . $key) ?? '' }}</textarea>
+
+                            <button type="button" class="btn btn-sm btn-success guardar-descripcion" 
+                                    style="margin-left: 0.5rem; display: {{ old('examenes.' . $key) ? 'inline-block' : 'none' }};">
+                                Guardar
+                            </button>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endforeach
+    </div>
+
+    {{-- Botones --}}
+    <div class="d-flex justify-content-center gap-3 mt-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Guardar Orden
+        </button>
+
+        <button type="button" id="btnLimpiar" class="btn btn-warning">
+            <i class="bi bi-trash"></i> Limpiar
+        </button>
+
+        <a href="{{ route('rayosx.index') }}" class="btn btn-success">
+            <i class="bi bi-arrow-left-circle"></i> Regresar
+        </a>
+    </div>
+</form>
+
+{{-- Mensaje emergente máximo 5 seleccionados --}}
+<div id="alertMax" class="alert-custom alert-error" style="display:none;">
+    Solo puede seleccionar un máximo de 5 Rayos X.
 </div>
 
+{{-- JavaScript --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const btnLimpiar = document.getElementById('btnLimpiar');
@@ -491,11 +488,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const mensajesContainer = document.getElementById('mensajesEmergentes');
 
     btnLimpiar.addEventListener('click', () => {
-        checkboxes.forEach(cb => cb.checked = false);
+        checkboxes.forEach(cb => {
+            cb.checked = false;
+            const textarea = cb.closest('.examen-item').querySelector('textarea');
+            if (textarea) {
+                textarea.style.display = 'none';
+                textarea.value = '';
+            }
+            const btnGuardar = cb.closest('.examen-item').querySelector('.guardar-descripcion');
+            if (btnGuardar) btnGuardar.style.display = 'none';
+        });
         limpiarMensajes();
     });
 
-    // Mostrar datos del paciente seleccionado
+    // Datos paciente (mostrar)
     const datosDiv = document.getElementById('datosPaciente');
     const pacienteNombre = document.getElementById('pacienteNombre');
     const pacienteIdentidad = document.getElementById('pacienteIdentidad');
@@ -503,21 +509,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const pacienteEdad = document.getElementById('pacienteEdad');
 
     function calcularEdad(fecha) {
+        if (!fecha) return '';
         const hoy = new Date();
         const nacimiento = new Date(fecha);
         let edad = hoy.getFullYear() - nacimiento.getFullYear();
         const m = hoy.getMonth() - nacimiento.getMonth();
-        if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
-            edad--;
-        }
+        if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
         return edad;
     }
 
     selectPaciente.addEventListener('change', function() {
         const option = this.options[this.selectedIndex];
-        if (this.value) {
+        if (this.value && option) {
             pacienteNombre.textContent = option.text;
-            pacienteIdentidad.textContent = option.getAttribute('data-identidad');
+            pacienteIdentidad.textContent = option.getAttribute('data-identidad') || '';
             const fechaNac = option.getAttribute('data-fecha_nacimiento');
             fechaNacimiento.textContent = fechaNac ? new Date(fechaNac).toLocaleDateString() : '';
             pacienteEdad.textContent = fechaNac ? calcularEdad(fechaNac) + ' años' : '';
@@ -528,50 +533,51 @@ document.addEventListener('DOMContentLoaded', function() {
         limpiarMensajes();
     });
 
-    // Si hay paciente seleccionado al cargar, mostrar sus datos
     if (selectPaciente.value) {
-        const event = new Event('change');
-        selectPaciente.dispatchEvent(event);
+        selectPaciente.dispatchEvent(new Event('change'));
     }
 
-    // Función para mostrar mensajes en el div mensajesEmergentes
     function mostrarMensaje(mensaje, tipo = 'error') {
         limpiarMensajes();
         const div = document.createElement('div');
         div.textContent = mensaje;
         div.className = tipo === 'error' ? 'alert-custom alert-error' : 'alert-custom alert-success';
         mensajesContainer.appendChild(div);
-
-        // Scroll suave para que el mensaje se vea
         div.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        setTimeout(() => {
-            div.remove();
-        }, 5000);
+        setTimeout(() => div.remove(), 5000);
     }
 
     function limpiarMensajes() {
         mensajesContainer.innerHTML = '';
     }
 
-    // Validar máximo 5 checkboxes seleccionados
+    // Mostrar/ocultar textarea y botón guardar según checkbox
     checkboxes.forEach(cb => {
         cb.addEventListener('change', () => {
             const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
-            // Solo mostrar mensaje si está marcando y supera el límite
             if (checkedCount > 5 && cb.checked) {
-                cb.checked = false; // desmarca el último seleccionado
+                cb.checked = false;
                 mostrarMensaje('Solo puede seleccionar un máximo de 5 Rayos X.', 'error');
+                return;
+            }
+            const container = cb.closest('.examen-item');
+            const textarea = container.querySelector('textarea');
+            const btnGuardar = container.querySelector('.guardar-descripcion');
+            if (cb.checked) {
+                if (textarea) textarea.style.display = 'block';
+                if (btnGuardar) btnGuardar.style.display = 'inline-block';
+                if (textarea) textarea.focus();
+            } else {
+                if (textarea) { textarea.style.display = 'none'; textarea.value = ''; }
+                if (btnGuardar) btnGuardar.style.display = 'none';
             }
         });
     });
 
-    // Validar formulario antes de enviar
+    // Validar formulario principal antes de enviar
     form.addEventListener('submit', (e) => {
         const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
-
         limpiarMensajes();
-
         if (!selectPaciente.value) {
             e.preventDefault();
             mostrarMensaje('Debe seleccionar un paciente antes de guardar.', 'error');
@@ -588,19 +594,92 @@ document.addEventListener('DOMContentLoaded', function() {
             mostrarMensaje('No puede seleccionar más de 5 exámenes de Rayos X.', 'error');
             return;
         }
+        // (Opcional) ocultamos los textareas para limpiar la vista al enviar
+        checkboxes.forEach(cb => {
+            const ta = cb.closest('.examen-item').querySelector('textarea');
+            if (ta) ta.style.display = 'none';
+        });
     });
 
-    // Desvanecer mensajes de error de Laravel después de 4 segundos
+    // Desvanecer mensajes de error de Laravel
     const erroresDiv = document.getElementById('erroresLaravel');
     if (erroresDiv) {
         setTimeout(() => {
             erroresDiv.style.transition = 'opacity 0.7s ease';
             erroresDiv.style.opacity = '0';
-            setTimeout(() => {
-                erroresDiv.style.display = 'none';
-            }, 700);
+            setTimeout(() => erroresDiv.style.display = 'none', 700);
         }, 4000);
     }
+
+    // Guardar descripción individual via AJAX
+    document.querySelectorAll('.guardar-descripcion').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const container = this.closest('.examen-item');
+            if (!container) return;
+            const checkbox = container.querySelector('input[type="checkbox"]');
+            const descripcionTextarea = container.querySelector('textarea');
+            const examenKey = container.getAttribute('data-examen-key');
+            const pacienteId = selectPaciente.value;
+
+            if (!checkbox || !descripcionTextarea || !examenKey) {
+                mostrarMensaje('Error en el formulario. Recargue la página.', 'error');
+                return;
+            }
+
+            if (!checkbox.checked) {
+                mostrarMensaje('Debe seleccionar el examen antes de guardar la descripción.', 'error');
+                return;
+            }
+
+            if (!descripcionTextarea.value.trim()) {
+                mostrarMensaje('La descripción no puede estar vacía.', 'error');
+                descripcionTextarea.focus();
+                return;
+            }
+
+            try {
+                const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                const response = await fetch("{{ route('rayosx.descripcion.guardar') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        examen: examenKey,
+                        descripcion: descripcionTextarea.value.trim(),
+                        paciente: pacienteId,
+                    }),
+                });
+
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error('Error al guardar la descripción. ' + text);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    mostrarMensaje('Descripción guardada exitosamente.', 'success');
+                    // Ocultar textarea, botón y bloquear checkbox
+                    if (descripcionTextarea) descripcionTextarea.style.display = 'none';
+                    checkbox.disabled = true;
+                    this.style.display = 'none';
+                    const label = container.querySelector('label');
+                    if (label) label.style.display = 'none';
+                } else {
+                    mostrarMensaje(data.message || 'Error al guardar la descripción.', 'error');
+                }
+
+            } catch (error) {
+                mostrarMensaje(error.message || 'Error en la petición.', 'error');
+            }
+        });
+    });
+
 });
 </script>
+
 @endsection
