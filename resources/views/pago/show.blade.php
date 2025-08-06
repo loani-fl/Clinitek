@@ -100,7 +100,6 @@
     {{-- Botón de inicio --}}
     <a href="{{ route('inicio') }}" class="btn" style="background-color: #6c757d; color: white;">Inicio</a>
 
-
     <div class="factura-header">
         <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek">
         <h1>CLINITEK</h1>
@@ -109,14 +108,37 @@
 
     <div class="factura-divider"></div>
 
-    <div class="factura-section">
-        <p><strong>Nombre del Titular:</strong> {{ $pago->nombre_titular }}</p>
-        <p><strong>Fecha:</strong> {{ \Carbon\Carbon::parse($pago->fecha)->format('d/m/Y') }}</p>
-        <p><strong>Hora:</strong> {{ \Carbon\Carbon::now('America/Tegucigalpa')->format('h:i A') }}</p>
-        <p><strong>Método de Pago:</strong> {{ ucfirst($pago->metodo_pago) }}</p>
-        @if($pago->metodo_pago === 'tarjeta')
-            <p><strong>Número de Tarjeta:</strong> {{ $pago->numero_tarjeta }}</p>
-        @endif
+    <div class="factura-section row">
+        {{-- Columna 1 --}}
+        <div class="col-md-6">
+            @if($paciente)
+                <p><strong>Nombre completo:</strong> {{ $paciente->nombre }} {{ $paciente->apellidos }}</p>
+            @endif
+            <p><strong>Nombre del Titular:</strong> {{ $pago->nombre_titular }}</p>
+            <p><strong>Fecha:</strong> {{ \Carbon\Carbon::parse($pago->fecha)->format('d/m/Y') }}</p>
+        </div>
+
+        {{-- Columna 2 --}}
+        <div class="col-md-6">
+            @if($paciente)
+                <p><strong>Identidad:</strong> {{ $paciente->identidad }}</p>
+            @endif
+            @if($pago->metodo_pago === 'tarjeta')
+                <p><strong>Número de Tarjeta:</strong> {{ $pago->numero_tarjeta }}</p>
+            @endif
+            <p><strong>Hora:</strong> {{ \Carbon\Carbon::now('America/Tegucigalpa')->format('h:i A') }}</p>
+        </div>
+
+        {{-- Fila separada para Método de pago e Impuesto --}}
+        <div class="col-md-6 mt-2">
+            <p><strong>Método de Pago:</strong> {{ ucfirst($pago->metodo_pago) }}</p>
+        </div>
+        <div class="col-md-6 mt-2">
+            @php
+                $impuesto = round($pago->cantidad * 0.15, 2);
+            @endphp
+            <p><strong>Isv (15%):</strong> L. {{ number_format($impuesto, 2) }}</p>
+        </div>
     </div>
 
     <div class="factura-divider"></div>
@@ -130,7 +152,7 @@
         </thead>
         <tbody>
             <tr>
-                <td>{{ $pago->descripcion_servicio }}</td>
+            <td>{{ $pago->servicio }}</td>
                 <td>L. {{ number_format($pago->cantidad, 2) }}</td>
             </tr>
         </tbody>
@@ -139,7 +161,7 @@
     <div class="factura-divider"></div>
 
     <div class="factura-section">
-        <p><strong>Servicio pagado:</strong> {{ $pago->servicio }}</p>
+        <p><strong>Total a pagar:</strong> {{ $pago->servicio }}</p>
     </div>
 
     <div class="factura-divider"></div>
