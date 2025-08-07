@@ -458,11 +458,26 @@ public function analisis(RayosxOrder $orden)
 
 public function guardarAnalisis(Request $request, RayosxOrder $orden)
 {
-    $validated = $request->validate([
+      $validated = $request->validate([
         'medico_analista_id' => 'required|exists:medicos,id',
+
+        // 'examenes' es un array opcional
         'examenes' => 'nullable|array',
-        'examenes.*.descripcion' => 'nullable|string|max:10000',
-        'examenes.*.imagen' => 'nullable|image|max:5120', // 5MB max
+
+        // Para cada examen (ID) las descripciones son arrays opcionales de strings con regex
+        'examenes.*.descripciones' => 'nullable|array',
+        'examenes.*.descripciones.*' => [
+            'nullable',
+            'string',
+            'max:10000',
+            'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ ,.\-():]*$/'
+        ],
+
+        // Para cada examen las imagenes son arrays opcionales de imágenes
+        'examenes.*.imagenes' => 'nullable|array',
+        'examenes.*.imagenes.*' => 'nullable|image|max:5120', // max 5MB
+    ], [
+        'examenes.*.descripciones.*.regex' => 'La descripción contiene caracteres no permitidos.',
     ]);
 
     // Actualizar médico analista
@@ -492,6 +507,9 @@ public function guardarAnalisis(Request $request, RayosxOrder $orden)
             $examen->save();
         }
     }
+  // Cambiar estado a "Realizado" después de guardar el análisis
+    $orden->estado = 'Realizado';
+    $orden->save();
 
     return redirect()->route('rayosx.show', $orden->id)
                      ->with('success', 'Análisis guardado correctamente.');
