@@ -69,6 +69,10 @@ class PagoController extends Controller
             'cantidad.required' => 'La cantidad es obligatoria.',
             'cantidad.numeric' => 'La cantidad debe ser un número válido.',
             'cantidad.min' => 'La cantidad debe ser mayor que cero.',
+            'cantidad.max' => 'La cantidad no puede superar L. 9999.99.',
+            'cantidad.min' => 'La cantidad debe ser mayor o igual a L. 1000.00.',
+
+
     
             'servicio.required' => 'El campo servicio es obligatorio.',
         ];
@@ -79,10 +83,11 @@ class PagoController extends Controller
             'numero_tarjeta' => 'required_if:metodo_pago,tarjeta|max:19',
             'fecha_expiracion' => 'required_if:metodo_pago,tarjeta',
             'cvv' => 'required_if:metodo_pago,tarjeta|max:4',
-            'cantidad' => 'required|numeric|min:0.01',
+            'cantidad' => ['required', 'numeric', 'min:1000.00', 'max:9999.99'],
+            
             'servicio' => 'required',
-            // 'fecha' no va aquí
         ], $messages);
+        
     
         $pago = new Pago();
     
