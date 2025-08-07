@@ -185,7 +185,7 @@ class ConsultaController extends Controller
         $horaFormato12 = 'inmediata';
     }
 
-    // 👇 Aquí calculamos la hora más ocupada para este médico y fecha
+    // calculamos la hora más ocupada para este médico y fecha
     $horaMasOcupada = DB::table('consultas')
         ->select('hora', DB::raw('COUNT(*) as total'))
         ->where('medico_id', $consulta->medico_id)
