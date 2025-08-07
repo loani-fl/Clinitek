@@ -4,23 +4,27 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
-    /* ... (tu CSS actual) ... */
     body {
         background-color: #e8f4fc;
         margin: 0;
         padding: 0;
     }
+
     .header {
         background-color: #007BFF;
         position: fixed;
-        top: 0; left: 0; right: 0;
+        top: 0;
+        left: 0;
+        right: 0;
         z-index: 1100;
         padding: 0.5rem 1rem;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
     }
+
     .content-wrapper {
         margin-top: 60px;
     }
+
     .custom-card::before {
         content: "";
         position: absolute;
@@ -28,144 +32,155 @@
         left: 50%;
         width: 2200px;
         height: 2200px;
-        background-image: url('/images/logo2.jpg');
+        background-image: url('{{ asset('images/logo2.jpg') }}');
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
-        opacity: 0.1;
+        opacity: 0.07;
         transform: translate(-50%, -50%);
         pointer-events: none;
         z-index: 0;
     }
+
     .custom-card {
         max-width: 1000px;
         background-color: #fff;
-        margin: 40px auto 60px auto; 
+        margin: 40px auto;
         border-radius: 1.5rem;
-        padding: 1rem 2rem;
+        padding: 2rem;
         position: relative;
         overflow: hidden;
         z-index: 1;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
+
     .card-header {
         background-color: transparent !important;
         border-bottom: 3px solid #007BFF;
     }
-    .patient-data-grid {
-        background: transparent;
-        box-shadow: none;
+
+    .section-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.7rem;
+        font-weight: 700;
+        color: #003366;
+    }
+
+    .seccion {
+        padding: 0.8rem;
         border-radius: 0;
-        padding: 0;
-        margin-bottom: 2rem;
     }
-    .patient-data-grid strong {
-        color:rgb(3, 12, 22);
-        font-weight: 600;
-    }
+
     .underline-field {
-        border-bottom: 1px solid #000;
-        min-height: 1.4rem;
-        line-height: 1.4rem;
+        border-bottom: 1px dashed #333;
+        flex: 1;
+        min-height: 1.5rem;
         padding-left: 4px;
         padding-right: 4px;
-        font-size: 0.95rem;
-        flex: 1;
         user-select: none;
     }
-    .fixed-name {
-        min-width: 400px;
+
+    .btn-imprimir,
+    .btn-danger,
+    .btn-warning,
+    .btn-primary,
+    .btn-success {
+        font-size: 0.95rem;
+        padding: 0.45rem 0.9rem;
     }
-    .patient-data-grid .row > div {
+
+    .patient-select-wrapper {
         display: flex;
         align-items: center;
+        gap: 1rem;
     }
-    .btn-imprimir {
-        background-color: rgb(97, 98, 99);
-        color: #fff;
-        border: none;
-        padding: 0.5rem 1rem;
-        font-size: 1rem;
-        font-weight: 500;
-        border-radius: 0.375rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-    .btn-imprimir:hover {
-        background-color: #a59d8f;
-        color: #fff;
-    }
-    .btn {
-        padding: 0.40rem 0.5rem;
-        font-size: 0.95rem;
-        line-height: 1.2;
-    }
-    #max-examenes-error, #min-examenes-error {
-        display: none;
-        padding: 0.6rem 1rem;
-        margin-bottom: 1rem;
-        font-weight: 600;
-        border-radius: 0.3rem;
-        width: 100%;
-    }
-    .alert-custom {
-        padding: 1rem 1.5rem;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        box-sizing: border-box;
-        display: block;
-    }
-    .alert-error {
-        background-color: #f8d7da;
-        color: #842029;
-        border: 1px solid #f5c2c7;
-        box-shadow: 0 0 10px rgba(216, 62, 62, 0.5);
-    }
+
     .secciones-container {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1.3rem 0.10rem;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.3rem 0.10rem; /* poco espacio entre secciones */
         margin-top: 0.3rem;
     }
+
     .seccion {
         padding: 0;
     }
+
     .section-title {
-        font-size: 1.1rem;
+        font-size: 1.5rem; /* más grande */
         margin: 0 0 0.7rem;
         color: rgb(6, 11, 17);
         font-weight: 700;
-        line-height: 1.4rem;
+        line-height: 1.6rem; /* ajusta para que no quede muy apretado */
     }
+
     .examenes-grid {
         display: flex;
         flex-direction: column;
-        gap: 0.15rem;
+        gap: 0.15rem; /* menos espacio entre checkboxes */
     }
+
     .examenes-grid label {
         font-size: 0.85rem;
         line-height: 1rem;
+        cursor: pointer;
     }
-    .d-flex.justify-content-center.gap-3.mt-4 {
-        margin-top: 2rem !important;
+
+    .examenes-grid input[type="checkbox"] {
+        margin-right: 6px;
+    }
+
+    .section-title:first-of-type {
+        margin-top: 3rem; /* Ajusta el valor a lo que necesites */
+    }
+
+    /* Título general (más grande) */
+    .section-title.general {
+        font-size: 1.5rem; /* tamaño mayor */
+        margin: 0 0 0.7rem;
+        color: rgb(6, 11, 17);
+        font-weight: 700;
+        line-height: 1.6rem;
+        text-align: center; /* CENTRAR */
+    }
+
+    /* Títulos de secciones (más pequeños) */
+    .section-title.seccion {
+        font-size: 1.1rem; /* tamaño menor */
+        margin-bottom: 0.5rem;
+        color: #003366;
+        font-weight: 700;
+        line-height: 1.3rem;
+    }
+
+    /* Estilos para mensajes flash emergentes */
+    .mensaje-flash {
+        display: none; /* oculto por defecto */
+        background-color: #f8d7da; /* rojo suave */
+        color: #842029; /* texto rojo oscuro */
+        border: 1px solid #f5c2c7;
+        padding: 8px 12px;
+        border-radius: 0.4rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        max-width: 600px;
+        user-select: none;
     }
 </style>
 
 <div class="content-wrapper">
-    <div class="card custom-card shadow-sm">
-        <div class="card-header">
+    <div class="card custom-card">
+        <div class="card-header text-center">
             <div class="row align-items-center">
                 <div class="col-md-3 text-center">
-                    <img src="{{ asset('images/logo2.jpg') }}" alt="Logo Clinitek" style="height: 60px; width: auto;">
+                    <img src="{{ asset('images/logo2.jpg') }}" alt="Logo" style="height: 60px;">
                     <div style="font-size: 1rem; font-weight: 700; color: #555;">
                         Laboratorio Clínico Honduras
                     </div>
                 </div>
                 <div class="col-md-9 text-center" style="transform: translateX(30%);">
-                    <h4 class="mb-0" style="font-size: 1.2rem; font-weight: 600; color: #333; line-height: 1.3;">
+                    <h4 class="mb-0" style="font-size: 1.2rem; font-weight: 600; color: #333;">
                         CREAR ORDEN DE RAYOS X
                     </h4>
                 </div>
@@ -173,8 +188,7 @@
         </div>
 
         <div class="card-body">
-
-            {{-- Mensajes flash --}}
+            {{-- Flash messages Laravel (opcional) --}}
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
@@ -182,162 +196,121 @@
                 </div>
             @endif
 
-            @if (session('error'))
+            @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     {{ session('error') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                 </div>
             @endif
 
-       
+            @if ($errors->any())
+                <div class="alert alert-danger mb-4">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-            <form method="POST" action="{{ route('rayosx.store') }}" id="formOrden">
+            {{-- Formulario --}}
+            <form method="POST" action="{{ route('rayosx.store') }}" id="formOrden" novalidate>
                 @csrf
-<div class="mb-4 row align-items-center">
-    <label for="diagnostico_id" class="col-md-3 col-form-label fw-bold text-end">
-        Seleccione Diagnóstico
-    </label>
-    <div class="col-md-5">
-        @if($diagnosticos->isEmpty())
-            <div class="alert alert-warning" role="alert">
-                No hay diagnósticos realizados disponibles.
-            </div>
-        @else
-            <select name="diagnostico_id" id="diagnostico_id" class="form-select form-select-sm" required>
-                <option value="" disabled {{ old('diagnostico_id') ? '' : 'selected' }}>-- Seleccione un diagnóstico --</option>
-                @foreach($diagnosticos as $diagnostico)
-                    @if($diagnostico->consulta)
-                        <option value="{{ $diagnostico->id }}"
-                            data-nombre="{{ $diagnostico->paciente->nombre }} {{ $diagnostico->paciente->apellidos }}"
-                            data-identidad="{{ $diagnostico->paciente->identidad }}"
-                            data-fecha="{{ \Carbon\Carbon::parse($diagnostico->created_at)->format('d/m/Y') }}"
-                            data-edad="{{ \Carbon\Carbon::parse($diagnostico->paciente->fecha_nacimiento)->age }}"
-                            data-medico="{{ $diagnostico->consulta->medico->nombre ?? '' }} {{ $diagnostico->consulta->medico->apellidos ?? '' }}"
-                            {{ old('diagnostico_id') == $diagnostico->id ? 'selected' : '' }}>
-                            {{ $diagnostico->paciente->nombre }} {{ $diagnostico->paciente->apellidos }} - Diagnóstico #{{ $diagnostico->id }}
-                        </option>
-                    @endif
-                @endforeach
-            </select>
-        @endif
-    </div>
-</div>
 
+                <div class="mb-4 row align-items-center">
+                    <label for="paciente_id" class="col-md-2 col-form-label fw-bold text-end">Seleccione Paciente</label>
 
-                {{-- Datos dinámicos del paciente y diagnóstico --}}
-                <div class="section-title">DATOS DEL PACIENTE </div>
-
-                <div class="patient-data-grid mb-4" id="datosPaciente" style="display:none;">
-                    <div class="row">
-                        <div class="col-md-8 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Paciente:</strong>
-                            <div class="underline-field no-select" id="pacienteNombre"></div>
-                        </div>
-                        <div class="col-md-4 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Fecha Diagnóstico:</strong>
-                            <div class="underline-field no-select" id="fechaDiagnostico"></div>
-                        </div>
+                    <div class="col-md-4">
+                        <select id="paciente_id" name="seleccion" class="form-select" required>
+                            <option value="" selected disabled>-- Seleccione un paciente --</option>
+                            @foreach($pacientesClinica as $paciente)
+                                <option value="clinica-{{ $paciente->id }}"
+                                    data-nombre="{{ $paciente->nombre }} {{ $paciente->apellidos }}"
+                                    data-identidad="{{ $paciente->identidad }}"
+                                    data-fecha_nacimiento="{{ $paciente->fecha_nacimiento }}"
+                                    data-edad="{{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }}"
+                                    data-datos_clinicos="{{ e($paciente->datos_clinicos ?? '') }}"
+                                    {{ (old('seleccion') == "clinica-{$paciente->id}") ? 'selected' : '' }}>
+                                    {{ $paciente->nombre }} {{ $paciente->apellidos }} - {{ $paciente->identidad }} (Clínica)
+                                </option>
+                            @endforeach
+                            @foreach($pacientesRayosX as $paciente)
+                                <option value="rayosx-{{ $paciente->id }}"
+                                    data-nombre="{{ $paciente->nombre }} {{ $paciente->apellidos }}"
+                                    data-identidad="{{ $paciente->identidad }}"
+                                    data-fecha_nacimiento="{{ $paciente->fecha_nacimiento }}"
+                                    data-edad="{{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }}"
+                                    data-datos_clinicos="{{ e($paciente->datos_clinicos ?? '') }}"
+                                    {{ (old('seleccion') == "rayosx-{$paciente->id}") ? 'selected' : '' }}>
+                                    {{ $paciente->nombre }} {{ $paciente->apellidos }} - {{ $paciente->identidad }} (Rayos X)
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
 
+                    <label for="fecha" class="col-md-1 col-form-label fw-bold text-end">Fecha</label>
+                    <div class="col-md-2">
+                        <input type="date" id="fecha" name="fecha" class="form-control"
+                            value="{{ old('fecha', date('Y-m-d')) }}" required>
+                    </div>
+
+                    <div class="col-md-2">
+                        <a href="{{ route('pacientes.rayosx.create') }}" class="btn btn-primary w-100">
+                            Registrar
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Datos del paciente --}}
+                <div id="datosPaciente" class="mb-4" style="display:none;">
+                    <div class="section-title">DATOS DEL PACIENTE</div>
                     <div class="row">
-                        <div class="col-md-4 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Identidad:</strong>
-                            <div class="underline-field no-select" id="pacienteIdentidad"></div>
-                        </div>
-                        <div class="col-md-2 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Edad:</strong>
-                            <div class="underline-field no-select" id="pacienteEdad"></div>
+                        <div class="col-md-6 mb-2 d-flex align-items-center">
+                            <strong class="me-2">Nombre completo:</strong>
+                            <div class="underline-field" id="dp-nombre"></div>
                         </div>
                         <div class="col-md-6 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Médico Solicitante:</strong>
-                            <div class="underline-field no-select" id="medicoSolicitante"></div>
+                            <strong class="me-2">Identidad:</strong>
+                            <div class="underline-field" id="dp-identidad"></div>
+                        </div>
+                        <div class="col-md-4 mb-2 d-flex align-items-center">
+                            <strong class="me-2">Edad:</strong>
+                            <div class="underline-field" id="dp-edad"></div>
+                        </div>
+                        <div class="col-md-4 mb-2 d-flex align-items-center">
+                            <strong class="me-2">Fecha Nacimiento:</strong>
+                            <div class="underline-field" id="dp-fecha-nac"></div>
                         </div>
                     </div>
                 </div>
 
-<div id="mensajesEmergentes" style="margin-top: 1rem; min-height: 40px;">
-    @if ($errors->any())
-        <div class="alert-custom alert-error" id="erroresLaravel">
-            <ul style="margin: 0; padding-left: 1.2rem;">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-</div>
+                {{-- Mensajes debajo de datos paciente --}}
+                <div id="mensajePaciente" class="mensaje-flash"></div>
+                <div id="mensajeExamenes" class="mensaje-flash"></div>
 
-                {{-- Secciones con checkboxes para estudios de Rayos X --}}
-                @php
-                $secciones = [
-                    'Rayos X Cabeza' => [
-                        'craneo' => 'Cráneo',
-                        'waters' => 'Waters',
-                        'conductos_auditivos' => 'Conductos Auditivos',
-                        'cavum' => 'Cavum',
-                        'senos_paranasales' => 'Senos Paranasales',
-                        'silla_turca' => 'Silla Turca',
-                        'huesos_nasales' => 'Huesos Nasales',
-                        'atm_tm' => 'ATM - TM',
-                        'mastoides' => 'Mastoides',
-                        'mandibula' => 'Mandíbula',
-                    ],
-                    'Rayos X Tórax' => [
-                        'torax_pa' => 'Tórax PA',
-                        'torax_pa_lat' => 'Tórax PA Lateral',
-                        'costillas' => 'Costillas',
-                        'esternon' => 'Esternón',
-                    ],
-                    'Rayos X Abdomen' => [
-                        'abdomen_simple' => 'Abdomen Simple',
-                        'abdomen_agudo' => 'Abdomen Agudo',
-                    ],
-                    'Rayos X Extremidad Superior' => [
-                        'clavicula' => 'Clavícula',
-                        'hombro' => 'Hombro',
-                        'humero' => 'Húmero',
-                        'codo' => 'Codo',
-                        'antebrazo' => 'Antebrazo',
-                        'muneca' => 'Muñeca',
-                        'mano' => 'Mano',
-                    ],
-                    'Rayos X Extremidad Inferior' => [
-                        'cadera' => 'Cadera',
-                        'femur' => 'Fémur',
-                        'rodilla' => 'Rodilla',
-                        'tibia' => 'Tibia',
-                        'pie' => 'Pie',
-                        'calcaneo' => 'Calcáneo',
-                    ],
-                    'Rayos X Columna y Pelvis' => [
-                        'cervical' => 'Cervical',
-                        'dorsal' => 'Dorsal',
-                        'lumbar' => 'Lumbar',
-                        'sacro_coxis' => 'Sacro Coxis',
-                        'pelvis' => 'Pelvis',
-                        'escoliosis' => 'Escoliosis',
-                    ],
-                    'Rayos X Estudios Especiales' => [
-                        'arteriograma' => 'Arteriograma',
-                        'histerosalpingograma' => 'Histerosalpingograma',
-                        'colecistograma' => 'Colecistograma',
-                        'fistulograma' => 'Fistulograma',
-                        'artrograma' => 'Artrógama',
-                    ],
-                ];
-                @endphp
+                {{-- Datos clínicos --}}
+                <div class="mb-4 row align-items-center" id="datosClinicosContainer" style="display:none;">
+                    <label for="datos_clinicos" class="col-md-3 col-form-label fw-bold text-end">Datos Clínicos</label>
+                    <div class="col-md-6">
+                        <textarea name="datos_clinicos" id="datos_clinicos" rows="3" class="form-control">{{ old('datos_clinicos') }}</textarea>
+                    </div>
+                </div>
+
+                {{-- Exámenes --}}
+                {{-- Título general --}}
+                <div class="section-title general">Estudios para rayos X</div>
 
                 <div class="secciones-container">
-                    @foreach($secciones as $titulo => $examenes)
+                    @foreach($secciones as $titulo => $examenesSeccion)
                         <div class="seccion">
-                            <div class="section-title">{{ $titulo }}</div>
+                            {{-- Título de sección --}}
+                            <div class="section-title seccion">{{ $titulo }}</div>
                             <div class="examenes-grid">
-                                @foreach($examenes as $key => $label)
+                                @foreach($examenesSeccion as $clave)
                                     <label>
-                                        <input type="checkbox" name="examenes[{{ $key }}]"
-                                            value="1"
-                                            {{ old('examenes.' . $key) ? 'checked' : '' }}>
-                                        {{ $label }}
+                                        <input type="checkbox" name="examenes[]" value="{{ $clave }}"
+                                            {{ (is_array(old('examenes')) && in_array($clave, old('examenes'))) ? 'checked' : '' }}>
+                                        {{ $examenes[$clave] ?? ucfirst(str_replace('_', ' ', $clave)) }}
                                     </label>
                                 @endforeach
                             </div>
@@ -350,145 +323,137 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-save"></i> Guardar Orden
                     </button>
-
                     <button type="button" id="btnLimpiar" class="btn btn-warning">
                         <i class="bi bi-trash"></i> Limpiar
                     </button>
-
-                   <a href="{{ route('rayosx.index') }}" class="btn btn-success">
-    <i class="bi bi-arrow-left-circle"></i> Regresar
-</a>
-
+                    <a href="{{ route('rayosx.index') }}" class="btn btn-success">
+                        <i class="bi bi-arrow-left-circle"></i> Regresar
+                    </a>
                 </div>
             </form>
         </div>
-    </div>
-
-    {{-- Mensaje emergente máximo 5 seleccionados --}}
-    <div id="alertMax" class="alert-custom alert-error" style="display:none;">
-        Solo puede seleccionar un máximo de 5 Rayos X.
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const btnLimpiar = document.getElementById('btnLimpiar');
-    const checkboxes = document.querySelectorAll('input[type="checkbox"][name^="examenes"]');
-    const form = document.getElementById('formOrden');
-    const selectDiagnostico = document.getElementById('diagnostico_id');
-    const mensajesContainer = document.getElementById('mensajesEmergentes');
+    const selectPaciente = document.getElementById('paciente_id');
+    const datosPacienteDiv = document.getElementById('datosPaciente');
+    const dpNombre = document.getElementById('dp-nombre');
+    const dpIdentidad = document.getElementById('dp-identidad');
+    const dpEdad = document.getElementById('dp-edad');
+    const dpFechaNac = document.getElementById('dp-fecha-nac');
+    const datosClinicosContainer = document.getElementById('datosClinicosContainer');
+    const datosClinicosTextarea = document.getElementById('datos_clinicos');
 
-    btnLimpiar.addEventListener('click', () => {
-        checkboxes.forEach(cb => cb.checked = false);
-        limpiarMensajes();
-    });
+    const mensajePaciente = document.getElementById('mensajePaciente');
+    const mensajeExamenes = document.getElementById('mensajeExamenes');
+    const formOrden = document.getElementById('formOrden');
+    const checkboxes = formOrden.querySelectorAll('input[type=checkbox][name="examenes[]"]');
+    const MAX_EXAMENES = 7;
 
-    // Mostrar datos del diagnóstico seleccionado
-    const datosDiv = document.getElementById('datosPaciente');
-    const pacienteNombre = document.getElementById('pacienteNombre');
-    const pacienteIdentidad = document.getElementById('pacienteIdentidad');
-    const fechaDiagnostico = document.getElementById('fechaDiagnostico');
-    const pacienteEdad = document.getElementById('pacienteEdad');
-    const medicoSolicitante = document.getElementById('medicoSolicitante');
+    // Mostrar datos paciente cuando cambie selección
+    function mostrarDatosPaciente() {
+        const selectedOption = selectPaciente.options[selectPaciente.selectedIndex];
+        if (selectPaciente.value && selectedOption) {
+            dpNombre.textContent = selectedOption.getAttribute('data-nombre') || '';
+            dpIdentidad.textContent = selectedOption.getAttribute('data-identidad') || '';
+            const fechaNacRaw = selectedOption.getAttribute('data-fecha_nacimiento') || '';
+            dpFechaNac.textContent = fechaNacRaw ? new Date(fechaNacRaw).toLocaleDateString('es-ES') : '';
+            const edad = selectedOption.getAttribute('data-edad') || '';
+            dpEdad.textContent = edad ? `${edad} años` : '';
+            datosPacienteDiv.style.display = 'block';
 
-    selectDiagnostico.addEventListener('change', function() {
-        const option = this.options[this.selectedIndex];
-        if(this.value){
-            pacienteNombre.textContent = option.getAttribute('data-nombre');
-            pacienteIdentidad.textContent = option.getAttribute('data-identidad');
-            fechaDiagnostico.textContent = option.getAttribute('data-fecha');
-            pacienteEdad.textContent = option.getAttribute('data-edad') + ' años';
-            medicoSolicitante.textContent = option.getAttribute('data-medico');
-            datosDiv.style.display = 'block';
+            const datosClin = selectedOption.getAttribute('data-datos_clinicos') || '';
+            if (datosClin.trim() !== '') {
+                datosClinicosTextarea.value = datosClin;
+                datosClinicosContainer.style.display = 'flex';
+            } else {
+                datosClinicosTextarea.value = '';
+                datosClinicosContainer.style.display = 'none';
+            }
         } else {
-            datosDiv.style.display = 'none';
+            dpNombre.textContent = '';
+            dpIdentidad.textContent = '';
+            dpFechaNac.textContent = '';
+            dpEdad.textContent = '';
+            datosPacienteDiv.style.display = 'none';
+            datosClinicosContainer.style.display = 'none';
         }
-        limpiarMensajes();
-    });
-
-    // Cargar datos paciente automáticamente si hay diagnóstico seleccionado al cargar la página
-    if (selectDiagnostico.value) {
-        const option = selectDiagnostico.options[selectDiagnostico.selectedIndex];
-        pacienteNombre.textContent = option.getAttribute('data-nombre');
-        pacienteIdentidad.textContent = option.getAttribute('data-identidad');
-        fechaDiagnostico.textContent = option.getAttribute('data-fecha');
-        pacienteEdad.textContent = option.getAttribute('data-edad') + ' años';
-        medicoSolicitante.textContent = option.getAttribute('data-medico');
-        datosDiv.style.display = 'block';
+        clearMensaje(mensajePaciente);
+    }
+    selectPaciente?.addEventListener('change', mostrarDatosPaciente);
+    if (selectPaciente && selectPaciente.value) {
+        mostrarDatosPaciente();
     }
 
-    // Función para mostrar mensajes en el div mensajesEmergentes
-    function mostrarMensaje(mensaje, tipo = 'error') {
-        limpiarMensajes();
-        const div = document.createElement('div');
-        div.textContent = mensaje;
-        div.className = tipo === 'error' ? 'alert-custom alert-error' : 'alert-custom alert-success';
-        mensajesContainer.appendChild(div);
+    // Limpiar formulario
+    const btnLimpiar = document.getElementById('btnLimpiar');
+    if (btnLimpiar) {
+        btnLimpiar.addEventListener('click', () => {
+            formOrden.reset();
+            datosPacienteDiv.style.display = 'none';
+            datosClinicosContainer.style.display = 'none';
+            const fecha = document.getElementById('fecha');
+            if (fecha) fecha.value = new Date().toISOString().slice(0,10);
+            clearMensaje(mensajePaciente);
+            clearMensaje(mensajeExamenes);
+        });
+    }
 
-        // Scroll suave para que el mensaje se vea
-        div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Mostrar mensaje emergente con scroll y autoclose
+    function showMensaje(mensajeElem, texto) {
+        mensajeElem.textContent = texto;
+        mensajeElem.style.display = 'inline-block'; // para estilo tipo etiqueta
+
+        mensajeElem.scrollIntoView({behavior: 'smooth', block: 'center'});
 
         setTimeout(() => {
-            div.remove();
-        }, 5000);
+            mensajeElem.style.display = 'none';
+            mensajeElem.textContent = '';
+        }, 4000);
+    }
+    function clearMensaje(mensajeElem) {
+        mensajeElem.textContent = '';
+        mensajeElem.style.display = 'none';
     }
 
-    function limpiarMensajes() {
-        mensajesContainer.innerHTML = '';
-    }
-
-    // Validar máximo 5 checkboxes seleccionados
-    checkboxes.forEach(cb => {
-        cb.addEventListener('change', () => {
-            const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
-            // Solo mostrar mensaje si está marcando y supera el límite
-            if (checkedCount > 5 && cb.checked) {
-                cb.checked = false; // desmarca el último seleccionado
-                mostrarMensaje('Solo puede seleccionar un máximo de 5 Rayos X.', 'error');
+    // Control de límite de selección de rayos X
+    checkboxes.forEach(chk => {
+        chk.addEventListener('change', function() {
+            const seleccionados = [...checkboxes].filter(c => c.checked);
+            if (seleccionados.length > MAX_EXAMENES) {
+                // Deseleccionar último y mostrar mensaje
+                this.checked = false;
+                showMensaje(mensajeExamenes, `Solo se pueden seleccionar máximo ${MAX_EXAMENES} rayos X.`);
+            } else {
+                clearMensaje(mensajeExamenes);
             }
         });
     });
 
     // Validar formulario antes de enviar
-    form.addEventListener('submit', (e) => {
-        const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
+    formOrden.addEventListener('submit', function(e) {
+        clearMensaje(mensajePaciente);
+        clearMensaje(mensajeExamenes);
 
-        limpiarMensajes();
-
-        if (!selectDiagnostico.value) {
+        // Verificar paciente seleccionado
+        if (!selectPaciente.value) {
             e.preventDefault();
-            mostrarMensaje('Debe seleccionar un diagnóstico antes de guardar.', 'error');
-            selectDiagnostico.focus();
+            showMensaje(mensajePaciente, 'Debe seleccionar un paciente antes de guardar.');
+            selectPaciente.focus();
             return;
         }
-        if (checkedCount === 0) {
+
+        // Verificar al menos un examen seleccionado
+        const seleccionados = [...checkboxes].filter(c => c.checked);
+        if (seleccionados.length === 0) {
             e.preventDefault();
-            mostrarMensaje('Debe seleccionar al menos un examen de Rayos X.', 'error');
-            return;
-        }
-        if (checkedCount > 5) {
-            e.preventDefault();
-            mostrarMensaje('No puede seleccionar más de 5 exámenes de Rayos X.', 'error');
+            showMensaje(mensajeExamenes, 'Debe seleccionar al menos un examen para guardar.');
+            mensajeExamenes.scrollIntoView({behavior: 'smooth', block: 'center'});
             return;
         }
     });
-
 });
-
- document.addEventListener('DOMContentLoaded', function() {
-        const erroresDiv = document.getElementById('erroresLaravel');
-        if (erroresDiv) {
-            // Mostrar el div y luego ocultarlo después de 4 segundos (4000 ms)
-            setTimeout(() => {
-                // Opcional: animación para ocultar (desvanecer)
-                erroresDiv.style.transition = 'opacity 0.7s ease';
-                erroresDiv.style.opacity = '0';
-                // Luego de la transición, ocultamos el div para que no ocupe espacio
-                setTimeout(() => {
-                    erroresDiv.style.display = 'none';
-                }, 700);
-            }, 4000);
-        }
-    });
 </script>
 @endsection
