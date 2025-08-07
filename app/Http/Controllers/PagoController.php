@@ -62,7 +62,7 @@ public function store(Request $request)
         'cantidad.required' => 'La cantidad es obligatoria.',
         'cantidad.numeric' => 'La cantidad debe ser un número válido.',
         'cantidad.min' => 'La cantidad debe ser mayor o igual a L. 1000.00.',
-        'cantidad.max' => 'La cantidad no puede superar L. 9999.99.',
+        'cantidad.max' => 'La cantidad no puede superar L. 99999.99.',
 
         'servicio.required' => 'El campo servicio es obligatorio.',
     ];
@@ -75,7 +75,7 @@ public function store(Request $request)
         'fecha_expiracion' => 'required_if:metodo_pago,tarjeta',
         'cvv' => 'required_if:metodo_pago,tarjeta|max:4',
         'servicio' => 'required|string',
-        'cantidad' => ['required', 'numeric', 'min:1000.00', 'max:9999.99'],
+        'cantidad' => ['required', 'numeric', 'min:0.01', 'max:99999.99'],
     ];
 
     $request->validate($rules, $messages);

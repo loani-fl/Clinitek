@@ -101,14 +101,21 @@
 </style>
 
 <div class="factura-container">
-    {{-- Botón de inicio --}}
-    <a href="{{ route('inicio') }}" class="btn boton-inicio">Inicio</a>
 
-    <div class="factura-header">
-        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek">
-        <h1>CLINITEK</h1>
-        <h2>FACTURA DE PAGO</h2>
+    <div class="factura-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+    <!-- Lado izquierdo: logo y nombre -->
+    <div style="display: flex; align-items: center;">
+        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 60px; margin-right: 10px;">
+        <h1 style="margin: 0; font-weight: bold; font-style: italic;">CLINITEK</h1>
     </div>
+
+    <!-- Lado derecho: dirección y título -->
+    <div style="text-align: right;">
+        <p style="margin: 0;">Uniplaza, Bo. Gualiqueme,<br>Gasolinera Texaco, Frente a, Danlí</p>
+        <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 14px;">FACTURA DE PAGO</p>
+    </div>
+</div>
+
 
     <div class="factura-divider"></div>
 
@@ -209,10 +216,26 @@
     </div>
 
     <div class="factura-divider"></div>
+    <!-- Pie de factura: botón + texto alineados horizontalmente -->
+<div class="factura-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px;">
+    <!-- Botón a la izquierda -->
+    <a href="{{ route('inicio') }}" style="
+        display: inline-block;
+        background-color: #ccc;
+        color: black;
+        padding: 8px 16px;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+        border: 1px solid #999;
+    ">Inicio</a>
 
-    <div class="factura-footer">
+    <!-- Texto a la derecha -->
+    <div style="text-align: right;">
         *** ¡AGRADECEMOS SU PREFERENCIA! ***<br>
         Gracias por confiar en nosotros <strong>CLINITEK</strong>.
     </div>
+</div>
+
 </div>
 @endsection
