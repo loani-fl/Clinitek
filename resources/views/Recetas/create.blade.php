@@ -106,11 +106,27 @@
             : 'Edad no disponible';
     @endphp
 
-    <div style="display: flex; align-items: center; gap: 8rem; margin-bottom: 1rem;">
-        <p><strong>Paciente:</strong> {{ $consulta->paciente->nombre ?? '' }} {{ $consulta->paciente->apellidos ?? '' }}</p>
-        <p><strong>Edad:</strong> {{ $edad }}</p>
-        <p><strong>Fecha:</strong> {{ $consulta->fecha ?? 'Sin fecha' }}</p>
-    </div>
+    <div style="display: flex; align-items: center; gap: 3rem; margin-bottom: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+    <p style="flex: 3; margin: 0; font-size: 1.1rem;">
+        <strong>Paciente:</strong>
+        <span style="border-bottom: 1px solid black; padding-bottom: 0.3rem;">
+            {{ $consulta->paciente->nombre ?? '' }} {{ $consulta->paciente->apellidos ?? '' }}
+        </span>
+    </p>
+    <p style="flex: 1; margin: 0; font-size: 1.1rem; text-align: center;">
+        <strong>Edad:</strong>
+        <span style="border-bottom: 1px solid black; padding-bottom: 0.3rem;">
+            {{ $edad }}
+        </span>
+    </p>
+    <p style="flex: 2; margin: 0; font-size: 1.1rem; text-align: right; white-space: nowrap;">
+        <strong>Fecha:</strong>
+        <span style="border-bottom: 1px solid black; padding-bottom: 0.3rem;">
+            {{ $consulta->fecha ?? 'Sin fecha' }}
+        </span>
+    </p>
+</div>
+
 
 
     <form action="{{ route('recetas.store', ['consulta' => $consulta->id]) }}" method="POST">
@@ -120,55 +136,56 @@
     <input type="hidden" name="consulta_id" value="{{ $consulta->id }}">
 
 
-        <!-- Medicamento con autocompletado -->
-        <div style="position: relative; margin-bottom: 1rem;">
-    <label for="medicamento" style="font-weight: 600;">Medicamento:</label>
-    <input
-        type="text"
-        id="medicamento"
-        name="medicamentos[0][nombre]"
-        maxlength="55"
-        placeholder="Escribe el nombre del medicamento"
-        autocomplete="off"
-        style="width: 35%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;"
-        value="{{ old('medicamentos.0.nombre') }}">
-    <div id="medicamento-list"></div>
-    <div id="error-medicamento" class="error-message"></div>
-@error('medicamentos.0.nombre')
-    <small class="text-danger">{{ $message }}</small>
-@enderror
+       <!-- Fila de Medicamento, Indicaciones y Dosis -->
+<div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; align-items: flex-start;">
+    <!-- Medicamento con autocompletado -->
+    <div style="flex: 1 1 40%; position: relative;">
+        <label for="medicamento" style="font-weight: 600;">Medicamento:</label>
+        <input
+            type="text"
+            id="medicamento"
+            name="medicamentos[0][nombre]"
+            maxlength="55"
+            placeholder="Escribe el nombre del medicamento"
+            autocomplete="off"
+            style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;"
+            value="{{ old('medicamentos.0.nombre') }}">
+        <div id="medicamento-list"></div>
+        <div id="error-medicamento" class="error-message"></div>
+        @error('medicamentos.0.nombre')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+    </div>
 
-</div>
+    <!-- Indicaciones -->
+    <div style="flex: 1 1 25%;">
+        <label for="indicacion" style="font-weight: 600;">Indicaciones:</label>
+        <select id="indicacion" style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+            <option value="Cada 8 horas">Cada 8 horas</option>
+            <option value="Cada 12 horas">Cada 12 horas</option>
+            <option value="Cada 24 horas">Cada 24 horas</option>
+            <option value="Una vez al día">Cada 6 horas</option>
+            <option value="Antes de dormir">Antes de dormir</option>
+        </select>
+        @error('medicamentos.0.indicacion')
+            <div class="error-message">{{ $message }}</div>
+        @enderror
+    </div>
 
-        <!-- Indicaciones -->
-        <div style="margin-bottom: 1rem;">
-            <label for="indicacion" style="font-weight: 600;">Indicaciones:</label>
-            <select id="indicacion" style="width: 18%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
-                <option value="Cada 8 horas">Cada 8 horas</option>
-                <option value="Cada 12 horas">Cada 12 horas</option>
-                <option value="Cada 24 horas">Cada 24 horas</option>
-                <option value="Una vez al día">Cada 6 horas</option>
-                <option value="Antes de dormir">Antes de dormir</option>
-            </select>
-            @error('medicamentos.0.indicacion')
-                <div class="error-message">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <!-- Dosis -->
-        <div style="margin-bottom: 1rem;">
-    <label for="dosis" style="font-weight: 600;">Dosis:</label>
-    <input
-        type="text"
-        id="dosis"
-        maxlength="25"
-        placeholder="Ejemplo: 500 mg"
-        style="width: 20%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+    <!-- Dosis -->
+    <div style="flex: 1 1 20%;">
+        <label for="dosis" style="font-weight: 600;">Dosis:</label>
+        <input
+            type="text"
+            id="dosis"
+            maxlength="25"
+            placeholder="Ejemplo: 500 mg"
+            style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
         <div id="error-dosis" class="error-message"></div>
-
-    @error('medicamentos.0.dosis')
-        <div class="error-message">{{ $message }}</div>
-    @enderror
+        @error('medicamentos.0.dosis')
+            <div class="error-message">{{ $message }}</div>
+        @enderror
+    </div>
 </div>
 
 
@@ -235,12 +252,8 @@
 </div>
 
 <script>
-    function updateCount() {
-        const detalles = document.getElementById('detalles');
-        const count = document.getElementById('charCount');
-        count.textContent = detalles.value.length;
-    }
-    document.addEventListener('DOMContentLoaded', () => {
+
+document.addEventListener('DOMContentLoaded', () => {
     const medicamentoInput = document.getElementById('medicamento');
     const medicamentoList = document.getElementById('medicamento-list');
     const indicacionSelect = document.getElementById('indicacion');
@@ -251,6 +264,8 @@
     const tablaMedicamentos = document.getElementById('tabla-medicamentos').querySelector('tbody');
     const hiddenContainer = document.getElementById('medicamentos-hidden');
     const medicamentosAgregados = new Set();
+
+    let medicamentoSeleccionado = false; // Bandera para controlar selección
 
     function updateCount() {
         const detalles = detallesTextarea;
@@ -283,11 +298,13 @@
                 div.textContent = med;
                 div.addEventListener('click', () => {
                     medicamentoInput.value = med;
+                    medicamentoList.innerHTML = ''; // Limpia la lista para que no aparezca
                     medicamentoList.style.display = 'none';
                     detallesContainer.style.display = 'block';
                     updateCount();
                     dosisInput.value = '';
-                    medicamentoInput.focus();
+                    medicamentoSeleccionado = true; // Marca como seleccionado
+                    medicamentoInput.blur(); // Opcional: quita el foco para evitar reabrir la lista
                 });
                 medicamentoList.appendChild(div);
             });
@@ -301,23 +318,32 @@
     medicamentoInput.addEventListener('input', () => {
         const texto = medicamentoInput.value.trim();
 
-        // Mostrar detalles si hay texto
         if (texto.length > 0) {
+            medicamentoSeleccionado = false; // Si escribe algo nuevo, quita selección
             detallesContainer.style.display = 'block';
+            fetchSugerencias(texto);
         } else {
             detallesContainer.style.display = 'none';
             detallesTextarea.value = '';
             updateCount();
             medicamentoList.style.display = 'none';
-            return;
         }
-
-        fetchSugerencias(texto);
     });
 
     medicamentoInput.addEventListener('focus', () => {
         const texto = medicamentoInput.value.trim();
-        fetchSugerencias(texto);
+
+        // Si ya se seleccionó un medicamento, no mostrar sugerencias
+        if (medicamentoSeleccionado) {
+            medicamentoList.style.display = 'none';
+            return;
+        }
+
+        if (texto.length > 0) {
+            fetchSugerencias(texto);
+        } else {
+            medicamentoList.style.display = 'none';
+        }
     });
 
     document.addEventListener('click', (e) => {
@@ -332,7 +358,7 @@
         const dosis = dosisInput.value.trim();
         const detalles = detallesTextarea.value.trim();
 
-            // Limpiar errores anteriores
+        // Limpiar errores anteriores
         document.getElementById('error-medicamento').textContent = '';
         document.getElementById('error-dosis').textContent = '';
         document.getElementById('error-detalles').textContent = '';
@@ -358,7 +384,6 @@
         }
 
         if (error) return;
-
 
         if (document.getElementById('tabla-medicamentos').style.display === 'none') {
             document.getElementById('tabla-medicamentos').style.display = 'table';
@@ -444,6 +469,8 @@
         dosisInput.value = '';
         detallesTextarea.value = '';
         detallesContainer.style.display = 'none';
+
+        medicamentoSeleccionado = false; // Para que si empiezas a escribir otro medicamento funcione bien
 
         // Dar foco para seguir escribiendo y mostrar sugerencias si empieza a escribir
         medicamentoInput.focus();
