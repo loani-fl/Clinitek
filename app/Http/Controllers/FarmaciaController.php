@@ -314,6 +314,11 @@ class FarmaciaController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $farmacia = Farmacia::findOrFail($id);
+        $farmacia->delete();
+
+        return redirect()->route('farmacias.index')
+            ->with('success', 'Farmacia eliminada correctamente.');
     }
+
 }
