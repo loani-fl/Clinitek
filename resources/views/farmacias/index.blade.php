@@ -2,9 +2,14 @@
 
 @push('styles')
 <style>
-    html, body {
-        background-color: #e8f4fc;
+    body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .fondo-azul {
+        background-color: #e8f4fc;
+        min-height: 100vh;
+        padding-bottom: 2rem;
     }
 
     .contenedor-principal {
@@ -78,6 +83,7 @@
         color: #0856b3;
         background-color: white;
     }
+
     .btn-ver:hover {
         background-color: #e0f0ff;
         color: #0856b3;
@@ -88,6 +94,7 @@
         color: #996600;
         background-color: white;
     }
+
     .btn-editar:hover {
         background-color: #fff8cc;
         color: #996600;
@@ -96,102 +103,103 @@
 @endpush
 
 @section('content')
-<div class="contenedor-principal">
-    <div class="card custom-card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center" style="flex: 1;">
-                <a href="{{ route('inicio') }}" class="btn btn-light me-2">
-                    <i class="bi bi-house-door"></i> Inicio
-                </a>
+<div class="fondo-azul">
+    <div class="contenedor-principal">
+        <div class="card custom-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center" style="flex: 1;">
+                    <a href="{{ route('inicio') }}" class="btn btn-light me-2">
+                        <i class="bi bi-house-door"></i> Inicio
+                    </a>
+                </div>
+
+                <h5 class="mb-0 flex-grow-1 text-center" style="color: black;">
+                    Listado de farmacias asociadas
+                </h5>
+
+                <div style="flex: 1; display: flex; justify-content: flex-end;">
+                    <a href="{{ route('farmacias.create') }}" class="btn btn-primary btn-sm d-flex align-items-center gap-1" style="white-space: nowrap;">
+                        <i class="bi bi-plus-circle"></i> Registrar farmacia
+                    </a>
+                </div>
             </div>
 
-            <h5 class="mb-0 flex-grow-1 text-center" style="color: black;">
-                Listado de farmacias asociadas
-            </h5>
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show mt-3 mx-3" role="alert">
+                    <i class="bi bi-check-circle-fill"></i>
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            @endif
 
-            <div style="flex: 1; display: flex; justify-content: flex-end;">
-                <a href="{{ route('farmacias.create') }}" class="btn btn-primary btn-sm d-flex align-items-center gap-1" style="white-space: nowrap;">
-                    <i class="bi bi-plus-circle"></i> Registrar farmacia
-                </a>
+            <div class="px-3 py-2 mt-3">
+                <form id="formFiltro" onsubmit="return false;">
+                    <div class="d-flex gap-2">
+                        <input type="text" name="filtro" id="inputFiltro" class="form-control w-50"
+                            placeholder="Buscar por nombre o ubicación" value="{{ request('filtro') }}">
+                    </div>
+                </form>
             </div>
-        </div>
 
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show mt-3 mx-3" role="alert">
-                <i class="bi bi-check-circle-fill"></i>
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            <div id="tabla-container">
+                @include('farmacias.partials.tabla', ['farmacias' => $farmacias, 'conNumeracion' => true])
             </div>
-        @endif
 
-        <div class="px-3 py-2 mt-3">
-        <form id="formFiltro" onsubmit="return false;">
-        <div class="d-flex gap-2">
-            <input type="text" name="filtro" id="inputFiltro" class="form-control w-50"
-                placeholder="Buscar por nombre o ubicación" value="{{ request('filtro') }}">
-        </div>
-</form>
-
-        </div>
-
-        <div id="tabla-container">
-            @include('farmacias.partials.tabla', ['farmacias' => $farmacias, 'conNumeracion' => true])
-        </div>
-
-        <div id="mensajeResultados">
-            Se encontraron {{ $farmacias->total() }} resultado{{ $farmacias->total() != 1 ? 's' : '' }}.
+            <div id="mensajeResultados">
+                Se encontraron {{ $farmacias->total() }} resultado{{ $farmacias->total() != 1 ? 's' : '' }}.
+            </div>
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script>
-$(document).ready(function () {
-    function actualizarMensaje(total, all, query) {
-        if (query === '') {
-            $('#mensajeResultados').html('');
-        } else {
-            $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
-        }
-    }
-
-    function cargarDatos(page = 1, filtro = '') {
-        $.ajax({
-            url: "{{ route('farmacias.index') }}",
-            type: 'GET',
-            data: { page, filtro },
-            success: function(data) {
-                $('#tabla-container').html(data.html);
-                actualizarMensaje(data.total, data.all, filtro);
-                window.history.pushState("", "", `?page=${page}&filtro=${encodeURIComponent(filtro)}`);
-            },
-            error: function(xhr) {
-                let msg = 'No se encontraron resultados.';
-                if(xhr.responseJSON && xhr.responseJSON.message){
-                    msg += ' ' + xhr.responseJSON.message;
-                }
-                $('#mensajeResultados').html(msg);
+    $(document).ready(function () {
+        function actualizarMensaje(total, all, query) {
+            if (query === '') {
+                $('#mensajeResultados').html('');
+            } else {
+                $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
             }
+        }
+
+        function cargarDatos(page = 1, filtro = '') {
+            $.ajax({
+                url: "{{ route('farmacias.index') }}",
+                type: 'GET',
+                data: { page, filtro },
+                success: function(data) {
+                    $('#tabla-container').html(data.html);
+                    actualizarMensaje(data.total, data.all, filtro);
+                    window.history.pushState("", "", `?page=${page}&filtro=${encodeURIComponent(filtro)}`);
+                },
+                error: function(xhr) {
+                    let msg = 'No se encontraron resultados.';
+                    if(xhr.responseJSON && xhr.responseJSON.message){
+                        msg += ' ' + xhr.responseJSON.message;
+                    }
+                    $('#mensajeResultados').html(msg);
+                }
+            });
+        }
+
+        let timeout = null;
+        $('#inputFiltro').on('input', function () {
+            clearTimeout(timeout);
+            let filtro = $(this).val();
+            timeout = setTimeout(() => {
+                cargarDatos(1, filtro);
+            }, 500);
         });
-    }
 
-    let timeout = null;
-    $('#inputFiltro').on('input', function () {
-        clearTimeout(timeout);
-        let filtro = $(this).val();
-        timeout = setTimeout(() => {
-            cargarDatos(1, filtro);
-        }, 500);
+        $(document).on('click', '.pagination a', function(e) {
+            e.preventDefault();
+            let url = $(this).attr('href');
+            let page = url.split('page=')[1];
+            let filtro = $('#inputFiltro').val();
+            cargarDatos(page, filtro);
+        });
     });
-
-    $(document).on('click', '.pagination a', function(e) {
-        e.preventDefault();
-        let url = $(this).attr('href');
-        let page = url.split('page=')[1];
-        let filtro = $('#inputFiltro').val();
-        cargarDatos(page, filtro);
-    });
-});
 </script>
 @endpush
-@endsection
