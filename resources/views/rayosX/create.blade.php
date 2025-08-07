@@ -66,11 +66,10 @@
         color: #003366;
     }
 
-   .seccion {
-    padding: 0.8rem;
-    border-radius: 0;
-}
-
+    .seccion {
+        padding: 0.8rem;
+        border-radius: 0;
+    }
 
     .underline-field {
         border-bottom: 1px dashed #333;
@@ -97,67 +96,77 @@
     }
 
     .secciones-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.3rem 0.10rem; /* poco espacio entre secciones */
-    margin-top: 0.3rem;
-}
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.3rem 0.10rem; /* poco espacio entre secciones */
+        margin-top: 0.3rem;
+    }
 
-.seccion {
-    padding: 0;
-}
+    .seccion {
+        padding: 0;
+    }
 
-.section-title {
-    font-size: 1.5rem;   /* más grande */
-    margin: 0 0 0.7rem;
-    color: rgb(6, 11, 17);
-    font-weight: 700;
-    line-height: 1.6rem; /* ajusta para que no quede muy apretado */
-}
+    .section-title {
+        font-size: 1.5rem; /* más grande */
+        margin: 0 0 0.7rem;
+        color: rgb(6, 11, 17);
+        font-weight: 700;
+        line-height: 1.6rem; /* ajusta para que no quede muy apretado */
+    }
 
+    .examenes-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem; /* menos espacio entre checkboxes */
+    }
 
-.examenes-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem; /* menos espacio entre checkboxes */
-}
+    .examenes-grid label {
+        font-size: 0.85rem;
+        line-height: 1rem;
+        cursor: pointer;
+    }
 
-.examenes-grid label {
-    font-size: 0.85rem;
-    line-height: 1rem;
-    cursor: pointer;
-}
+    .examenes-grid input[type="checkbox"] {
+        margin-right: 6px;
+    }
 
-.examenes-grid input[type="checkbox"] {
-    margin-right: 6px;
-}
+    .section-title:first-of-type {
+        margin-top: 3rem; /* Ajusta el valor a lo que necesites */
+    }
 
-.section-title:first-of-type {
-  margin-top: 3rem; /* Ajusta el valor a lo que necesites */
-}
+    /* Título general (más grande) */
+    .section-title.general {
+        font-size: 1.5rem; /* tamaño mayor */
+        margin: 0 0 0.7rem;
+        color: rgb(6, 11, 17);
+        font-weight: 700;
+        line-height: 1.6rem;
+        text-align: center; /* CENTRAR */
+    }
 
-/* Título general (más grande) */
-.section-title.general {
-    font-size: 1.5rem;   /* tamaño mayor */
-    margin: 0 0 0.7rem;
-    color: rgb(6, 11, 17);
-    font-weight: 700;
-    line-height: 1.6rem;
-    text-align: center;   /* CENTRAR */
-}
+    /* Títulos de secciones (más pequeños) */
+    .section-title.seccion {
+        font-size: 1.1rem; /* tamaño menor */
+        margin-bottom: 0.5rem;
+        color: #003366;
+        font-weight: 700;
+        line-height: 1.3rem;
+    }
 
-
-/* Títulos de secciones (más pequeños) */
-.section-title.seccion {
-    font-size: 1.1rem;  /* tamaño menor */
-    margin-bottom: 0.5rem;
-    color: #003366;
-    font-weight: 700;
-    line-height: 1.3rem;
-}
-
-
-
+    /* Estilos para mensajes flash emergentes */
+    .mensaje-flash {
+        display: none; /* oculto por defecto */
+        background-color: #f8d7da; /* rojo suave */
+        color: #842029; /* texto rojo oscuro */
+        border: 1px solid #f5c2c7;
+        padding: 8px 12px;
+        border-radius: 0.4rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        max-width: 600px;
+        user-select: none;
+    }
 </style>
 
 <div class="content-wrapper">
@@ -179,7 +188,7 @@
         </div>
 
         <div class="card-body">
-            {{-- Flash messages --}}
+            {{-- Flash messages Laravel (opcional) --}}
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
@@ -205,54 +214,52 @@
             @endif
 
             {{-- Formulario --}}
-            <form method="POST" action="{{ route('rayosx.store') }}" id="formOrden">
+            <form method="POST" action="{{ route('rayosx.store') }}" id="formOrden" novalidate>
                 @csrf
 
- <div class="mb-4 row align-items-center">
-    <label for="paciente_id" class="col-md-2 col-form-label fw-bold text-end">Seleccione Paciente</label>
+                <div class="mb-4 row align-items-center">
+                    <label for="paciente_id" class="col-md-2 col-form-label fw-bold text-end">Seleccione Paciente</label>
 
-    <div class="col-md-4">
-        <select id="paciente_id" name="seleccion" class="form-select" required>
-            <option value="" selected disabled>-- Seleccione un paciente --</option>
-            @foreach($pacientesClinica as $paciente)
-                <option value="clinica-{{ $paciente->id }}"
-                    data-nombre="{{ $paciente->nombre }} {{ $paciente->apellidos }}"
-                    data-identidad="{{ $paciente->identidad }}"
-                    data-fecha_nacimiento="{{ $paciente->fecha_nacimiento }}"
-                    data-edad="{{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }}"
-                    data-datos_clinicos="{{ e($paciente->datos_clinicos ?? '') }}"
-                    {{ (old('seleccion') == "clinica-{$paciente->id}") ? 'selected' : '' }}>
-                    {{ $paciente->nombre }} {{ $paciente->apellidos }} - {{ $paciente->identidad }} (Clínica)
-                </option>
-            @endforeach
-            @foreach($pacientesRayosX as $paciente)
-                <option value="rayosx-{{ $paciente->id }}"
-                    data-nombre="{{ $paciente->nombre }} {{ $paciente->apellidos }}"
-                    data-identidad="{{ $paciente->identidad }}"
-                    data-fecha_nacimiento="{{ $paciente->fecha_nacimiento }}"
-                    data-edad="{{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }}"
-                    data-datos_clinicos="{{ e($paciente->datos_clinicos ?? '') }}"
-                    {{ (old('seleccion') == "rayosx-{$paciente->id}") ? 'selected' : '' }}>
-                    {{ $paciente->nombre }} {{ $paciente->apellidos }} - {{ $paciente->identidad }} (Rayos X)
-                </option>
-            @endforeach
-        </select>
-    </div>
+                    <div class="col-md-4">
+                        <select id="paciente_id" name="seleccion" class="form-select" required>
+                            <option value="" selected disabled>-- Seleccione un paciente --</option>
+                            @foreach($pacientesClinica as $paciente)
+                                <option value="clinica-{{ $paciente->id }}"
+                                    data-nombre="{{ $paciente->nombre }} {{ $paciente->apellidos }}"
+                                    data-identidad="{{ $paciente->identidad }}"
+                                    data-fecha_nacimiento="{{ $paciente->fecha_nacimiento }}"
+                                    data-edad="{{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }}"
+                                    data-datos_clinicos="{{ e($paciente->datos_clinicos ?? '') }}"
+                                    {{ (old('seleccion') == "clinica-{$paciente->id}") ? 'selected' : '' }}>
+                                    {{ $paciente->nombre }} {{ $paciente->apellidos }} - {{ $paciente->identidad }} (Clínica)
+                                </option>
+                            @endforeach
+                            @foreach($pacientesRayosX as $paciente)
+                                <option value="rayosx-{{ $paciente->id }}"
+                                    data-nombre="{{ $paciente->nombre }} {{ $paciente->apellidos }}"
+                                    data-identidad="{{ $paciente->identidad }}"
+                                    data-fecha_nacimiento="{{ $paciente->fecha_nacimiento }}"
+                                    data-edad="{{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }}"
+                                    data-datos_clinicos="{{ e($paciente->datos_clinicos ?? '') }}"
+                                    {{ (old('seleccion') == "rayosx-{$paciente->id}") ? 'selected' : '' }}>
+                                    {{ $paciente->nombre }} {{ $paciente->apellidos }} - {{ $paciente->identidad }} (Rayos X)
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-    <label for="fecha" class="col-md-1 col-form-label fw-bold text-end">Fecha</label>
-    <div class="col-md-2">
-        <input type="date" id="fecha" name="fecha" class="form-control"
-            value="{{ old('fecha', date('Y-m-d')) }}" required>
-    </div>
+                    <label for="fecha" class="col-md-1 col-form-label fw-bold text-end">Fecha</label>
+                    <div class="col-md-2">
+                        <input type="date" id="fecha" name="fecha" class="form-control"
+                            value="{{ old('fecha', date('Y-m-d')) }}" required>
+                    </div>
 
-    <div class="col-md-2">
-        <a href="{{ route('pacientes.rayosx.create') }}" class="btn btn-primary w-100">
-            Registrar
-        </a>
-    </div>
-</div>
-
-
+                    <div class="col-md-2">
+                        <a href="{{ route('pacientes.rayosx.create') }}" class="btn btn-primary w-100">
+                            Registrar
+                        </a>
+                    </div>
+                </div>
 
                 {{-- Datos del paciente --}}
                 <div id="datosPaciente" class="mb-4" style="display:none;">
@@ -277,7 +284,9 @@
                     </div>
                 </div>
 
-      
+                {{-- Mensajes debajo de datos paciente --}}
+                <div id="mensajePaciente" class="mensaje-flash"></div>
+                <div id="mensajeExamenes" class="mensaje-flash"></div>
 
                 {{-- Datos clínicos --}}
                 <div class="mb-4 row align-items-center" id="datosClinicosContainer" style="display:none;">
@@ -287,29 +296,27 @@
                     </div>
                 </div>
 
-              {{-- Exámenes --}}
-{{-- Título general --}}
-<div class="section-title general">Estudios para rayos X</div>
+                {{-- Exámenes --}}
+                {{-- Título general --}}
+                <div class="section-title general">Estudios para rayos X</div>
 
-<div class="secciones-container">
-    @foreach($secciones as $titulo => $examenesSeccion)
-        <div class="seccion">
-            {{-- Título de sección --}}
-            <div class="section-title seccion">{{ $titulo }}</div>
-            <div class="examenes-grid">
-                @foreach($examenesSeccion as $clave)
-                    <label>
-                        <input type="checkbox" name="examenes[]" value="{{ $clave }}"
-                            {{ (is_array(old('examenes')) && in_array($clave, old('examenes'))) ? 'checked' : '' }}>
-                        {{ $examenes[$clave] ?? ucfirst(str_replace('_', ' ', $clave)) }}
-                    </label>
-                @endforeach
-            </div>
-        </div>
-    @endforeach
-</div>
-
-
+                <div class="secciones-container">
+                    @foreach($secciones as $titulo => $examenesSeccion)
+                        <div class="seccion">
+                            {{-- Título de sección --}}
+                            <div class="section-title seccion">{{ $titulo }}</div>
+                            <div class="examenes-grid">
+                                @foreach($examenesSeccion as $clave)
+                                    <label>
+                                        <input type="checkbox" name="examenes[]" value="{{ $clave }}"
+                                            {{ (is_array(old('examenes')) && in_array($clave, old('examenes'))) ? 'checked' : '' }}>
+                                        {{ $examenes[$clave] ?? ucfirst(str_replace('_', ' ', $clave)) }}
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
 
                 {{-- Botones --}}
                 <div class="d-flex justify-content-center gap-3 mt-4">
@@ -328,9 +335,6 @@
     </div>
 </div>
 
-
-
-{{-- Script del selector de paciente --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const selectPaciente = document.getElementById('paciente_id');
@@ -342,6 +346,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const datosClinicosContainer = document.getElementById('datosClinicosContainer');
     const datosClinicosTextarea = document.getElementById('datos_clinicos');
 
+    const mensajePaciente = document.getElementById('mensajePaciente');
+    const mensajeExamenes = document.getElementById('mensajeExamenes');
+    const formOrden = document.getElementById('formOrden');
+    const checkboxes = formOrden.querySelectorAll('input[type=checkbox][name="examenes[]"]');
+    const MAX_EXAMENES = 7;
+
+    // Mostrar datos paciente cuando cambie selección
     function mostrarDatosPaciente() {
         const selectedOption = selectPaciente.options[selectPaciente.selectedIndex];
         if (selectPaciente.value && selectedOption) {
@@ -358,13 +369,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 datosClinicosTextarea.value = datosClin;
                 datosClinicosContainer.style.display = 'flex';
             } else {
-                @if(old('datos_clinicos'))
-                    datosClinicosTextarea.value = {!! json_encode(old('datos_clinicos')) !!};
-                    datosClinicosContainer.style.display = 'flex';
-                @else
-                    datosClinicosTextarea.value = '';
-                    datosClinicosContainer.style.display = 'none';
-                @endif
+                datosClinicosTextarea.value = '';
+                datosClinicosContainer.style.display = 'none';
             }
         } else {
             dpNombre.textContent = '';
@@ -374,23 +380,80 @@ document.addEventListener('DOMContentLoaded', function() {
             datosPacienteDiv.style.display = 'none';
             datosClinicosContainer.style.display = 'none';
         }
+        clearMensaje(mensajePaciente);
     }
-
     selectPaciente?.addEventListener('change', mostrarDatosPaciente);
     if (selectPaciente && selectPaciente.value) {
         mostrarDatosPaciente();
     }
 
+    // Limpiar formulario
     const btnLimpiar = document.getElementById('btnLimpiar');
     if (btnLimpiar) {
         btnLimpiar.addEventListener('click', () => {
-            document.getElementById('formOrden').reset();
+            formOrden.reset();
             datosPacienteDiv.style.display = 'none';
             datosClinicosContainer.style.display = 'none';
             const fecha = document.getElementById('fecha');
             if (fecha) fecha.value = new Date().toISOString().slice(0,10);
+            clearMensaje(mensajePaciente);
+            clearMensaje(mensajeExamenes);
         });
     }
+
+    // Mostrar mensaje emergente con scroll y autoclose
+    function showMensaje(mensajeElem, texto) {
+        mensajeElem.textContent = texto;
+        mensajeElem.style.display = 'inline-block'; // para estilo tipo etiqueta
+
+        mensajeElem.scrollIntoView({behavior: 'smooth', block: 'center'});
+
+        setTimeout(() => {
+            mensajeElem.style.display = 'none';
+            mensajeElem.textContent = '';
+        }, 4000);
+    }
+    function clearMensaje(mensajeElem) {
+        mensajeElem.textContent = '';
+        mensajeElem.style.display = 'none';
+    }
+
+    // Control de límite de selección de rayos X
+    checkboxes.forEach(chk => {
+        chk.addEventListener('change', function() {
+            const seleccionados = [...checkboxes].filter(c => c.checked);
+            if (seleccionados.length > MAX_EXAMENES) {
+                // Deseleccionar último y mostrar mensaje
+                this.checked = false;
+                showMensaje(mensajeExamenes, `Solo se pueden seleccionar máximo ${MAX_EXAMENES} rayos X.`);
+            } else {
+                clearMensaje(mensajeExamenes);
+            }
+        });
+    });
+
+    // Validar formulario antes de enviar
+    formOrden.addEventListener('submit', function(e) {
+        clearMensaje(mensajePaciente);
+        clearMensaje(mensajeExamenes);
+
+        // Verificar paciente seleccionado
+        if (!selectPaciente.value) {
+            e.preventDefault();
+            showMensaje(mensajePaciente, 'Debe seleccionar un paciente antes de guardar.');
+            selectPaciente.focus();
+            return;
+        }
+
+        // Verificar al menos un examen seleccionado
+        const seleccionados = [...checkboxes].filter(c => c.checked);
+        if (seleccionados.length === 0) {
+            e.preventDefault();
+            showMensaje(mensajeExamenes, 'Debe seleccionar al menos un examen para guardar.');
+            mensajeExamenes.scrollIntoView({behavior: 'smooth', block: 'center'});
+            return;
+        }
+    });
 });
 </script>
 @endsection
