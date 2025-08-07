@@ -198,6 +198,23 @@
         font-size: 0.95rem;
     }
 
+    /* Estilo mensaje error validación dinámico */
+    #form-error-message {
+        color: #b22222; /* rojo quemado */
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        padding: 0.75rem 1rem;
+        border: 2px solid #b22222;
+        border-radius: 0.5rem;
+        background-color: #ffe6e6;
+        opacity: 0;
+        transition: opacity 0.4s ease-in-out;
+        user-select: none;
+    }
+    #form-error-message.show {
+        opacity: 1;
+    }
+
     @media (max-width: 575px) {
         .custom-card {
             padding: 1rem 1rem;
@@ -268,6 +285,9 @@
             </div>
         </div>
     </div>
+
+    {{-- Mensaje error validación (inicialmente oculto) --}}
+    <div id="form-error-message" role="alert" aria-live="assertive" aria-atomic="true"></div>
 
     {{-- Formulario análisis --}}
     <form method="POST" action="{{ route('rayosx.guardarAnalisis', $orden->id) }}" enctype="multipart/form-data">
@@ -458,5 +478,56 @@
 
         container.appendChild(blockDiv);
     }
+
+    // Función que permite solo caracteres válidos en la descripción
+    function validarDescripcion(textarea) {
+        // Caracteres permitidos: letras (mayúsculas, minúsculas), números, espacios, tildes, ñ, ü, signos básicos: , . - ( ) :
+        const regexPermitidos = /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ ,.\-():]*$/;
+
+        if (!regexPermitidos.test(textarea.value)) {
+            // Quitar los caracteres no permitidos en tiempo real
+            textarea.value = textarea.value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ ,.\-():]/g, '');
+        }
+    }
+
+    // Aplicar validación a todos los textarea de descripción existentes y futuros (delegación)
+    document.addEventListener('input', function(e) {
+        if (e.target && e.target.tagName.toLowerCase() === 'textarea' && e.target.id.startsWith('descripcion_')) {
+            validarDescripcion(e.target);
+        }
+    });
+
+    document.querySelector('form').addEventListener('submit', function(event) {
+        const form = this;
+        const examenes = form.querySelectorAll('.examen-card');
+        const errorDiv = document.getElementById('form-error-message');
+
+        let valido = false; // Indica si hay al menos 1 imagen + descripción válida
+
+        examenes.forEach(examenCard => {
+            // Buscar todos los bloques de imagen y descripción dentro de este examen
+            const bloques = examenCard.querySelectorAll('.image-description-block');
+            for (const bloque of bloques) {
+                const inputFile = bloque.querySelector('input[type="file"]');
+                const textarea = bloque.querySelector('textarea');
+
+                // Comprobar si hay archivo seleccionado y texto no vacío (tras trim)
+                if (inputFile && inputFile.files.length > 0 && textarea && textarea.value.trim() !== '') {
+                    valido = true;
+                    break; // Ya encontramos un bloque válido en este examen
+                }
+            }
+        });
+
+        if (!valido) {
+            event.preventDefault(); // Detener envío
+            errorDiv.textContent = 'Debe agregar al menos una imagen y su descripción para poder guardar el análisis.';
+            errorDiv.classList.add('show');
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            errorDiv.textContent = '';
+            errorDiv.classList.remove('show');
+        }
+    });
 </script>
 @endsection
