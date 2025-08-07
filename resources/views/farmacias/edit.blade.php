@@ -107,7 +107,7 @@
                               class="form-control @error('ubicacion') is-invalid @enderror"
                               maxlength="255"
                               style="resize: vertical;"
-                              placeholder="Dirección o referencia">{{ old('ubicacion', $farmacia->ubicacion) }}</textarea>
+                              placeholder="Ciudad, Departamento, País">{{ old('ubicacion', $farmacia->ubicacion) }}</textarea>
                     @error('ubicacion')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
             </div>
