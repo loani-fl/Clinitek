@@ -188,3 +188,5 @@ Route::put('/rayosx/{orden}/guardar-analisis', [OrdenRayosXController::class, 'g
 
 
 Route::get('/rayosx/{id}/analizar', [OrdenRayosXController::class, 'analizar'])->name('rayosx.analizar');
+
+
