@@ -23,6 +23,7 @@
         pointer-events: none;
         z-index: 0;
     }
+
     .custom-card {
         max-width: 1000px;
         background-color: #fff;
@@ -33,9 +34,28 @@
         padding: 1rem;
         border: 1px solid #91cfff;
         border-radius: 12px;
+        z-index: 1;
     }
+
     .clickable-img {
         cursor: pointer;
+    }
+
+    .farmacia-img {
+        width: 180px;
+        height: auto;
+        max-height: 180px;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    }
+
+    .info-label {
+        font-weight: bold;
+    }
+
+    .info-block {
+        margin-bottom: 1rem;
     }
 </style>
 
@@ -45,36 +65,64 @@
             <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Detalles de la farmacia</h5>
         </div>
 
-        @if ($mostrarFoto)
-        <div class="text-center my-4">
-            <img src="{{ asset('storage/' . $farmacia->foto) }}"
-                 alt="Foto de la farmacia"
-                 class="rounded-circle shadow-sm clickable-img"
-                 style="width: 150px; height: 150px; object-fit: cover;"
-                 data-bs-toggle="modal"
-                 data-bs-target="#fotoModal">
-        </div>
-        @endif
-
         <div class="card-body px-4 py-3">
-            <div class="row gy-3">
-                <div class="col-md-4"><strong>Nombre:</strong><br>{{ $farmacia->nombre }}</div>
-                <div class="col-md-4"><strong>Teléfono:</strong><br>{{ $farmacia->telefono }}</div>
-                <div class="col-md-4"><strong>Ubicación:</strong><br>{{ $farmacia->ubicacion }}</div>
-                <div class="col-md-4"><strong>Horario:</strong><br>{{ $farmacia->horario }}</div>
-                <div class="col-md-4"><strong>Descuento:</strong><br>{{ $farmacia->descuento ?? '—' }}%</div>
-                <div class="col-md-4"><strong>Página Web:</strong><br>
-                    @if ($farmacia->pagina_web)
-                        <a href="{{ $farmacia->pagina_web }}" target="_blank">{{ $farmacia->pagina_web }}</a>
-                    @else
-                        No disponible
-                    @endif
+            <div class="row">
+                @if ($mostrarFoto)
+                <div class="col-md-4 text-center mb-3 mb-md-0 d-flex align-items-center justify-content-center">
+                    <img src="{{ asset('storage/' . $farmacia->foto) }}"
+                         alt="Foto de la farmacia"
+                         class="farmacia-img clickable-img"
+                         data-bs-toggle="modal"
+                         data-bs-target="#fotoModal">
+                </div>
+                @endif
+
+                <div class="col-md-8">
+                    <div class="row gy-3">
+                        <div class="col-md-6 info-block">
+                            <span class="info-label">Nombre:</span><br>{{ $farmacia->nombre }}
+                        </div>
+                        <div class="col-md-6 info-block">
+                            <span class="info-label">Teléfono:</span><br>{{ $farmacia->telefono }}
+                        </div>
+
+                        <div class="col-md-6 info-block">
+                            <span class="info-label">Horario:</span><br>{{ $farmacia->horario }}
+                        </div>
+                        <div class="col-md-6 info-block">
+                            <span class="info-label">Descuento:</span><br>{{ $farmacia->descuento ?? '—' }}%
+                        </div>
+
+                        <div class="col-md-6 info-block">
+                            <span class="info-label">Página Web:</span><br>
+                            @if ($farmacia->pagina_web)
+                                <a href="{{ $farmacia->pagina_web }}" target="_blank">{{ $farmacia->pagina_web }}</a>
+                            @else
+                                No disponible
+                            @endif
+                        </div>
+
+                        <div class="col-md-6 info-block">
+                            <span class="info-label">Ubicación:</span><br>{{ $farmacia->ubicacion }}
+                            <br>
+                            @if($farmacia->ubicacion)
+                                @php $direccionUrl = urlencode($farmacia->ubicacion); @endphp
+                                <a href="https://www.google.com/maps/search/?api=1&query={{ $direccionUrl }}" 
+                                   target="_blank" 
+                                   class="btn btn-outline-primary btn-sm mt-2">
+                                   Ver en Google Maps
+                                </a>
+                            @else
+                                <span>No hay ubicación disponible</span>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="row gy-3 mt-3">
-                <div class="col-md-12">
-                    <strong>Descripción:</strong><br>
+            <div class="row gy-3 mt-4">
+                <div class="col-12">
+                    <span class="info-label">Descripción:</span><br>
                     <span style="white-space: pre-line;">{{ $farmacia->descripcion ?: 'Sin descripción.' }}</span>
                 </div>
             </div>
@@ -84,20 +132,21 @@
             <a href="{{ route('farmacias.index') }}" 
                class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2" 
                style="font-size: 0.85rem;">
-                <i class="bi bi-arrow-left"></i> Regresar
+                ← Regresar
             </a>
         </div>
     </div>
 </div>
 
 @if ($mostrarFoto)
+<!-- Modal de imagen -->
 <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content bg-transparent border-0 position-relative d-flex justify-content-center align-items-center" style="background: rgba(0,0,0,0.7);">
       <div class="modal-body p-0" style="max-width: 90vw; max-height: 90vh;">
         <img src="{{ asset('storage/' . $farmacia->foto) }}"
              alt="Foto de la farmacia"
-             style="max-width: 450px; max-height: 450px; object-fit: cover; cursor: pointer;"
+             style="max-width: 450px; max-height: 450px; object-fit: contain; cursor: pointer;"
              id="imagenGrande">
       </div>
     </div>
