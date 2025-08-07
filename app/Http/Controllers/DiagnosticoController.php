@@ -16,7 +16,6 @@ class DiagnosticoController extends Controller
 
         return view('diagnosticos.create', compact('paciente', 'consulta'));
     }
-
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -48,34 +47,34 @@ class DiagnosticoController extends Controller
             'titulo.required' => 'El resumen es obligatorio.',
             'titulo.string' => 'El resumen debe ser un texto válido.',
             'titulo.regex' => 'El título solo puede contener letras, números, espacios, comas, puntos, punto y coma, dos puntos, guiones y letras con tilde o ñ.',
-
+    
             'descripcion.required' => 'La descripción es obligatoria.',
             'descripcion.string' => 'La descripción debe ser un texto válido.',
             'descripcion.regex' => 'La descripción solo puede contener letras, números, espacios, comas, puntos, punto y coma, dos puntos, guiones y letras con tilde o ñ.',
-
+    
             'tratamiento.required' => 'El tratamiento es obligatorio.',
             'tratamiento.string' => 'El tratamiento debe ser un texto válido.',
             'tratamiento.regex' => 'El tratamiento solo puede contener letras, números, espacios, comas, puntos, punto y coma, dos puntos, guiones y letras con tilde o ñ.',
-
+    
             'observaciones.string' => 'Las observaciones deben ser un texto válido.',
             'observaciones.regex' => 'Las observaciones solo pueden contener letras, números, espacios, comas, puntos, punto y coma, dos puntos, guiones y letras con tilde o ñ.',
         ]);
-
-        // Agregamos el consulta_id al array validado para que se guarde
+    
         $validatedData['consulta_id'] = $request->consulta_id;
         $validatedData['paciente_id'] = $request->paciente_id;
-
+    
         $diagnostico = Diagnostico::create($validatedData);
-
+    
         $consulta = Consulta::find($request->consulta_id);
         if ($consulta) {
             $consulta->estado = 'realizada';
             $consulta->save();
         }
-
-        return redirect()->route('consultas.show', $diagnostico->id)
+    
+        return redirect()->route('consultas.show', $validatedData['consulta_id'])
             ->with('success', 'Diagnóstico creado correctamente.');
     }
+    
 
 
     public function show(Diagnostico $diagnostico)

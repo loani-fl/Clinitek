@@ -27,7 +27,7 @@ class RecetaController extends Controller
             'consulta_id' => 'required|exists:consultas,id',
             'detalles' => 'nullable|string|max:500',
             'medicamentos' => 'required|array|min:1',
-            'medicamentos.*.nombre' => ['required', 'string', 'max:55', 'regex:/^[a-zA-Z0-9\s]+$/'],
+            'medicamentos.*.nombre' => ['required', 'string', 'max:55', 'regex:/^[\pL\pN\s\-,.()]+$/u'],            
             'medicamentos.*.indicacion' => 'required|string|max:255',
             'medicamentos.*.dosis' => ['required', 'string', 'max:25', 'regex:/^[a-zA-Z0-9\s]+$/'],
             'medicamentos.*.detalles' => ['nullable', 'string', 'max:500', 'regex:/^[a-zA-Z0-9\s]+$/'],
