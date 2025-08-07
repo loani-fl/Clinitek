@@ -18,7 +18,7 @@ class OrdenRayosXController extends Controller
     /**
      * Mostrar listado paginado.
      */
-    public function index()
+   public function index()
     {
         $ordenes = RayosxOrder::with(['diagnostico', 'pacienteClinica', 'pacienteRayosX', 'examenes'])
             ->latest()
@@ -31,202 +31,199 @@ class OrdenRayosXController extends Controller
      * Mostrar formulario de creación.
      */
     public function create(Request $request)
-{
-    $pacientesClinica = Paciente::orderBy('nombre')->get();
-    $pacientesRayosX = PacienteRayosX::orderBy('nombre')->get();
-    $diagnosticos = Diagnostico::orderBy('id', 'desc')->get();
+    {
+        $pacientesClinica = Paciente::orderBy('nombre')->get();
+        $pacientesRayosX = PacienteRayosX::orderBy('nombre')->get();
+        $diagnosticos = Diagnostico::orderBy('id', 'desc')->get();
 
-    // Define las secciones con los exámenes agrupados
-    $secciones = [
-        'CABEZA' => [
-            'craneo', 'waters', 'conductos_auditivos', 'cavum',
-            'senos_paranasales', 'silla_turca', 'huesos_nasales',
-            'atm_tm', 'mastoides', 'mandibula',
-        ],
-        'TÓRAX' => [
-            'torax_pa', 'torax_pa_lat', 'costillas', 'esternon',
-        ],
-        'ABDOMEN' => [
-            'abdomen_simple', 'abdomen_agudo',
-        ],
-        'EXTREMIDAD SUPERIOR' => [
-            'clavicula', 'hombro', 'humero', 'codo',
-            'antebrazo', 'muneca', 'mano',
-        ],
-        'EXTREMIDAD INFERIOR' => [
-            'cadera', 'femur', 'rodilla', 'tibia',
-            'pie', 'calcaneo',
-        ],
-        'COLUMNA Y PELVIS' => [
-            'cervical', 'dorsal', 'lumbar', 'sacro_coxis', 'pelvis', 'escoliosis',
-        ],
-        'ESTUDIOS ESPECIALES' => [
-            'arteriograma', 'histerosalpingograma', 'colecistograma', 'fistulograma', 'artrograma',
-        ],
-    ];
+        // Define las secciones con los exámenes agrupados
+        $secciones = [
+            'CABEZA' => [
+                'craneo', 'waters', 'conductos_auditivos', 'cavum',
+                'senos_paranasales', 'silla_turca', 'huesos_nasales',
+                'atm_tm', 'mastoides', 'mandibula',
+            ],
+            'TÓRAX' => [
+                'torax_pa', 'torax_pa_lat', 'costillas', 'esternon',
+            ],
+            'ABDOMEN' => [
+                'abdomen_simple', 'abdomen_agudo',
+            ],
+            'EXTREMIDAD SUPERIOR' => [
+                'clavicula', 'hombro', 'humero', 'codo',
+                'antebrazo', 'muneca', 'mano',
+            ],
+            'EXTREMIDAD INFERIOR' => [
+                'cadera', 'femur', 'rodilla', 'tibia',
+                'pie', 'calcaneo',
+            ],
+            'COLUMNA Y PELVIS' => [
+                'cervical', 'dorsal', 'lumbar', 'sacro_coxis', 'pelvis', 'escoliosis',
+            ],
+            'ESTUDIOS ESPECIALES' => [
+                'arteriograma', 'histerosalpingograma', 'colecistograma', 'fistulograma', 'artrograma',
+            ],
+        ];
 
-    $examenes = [
-        'craneo' => 'Cráneo',
-        'waters' => 'Waters',
-        'conductos_auditivos' => 'Conductos Auditivos',
-        'cavum' => 'Cavum',
-        'senos_paranasales' => 'Senos Paranasales',
-        'silla_turca' => 'Silla Turca',
-        'huesos_nasales' => 'Huesos Nasales',
-        'atm_tm' => 'ATM - TM',
-        'mastoides' => 'Mastoides',
-        'mandibula' => 'Mandíbula',
-        'torax_pa' => 'Tórax PA',
-        'torax_pa_lat' => 'Tórax PA Lateral',
-        'costillas' => 'Costillas',
-        'esternon' => 'Esternón',
-        'abdomen_simple' => 'Abdomen Simple',
-        'abdomen_agudo' => 'Abdomen Agudo',
-        'clavicula' => 'Clavícula',
-        'hombro' => 'Hombro',
-        'humero' => 'Húmero',
-        'codo' => 'Codo',
-        'antebrazo' => 'Antebrazo',
-        'muneca' => 'Muñeca',
-        'mano' => 'Mano',
-        'cadera' => 'Cadera',
-        'femur' => 'Fémur',
-        'rodilla' => 'Rodilla',
-        'tibia' => 'Tibia',
-        'pie' => 'Pie',
-        'calcaneo' => 'Calcáneo',
-        'cervical' => 'Cervical',
-        'dorsal' => 'Dorsal',
-        'lumbar' => 'Lumbar',
-        'sacro_coxis' => 'Sacro Coxis',
-        'pelvis' => 'Pelvis',
-        'escoliosis' => 'Escoliosis',
-        'arteriograma' => 'Arteriograma',
-        'histerosalpingograma' => 'Histerosalpingograma',
-        'colecistograma' => 'Colecistograma',
-        'fistulograma' => 'Fistulograma',
-        'artrograma' => 'Artrógama',
-    ];
+        $examenes = [
+            'craneo' => 'Cráneo',
+            'waters' => 'Waters',
+            'conductos_auditivos' => 'Conductos Auditivos',
+            'cavum' => 'Cavum',
+            'senos_paranasales' => 'Senos Paranasales',
+            'silla_turca' => 'Silla Turca',
+            'huesos_nasales' => 'Huesos Nasales',
+            'atm_tm' => 'ATM - TM',
+            'mastoides' => 'Mastoides',
+            'mandibula' => 'Mandíbula',
+            'torax_pa' => 'Tórax PA',
+            'torax_pa_lat' => 'Tórax PA Lateral',
+            'costillas' => 'Costillas',
+            'esternon' => 'Esternón',
+            'abdomen_simple' => 'Abdomen Simple',
+            'abdomen_agudo' => 'Abdomen Agudo',
+            'clavicula' => 'Clavícula',
+            'hombro' => 'Hombro',
+            'humero' => 'Húmero',
+            'codo' => 'Codo',
+            'antebrazo' => 'Antebrazo',
+            'muneca' => 'Muñeca',
+            'mano' => 'Mano',
+            'cadera' => 'Cadera',
+            'femur' => 'Fémur',
+            'rodilla' => 'Rodilla',
+            'tibia' => 'Tibia',
+            'pie' => 'Pie',
+            'calcaneo' => 'Calcáneo',
+            'cervical' => 'Cervical',
+            'dorsal' => 'Dorsal',
+            'lumbar' => 'Lumbar',
+            'sacro_coxis' => 'Sacro Coxis',
+            'pelvis' => 'Pelvis',
+            'escoliosis' => 'Escoliosis',
+            'arteriograma' => 'Arteriograma',
+            'histerosalpingograma' => 'Histerosalpingograma',
+            'colecistograma' => 'Colecistograma',
+            'fistulograma' => 'Fistulograma',
+            'artrograma' => 'Artrógama',
+        ];
 
-    return view('rayosX.create', [
-        'pacientesClinica' => $pacientesClinica,
-        'pacientesRayosX' => $pacientesRayosX,
-        'diagnosticos' => $diagnosticos,
-        'seleccion' => $request->query('seleccion'),
-        'examenes' => $examenes,
-        'secciones' => $secciones,
-        'paciente_tipo' => null,
-    ]);
-}
-
+        return view('rayosX.create', [
+            'pacientesClinica' => $pacientesClinica,
+            'pacientesRayosX' => $pacientesRayosX,
+            'diagnosticos' => $diagnosticos,
+            'seleccion' => $request->query('seleccion'),
+            'examenes' => $examenes,
+            'secciones' => $secciones,
+            'paciente_tipo' => null,
+        ]);
+    }
 
     /**
      * Guardar nueva orden.
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'seleccion' => ['required', 'string'],
-            'fecha' => ['required','date'],
-            'examenes' => ['required','array','min:1','max:10'],
-            'examenes.*' => ['string'],
-            'nombres' => [Rule::requiredIf(fn() => $request->seleccion === 'manual'), 'nullable', 'string', 'max:255'],
-            'apellidos' => [Rule::requiredIf(fn() => $request->seleccion === 'manual'), 'nullable', 'string', 'max:255'],
-            'identidad' => [Rule::requiredIf(fn() => $request->seleccion === 'manual'), 'nullable', 'digits:13', 'string', 'max:13'],
-            'edad' => ['nullable','integer','min:0','max:150'],
-            'datos_clinicos' => ['nullable','string'],
-        ], [
-            'seleccion.required' => 'Debe seleccionar diagnóstico o paciente.',
-            'fecha.required' => 'La fecha es obligatoria.',
-            'examenes.required' => 'Seleccione al menos un examen.',
-            'examenes.max' => 'No puede seleccionar más de 10 exámenes.'
+{
+    $request->validate([
+        'seleccion' => ['required', 'string'],
+        'fecha' => ['required','date'],
+        'examenes' => ['required','array','min:1','max:10'],
+        'examenes.*' => ['string'],
+        'nombres' => [Rule::requiredIf(fn() => $request->seleccion === 'manual'), 'nullable', 'string', 'max:255'],
+        'apellidos' => [Rule::requiredIf(fn() => $request->seleccion === 'manual'), 'nullable', 'string', 'max:255'],
+        'identidad' => [Rule::requiredIf(fn() => $request->seleccion === 'manual'), 'nullable', 'digits:13', 'string', 'max:13'],
+        'edad' => ['nullable','integer','min:0','max:150'],
+        'datos_clinicos' => ['nullable','string'],
+    ], [
+        'seleccion.required' => 'Debe seleccionar diagnóstico o paciente.',
+        'fecha.required' => 'La fecha es obligatoria.',
+        'examenes.required' => 'Seleccione al menos un examen.',
+        'examenes.max' => 'No puede seleccionar más de 10 exámenes.'
+    ]);
+
+    $diagnostico_id = null;
+    $paciente_id = null;
+    $paciente_tipo = null;
+
+    if (str_starts_with($request->seleccion, 'diagnostico-')) {
+        $diagnostico_id = (int) str_replace('diagnostico-', '', $request->seleccion);
+    } elseif (str_starts_with($request->seleccion, 'clinica-')) {
+        $paciente_id = (int) str_replace('clinica-', '', $request->seleccion);
+        $paciente_tipo = 'clinica';
+    } elseif (str_starts_with($request->seleccion, 'rayosx-')) {
+        $paciente_id = (int) str_replace('rayosx-', '', $request->seleccion);
+        $paciente_tipo = 'rayosx';
+    } elseif ($request->seleccion === 'manual') {
+        // manual, no id
+    } else {
+        return back()->withInput()->with('error', 'Selección inválida.');
+    }
+
+    if ($diagnostico_id && !Diagnostico::find($diagnostico_id)) {
+        return back()->withInput()->with('error', 'Diagnóstico no encontrado.');
+    }
+    if ($paciente_tipo === 'clinica' && !Paciente::find($paciente_id)) {
+        return back()->withInput()->with('error', 'Paciente (clínica) no encontrado.');
+    }
+    if ($paciente_tipo === 'rayosx' && !PacienteRayosX::find($paciente_id)) {
+        return back()->withInput()->with('error', 'Paciente (Rayos X) no encontrado.');
+    }
+
+    $identidad = $request->identidad ?? null;
+    $edad = $request->edad ?? null;
+    $nombres = $request->nombres ?? null;
+    $apellidos = $request->apellidos ?? null;
+
+    if ($paciente_tipo === 'clinica') {
+        $p = Paciente::find($paciente_id);
+        $identidad = $p->identidad ?? $identidad;
+        $edad = $p->edad ?? $edad;
+        $nombres = $p->nombre ?? $nombres;
+        $apellidos = $p->apellidos ?? $apellidos;
+    } elseif ($paciente_tipo === 'rayosx') {
+        $p = PacienteRayosX::find($paciente_id);
+        $identidad = $p->identidad ?? $identidad;
+        $edad = $p->edad ?? $edad;
+        $nombres = $p->nombre ?? $nombres;
+        $apellidos = $p->apellidos ?? $apellidos;
+    }
+
+    DB::beginTransaction();
+    try {
+        $orden = RayosxOrder::create([
+            'diagnostico_id' => $diagnostico_id,
+            'paciente_id' => $paciente_id,
+            'paciente_tipo' => $paciente_tipo,
+            'fecha' => $request->fecha,
+            'edad' => $edad,
+            'identidad' => $identidad,
+            'nombres' => $nombres,
+            'apellidos' => $apellidos,
+            'datos_clinicos' => $request->datos_clinicos,
+            'estado' => 'Pendiente',
         ]);
 
-        $diagnostico_id = null;
-        $paciente_id = null;
-        $paciente_tipo = null;
+        // Insertar exámenes relacionados usando la columna correcta 'examen_codigo'
+        $examenesToInsert = collect($request->examenes)
+            ->map(fn($codigo) => [
+                'rayosx_order_id' => $orden->id,
+                'examen_codigo' => $codigo,
+                'created_at' => now(),
+                'updated_at' => now()
+            ])
+            ->toArray();
 
-        if (str_starts_with($request->seleccion, 'diagnostico-')) {
-            $diagnostico_id = (int) str_replace('diagnostico-', '', $request->seleccion);
-        } elseif (str_starts_with($request->seleccion, 'clinica-')) {
-            $paciente_id = (int) str_replace('clinica-', '', $request->seleccion);
-            $paciente_tipo = 'clinica';
-        } elseif (str_starts_with($request->seleccion, 'rayosx-')) {
-            $paciente_id = (int) str_replace('rayosx-', '', $request->seleccion);
-            $paciente_tipo = 'rayosx';
-        } elseif ($request->seleccion === 'manual') {
-            // manual, no id
-        } else {
-            return back()->withInput()->with('error', 'Selección inválida.');
-        }
+        RayosxOrderExamen::insert($examenesToInsert);
 
-        if ($diagnostico_id && !Diagnostico::find($diagnostico_id)) {
-            return back()->withInput()->with('error', 'Diagnóstico no encontrado.');
-        }
-        if ($paciente_tipo === 'clinica' && !Paciente::find($paciente_id)) {
-            return back()->withInput()->with('error', 'Paciente (clínica) no encontrado.');
-        }
-        if ($paciente_tipo === 'rayosx' && !PacienteRayosX::find($paciente_id)) {
-            return back()->withInput()->with('error', 'Paciente (Rayos X) no encontrado.');
-        }
+        DB::commit();
 
-        $identidad = $request->identidad ?? null;
-        $edad = $request->edad ?? null;
-        $nombres = $request->nombres ?? null;
-        $apellidos = $request->apellidos ?? null;
+        return redirect()->route('rayosx.analisis', $orden->id)->with('success', 'Orden creada correctamente, ahora puede analizarla.');
 
-        if ($paciente_tipo === 'clinica') {
-            $p = Paciente::find($paciente_id);
-            $identidad = $p->identidad ?? $identidad;
-            $edad = $p->edad ?? $edad;
-            $nombres = $p->nombre ?? $nombres;
-            $apellidos = $p->apellidos ?? $apellidos;
-        } elseif ($paciente_tipo === 'rayosx') {
-            $p = PacienteRayosX::find($paciente_id);
-            $identidad = $p->identidad ?? $identidad;
-            $edad = $p->edad ?? $edad;
-            $nombres = $p->nombre ?? $nombres;
-            $apellidos = $p->apellidos ?? $apellidos;
-        }
-
-        DB::beginTransaction();
-        try {
-            $orden = RayosxOrder::create([
-                'diagnostico_id' => $diagnostico_id,
-                'paciente_id' => $paciente_id,
-                'paciente_tipo' => $paciente_tipo,
-                'fecha' => $request->fecha,
-                'edad' => $edad,
-                'identidad' => $identidad,
-                'nombres' => $nombres,
-                'apellidos' => $apellidos,
-                'datos_clinicos' => $request->datos_clinicos,
-                'estado' => 'Pendiente', // añadido desde main
-            ]);
-
-            $examenes = collect($request->examenes)
-                ->map(fn($e) => ['examen' => $e, 'created_at' => now(), 'updated_at' => now()])
-                ->toArray();
-
-            if (method_exists($orden, 'examenes')) {
-                $orden->examenes()->createMany(array_map(fn($x) => ['examen' => $x['examen']], $examenes));
-            } else {
-                foreach ($request->examenes as $ex) {
-                    RayosxOrderExamen::create([
-                        'rayosx_order_id' => $orden->id,
-                        'examen' => $ex,
-                    ]);
-                }
-            }
-
-            DB::commit();
-return redirect()->route('rayosx.analisis', $orden->id)->with('success', 'Orden creada correctamente, ahora puede analizarla.');
-
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            return back()->withInput()->with('error', 'Error al guardar la orden: ' . $th->getMessage());
-        }
+    } catch (\Throwable $th) {
+        DB::rollBack();
+        return back()->withInput()->with('error', 'Error al guardar la orden: ' . $th->getMessage());
     }
+}
 
     /**
      * Mostrar una orden (con relaciones).
@@ -459,7 +456,6 @@ public function analisis(RayosxOrder $orden)
 
 
 
-
 public function guardarAnalisis(Request $request, RayosxOrder $orden)
 {
     $validated = $request->validate([
@@ -484,13 +480,13 @@ public function guardarAnalisis(Request $request, RayosxOrder $orden)
 
             if (isset($datos['imagen']) && $datos['imagen'] instanceof \Illuminate\Http\UploadedFile) {
                 // Elimina imagen anterior si existe
-                if ($examen->imagen) {
-                    Storage::disk('public')->delete($examen->imagen);
+                if ($examen->imagen_path) {
+                    Storage::disk('public')->delete($examen->imagen_path);
                 }
 
                 // Guardar nueva imagen
                 $ruta = $datos['imagen']->store('rayosx_examenes', 'public');
-                $examen->imagen = $ruta;
+                $examen->imagen_path = $ruta;
             }
 
             $examen->save();
@@ -500,6 +496,7 @@ public function guardarAnalisis(Request $request, RayosxOrder $orden)
     return redirect()->route('rayosx.show', $orden->id)
                      ->with('success', 'Análisis guardado correctamente.');
 }
+
 
 
 }
