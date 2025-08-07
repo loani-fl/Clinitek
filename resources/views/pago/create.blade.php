@@ -196,7 +196,7 @@
                 </div>
                 <div>
                     <label for="cantidad">Cantidad</label>
-                    <input type="number" step="0.01" min="0.01" max="9999.99" name="cantidad" placeholder="L. 0.00" value="{{ old('cantidad') }}">
+                    <input type="text" name="cantidad" placeholder="L. 0.00" value="{{ old('cantidad') }}">
                     @error('cantidad')
                         <div class="error-text">{{ $message }}</div>
                     @enderror
@@ -213,7 +213,7 @@
                     @enderror
                 </div>
                 <div class="full-width" style="grid-column: span 2;">
-                    <label for="descripcion_servicio">Descripción breve</label>
+                    <label for="descripcion_servicio">Descripción breve(Opcional)</label>
                     <input type="text" name="descripcion_servicio" maxlength="100" autocomplete="off" value="{{ old('descripcion_servicio') }}">
                     @error('descripcion_servicio')
                         <div class="error-text">{{ $message }}</div>
@@ -336,6 +336,34 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+const inputCantidad = document.querySelector('input[name="cantidad"]');
+
+inputCantidad.addEventListener('input', function(e) {
+    // Obtener solo dígitos
+    let val = this.value.replace(/\D/g, '');
+
+    // Si el valor está vacío, poner vacío y salir
+    if(val === '') {
+        this.value = '';
+        return;
+    }
+
+    // Convertir a número para eliminar ceros a la izquierda
+    val = parseInt(val, 10).toString();
+
+    // Si es menor que 3 dígitos, rellena con ceros a la izquierda para mostrar centavos
+    while(val.length < 3) {
+        val = '0' + val;
+    }
+
+    // Insertar punto decimal antes de los últimos dos dígitos
+    const len = val.length;
+    const formatted = val.substring(0, len - 2) + '.' + val.substring(len - 2);
+
+    this.value = formatted;
+});
+
 </script>
 
 @endsection
