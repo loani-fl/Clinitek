@@ -262,7 +262,7 @@
                 </div>
                 <div>
                     <label for="cantidad_efectivo">Cantidad</label>
-                    <input type="number" step="0.01" min="0.01" max="9999.99" name="cantidad" placeholder="L. 0.00" value="{{ old('cantidad') }}">
+                    <input type="number" step="0.01"  name="cantidad" placeholder="L. 0.00" value="{{ old('cantidad') }}">
                     @error('cantidad')
                         <div class="error-text">{{ $message }}</div>
                     @enderror
@@ -327,15 +327,14 @@ function mostrarCamposPago() {
     }
 
     if (metodo === 'efectivo') {
-    const btnGuardarEfectivo = document.createElement('button');
-    btnGuardarEfectivo.type = 'submit';
-    btnGuardarEfectivo.id = 'btnGuardarEfectivo';
-    btnGuardarEfectivo.className = 'btn btn-primary btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2';
-    btnGuardarEfectivo.style.fontSize = '0.85rem';
-    btnGuardarEfectivo.innerHTML = '<i class="bi bi-check-circle"></i> Guardar';
-    btnContainer.appendChild(btnGuardarEfectivo);
-}
-
+        const btnGuardarEfectivo = document.createElement('button');
+        btnGuardarEfectivo.type = 'submit';
+        btnGuardarEfectivo.id = 'btnGuardarEfectivo';
+        btnGuardarEfectivo.className = 'btn btn-primary btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2';
+        btnGuardarEfectivo.style.fontSize = '0.85rem';
+        btnGuardarEfectivo.innerHTML = '<i class="bi bi-check-circle"></i> Guardar';
+        btnContainer.appendChild(btnGuardarEfectivo);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -350,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Auto-llenar descripción si servicio es consulta médica
     const servicioSelect = document.getElementById('servicio');
     const descripcionInput = document.querySelector('input[name="descripcion_servicio"]');
-    if(servicioSelect && descripcionInput) {
+    if (servicioSelect && descripcionInput) {
         servicioSelect.addEventListener('change', function () {
             if (this.value === 'consulta_medica') {
                 descripcionInput.value = "Pago por consulta médica";
@@ -362,42 +361,42 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Validaciones de inputs (tu lógica previa)
     const cantidadInput = document.querySelector('input[name="cantidad"]');
-    if(cantidadInput){
+    if (cantidadInput) {
         cantidadInput.addEventListener('input', function () {
             this.value = this.value.replace(/[^0-9.]/g, '').slice(0, 6);
         });
     }
 
     const nombreTitularInput = document.querySelector('input[name="nombre_titular"]');
-    if(nombreTitularInput){
+    if (nombreTitularInput) {
         nombreTitularInput.addEventListener('input', function () {
             this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]/g, '');
         });
     }
 
     const descripcionInput2 = document.querySelector('input[name="descripcion_servicio"]');
-    if(descripcionInput2){
+    if (descripcionInput2) {
         descripcionInput2.addEventListener('input', function () {
             this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]/g, '');
         });
     }
 
     const numeroTarjetaInput = document.querySelector('input[name="numero_tarjeta"]');
-    if(numeroTarjetaInput){
+    if (numeroTarjetaInput) {
         numeroTarjetaInput.addEventListener('input', function () {
             this.value = this.value.replace(/\D/g, '').slice(0, 19);
         });
     }
 
     const cvvInput = document.querySelector('input[name="cvv"]');
-    if(cvvInput){
+    if (cvvInput) {
         cvvInput.addEventListener('input', function () {
             this.value = this.value.replace(/\D/g, '').slice(0, 4);
         });
     }
 
     const fechaExpiracionInput = document.querySelector('input[name="fecha_expiracion"]');
-    if(fechaExpiracionInput){
+    if (fechaExpiracionInput) {
         fechaExpiracionInput.addEventListener('change', function () {
             const hoy = new Date();
             const seleccionada = new Date(this.value);
@@ -416,35 +415,130 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // --- VALIDACIONES MÉTODO EFECTIVO ---
+
+    const servicioEfectivoSelect = document.querySelector('#efectivoCampos select[name="servicio"]');
+    const cantidadEfectivoInput = document.querySelector('#efectivoCampos input[name="cantidad"]');
+    const descripcionEfectivoInput = document.querySelector('#efectivoCampos input[name="descripcion_servicio"]');
+
+    function mostrarError(input, mensaje) {
+        eliminarError(input);
+        const errorDiv = document.createElement('div');
+        errorDiv.classList.add('error-text');
+        errorDiv.textContent = mensaje;
+        input.parentNode.appendChild(errorDiv);
+    }
+
+    function eliminarError(input) {
+        const parent = input.parentNode;
+        const error = parent.querySelector('.error-text');
+        if (error) error.remove();
+    }
+
+    if (cantidadEfectivoInput) {
+        cantidadEfectivoInput.addEventListener('input', function () {
+            let val = this.value;
+
+            val = val.replace(/[^0-9.]/g, '');
+
+            const parts = val.split('.');
+            if (parts.length > 2) {
+                val = parts[0] + '.' + parts[1];
+            }
+
+            if (parts[0].length > 5) {
+                parts[0] = parts[0].slice(0, 5);
+            }
+
+            if (parts[1]) {
+                parts[1] = parts[1].slice(0, 2);
+                val = parts[0] + '.' + parts[1];
+            } else {
+                val = parts[0];
+            }
+
+            this.value = val;
+
+            eliminarError(this);
+        });
+    }
+
+    if (descripcionEfectivoInput) {
+        descripcionEfectivoInput.addEventListener('input', function () {
+            this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]/g, '').slice(0, 100);
+            eliminarError(this);
+        });
+    }
+
+    if (servicioEfectivoSelect) {
+        servicioEfectivoSelect.addEventListener('change', function () {
+            eliminarError(this);
+        });
+    }
+
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function (event) {
+        const metodo = document.getElementById('metodo_pago').value;
+
+        if (metodo === 'efectivo') {
+            let hayError = false;
+
+            if (servicioEfectivoSelect.value === '') {
+                mostrarError(servicioEfectivoSelect, 'Por favor, selecciona un servicio.');
+                hayError = true;
+            }
+
+            const cantidadVal = cantidadEfectivoInput.value.trim();
+            if (cantidadVal === '') {
+                mostrarError(cantidadEfectivoInput, 'La cantidad es obligatoria.');
+                hayError = true;
+            } else {
+                if (!/^\d{1,5}(\.\d{1,2})?$/.test(cantidadVal)) {
+                    mostrarError(cantidadEfectivoInput, 'Cantidad inválida. Máximo 5 enteros y 2 decimales.');
+                    hayError = true;
+                } else if (parseFloat(cantidadVal) <= 0) {
+                    mostrarError(cantidadEfectivoInput, 'La cantidad debe ser mayor que cero.');
+                    hayError = true;
+                }
+            }
+
+            const descripcionVal = descripcionEfectivoInput.value.trim();
+            if (descripcionVal !== '') {
+                if (!/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]{1,100}$/.test(descripcionVal)) {
+                    mostrarError(descripcionEfectivoInput, 'La descripción solo debe contener letras y espacios, máximo 100 caracteres.');
+                    hayError = true;
+                }
+            }
+
+            if (hayError) {
+                event.preventDefault();
+            }
+        }
+    });
 });
 
 const inputCantidad = document.querySelector('input[name="cantidad"]');
 
-inputCantidad.addEventListener('input', function(e) {
-    // Obtener solo dígitos
+inputCantidad.addEventListener('input', function (e) {
     let val = this.value.replace(/\D/g, '');
 
-    // Si el valor está vacío, poner vacío y salir
-    if(val === '') {
+    if (val === '') {
         this.value = '';
         return;
     }
 
-    // Convertir a número para eliminar ceros a la izquierda
     val = parseInt(val, 10).toString();
 
-    // Si es menor que 3 dígitos, rellena con ceros a la izquierda para mostrar centavos
-    while(val.length < 3) {
+    while (val.length < 3) {
         val = '0' + val;
     }
 
-    // Insertar punto decimal antes de los últimos dos dígitos
     const len = val.length;
     const formatted = val.substring(0, len - 2) + '.' + val.substring(len - 2);
 
     this.value = formatted;
 });
-
 </script>
 
 @endsection
