@@ -121,6 +121,8 @@ Route::prefix('rayosx')->group(function () {
     Route::get('/create', [OrdenRayosXController::class, 'create'])->name('rayosx.create');
     Route::post('/store', [OrdenRayosXController::class, 'store'])->name('rayosx.store');
     Route::get('/{orden}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
+
+   Route::patch('/{orden}/realizar', [OrdenRayosXController::class, 'marcarRealizado'])->name('rayosx.marcarRealizado');
 });
 
 // Rutas para pago
@@ -132,3 +134,59 @@ Route::get('/pago/{pago}', [App\Http\Controllers\PagoController::class, 'show'])
 
 // Rutas para farmacia
 Route::resource('farmacias', FarmaciaController::class);
+
+
+//NUEVO
+
+// Mostrar formulario para crear paciente solo para Rayos X
+Route::get('/pacientes/rayosx/create', [App\Http\Controllers\PacienteRayosXController::class, 'create'])
+    ->name('pacientes.rayosx.create');
+
+// Guardar paciente nuevo para Rayos X
+Route::post('/pacientes/rayosx/store', [App\Http\Controllers\PacienteRayosXController::class, 'store'])
+    ->name('pacientes.rayosx.store');
+
+
+//validar identidad
+
+use App\Http\Controllers\PacienteRayosXController;
+
+Route::get('/pacientes/validar-identidad/{identidad}', [PacienteRayosXController::class, 'validarIdentidad'])->name('pacientes.validarIdentidad');
+// rutas/web.php (ejemplo)
+Route::get('pacientes/rayosx/create', [PacienteRayosXController::class, 'create'])->name('pacientes.rayosx.create');
+Route::post('pacientes/rayosx/store', [PacienteRayosXController::class, 'store'])->name('pacientes.rayosx.store');
+
+
+Route::get('rayosx/{id}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
+
+// ORDEN
+Route::post('/rayosx/descripcion-guardar', [OrdenRayosXController::class, 'guardarDescripcion'])
+    ->name('rayosx.descripcion.guardar');
+
+
+    //OOTRAS
+    Route::get('/rayosx', [OrdenRayosXController::class, 'index'])->name('rayosx.index');
+Route::get('/rayosx/create', [OrdenRayosXController::class, 'create'])->name('rayosx.create');
+Route::post('/rayosx', [OrdenRayosXController::class, 'store'])->name('rayosx.store');
+Route::get('/rayosx/{id}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
+Route::get('/rayosx/{id}/edit', [OrdenRayosXController::class, 'edit'])->name('rayosx.edit');
+Route::put('/rayosx/{id}', [OrdenRayosXController::class, 'update'])->name('rayosx.update');
+Route::delete('/rayosx/{id}', [OrdenRayosXController::class, 'destroy'])->name('rayosx.destroy');
+
+
+Route::post('/pacientes/rayosx/store', [App\Http\Controllers\PacienteRayosXController::class, 'storePacienteRayosX'])->name('pacientes.rayosx.store');
+Route::post('pacientes/rayosx/store', [PacienteRayosXController::class, 'store'])->name('pacientes.rayosx.store');
+
+
+
+Route::post('/rayosx/descripcion/guardar', [OrdenRayosXController::class, 'guardarDescripcion'])->name('rayosx.descripcion.guardar');
+
+//ANALISIS ;
+
+Route::get('rayosx/{orden}/analisis', [OrdenRayosXController::class, 'analisis'])->name('rayosx.analisis');
+Route::post('rayosx/{orden}/analisis', [OrdenRayosXController::class, 'guardarAnalisis'])->name('rayosx.analisis.guardar');
+Route::put('/rayosx/{orden}/guardar-analisis', [OrdenRayosXController::class, 'guardarAnalisis'])->name('rayosx.guardarAnalisis');
+
+
+
+Route::get('/rayosx/{id}/analizar', [OrdenRayosXController::class, 'analizar'])->name('rayosx.analizar');

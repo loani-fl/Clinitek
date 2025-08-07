@@ -319,10 +319,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const totalPagarInput = document.getElementById('total_pagar');
     const contenedorTotalPagar = document.getElementById('contenedor_total_pagar');
 
-    const opt = document.querySelector('#paciente_id').selectedOptions[0];
-console.log(opt.getAttribute('data-genero'));
-
-
     const preciosPorEspecialidad = {
         "Cardiología": 900.00,
         "Pediatría": 500.00,
@@ -334,43 +330,18 @@ console.log(opt.getAttribute('data-genero'));
     };
 
     function autocompletarPaciente() {
-    const opt = pacienteSelect.options[pacienteSelect.selectedIndex];
-    if (!opt) return;
+        const opt = pacienteSelect.options[pacienteSelect.selectedIndex];
+        if (!opt) return;
 
-    console.log('Paciente seleccionado:', opt.textContent, 'Género:', opt.getAttribute('data-genero'));
-
-    const nacimiento = opt.getAttribute('data-nacimiento') || '';
-    document.getElementById('fecha_nacimiento').textContent = nacimiento.replaceAll('-', '/');
-    document.getElementById('identidad').textContent = opt.getAttribute('data-identidad') || '';
-    document.getElementById('telefono').textContent = opt.getAttribute('data-telefono') || '';
-    document.getElementById('correo').textContent = opt.getAttribute('data-correo') || '';
-    document.getElementById('direccion').value = opt.getAttribute('data-direccion') || ''; // la dejas como está
-    generoInput.textContent = opt.getAttribute('data-genero') || '';
-}
-
-
-    function actualizarVisibilidadTotalPagar() {
-        const horaSeleccionada = horaSelect.value;
-
-        if (horaSeleccionada === 'inmediata') {
-            contenedorTotalPagar.style.display = 'block';
-
-            const selectedMedico = medicoSelect.options[medicoSelect.selectedIndex];
-            const especialidad = selectedMedico ? selectedMedico.getAttribute('data-especialidad') : '';
-
-            if (especialidad && preciosPorEspecialidad.hasOwnProperty(especialidad)) {
-                totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
-            } else {
-                totalPagarInput.value = '';
-            }
-        } else {
-            contenedorTotalPagar.style.display = 'none';
-            totalPagarInput.value = '';
-        }
+        document.getElementById('fecha_nacimiento').textContent = (opt.getAttribute('data-nacimiento') || '').replaceAll('-', '/');
+        document.getElementById('identidad').textContent = opt.getAttribute('data-identidad') || '';
+        document.getElementById('telefono').textContent = opt.getAttribute('data-telefono') || '';
+        document.getElementById('correo').textContent = opt.getAttribute('data-correo') || '';
+        document.getElementById('direccion').value = opt.getAttribute('data-direccion') || '';
+        generoInput.textContent = opt.getAttribute('data-genero') || '';
     }
 
     function hora12a24(hora12) {
-        if (hora12 === 'inmediata') return null;
         const [hora, minutoPeriodo] = hora12.split(':');
         const [minuto, periodo] = minutoPeriodo.split(' ');
         let h = parseInt(hora);
@@ -388,11 +359,6 @@ console.log(opt.getAttribute('data-genero'));
         defaultOption.value = '';
         defaultOption.textContent = '-- Selecciona hora --';
         horaSelect.appendChild(defaultOption);
-
-        const inmediataOption = document.createElement('option');
-        inmediataOption.value = 'inmediata';
-        inmediataOption.textContent = 'Inmediata';
-        horaSelect.appendChild(inmediataOption);
 
         if (!medico || !fecha) return;
 
@@ -430,8 +396,6 @@ console.log(opt.getAttribute('data-genero'));
                     const optMatch = Array.from(horaSelect.options).find(opt => opt.value === horaPrev);
                     if (optMatch && !optMatch.disabled) horaSelect.value = horaPrev;
                 }
-
-                actualizarVisibilidadTotalPagar();
             })
             .catch(err => {
                 console.error('Error cargando horas:', err);
@@ -441,105 +405,77 @@ console.log(opt.getAttribute('data-genero'));
                     option.textContent = hora12;
                     horaSelect.appendChild(option);
                 });
-                actualizarVisibilidadTotalPagar();
             });
+    }
+
+    function actualizarTotalPagar() {
+        const selectedMedico = medicoSelect.options[medicoSelect.selectedIndex];
+        const especialidad = selectedMedico ? selectedMedico.getAttribute('data-especialidad') : '';
+
+        if (especialidad && preciosPorEspecialidad.hasOwnProperty(especialidad)) {
+            totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
+            contenedorTotalPagar.style.display = 'block';
+        } else {
+            totalPagarInput.value = '';
+            contenedorTotalPagar.style.display = 'none';
+        }
     }
 
     medicoSelect.addEventListener('change', function () {
         const selected = this.options[this.selectedIndex];
         const especialidad = selected.getAttribute('data-especialidad') || '';
-    especialidadInput.textContent = especialidad;
+        especialidadInput.textContent = especialidad;
 
-
-        if (especialidad && preciosPorEspecialidad.hasOwnProperty(especialidad)) {
-            if (horaSelect.value === 'inmediata') {
-                totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
-            }
-        } else {
-            totalPagarInput.value = '';
-        }
-
+        actualizarTotalPagar();
         cargarHorasDisponibles();
     });
 
     fechaConsultaInput.addEventListener('change', cargarHorasDisponibles);
-    const fechaHoy = new Date();
-    const fechaMax = new Date();
-    fechaMax.setMonth(fechaMax.getMonth() + 1);
-
-fechaConsultaInput.min = fechaHoy.toISOString().split('T')[0];
-fechaConsultaInput.max = fechaMax.toISOString().split('T')[0];
-
-    horaSelect.addEventListener('change', actualizarVisibilidadTotalPagar);
     pacienteSelect.addEventListener('change', autocompletarPaciente);
 
-btnLimpiar.addEventListener('click', function (e) {
-    e.preventDefault();
+    btnLimpiar.addEventListener('click', function (e) {
+        e.preventDefault();
 
-    form.reset();
-    pacienteSelect.value = '';
-    medicoSelect.value = '';
-    horaSelect.innerHTML = `
-        <option value="">-- Selecciona hora --</option>
-        <option value="inmediata">Inmediata</option>
-    `;
+        form.reset();
+        pacienteSelect.value = '';
+        medicoSelect.value = '';
+        horaSelect.innerHTML = `<option value="">-- Selecciona hora --</option>`;
 
-    // Limpiar campos visibles (labels)
-    document.getElementById('identidad').textContent = '';
-    document.getElementById('fecha_nacimiento').textContent = '';
-    document.getElementById('telefono').textContent = '';
-    document.getElementById('correo').textContent = '';
-    document.getElementById('especialidad').textContent = '';
-    document.getElementById('total_pagar').textContent = '';
-    document.getElementById('genero').textContent = '';
-    document.querySelector('[name="motivo"]').value = '';
-    document.querySelector('[name="sintomas"]').value = '';
+        document.getElementById('identidad').textContent = '';
+        document.getElementById('fecha_nacimiento').textContent = '';
+        document.getElementById('telefono').textContent = '';
+        document.getElementById('correo').textContent = '';
+        document.getElementById('especialidad').textContent = '';
+        document.getElementById('genero').textContent = '';
+        document.getElementById('direccion').value = '';
+        document.querySelector('[name="motivo"]').value = '';
+        document.querySelector('[name="sintomas"]').value = '';
+        totalPagarInput.value = '';
+        contenedorTotalPagar.style.display = 'none';
 
+        form.querySelectorAll('.is-invalid, .is-valid').forEach(el => {
+            el.classList.remove('is-invalid', 'is-valid');
+        });
 
-    // Limpiar textarea de dirección
-    document.getElementById('direccion').value = '';
+        form.querySelectorAll('.invalid-feedback').forEach(feedback => feedback.remove());
 
-    // Limpiar input oculto de género (si lo usas para enviar al servidor)
-    generoInput.value = '';
-
-    // Ocultar total a pagar
-    contenedorTotalPagar.style.display = 'none';
-
-    // Limpiar clases y mensajes de validación
-    form.querySelectorAll('.is-invalid, .is-valid').forEach(el => {
-        el.classList.remove('is-invalid', 'is-valid');
+        form.querySelectorAll('.text-danger').forEach(span => {
+            span.textContent = '';
+        });
     });
 
-    form.querySelectorAll('.invalid-feedback').forEach(feedback => {
-        feedback.remove();
-    });
+    // Inicializar si hay datos antiguos tras validación fallida
+    if (pacienteSelect.value) autocompletarPaciente();
 
-    form.querySelectorAll('.text-danger').forEach(span => {
-        span.textContent = '';
-    });
-});
-
-
-        // Ejecutar lógica con datos antiguos si hay errores de validación
-        if (pacienteSelect.value) autocompletarPaciente();
-
-if (medicoSelect.value && fechaConsultaInput.value) {
-    cargarHorasDisponibles();
-} else {
-    actualizarVisibilidadTotalPagar();
-}
-
-// Mostrar especialidad si hay un médico previamente seleccionado
-if (medicoSelect.value) {
-    const opt = medicoSelect.options[medicoSelect.selectedIndex];
-    const especialidad = opt.getAttribute('data-especialidad') || '';
-    especialidadInput.textContent = especialidad;
-
-    // Si ya se había seleccionado "inmediata", calcular el total a pagar
-    if (horaSelect.value === 'inmediata' && preciosPorEspecialidad.hasOwnProperty(especialidad)) {
-        totalPagarInput.value = preciosPorEspecialidad[especialidad].toFixed(2);
-        contenedorTotalPagar.style.display = 'block';
+    if (medicoSelect.value) {
+        const opt = medicoSelect.options[medicoSelect.selectedIndex];
+        const especialidad = opt.getAttribute('data-especialidad') || '';
+        especialidadInput.textContent = especialidad;
+        actualizarTotalPagar();
     }
-}
+
+    if (medicoSelect.value && fechaConsultaInput.value) {
+        cargarHorasDisponibles();
+    }
 });
 </script>

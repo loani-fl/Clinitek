@@ -141,7 +141,7 @@
                         maxlength="255"
                         class="form-control @error('ubicacion') is-invalid @enderror"
                         style="resize: vertical;"
-                        placeholder="Dirección o referencia">{{ old('ubicacion') }}</textarea>
+                        placeholder="Ciudad, Departamento, País">{{ old('ubicacion') }}</textarea>
                     @error('ubicacion')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -184,9 +184,12 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-plus-circle"></i> Registrar
                 </button>
-                <a href="{{ route('farmacias.index') }}" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> Cancelar
-                </a>
+            <button type="button" id="btnLimpiar" class="btn btn-warning">
+                <i class="bi bi-trash"></i> Limpiar
+            </button>
+            <a href="{{ route('farmacias.index') }}" class="btn btn-success">
+                <i class="bi bi-arrow-left"></i> Regresar
+            </a>
             </div>
 
         </form>
@@ -224,6 +227,24 @@
             if (!regex.test(e.key)) {
                 e.preventDefault();
             }
+        });
+    </script>
+    <script>
+        document.getElementById('btnLimpiar').addEventListener('click', function () {
+            const form = this.closest('form');
+            form.reset();
+
+            // Limpia manualmente los campos con valores por defecto (como old('') en Blade)
+            Array.from(form.querySelectorAll('input, textarea')).forEach(input => {
+                if (input.type !== 'hidden' && input.type !== 'submit' && input.type !== 'button') {
+                    input.value = '';
+                }
+            });
+
+            // Elimina posibles mensajes de error visuales (como .is-invalid)
+            form.querySelectorAll('.is-invalid').forEach(el => {
+                el.classList.remove('is-invalid');
+            });
         });
     </script>
 

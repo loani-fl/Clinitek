@@ -183,6 +183,10 @@ class PacienteController extends Controller
 
         return view('pacientes.show', compact('paciente'));
     }
+    public function edit(Paciente $paciente)
+    {
+        return view('pacientes.edit', compact('paciente'));
+    }
 
 
     public function update(Request $request, Paciente $paciente)

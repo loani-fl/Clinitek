@@ -1,33 +1,7 @@
-@push('styles')
-<style>
-    /* Botón Ver con borde azul claro */
-    .btn-ver {
-        border: 2px solid #85bfff !important;
-        color: #0856b3 !important;
-        background-color: white !important;
-    }
-    .btn-ver:hover {
-        background-color: #e0f0ff !important;
-        color: #0856b3 !important;
-    }
-
-    /* Botón Editar con borde amarillo */
-    .btn-editar {
-        border: 2px solid #ffcc00 !important;
-        color: #996600 !important;
-        background-color: white !important;
-    }
-    .btn-editar:hover {
-        background-color: #fff8cc !important;
-        color: #996600 !important;
-    }
-</style>
-@endpush
-
-<table class="table table-striped table-hover">
+<table class="table table-striped table-bordered table-hover text-center align-middle">
     <thead>
         <tr>
-            <th>#</th> <!-- Nueva columna para la numeración -->
+            <th>#</th>
             <th>Nombre</th>
             <th>Teléfono</th>
             <th>Ubicación</th>
@@ -38,12 +12,11 @@
     <tbody>
         @forelse($farmacias as $index => $farmacia)
             <tr>
-                <td>{{ $farmacias->firstItem() + $index }}</td> <!-- Numeración correcta con paginación -->
+                <td>{{ $farmacias->firstItem() + $index }}</td>
                 <td>{{ $farmacia->nombre }}</td>
                 <td>{{ $farmacia->telefono }}</td>
                 <td>{{ $farmacia->ubicacion }}</td>
                 <td>{{ $farmacia->descuento ?? '—' }}%</td>
-    
                 <td>
                     <a href="{{ route('farmacias.show', $farmacia) }}" class="btn btn-ver btn-sm" title="Ver">
                         <i class="bi bi-eye"></i>
@@ -61,7 +34,9 @@
                 </td>
             </tr>
         @empty
-            <tr><td colspan="7" class="text-center">No hay farmacias registradas.</td></tr>
+            <tr>
+                <td colspan="6" class="text-center">No hay farmacias registradas.</td>
+            </tr>
         @endforelse
     </tbody>
 </table>
