@@ -105,7 +105,6 @@
     <form action="{{ route('pago.store') }}" method="POST">
         @csrf
 
-        {{-- Método de pago --}}
         <div style="margin-bottom: 1.5rem;">
             <label for="metodo_pago">Método de Pago</label>
             <select name="metodo_pago" id="metodo_pago" required onchange="mostrarCamposPago()" data-old="{{ old('metodo_pago') }}">
@@ -228,6 +227,66 @@
                 <strong>Pago pendiente:</strong> El pago se realizará en efectivo. El recibo se entregará al momento de cancelar.
             </div>
         </div>
+
+        {{-- Campos para efectivo --}}
+        <div id="efectivoCampos" class="{{ old('metodo_pago') == 'efectivo' ? '' : 'hidden' }}">
+            @if($paciente)
+                <div class="grid-3-cols" style="margin-bottom: 1rem;">
+                    <div>
+                        <label>Nombre del paciente</label>
+                        <input type="text" value="{{ $paciente->nombre }}" readonly class="form-control">
+                    </div>
+                    <div>
+                        <label>Apellidos</label>
+                        <input type="text" value="{{ $paciente->apellidos }}" readonly class="form-control">
+                    </div>
+                    <div>
+                        <label>Identidad</label>
+                        <input type="text" value="{{ $paciente->identidad }}" readonly class="form-control">
+                    </div>
+                </div>
+            @endif
+
+            <div class="grid-3-cols">
+                <div>
+                    <label for="servicio_efectivo">Servicio</label>
+                    <select name="servicio" id="servicio">
+                        <option value="">-- Selecciona un servicio --</option>
+                        <option value="consulta_medica" {{ old('servicio') == 'consulta_medica' ? 'selected' : '' }}>Consulta médica</option>
+                        <option value="emergencia" {{ old('servicio') == 'emergencia' ? 'selected' : '' }}>Servicio de emergencia</option>
+                        <option value="rayos_x" {{ old('servicio') == 'rayos_x' ? 'selected' : '' }}>Examen de rayos X</option>
+                    </select>
+                    @error('servicio')
+                        <div class="error-text">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div>
+                    <label for="cantidad_efectivo">Cantidad</label>
+                    <input type="number" step="0.01" min="0.01" max="9999.99" name="cantidad" placeholder="L. 0.00" value="{{ old('cantidad') }}">
+                    @error('cantidad')
+                        <div class="error-text">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div>
+                    <label for="descripcion_efectivo">Descripción breve</label>
+                    <input type="text" name="descripcion_servicio" maxlength="100" autocomplete="off" placeholder="Ej. Pago por consulta médica" value="{{ old('descripcion_servicio') }}">
+                    @error('descripcion_servicio')
+                        <div class="error-text">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="grid-3-cols">
+                <div>
+                    <label for="fecha_efectivo">Fecha</label>
+                    <input type="date" name="fecha" value="{{ old('fecha', date('Y-m-d')) }}" readonly>
+                    @error('fecha')
+                        <div class="error-text">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+        </div>
+
         <input type="hidden" name="consulta_id" value="{{ $consulta->id ?? '' }}">
 
 
@@ -244,6 +303,7 @@ function mostrarCamposPago() {
 
     document.getElementById('tarjetaCampos').classList.toggle('hidden', metodo !== 'tarjeta');
     document.getElementById('efectivoMensaje').classList.toggle('hidden', metodo !== 'efectivo');
+    document.getElementById('efectivoCampos').classList.toggle('hidden', metodo !== 'efectivo');
 
     const btnContainer = document.getElementById('btnContainer');
     btnContainer.innerHTML = '';
@@ -267,14 +327,15 @@ function mostrarCamposPago() {
     }
 
     if (metodo === 'efectivo') {
-        const btnGuardarEfectivo = document.createElement('a');
-        btnGuardarEfectivo.href = '{{ route("consultas.index") }}';
-        btnGuardarEfectivo.id = 'btnGuardarEfectivo';
-        btnGuardarEfectivo.className = 'btn btn-primary btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2';
-        btnGuardarEfectivo.style.fontSize = '0.85rem';
-        btnGuardarEfectivo.innerHTML = '<i class="bi bi-check-circle"></i> Guardar';
-        btnContainer.appendChild(btnGuardarEfectivo);
-    }
+    const btnGuardarEfectivo = document.createElement('button');
+    btnGuardarEfectivo.type = 'submit';
+    btnGuardarEfectivo.id = 'btnGuardarEfectivo';
+    btnGuardarEfectivo.className = 'btn btn-primary btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2';
+    btnGuardarEfectivo.style.fontSize = '0.85rem';
+    btnGuardarEfectivo.innerHTML = '<i class="bi bi-check-circle"></i> Guardar';
+    btnContainer.appendChild(btnGuardarEfectivo);
+}
+
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -289,52 +350,72 @@ document.addEventListener('DOMContentLoaded', function () {
     // Auto-llenar descripción si servicio es consulta médica
     const servicioSelect = document.getElementById('servicio');
     const descripcionInput = document.querySelector('input[name="descripcion_servicio"]');
-    servicioSelect.addEventListener('change', function () {
-        if (this.value === 'consulta_medica') {
-            descripcionInput.value = "Pago por consulta médica";
-        } else if (descripcionInput.value === "Pago por consulta médica") {
-            descripcionInput.value = "";
-        }
-    });
+    if(servicioSelect && descripcionInput) {
+        servicioSelect.addEventListener('change', function () {
+            if (this.value === 'consulta_medica') {
+                descripcionInput.value = "Pago por consulta médica";
+            } else if (descripcionInput.value === "Pago por consulta médica") {
+                descripcionInput.value = "";
+            }
+        });
+    }
 
     // Validaciones de inputs (tu lógica previa)
-    document.querySelector('input[name="cantidad"]').addEventListener('input', function () {
-        this.value = this.value.replace(/[^0-9.]/g, '').slice(0, 6);
-    });
+    const cantidadInput = document.querySelector('input[name="cantidad"]');
+    if(cantidadInput){
+        cantidadInput.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9.]/g, '').slice(0, 6);
+        });
+    }
 
-    document.querySelector('input[name="nombre_titular"]').addEventListener('input', function () {
-        this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]/g, '');
-    });
+    const nombreTitularInput = document.querySelector('input[name="nombre_titular"]');
+    if(nombreTitularInput){
+        nombreTitularInput.addEventListener('input', function () {
+            this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]/g, '');
+        });
+    }
 
-    document.querySelector('input[name="descripcion_servicio"]').addEventListener('input', function () {
-        this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]/g, '');
-    });
+    const descripcionInput2 = document.querySelector('input[name="descripcion_servicio"]');
+    if(descripcionInput2){
+        descripcionInput2.addEventListener('input', function () {
+            this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]/g, '');
+        });
+    }
 
-    document.querySelector('input[name="numero_tarjeta"]').addEventListener('input', function () {
-        this.value = this.value.replace(/\D/g, '').slice(0, 19);
-    });
+    const numeroTarjetaInput = document.querySelector('input[name="numero_tarjeta"]');
+    if(numeroTarjetaInput){
+        numeroTarjetaInput.addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '').slice(0, 19);
+        });
+    }
 
-    document.querySelector('input[name="cvv"]').addEventListener('input', function () {
-        this.value = this.value.replace(/\D/g, '').slice(0, 4);
-    });
+    const cvvInput = document.querySelector('input[name="cvv"]');
+    if(cvvInput){
+        cvvInput.addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '').slice(0, 4);
+        });
+    }
 
-    document.querySelector('input[name="fecha_expiracion"]').addEventListener('change', function () {
-        const hoy = new Date();
-        const seleccionada = new Date(this.value);
-        const parent = this.parentElement;
+    const fechaExpiracionInput = document.querySelector('input[name="fecha_expiracion"]');
+    if(fechaExpiracionInput){
+        fechaExpiracionInput.addEventListener('change', function () {
+            const hoy = new Date();
+            const seleccionada = new Date(this.value);
+            const parent = this.parentElement;
 
-        const mensajeAnterior = parent.querySelector('.error-text.fecha-expirada');
-        if (mensajeAnterior) {
-            mensajeAnterior.remove();
-        }
+            const mensajeAnterior = parent.querySelector('.error-text.fecha-expirada');
+            if (mensajeAnterior) {
+                mensajeAnterior.remove();
+            }
 
-        if (seleccionada < new Date(hoy.getFullYear(), hoy.getMonth(), 1)) {
-            const errorDiv = document.createElement('div');
-            errorDiv.classList.add('error-text', 'fecha-expirada');
-            errorDiv.textContent = "La tarjeta ya expiró.";
-            parent.appendChild(errorDiv);
-        }
-    });
+            if (seleccionada < new Date(hoy.getFullYear(), hoy.getMonth(), 1)) {
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('error-text', 'fecha-expirada');
+                errorDiv.textContent = "La tarjeta ya expiró.";
+                parent.appendChild(errorDiv);
+            }
+        });
+    }
 });
 </script>
 

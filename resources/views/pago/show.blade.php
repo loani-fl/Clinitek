@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+@if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+
 <style>
     .factura-container {
         max-width: 800px;
@@ -98,7 +102,7 @@
 
 <div class="factura-container">
     {{-- Botón de inicio --}}
-    <a href="{{ route('inicio') }}" class="btn" style="background-color: #6c757d; color: white;">Inicio</a>
+    <a href="{{ route('inicio') }}" class="btn boton-inicio">Inicio</a>
 
     <div class="factura-header">
         <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek">
@@ -108,37 +112,73 @@
 
     <div class="factura-divider"></div>
 
-    <div class="factura-section row">
-        {{-- Columna 1 --}}
-        <div class="col-md-6">
-            @if($paciente)
-                <p><strong>Nombre completo:</strong> {{ $paciente->nombre }} {{ $paciente->apellidos }}</p>
-            @endif
-            <p><strong>Nombre del Titular:</strong> {{ $pago->nombre_titular }}</p>
-            <p><strong>Fecha:</strong> {{ \Carbon\Carbon::parse($pago->fecha)->format('d/m/Y') }}</p>
+    <div class="factura-section">
+        <div class="factura-section">
+    {{-- Datos comunes --}}
+    @if($paciente)
+        {{-- Fila 1 --}}
+        <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Nombre completo:</strong> {{ $paciente->nombre }} {{ $paciente->apellidos }}
+            </p>
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Identidad:</strong> {{ $paciente->identidad }}
+            </p>
+        </div>
+    @endif
+
+    @if($pago->metodo_pago === 'efectivo')
+        {{-- Fila 2 --}}
+        <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Método de pago:</strong> {{ ucfirst($pago->metodo_pago) }}
+            </p>
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Fecha:</strong> {{ \Carbon\Carbon::parse($pago->fecha)->format('d/m/Y')}}
+            </p>
         </div>
 
-        {{-- Columna 2 --}}
-        <div class="col-md-6">
-            @if($paciente)
-                <p><strong>Identidad:</strong> {{ $paciente->identidad }}</p>
-            @endif
-            @if($pago->metodo_pago === 'tarjeta')
-                <p><strong>Número de Tarjeta:</strong> {{ $pago->numero_tarjeta }}</p>
-            @endif
-            <p><strong>Hora:</strong> {{ \Carbon\Carbon::now('America/Tegucigalpa')->format('h:i A') }}</p>
+        {{-- Fila 3 --}}
+        <div style="margin-bottom: 0.3rem;">
+            <p style="margin: 0; display: flex; align-items: center;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Hora:</strong> {{ \Carbon\Carbon::now('America/Tegucigalpa')->format('h:i A') }}
+            </p>
         </div>
 
-        {{-- Fila separada para Método de pago e Impuesto --}}
-        <div class="col-md-6 mt-2">
-            <p><strong>Método de Pago:</strong> {{ ucfirst($pago->metodo_pago) }}</p>
+    @elseif($pago->metodo_pago === 'tarjeta')
+        {{-- Fila 2 --}}
+        <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Método de pago:</strong> {{ ucfirst($pago->metodo_pago) }}
+            </p>
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Nombre del titular:</strong> {{ $pago->nombre_titular ?? 'No disponible' }}
+            </p>
         </div>
-        <div class="col-md-6 mt-2">
-            @php
-                $impuesto = round($pago->cantidad * 0.15, 2);
-            @endphp
-            <p><strong>Isv (15%):</strong> L. {{ number_format($impuesto, 2) }}</p>
+
+        {{-- Fila 3 --}}
+        <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Número de tarjeta:</strong> {{ $pago->numero_tarjeta ?? 'No disponible' }}
+            </p>
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Fecha de expiración:</strong> {{ $pago->fecha_expiracion ?? 'No disponible' }}
+            </p>
         </div>
+
+        {{-- Fila 4 --}}
+        <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Fecha:</strong> {{ \Carbon\Carbon::parse($pago->fecha)->format('d/m/Y')}}
+            </p>
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Hora:</strong> {{ \Carbon\Carbon::now('America/Tegucigalpa')->format('h:i A') }}
+            </p>
+        </div>
+    @endif
+
+</div>
+
     </div>
 
     <div class="factura-divider"></div>
@@ -146,13 +186,13 @@
     <table class="factura-table">
         <thead>
             <tr>
-                <th>Descripcion</th>
+                <th>Descripción</th>
                 <th>Valor</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-            <td>{{ $pago->servicio }}</td>
+                <td>{{ $pago->servicio }}</td>
                 <td>L. {{ number_format($pago->cantidad, 2) }}</td>
             </tr>
         </tbody>
@@ -161,13 +201,17 @@
     <div class="factura-divider"></div>
 
     <div class="factura-section">
-        <p><strong>Total a pagar:</strong> {{ $pago->servicio }}</p>
+        @php
+            $isv = round($pago->cantidad * 0.15, 2);
+        @endphp
+        <p><strong>ISV (15%):</strong> L. {{ number_format($isv, 2) }}</p>
+        <p><strong>Total a pagar:</strong> L. {{ number_format($pago->cantidad + $isv, 2) }}</p>
     </div>
 
     <div class="factura-divider"></div>
 
     <div class="factura-footer">
-        *** AGRADECEMOS A PREFERENCIA! ***<br>
+        *** ¡AGRADECEMOS SU PREFERENCIA! ***<br>
         Gracias por confiar en nosotros <strong>CLINITEK</strong>.
     </div>
 </div>

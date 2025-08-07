@@ -126,6 +126,8 @@ Route::prefix('rayosx')->group(function () {
 // Rutas para pago
 Route::get('/pago/create', [App\Http\Controllers\PagoController::class, 'create'])->name('pago.create');
 Route::post('/pago', [App\Http\Controllers\PagoController::class, 'store'])->name('pago.store');
+Route::resource('pago', PagoController::class);
+
 Route::get('/pago/{pago}', [App\Http\Controllers\PagoController::class, 'show'])->name('pago.show');
 
 // Rutas para farmacia
