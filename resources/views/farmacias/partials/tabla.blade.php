@@ -24,13 +24,14 @@
                     <a href="{{ route('farmacias.edit', $farmacia) }}" class="btn btn-editar btn-sm" title="Editar">
                         <i class="bi bi-pencil-square"></i>
                     </a>
-                    <form action="{{ route('farmacias.destroy', $farmacia) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('¿Está seguro de eliminar esta farmacia?');">
+                    <form action="{{ route('farmacias.destroy', $farmacia) }}" method="POST" class="form-eliminar d-inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar">
                             <i class="bi bi-trash"></i>
                         </button>
                     </form>
+
                 </td>
             </tr>
         @empty
@@ -44,3 +45,28 @@
 <div class="d-flex justify-content-center mt-3">
     {!! $farmacias->links() !!}
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const forms = document.querySelectorAll('.form-eliminar');
+        forms.forEach(form => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault(); // Evita el envío inmediato
+
+                Swal.fire({
+                    title: '¿Está seguro?',
+                    text: 'Esta farmacia se eliminará permanentemente.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit(); // Envía el formulario si el usuario confirma
+                    }
+                });
+            });
+        });
+    });
+</script>

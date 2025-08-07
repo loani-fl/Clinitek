@@ -146,7 +146,7 @@
                 </div>
             @endif
 
-            
+
             <!-- Fila 1: Nombre del Titular, Número de Tarjeta y CVV -->
             <div class="grid-3-cols">
                 <div>
@@ -249,7 +249,7 @@
 
             <div class="grid-3-cols">
                 <div>
-                    <label for="servicio_efectivo">Servicio</label>
+                    <label for="servicio">Servicio</label>
                     <select name="servicio" id="servicio">
                         <option value="">-- Selecciona un servicio --</option>
                         <option value="consulta_medica" {{ old('servicio') == 'consulta_medica' ? 'selected' : '' }}>Consulta médica</option>
@@ -261,7 +261,7 @@
                     @enderror
                 </div>
                 <div>
-                    <label for="cantidad_efectivo">Cantidad</label>
+                    <label for="cantidad">Cantidad</label>
                     <input type="number" step="0.01"  name="cantidad" placeholder="L. 0.00" value="{{ old('cantidad') }}">
                     @error('cantidad')
                         <div class="error-text">{{ $message }}</div>
