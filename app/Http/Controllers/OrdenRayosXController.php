@@ -18,11 +18,56 @@ class OrdenRayosXController extends Controller
     /**
      * Mostrar listado paginado.
      */
-public function index()
+public function index(Request $request)
 {
-    $ordenes = RayosxOrder::with('examenes')->paginate(10);
-    return view('rayosx.index', compact('ordenes'));
+    try {
+        $query = $request->input('search', '');
+        $ordenesQuery = RayosxOrder::with(['examenes', 'pacienteClinica', 'pacienteRayosX', 'diagnostico.paciente'])
+            ->orderBy('fecha', 'desc');
+
+        if ($query) {
+            $ordenesQuery->where(function ($q) use ($query) {
+                $q->whereHas('pacienteClinica', function ($q2) use ($query) {
+                    $q2->where('nombre', 'like', "%$query%")
+                       ->orWhere('apellidos', 'like', "%$query%");
+                })
+                ->orWhereHas('pacienteRayosX', function ($q2) use ($query) {
+                    $q2->where('nombre', 'like', "%$query%")
+                       ->orWhere('apellidos', 'like', "%$query%");
+                })
+                ->orWhere('nombres', 'like', "%$query%")
+                ->orWhere('apellidos', 'like', "%$query%");
+            });
+        }
+
+        // Si hay búsqueda, traemos todos resultados sin paginar para listarlos todos
+        if ($query) {
+            $ordenes = $ordenesQuery->get();
+            $isSearch = true;
+        } else {
+            // Paginación de 5 resultados cuando no hay filtro
+            $ordenes = $ordenesQuery->paginate(5);
+            $isSearch = false;
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('rayosx.partials.tabla', compact('ordenes', 'isSearch'))->render(),
+                'pagination' => $isSearch ? '' : $ordenes->links('pagination::bootstrap-5')->render(),
+                'total' => $ordenes->count(),
+                'all' => RayosxOrder::count(),
+            ]);
+        }
+
+        return view('rayosx.index', compact('ordenes', 'isSearch'));
+    } catch (\Exception $e) {
+        if ($request->ajax()) {
+            return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
+        }
+        abort(500, $e->getMessage());
+    }
 }
+
 
 
 
