@@ -11,20 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-   Schema::create('rayosx_extremidad_superiors', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('rayosx_order_id')->constrained('rayosx_orders')->onDelete('cascade');
-            $table->boolean('clavicula')->default(false);
-            $table->boolean('hombro')->default(false);
-            $table->boolean('humero')->default(false);
-            $table->boolean('codo')->default(false);
-            $table->boolean('antebrazo')->default(false);
-            $table->boolean('muneca')->default(false);
-            $table->boolean('mano')->default(false);
-            $table->text('otros')->nullable();
-            $table->timestamps();
-        });
+ Schema::create('rayosx_extremidad_superiors', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('rayosx_order_id')->constrained('rayosx_orders')->onDelete('cascade');
+    $table->boolean('clavicula_izquierda')->default(false);
+    $table->boolean('clavicula_derecha')->default(false);
+    $table->boolean('hombro_anterior')->default(false);
+    $table->boolean('hombro_lateral')->default(false);
+    $table->boolean('humero_proximal')->default(false);
+    $table->boolean('humero_distal')->default(false);
+    $table->boolean('codo_anterior')->default(false);
+    $table->boolean('codo_lateral')->default(false);
+    $table->boolean('antebrazo')->default(false);
+    $table->boolean('muneca')->default(false);
+    $table->boolean('mano')->default(false);
 
+    $table->timestamps();
+});
     }
 
     /**

@@ -11,18 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-   Schema::create('rayosx_extremidad_inferiors', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('rayosx_order_id')->constrained('rayosx_orders')->onDelete('cascade');
-            $table->boolean('cadera')->default(false);
-            $table->boolean('femur')->default(false);
-            $table->boolean('rodilla')->default(false);
-            $table->boolean('tibia')->default(false);
-            $table->boolean('pie')->default(false);
-            $table->boolean('calcaneo')->default(false);
-            $table->text('otros')->nullable();
-            $table->timestamps();
-        });
+Schema::create('rayosx_extremidad_inferiors', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('rayosx_order_id')->constrained('rayosx_orders')->onDelete('cascade');
+    $table->boolean('cadera_izquierda')->default(false);
+    $table->boolean('cadera_derecha')->default(false);
+    $table->boolean('femur_proximal')->default(false);
+    $table->boolean('femur_distal')->default(false);
+    $table->boolean('rodilla_anterior')->default(false);
+    $table->boolean('rodilla_lateral')->default(false);
+    $table->boolean('tibia')->default(false);
+    $table->boolean('pie')->default(false);
+    $table->boolean('calcaneo')->default(false);
+    $table->text('otros')->nullable();
+    $table->timestamps();
+});
 
     }
 

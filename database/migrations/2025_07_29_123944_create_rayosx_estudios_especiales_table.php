@@ -12,17 +12,21 @@ return new class extends Migration
     public function up(): void
     {
        Schema::create('rayosx_estudios_especiales', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('rayosx_order_id')->constrained('rayosx_orders')->onDelete('cascade');
-            $table->boolean('arteriograma')->default(false);
-            $table->boolean('histerosalpingograma')->default(false);
-            $table->boolean('colecistograma')->default(false);
-            $table->boolean('fistulograma')->default(false);
-            $table->boolean('artrograma')->default(false);
-            $table->text('otros')->nullable();
-            $table->timestamps();
-        });
-
+    $table->id();
+    $table->foreignId('rayosx_order_id')->constrained('rayosx_orders')->onDelete('cascade');
+    $table->boolean('arteriograma_simple')->default(false);
+    $table->boolean('arteriograma_contraste')->default(false);
+    $table->boolean('histerosalpingograma_simple')->default(false);
+    $table->boolean('histerosalpingograma_contraste')->default(false);
+    $table->boolean('colecistograma_simple')->default(false);
+    $table->boolean('colecistograma_contraste')->default(false);
+    $table->boolean('fistulograma_simple')->default(false);
+    $table->boolean('fistulograma_contraste')->default(false);
+    $table->boolean('artrograma_simple')->default(false);
+    $table->boolean('artrograma_contraste')->default(false);
+ 
+    $table->timestamps();
+});
     }
 
     /**

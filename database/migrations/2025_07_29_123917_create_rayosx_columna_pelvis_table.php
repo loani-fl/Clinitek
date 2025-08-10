@@ -11,18 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('rayosx_columna_pelvis', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('rayosx_order_id')->constrained('rayosx_orders')->onDelete('cascade');
-            $table->boolean('cervical')->default(false);
-            $table->boolean('dorsal')->default(false);
-            $table->boolean('lumbar')->default(false);
-            $table->boolean('sacro_coxis')->default(false);
-            $table->boolean('pelvis')->default(false);
-            $table->boolean('escoliosis')->default(false);
-            $table->text('otros')->nullable();
-            $table->timestamps();
-        });
+   Schema::create('rayosx_columna_pelvis', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('rayosx_order_id')->constrained('rayosx_orders')->onDelete('cascade');
+    $table->boolean('columna_cervical_lateral')->default(false);
+    $table->boolean('columna_cervical_anteroposterior')->default(false);
+    $table->boolean('columna_dorsal_lateral')->default(false);
+    $table->boolean('columna_dorsal_anteroposterior')->default(false);
+    $table->boolean('columna_lumbar_lateral')->default(false);
+    $table->boolean('columna_lumbar_anteroposterior')->default(false);
+    $table->boolean('sacro_coxis')->default(false);
+    $table->boolean('pelvis_anterior_posterior')->default(false);
+    $table->boolean('pelvis_oblicua')->default(false);
+    $table->boolean('escoliosis')->default(false);
+  
+    $table->timestamps();
+});
 
     }
 
