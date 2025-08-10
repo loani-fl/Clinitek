@@ -330,6 +330,9 @@
                     <a href="{{ route('rayosx.index') }}" class="btn btn-success">
                         <i class="bi bi-arrow-left-circle"></i> Regresar
                     </a>
+                      <a href="{{ route('pago.create', ['orden_id' => $orden->id ?? '']) }}" class="btn btn-info">
+        <i class="bi bi-cash-stack"></i> Pagar
+    </a>
                 </div>
             </form>
         </div>
