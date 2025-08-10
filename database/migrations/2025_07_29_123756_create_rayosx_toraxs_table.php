@@ -11,17 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-   Schema::create('rayosx_toraxs', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('rayosx_order_id')->constrained('rayosx_orders')->onDelete('cascade');
-            $table->boolean('torax_pa')->default(false);
-            $table->boolean('torax_pa_lat')->default(false);
-            $table->boolean('costillas')->default(false);
-            $table->boolean('esternon')->default(false);
-            $table->text('otros')->nullable();
-            $table->timestamps();
-        });
-
+ Schema::create('rayosx_toraxs', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('rayosx_order_id')->constrained('rayosx_orders')->onDelete('cascade');
+    $table->boolean('torax_posteroanterior_pa')->default(false);
+    $table->boolean('torax_anteroposterior_ap')->default(false);
+    $table->boolean('torax_lateral')->default(false);
+    $table->boolean('torax_oblicuo')->default(false);
+    $table->boolean('torax_superior')->default(false);
+    $table->boolean('torax_inferior')->default(false);
+    $table->boolean('costillas_superiores')->default(false);
+    $table->boolean('costillas_inferiores')->default(false);
+    $table->boolean('esternon_frontal')->default(false);
+    $table->boolean('esternon_lateral')->default(false);
+    $table->text('otros')->nullable();
+    $table->timestamps();
+});
     }
 
     /**

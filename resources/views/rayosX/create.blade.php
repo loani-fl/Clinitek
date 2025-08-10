@@ -3,6 +3,7 @@
 @section('content')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
+
 <style>
     body {
         background-color: #e8f4fc;
@@ -188,21 +189,19 @@
         </div>
 
         <div class="card-body">
-            {{-- Flash messages Laravel (opcional) --}}
+            {{-- Flash messages --}}
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                 </div>
             @endif
-
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     {{ session('error') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                 </div>
             @endif
-
             @if ($errors->any())
                 <div class="alert alert-danger mb-4">
                     <ul class="mb-0">
@@ -219,7 +218,6 @@
 
                 <div class="mb-4 row align-items-center">
                     <label for="paciente_id" class="col-md-2 col-form-label fw-bold text-end">Seleccione Paciente</label>
-
                     <div class="col-md-4">
                         <select id="paciente_id" name="seleccion" class="form-select" required>
                             <option value="" selected disabled>-- Seleccione un paciente --</option>
@@ -297,13 +295,11 @@
                 </div>
 
                 {{-- Exámenes --}}
-                {{-- Título general --}}
                 <div class="section-title general">Estudios para rayos X</div>
 
                 <div class="secciones-container">
                     @foreach($secciones as $titulo => $examenesSeccion)
                         <div class="seccion">
-                            {{-- Título de sección --}}
                             <div class="section-title seccion">{{ $titulo }}</div>
                             <div class="examenes-grid">
                                 @foreach($examenesSeccion as $clave)
@@ -316,6 +312,11 @@
                             </div>
                         </div>
                     @endforeach
+                </div>
+
+                {{-- Total a pagar dinámico --}}
+                <div id="totalAPagar" class="mb-3 fw-bold fs-5 text-end">
+                    Total a pagar: $0.00
                 </div>
 
                 {{-- Botones --}}
@@ -351,6 +352,77 @@ document.addEventListener('DOMContentLoaded', function() {
     const formOrden = document.getElementById('formOrden');
     const checkboxes = formOrden.querySelectorAll('input[type=checkbox][name="examenes[]"]');
     const MAX_EXAMENES = 7;
+    const totalAPagarDiv = document.getElementById('totalAPagar');
+
+    // Objeto con precios por examen (corregido con ':')
+    const preciosExamenes = {
+        'craneo_anterior_posterior': 120.00,
+        'craneo_lateral': 110.00,
+        'waters': 100.00,
+        'waters_lateral': 100.00,
+        'conductos_auditivos': 80.00,
+        'cavum': 90.00,
+        'senos_paranasales': 85.00,
+        'silla_turca': 95.00,
+        'huesos_nasales': 75.00,
+        'atm_tm': 90.00,
+        'mastoides': 88.00,
+        'mandibula': 85.00,
+        'torax_posteroanterior_pa': 150.00,
+        'torax_anteroposterior_ap': 150.00,
+        'torax_lateral': 140.00,
+        'torax_oblicuo': 130.00,
+        'torax_superior': 120.00,
+        'torax_inferior': 120.00,
+        'costillas_superiores': 110.00,
+        'costillas_inferiores': 110.00,
+        'esternon_frontal': 100.00,
+        'esternon_lateral': 100.00,
+        'abdomen_simple': 130.00,
+        'abdomen_agudo': 150.00,
+        'abdomen_erecto': 140.00,
+        'abdomen_decubito': 140.00,
+        'clavicula_izquierda': 90.00,
+        'clavicula_derecha': 90.00,
+        'hombro_anterior': 100.00,
+        'hombro_lateral': 100.00,
+        'humero_proximal': 110.00,
+        'humero_distal': 110.00,
+        'codo_anterior': 90.00,
+        'codo_lateral': 90.00,
+        'antebrazo': 80.00,
+        'muneca': 80.00,
+        'mano': 80.00,
+        'cadera_izquierda': 120.00,
+        'cadera_derecha': 120.00,
+        'femur_proximal': 130.00,
+        'femur_distal': 130.00,
+        'rodilla_anterior': 110.00,
+        'rodilla_lateral': 110.00,
+        'tibia': 100.00,
+        'pie': 90.00,
+        'calcaneo': 90.00,
+        'columna_cervical_lateral': 100.00,
+        'columna_cervical_anteroposterior': 100.00,
+        'columna_dorsal_lateral': 110.00,
+        'columna_dorsal_anteroposterior': 110.00,
+        'columna_lumbar_lateral': 110.00,
+        'columna_lumbar_anteroposterior': 110.00,
+        'sacro_coxis': 100.00,
+        'pelvis_anterior_posterior': 120.00,
+        'pelvis_oblicua': 120.00,
+        'escoliosis': 100.00,
+        'arteriograma_simple': 250.00,
+        'arteriograma_contraste': 300.00,
+        'histerosalpingograma_simple': 230.00,
+        'histerosalpingograma_contraste': 280.00,
+        'colecistograma_simple': 220.00,
+        'colecistograma_contraste': 270.00,
+        'fistulograma_simple': 210.00,
+        'fistulograma_contraste': 260.00,
+        'artrograma_simple': 200.00,
+        'artrograma_contraste': 250.00
+    };
 
     // Mostrar datos paciente cuando cambie selección
     function mostrarDatosPaciente() {
@@ -398,6 +470,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (fecha) fecha.value = new Date().toISOString().slice(0,10);
             clearMensaje(mensajePaciente);
             clearMensaje(mensajeExamenes);
+            actualizarTotal();
         });
     }
 
@@ -429,8 +502,26 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 clearMensaje(mensajeExamenes);
             }
+            actualizarTotal();
         });
     });
+
+    // Función para actualizar total a pagar
+    function actualizarTotal() {
+        let total = 0;
+        checkboxes.forEach(chk => {
+            if (chk.checked) {
+                const clave = chk.value;
+                if (preciosExamenes.hasOwnProperty(clave)) {
+                    total += preciosExamenes[clave];
+                }
+            }
+        });
+        totalAPagarDiv.textContent = `Total a pagar: $${total.toFixed(2)}`;
+    }
+
+    // Ejecutar al cargar para mostrar total si hay checkboxes preseleccionados
+    actualizarTotal();
 
     // Validar formulario antes de enviar
     formOrden.addEventListener('submit', function(e) {
@@ -454,6 +545,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
     });
+
+    // Para debug - puedes borrar
+    checkboxes.forEach(chk => {
+        console.log('Examen:', chk.value);
+    });
+
 });
 </script>
 @endsection

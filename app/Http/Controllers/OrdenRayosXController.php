@@ -18,56 +18,112 @@ class OrdenRayosXController extends Controller
     /**
      * Mostrar listado paginado.
      */
-   public function index()
-    {
-        $ordenes = RayosxOrder::with(['diagnostico', 'pacienteClinica', 'pacienteRayosX', 'examenes'])
-            ->latest()
-            ->paginate(12);
+public function index()
+{
+    $ordenes = RayosxOrder::with('examenes')->paginate(10);
+    return view('rayosx.index', compact('ordenes'));
+}
 
-        return view('rayosX.index', compact('ordenes'));
-    }
+
+
 
     /**
      * Mostrar formulario de creación.
      */
-    public function create(Request $request)
+  public function create(Request $request)
     {
         $pacientesClinica = Paciente::orderBy('nombre')->get();
         $pacientesRayosX = PacienteRayosX::orderBy('nombre')->get();
         $diagnosticos = Diagnostico::orderBy('id', 'desc')->get();
 
-        // Define las secciones con los exámenes agrupados
         $secciones = [
             'CABEZA' => [
-                'craneo', 'waters', 'conductos_auditivos', 'cavum',
-                'senos_paranasales', 'silla_turca', 'huesos_nasales',
-                'atm_tm', 'mastoides', 'mandibula',
+                'craneo_anterior_posterior',
+                'craneo_lateral',
+                'waters',
+                'waters_lateral',
+                'conductos_auditivos',
+                'cavum',
+                'senos_paranasales',
+                'silla_turca',
+                'huesos_nasales',
+                'atm_tm',
+                'mastoides',
+                'mandibula',
             ],
             'TÓRAX' => [
-                'torax_pa', 'torax_pa_lat', 'costillas', 'esternon',
+                'torax_posteroanterior_pa',
+                'torax_anteroposterior_ap',
+                'torax_lateral',
+                'torax_oblicuo',
+                'torax_superior',
+                'torax_inferior',
+                'costillas_superiores',
+                'costillas_inferiores',
+                'esternon_frontal',
+                'esternon_lateral',
             ],
             'ABDOMEN' => [
-                'abdomen_simple', 'abdomen_agudo',
+                'abdomen_simple',
+                'abdomen_agudo',
+                'abdomen_erecto',
+                'abdomen_decubito',
             ],
             'EXTREMIDAD SUPERIOR' => [
-                'clavicula', 'hombro', 'humero', 'codo',
-                'antebrazo', 'muneca', 'mano',
+                'clavicula_izquierda',
+                'clavicula_derecha',
+                'hombro_anterior',
+                'hombro_lateral',
+                'humero_proximal',
+                'humero_distal',
+                'codo_anterior',
+                'codo_lateral',
+                'antebrazo',
+                'muneca',
+                'mano',
             ],
             'EXTREMIDAD INFERIOR' => [
-                'cadera', 'femur', 'rodilla', 'tibia',
-                'pie', 'calcaneo',
+                'cadera_izquierda',
+                'cadera_derecha',
+                'femur_proximal',
+                'femur_distal',
+                'rodilla_anterior',
+                'rodilla_lateral',
+                'tibia',
+                'pie',
+                'calcaneo',
             ],
             'COLUMNA Y PELVIS' => [
-                'cervical', 'dorsal', 'lumbar', 'sacro_coxis', 'pelvis', 'escoliosis',
+                'columna_cervical_lateral',
+                'columna_cervical_anteroposterior',
+                'columna_dorsal_lateral',
+                'columna_dorsal_anteroposterior',
+                'columna_lumbar_lateral',
+                'columna_lumbar_anteroposterior',
+                'sacro_coxis',
+                'pelvis_anterior_posterior',
+                'pelvis_oblicua',
+                'escoliosis',
             ],
             'ESTUDIOS ESPECIALES' => [
-                'arteriograma', 'histerosalpingograma', 'colecistograma', 'fistulograma', 'artrograma',
+                'arteriograma_simple',
+                'arteriograma_contraste',
+                'histerosalpingograma_simple',
+                'histerosalpingograma_contraste',
+                'colecistograma_simple',
+                'colecistograma_contraste',
+                'fistulograma_simple',
+                'fistulograma_contraste',
+                'artrograma_simple',
+                'artrograma_contraste',
             ],
         ];
 
         $examenes = [
-            'craneo' => 'Cráneo',
+            'craneo_anterior_posterior' => 'Cráneo Anterior Posterior',
+            'craneo_lateral' => 'Cráneo Lateral',
             'waters' => 'Waters',
+            'waters_lateral' => 'Waters Lateral',
             'conductos_auditivos' => 'Conductos Auditivos',
             'cavum' => 'Cavum',
             'senos_paranasales' => 'Senos Paranasales',
@@ -76,36 +132,60 @@ class OrdenRayosXController extends Controller
             'atm_tm' => 'ATM - TM',
             'mastoides' => 'Mastoides',
             'mandibula' => 'Mandíbula',
-            'torax_pa' => 'Tórax PA',
-            'torax_pa_lat' => 'Tórax PA Lateral',
-            'costillas' => 'Costillas',
-            'esternon' => 'Esternón',
+            'torax_posteroanterior_pa' => 'Tórax PA',
+            'torax_anteroposterior_ap' => 'Tórax AP',
+            'torax_lateral' => 'Tórax Lateral',
+            'torax_oblicuo' => 'Tórax Oblicuo',
+            'torax_superior' => 'Tórax Superior',
+            'torax_inferior' => 'Tórax Inferior',
+            'costillas_superiores' => 'Costillas Superiores',
+            'costillas_inferiores' => 'Costillas Inferiores',
+            'esternon_frontal' => 'Esternón Frontal',
+            'esternon_lateral' => 'Esternón Lateral',
             'abdomen_simple' => 'Abdomen Simple',
             'abdomen_agudo' => 'Abdomen Agudo',
-            'clavicula' => 'Clavícula',
-            'hombro' => 'Hombro',
-            'humero' => 'Húmero',
-            'codo' => 'Codo',
+            'abdomen_erecto' => 'Abdomen Ereto',
+            'abdomen_decubito' => 'Abdomen Decúbito',
+            'clavicula_izquierda' => 'Clavícula Izquierda',
+            'clavicula_derecha' => 'Clavícula Derecha',
+            'hombro_anterior' => 'Hombro Anterior',
+            'hombro_lateral' => 'Hombro Lateral',
+            'humero_proximal' => 'Húmero Próximal',
+            'humero_distal' => 'Húmero Distal',
+            'codo_anterior' => 'Codo Anterior',
+            'codo_lateral' => 'Codo Lateral',
             'antebrazo' => 'Antebrazo',
             'muneca' => 'Muñeca',
             'mano' => 'Mano',
-            'cadera' => 'Cadera',
-            'femur' => 'Fémur',
-            'rodilla' => 'Rodilla',
+            'cadera_izquierda' => 'Cadera Izquierda',
+            'cadera_derecha' => 'Cadera Derecha',
+            'femur_proximal' => 'Fémur Próximal',
+            'femur_distal' => 'Fémur Distal',
+            'rodilla_anterior' => 'Rodilla Anterior',
+            'rodilla_lateral' => 'Rodilla Lateral',
             'tibia' => 'Tibia',
             'pie' => 'Pie',
             'calcaneo' => 'Calcáneo',
-            'cervical' => 'Cervical',
-            'dorsal' => 'Dorsal',
-            'lumbar' => 'Lumbar',
+            'columna_cervical_lateral' => 'Cervical Lateral',
+            'columna_cervical_anteroposterior' => 'Cervical Anteroposterior',
+            'columna_dorsal_lateral' => 'Dorsal Lateral',
+            'columna_dorsal_anteroposterior' => 'Dorsal Anteroposterior',
+            'columna_lumbar_lateral' => 'Lumbar Lateral',
+            'columna_lumbar_anteroposterior' => 'Lumbar Anteroposterior',
             'sacro_coxis' => 'Sacro Coxis',
-            'pelvis' => 'Pelvis',
+            'pelvis_anterior_posterior' => 'Pelvis Anterior Posterior',
+            'pelvis_oblicua' => 'Pelvis Oblicua',
             'escoliosis' => 'Escoliosis',
-            'arteriograma' => 'Arteriograma',
-            'histerosalpingograma' => 'Histerosalpingograma',
-            'colecistograma' => 'Colecistograma',
-            'fistulograma' => 'Fistulograma',
-            'artrograma' => 'Artrógama',
+            'arteriograma_simple' => 'Arteriograma Simple',
+            'arteriograma_contraste' => 'Arteriograma con Contraste',
+            'histerosalpingograma_simple' => 'Histerosalpingograma Simple',
+            'histerosalpingograma_contraste' => 'Histerosalpingograma con Contraste',
+            'colecistograma_simple' => 'Colecistograma Simple',
+            'colecistograma_contraste' => 'Colecistograma con Contraste',
+            'fistulograma_simple' => 'Fistulograma Simple',
+            'fistulograma_contraste' => 'Fistulograma con Contraste',
+            'artrograma_simple' => 'Artrograma Simple',
+            'artrograma_contraste' => 'Artrograma con Contraste',
         ];
 
         return view('rayosX.create', [
@@ -123,107 +203,192 @@ class OrdenRayosXController extends Controller
      * Guardar nueva orden.
      */
     public function store(Request $request)
-{
-    $request->validate([
-        'seleccion' => ['required', 'string'],
-        'fecha' => ['required','date'],
-        'examenes' => ['required','array','min:1','max:10'],
-        'examenes.*' => ['string'],
-        'nombres' => [Rule::requiredIf(fn() => $request->seleccion === 'manual'), 'nullable', 'string', 'max:255'],
-        'apellidos' => [Rule::requiredIf(fn() => $request->seleccion === 'manual'), 'nullable', 'string', 'max:255'],
-        'identidad' => [Rule::requiredIf(fn() => $request->seleccion === 'manual'), 'nullable', 'digits:13', 'string', 'max:13'],
-        'edad' => ['nullable','integer','min:0','max:150'],
-        'datos_clinicos' => ['nullable','string'],
-    ], [
-        'seleccion.required' => 'Debe seleccionar diagnóstico o paciente.',
-        'fecha.required' => 'La fecha es obligatoria.',
-        'examenes.required' => 'Seleccione al menos un examen.',
-        'examenes.max' => 'No puede seleccionar más de 10 exámenes.'
-    ]);
-
-    $diagnostico_id = null;
-    $paciente_id = null;
-    $paciente_tipo = null;
-
-    if (str_starts_with($request->seleccion, 'diagnostico-')) {
-        $diagnostico_id = (int) str_replace('diagnostico-', '', $request->seleccion);
-    } elseif (str_starts_with($request->seleccion, 'clinica-')) {
-        $paciente_id = (int) str_replace('clinica-', '', $request->seleccion);
-        $paciente_tipo = 'clinica';
-    } elseif (str_starts_with($request->seleccion, 'rayosx-')) {
-        $paciente_id = (int) str_replace('rayosx-', '', $request->seleccion);
-        $paciente_tipo = 'rayosx';
-    } elseif ($request->seleccion === 'manual') {
-        // manual, no id
-    } else {
-        return back()->withInput()->with('error', 'Selección inválida.');
-    }
-
-    if ($diagnostico_id && !Diagnostico::find($diagnostico_id)) {
-        return back()->withInput()->with('error', 'Diagnóstico no encontrado.');
-    }
-    if ($paciente_tipo === 'clinica' && !Paciente::find($paciente_id)) {
-        return back()->withInput()->with('error', 'Paciente (clínica) no encontrado.');
-    }
-    if ($paciente_tipo === 'rayosx' && !PacienteRayosX::find($paciente_id)) {
-        return back()->withInput()->with('error', 'Paciente (Rayos X) no encontrado.');
-    }
-
-    $identidad = $request->identidad ?? null;
-    $edad = $request->edad ?? null;
-    $nombres = $request->nombres ?? null;
-    $apellidos = $request->apellidos ?? null;
-
-    if ($paciente_tipo === 'clinica') {
-        $p = Paciente::find($paciente_id);
-        $identidad = $p->identidad ?? $identidad;
-        $edad = $p->edad ?? $edad;
-        $nombres = $p->nombre ?? $nombres;
-        $apellidos = $p->apellidos ?? $apellidos;
-    } elseif ($paciente_tipo === 'rayosx') {
-        $p = PacienteRayosX::find($paciente_id);
-        $identidad = $p->identidad ?? $identidad;
-        $edad = $p->edad ?? $edad;
-        $nombres = $p->nombre ?? $nombres;
-        $apellidos = $p->apellidos ?? $apellidos;
-    }
-
-    DB::beginTransaction();
-    try {
-        $orden = RayosxOrder::create([
-            'diagnostico_id' => $diagnostico_id,
-            'paciente_id' => $paciente_id,
-            'paciente_tipo' => $paciente_tipo,
-            'fecha' => $request->fecha,
-            'edad' => $edad,
-            'identidad' => $identidad,
-            'nombres' => $nombres,
-            'apellidos' => $apellidos,
-            'datos_clinicos' => $request->datos_clinicos,
-            'estado' => 'Pendiente',
+    {
+        $request->validate([
+            'seleccion' => ['required', 'string'],
+            'fecha' => ['required','date'],
+            'examenes' => ['required','array','min:1','max:10'],
+            'examenes.*' => ['string'],
+            'nombres' => [Rule::requiredIf(fn() => $request->seleccion === 'manual'), 'nullable', 'string', 'max:255'],
+            'apellidos' => [Rule::requiredIf(fn() => $request->seleccion === 'manual'), 'nullable', 'string', 'max:255'],
+            'identidad' => [Rule::requiredIf(fn() => $request->seleccion === 'manual'), 'nullable', 'digits:13', 'string', 'max:13'],
+            'edad' => ['nullable','integer','min:0','max:150'],
+            'datos_clinicos' => ['nullable','string'],
+        ], [
+            'seleccion.required' => 'Debe seleccionar diagnóstico o paciente.',
+            'fecha.required' => 'La fecha es obligatoria.',
+            'examenes.required' => 'Seleccione al menos un examen.',
+            'examenes.max' => 'No puede seleccionar más de 10 exámenes.'
         ]);
 
-        // Insertar exámenes relacionados usando la columna correcta 'examen_codigo'
-        $examenesToInsert = collect($request->examenes)
-            ->map(fn($codigo) => [
-                'rayosx_order_id' => $orden->id,
-                'examen_codigo' => $codigo,
-                'created_at' => now(),
-                'updated_at' => now()
-            ])
-            ->toArray();
+        // Log para depurar qué exámenes llegan
+        \Log::info('Exámenes recibidos:', $request->examenes);
 
-        RayosxOrderExamen::insert($examenesToInsert);
+        $preciosExamenes = [
+            'craneo_anterior_posterior' => 120.00,
+            'craneo_lateral' => 110.00,
+            'waters' => 100.00,
+            'waters_lateral' => 100.00,
+            'conductos_auditivos' => 80.00,
+            'cavum' => 90.00,
+            'senos_paranasales' => 85.00,
+            'silla_turca' => 95.00,
+            'huesos_nasales' => 75.00,
+            'atm_tm' => 90.00,
+            'mastoides' => 88.00,
+            'mandibula' => 85.00,
+            'torax_posteroanterior_pa' => 150.00,
+            'torax_anteroposterior_ap' => 150.00,
+            'torax_lateral' => 140.00,
+            'torax_oblicuo' => 130.00,
+            'torax_superior' => 120.00,
+            'torax_inferior' => 120.00,
+            'costillas_superiores' => 110.00,
+            'costillas_inferiores' => 110.00,
+            'esternon_frontal' => 100.00,
+            'esternon_lateral' => 100.00,
+            'abdomen_simple' => 130.00,
+            'abdomen_agudo' => 150.00,
+            'abdomen_erecto' => 140.00,
+            'abdomen_decubito' => 140.00,
+            'clavicula_izquierda' => 90.00,
+            'clavicula_derecha' => 90.00,
+            'hombro_anterior' => 100.00,
+            'hombro_lateral' => 100.00,
+            'humero_proximal' => 110.00,
+            'humero_distal' => 110.00,
+            'codo_anterior' => 90.00,
+            'codo_lateral' => 90.00,
+            'antebrazo' => 80.00,
+            'muneca' => 80.00,
+            'mano' => 80.00,
+            'cadera_izquierda' => 120.00,
+            'cadera_derecha' => 120.00,
+            'femur_proximal' => 130.00,
+            'femur_distal' => 130.00,
+            'rodilla_anterior' => 110.00,
+            'rodilla_lateral' => 110.00,
+            'tibia' => 100.00,
+            'pie' => 90.00,
+            'calcaneo' => 90.00,
+            'columna_cervical_lateral' => 100.00,
+            'columna_cervical_anteroposterior' => 100.00,
+            'columna_dorsal_lateral' => 110.00,
+            'columna_dorsal_anteroposterior' => 110.00,
+            'columna_lumbar_lateral' => 110.00,
+            'columna_lumbar_anteroposterior' => 110.00,
+            'sacro_coxis' => 100.00,
+            'pelvis_anterior_posterior' => 120.00,
+            'pelvis_oblicua' => 120.00,
+            'escoliosis' => 100.00,
+            'arteriograma_simple' => 250.00,
+            'arteriograma_contraste' => 300.00,
+            'histerosalpingograma_simple' => 230.00,
+            'histerosalpingograma_contraste' => 280.00,
+            'colecistograma_simple' => 220.00,
+            'colecistograma_contraste' => 270.00,
+            'fistulograma_simple' => 210.00,
+            'fistulograma_contraste' => 260.00,
+            'artrograma_simple' => 200.00,
+            'artrograma_contraste' => 250.00,
+        ];
 
-        DB::commit();
+        $total = 0;
+        foreach ($request->examenes as $codigo) {
+            if (isset($preciosExamenes[$codigo])) {
+                $total += $preciosExamenes[$codigo];
+            } else {
+                \Log::warning("Examen no encontrado en precios: $codigo");
+            }
+        }
 
-        return redirect()->route('rayosx.analisis', $orden->id)->with('success', 'Orden creada correctamente, ahora puede analizarla.');
+        \Log::info('Total calculado para la orden: ' . $total);
 
-    } catch (\Throwable $th) {
-        DB::rollBack();
-        return back()->withInput()->with('error', 'Error al guardar la orden: ' . $th->getMessage());
+        $diagnostico_id = null;
+        $paciente_id = null;
+        $paciente_tipo = null;
+
+        if (str_starts_with($request->seleccion, 'diagnostico-')) {
+            $diagnostico_id = (int) str_replace('diagnostico-', '', $request->seleccion);
+        } elseif (str_starts_with($request->seleccion, 'clinica-')) {
+            $paciente_id = (int) str_replace('clinica-', '', $request->seleccion);
+            $paciente_tipo = 'clinica';
+        } elseif (str_starts_with($request->seleccion, 'rayosx-')) {
+            $paciente_id = (int) str_replace('rayosx-', '', $request->seleccion);
+            $paciente_tipo = 'rayosx';
+        } elseif ($request->seleccion === 'manual') {
+            // manual, no id
+        } else {
+            return back()->withInput()->with('error', 'Selección inválida.');
+        }
+
+        if ($diagnostico_id && !Diagnostico::find($diagnostico_id)) {
+            return back()->withInput()->with('error', 'Diagnóstico no encontrado.');
+        }
+        if ($paciente_tipo === 'clinica' && !Paciente::find($paciente_id)) {
+            return back()->withInput()->with('error', 'Paciente (clínica) no encontrado.');
+        }
+        if ($paciente_tipo === 'rayosx' && !PacienteRayosX::find($paciente_id)) {
+            return back()->withInput()->with('error', 'Paciente (Rayos X) no encontrado.');
+        }
+
+        $identidad = $request->identidad ?? null;
+        $edad = $request->edad ?? null;
+        $nombres = $request->nombres ?? null;
+        $apellidos = $request->apellidos ?? null;
+
+        if ($paciente_tipo === 'clinica') {
+            $p = Paciente::find($paciente_id);
+            $identidad = $p->identidad ?? $identidad;
+            $edad = $p->edad ?? $edad;
+            $nombres = $p->nombre ?? $nombres;
+            $apellidos = $p->apellidos ?? $apellidos;
+        } elseif ($paciente_tipo === 'rayosx') {
+            $p = PacienteRayosX::find($paciente_id);
+            $identidad = $p->identidad ?? $identidad;
+            $edad = $p->edad ?? $edad;
+            $nombres = $p->nombre ?? $nombres;
+            $apellidos = $p->apellidos ?? $apellidos;
+        }
+
+        DB::beginTransaction();
+        try {
+            $orden = RayosxOrder::create([
+                'diagnostico_id' => $diagnostico_id,
+                'paciente_id' => $paciente_id,
+                'paciente_tipo' => $paciente_tipo,
+                'fecha' => $request->fecha,
+                'edad' => $edad,
+                'identidad' => $identidad,
+                'nombres' => $nombres,
+                'apellidos' => $apellidos,
+                'datos_clinicos' => $request->datos_clinicos,
+                'estado' => 'Pendiente',
+                'total_precio' => $total,
+            ]);
+
+            $examenesToInsert = collect($request->examenes)
+                ->map(fn($codigo) => [
+                    'rayosx_order_id' => $orden->id,
+                    'examen_codigo' => $codigo,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ])
+                ->toArray();
+
+            RayosxOrderExamen::insert($examenesToInsert);
+
+            DB::commit();
+
+          return redirect()->route('rayosx.index')
+    ->with('success', 'Orden creada correctamente, ahora puede analizarla.')
+    ->with('orden_id', $orden->id);
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return back()->withInput()->with('error', 'Error al guardar la orden: ' . $th->getMessage());
+        }
     }
-}
 
     /**
      * Mostrar una orden (con relaciones).
@@ -408,48 +573,87 @@ public function analisis(RayosxOrder $orden)
     $medicosRadiologos = Medico::where('especialidad', 'Radiología')->get();
 
     // Mismos nombres legibles que en create()
-    $examenes = [
-        'craneo' => 'Cráneo',
-        'waters' => 'Waters',
-        'conductos_auditivos' => 'Conductos Auditivos',
-        'cavum' => 'Cavum',
-        'senos_paranasales' => 'Senos Paranasales',
-        'silla_turca' => 'Silla Turca',
-        'huesos_nasales' => 'Huesos Nasales',
-        'atm_tm' => 'ATM - TM',
-        'mastoides' => 'Mastoides',
-        'mandibula' => 'Mandíbula',
-        'torax_pa' => 'Tórax PA',
-        'torax_pa_lat' => 'Tórax PA Lateral',
-        'costillas' => 'Costillas',
-        'esternon' => 'Esternón',
-        'abdomen_simple' => 'Abdomen Simple',
-        'abdomen_agudo' => 'Abdomen Agudo',
-        'clavicula' => 'Clavícula',
-        'hombro' => 'Hombro',
-        'humero' => 'Húmero',
-        'codo' => 'Codo',
-        'antebrazo' => 'Antebrazo',
-        'muneca' => 'Muñeca',
-        'mano' => 'Mano',
-        'cadera' => 'Cadera',
-        'femur' => 'Fémur',
-        'rodilla' => 'Rodilla',
-        'tibia' => 'Tibia',
-        'pie' => 'Pie',
-        'calcaneo' => 'Calcáneo',
-        'cervical' => 'Cervical',
-        'dorsal' => 'Dorsal',
-        'lumbar' => 'Lumbar',
-        'sacro_coxis' => 'Sacro Coxis',
-        'pelvis' => 'Pelvis',
-        'escoliosis' => 'Escoliosis',
-        'arteriograma' => 'Arteriograma',
-        'histerosalpingograma' => 'Histerosalpingograma',
-        'colecistograma' => 'Colecistograma',
-        'fistulograma' => 'Fistulograma',
-        'artrograma' => 'Artrógama',
-    ];
+   $examenes = [
+    // Cabeza
+    'craneo_anterior_posterior' => 'Cráneo Anterior Posterior',
+    'craneo_lateral' => 'Cráneo Lateral',
+    'waters' => 'Waters',
+    'waters_lateral' => 'Waters Lateral',
+    'conductos_auditivos' => 'Conductos Auditivos',
+    'cavum' => 'Cavum',
+    'senos_paranasales' => 'Senos Paranasales',
+    'silla_turca' => 'Silla Turca',
+    'huesos_nasales' => 'Huesos Nasales',
+    'atm_tm' => 'ATM - TM',
+    'mastoides' => 'Mastoides',
+    'mandibula' => 'Mandíbula',
+
+    // Tórax
+    'torax_posteroanterior_pa' => 'Tórax PA',
+    'torax_anteroposterior_ap' => 'Tórax AP',
+    'torax_lateral' => 'Tórax Lateral',
+    'torax_oblicuo' => 'Tórax Oblicuo',
+    'torax_superior' => 'Tórax Superior',
+    'torax_inferior' => 'Tórax Inferior',
+    'costillas_superiores' => 'Costillas Superiores',
+    'costillas_inferiores' => 'Costillas Inferiores',
+    'esternon_frontal' => 'Esternón Frontal',
+    'esternon_lateral' => 'Esternón Lateral',
+
+    // Abdomen
+    'abdomen_simple' => 'Abdomen Simple',
+    'abdomen_agudo' => 'Abdomen Agudo',
+    'abdomen_erecto' => 'Abdomen Ereto',
+    'abdomen_decubito' => 'Abdomen Decúbito',
+
+    // Extremidad superior
+    'clavicula_izquierda' => 'Clavícula Izquierda',
+    'clavicula_derecha' => 'Clavícula Derecha',
+    'hombro_anterior' => 'Hombro Anterior',
+    'hombro_lateral' => 'Hombro Lateral',
+    'humero_proximal' => 'Húmero Próximal',
+    'humero_distal' => 'Húmero Distal',
+    'codo_anterior' => 'Codo Anterior',
+    'codo_lateral' => 'Codo Lateral',
+    'antebrazo' => 'Antebrazo',
+    'muneca' => 'Muñeca',
+    'mano' => 'Mano',
+
+    // Extremidad inferior
+    'cadera_izquierda' => 'Cadera Izquierda',
+    'cadera_derecha' => 'Cadera Derecha',
+    'femur_proximal' => 'Fémur Próximal',
+    'femur_distal' => 'Fémur Distal',
+    'rodilla_anterior' => 'Rodilla Anterior',
+    'rodilla_lateral' => 'Rodilla Lateral',
+    'tibia' => 'Tibia',
+    'pie' => 'Pie',
+    'calcaneo' => 'Calcáneo',
+
+    // Columna y pelvis
+    'columna_cervical_lateral' => 'Cervical Lateral',
+    'columna_cervical_anteroposterior' => 'Cervical Anteroposterior',
+    'columna_dorsal_lateral' => 'Dorsal Lateral',
+    'columna_dorsal_anteroposterior' => 'Dorsal Anteroposterior',
+    'columna_lumbar_lateral' => 'Lumbar Lateral',
+    'columna_lumbar_anteroposterior' => 'Lumbar Anteroposterior',
+    'sacro_coxis' => 'Sacro Coxis',
+    'pelvis_anterior_posterior' => 'Pelvis Anterior Posterior',
+    'pelvis_oblicua' => 'Pelvis Oblicua',
+    'escoliosis' => 'Escoliosis',
+
+    // Estudios especiales
+    'arteriograma_simple' => 'Arteriograma Simple',
+    'arteriograma_contraste' => 'Arteriograma con Contraste',
+    'histerosalpingograma_simple' => 'Histerosalpingograma Simple',
+    'histerosalpingograma_contraste' => 'Histerosalpingograma con Contraste',
+    'colecistograma_simple' => 'Colecistograma Simple',
+    'colecistograma_contraste' => 'Colecistograma con Contraste',
+    'fistulograma_simple' => 'Fistulograma Simple',
+    'fistulograma_contraste' => 'Fistulograma con Contraste',
+    'artrograma_simple' => 'Artrograma Simple',
+    'artrograma_contraste' => 'Artrograma con Contraste',
+];
 
     return view('rayosx.analisis', compact('orden', 'medicosRadiologos', 'examenes'));
 }
