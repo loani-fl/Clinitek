@@ -19,6 +19,7 @@ class RayosxOrder extends Model
     'estado',
       'medico_radiologo_id',
         'medico_analista_id',
+         'total_precio',   // <- aquí debe estar
 ];
 
 
@@ -83,6 +84,12 @@ class RayosxOrder extends Model
     {
         return $this->belongsTo(Medico::class, 'medico_radiologo_id');
     }
+
+    public function paciente()
+{
+    return $this->belongsTo(Paciente::class, 'paciente_id'); // O la FK correcta que uses
+}
+
 
   
 
