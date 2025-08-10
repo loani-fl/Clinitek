@@ -189,31 +189,47 @@
     </div>
 
     <div class="factura-divider"></div>
+   
 
     <table class="factura-table">
-        <thead>
-            <tr>
-                <th>Descripción</th>
-                <th>Valor</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>{{ $pago->servicio }}</td>
-                <td>L. {{ number_format($pago->cantidad, 2) }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <thead>
+        <tr>
+            <th>Descripción</th>
+            <th>Valor</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+        <td>
+  {{ $pago->servicio ?? 'Sin servicio' }}
+        @if(!empty($pago->descripcion))
+            <br><small style="color: #555;">{{ $pago->descripcion }}</small>
+        @endif
+
+</td>
+
+
+
+            <td>L. {{ number_format($pago->cantidad, 2) }}</td>
+        </tr>
+    </tbody>
+</table>
+
 
     <div class="factura-divider"></div>
 
     <div class="factura-section">
-        @php
-            $isv = round($pago->cantidad * 0.15, 2);
-        @endphp
-        <p><strong>ISV (15%):</strong> L. {{ number_format($isv, 2) }}</p>
-        <p><strong>Total a pagar:</strong> L. {{ number_format($pago->cantidad + $isv, 2) }}</p>
-    </div>
+    @php
+        $isv = round($pago->cantidad * 0.15, 2);
+        $subtotal = round($pago->cantidad - $isv, 2);
+        $total = $subtotal + $isv;
+    @endphp
+
+    <p><strong>Subtotal:</strong> L. {{ number_format($subtotal, 2) }}</p>
+    <p><strong>ISV (15%):</strong> L. {{ number_format($isv, 2) }}</p>
+    <p><strong>Total a pagar:</strong> L. {{ number_format($total, 2) }}</p>
+</div>
+
 
     <div class="factura-divider"></div>
     <!-- Pie de factura: botón + texto alineados horizontalmente -->

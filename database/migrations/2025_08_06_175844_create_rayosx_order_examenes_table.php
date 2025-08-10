@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up()
-    {
+{
+    if (!Schema::hasTable('rayosx_order_examenes')) {
         Schema::create('rayosx_order_examenes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('rayosx_order_id')->constrained('rayosx_orders')->onDelete('cascade');
@@ -18,6 +19,8 @@ return new class extends Migration {
             $table->unique(['rayosx_order_id', 'examen_codigo']);
         });
     }
+}
+
 
     public function down()
     {
