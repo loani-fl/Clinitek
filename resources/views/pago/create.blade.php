@@ -11,6 +11,10 @@
         margin: 2rem auto;
         padding: 2rem;
     }
+    .grid-3-cols > div {
+    box-sizing: border-box;
+}
+
 
     .custom-card h2 {
         text-align: center;
@@ -102,6 +106,17 @@
     </div>
 
     <h2>Nuevo Pago</h2>
+    @if ($errors->any())
+    <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+        <strong>Se encontraron errores:</strong>
+        <ul style="margin: 5px 0 0 15px;">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
     <form action="{{ route('pago.store') }}" method="POST">
         @csrf
 
@@ -174,31 +189,27 @@
 
             <!-- Fila 2: Servicio, Fecha de Expiración y Cantidad -->
             <div class="grid-3-cols">
-                <div>
-                    <label for="servicio">Servicio</label>
-                    <select name="servicio" id="servicio">
-                        <option value="">-- Selecciona un servicio --</option>
-                        <option value="consulta_medica" {{ old('servicio') == 'consulta_medica' ? 'selected' : '' }}>Consulta médica</option>
-                        <option value="emergencia" {{ old('servicio') == 'emergencia' ? 'selected' : '' }}>Servicio de emergencia</option>
-                        <option value="rayos_x" {{ old('servicio') == 'rayos_x' ? 'selected' : '' }}>Examen de rayos X</option>
-                    </select>
-                    @error('servicio')
-                        <div class="error-text">{{ $message }}</div>
-                    @enderror
-                </div>
+            <div>
+                <label for="servicio_efectivo">Servicio</label>
+                <input type="text" name="servicio_efectivo" id="servicio_efectivo"
+                    value="{{ old('servicio', $servicio) }}" readonly>
+            </div>
                 <div>
                     <label for="fecha_expiracion">Fecha de Expiración</label>
                     <input type="month" name="fecha_expiracion" value="{{ old('fecha_expiracion') }}">
-                    @error('fecha_expiracion')
+                       @error('fecha_expiracion')
                         <div class="error-text">{{ $message }}</div>
-                    @enderror
+                    @enderror 
                 </div>
-                <div>
+
+
+                <div class="form-group">
                     <label for="cantidad">Cantidad</label>
-                    <input type="text" name="cantidad" placeholder="L. 0.00" value="{{ old('cantidad') }}">
-                    @error('cantidad')
-                        <div class="error-text">{{ $message }}</div>
-                    @enderror
+                    <input type="text" name="cantidad" placeholder="L. 0.00" 
+                value="{{ old('cantidad', number_format($cantidad, 2, '.', '')) }}" readonly>
+                   <!-- @error('cantidad')
+                        <span class="invalid-feedback">{{ $message }}</span>
+                    @enderror -->
                 </div>
             </div>
 
@@ -248,51 +259,52 @@
             @endif
 
             <div class="grid-3-cols">
-                <div>
-                    <label for="servicio">Servicio</label>
-                    <select name="servicio" id="servicio">
-                        <option value="">-- Selecciona un servicio --</option>
-                        <option value="consulta_medica" {{ old('servicio') == 'consulta_medica' ? 'selected' : '' }}>Consulta médica</option>
-                        <option value="emergencia" {{ old('servicio') == 'emergencia' ? 'selected' : '' }}>Servicio de emergencia</option>
-                        <option value="rayos_x" {{ old('servicio') == 'rayos_x' ? 'selected' : '' }}>Examen de rayos X</option>
-                    </select>
-                    @error('servicio')
-                        <div class="error-text">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div>
+            <div>
+                <label for="servicio_efectivo">Servicio</label>
+                <input type="text" name="servicio_efectivo" id="servicio_efectivo"
+                    value="{{ old('servicio', $servicio) }}" readonly>
+            </div>
+                <div class="form-group">
                     <label for="cantidad">Cantidad</label>
-                    <input type="number" step="0.01"  name="cantidad" placeholder="L. 0.00" value="{{ old('cantidad') }}">
-                    @error('cantidad')
-                        <div class="error-text">{{ $message }}</div>
+                    <input type="text" name="cantidad" placeholder="L. 0.00" 
+                    value="{{ old('cantidad', number_format($cantidad, 2, '.', '')) }}" readonly>>
+                     @error('cantidad')
+                        <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
                 </div>
-                <div>
-                    <label for="descripcion_efectivo">Descripción breve</label>
-                    <input type="text" name="descripcion_servicio" maxlength="100" autocomplete="off" placeholder="Ej. Pago por consulta médica" value="{{ old('descripcion_servicio') }}">
-                    @error('descripcion_servicio')
-                        <div class="error-text">{{ $message }}</div>
-                    @enderror
+                    <div>
+                        <label for="descripcion_efectivo">Descripción breve</label>
+                        <input type="text" name="descripcion_servicio" maxlength="100" autocomplete="off" placeholder="Ej. Pago por consulta médica" value="{{ old('descripcion_servicio') }}">
+                        @error('descripcion_servicio')
+                            <div class="error-text">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
-            </div>
 
-            <div class="grid-3-cols">
-                <div>
-                    <label for="fecha_efectivo">Fecha</label>
-                    <input type="date" name="fecha" value="{{ old('fecha', date('Y-m-d')) }}" readonly>
-                    @error('fecha')
-                        <div class="error-text">{{ $message }}</div>
-                    @enderror
+
+                <div class="grid-3-cols">
+                    <div>
+                        <label for="fecha_efectivo">Fecha</label>
+                        <input type="date" name="fecha" value="{{ old('fecha', date('Y-m-d')) }}" readonly>
+                        @error('fecha')
+                            <div class="error-text">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
-            </div>
         </div>
 
         <input type="hidden" name="consulta_id" value="{{ $consulta->id ?? '' }}">
+        @if($servicio && $cantidad)
+    <input type="hidden" name="servicio_tarjeta" value="{{ $servicio }}">
+    <input type="hidden" name="servicio_efectivo" value="{{ $servicio }}">
+    <input type="hidden" name="descripcion_servicio" placeholder="Descripción opcional o dinámica si la tienes">
+@endif
 
 
         <div class="text-center pt-4" style="margin-top: 2rem;">
             <div id="btnContainer" class="d-flex justify-content-center gap-2"></div>
         </div>
+        
     </form>
 </div>
 
@@ -304,6 +316,32 @@ function mostrarCamposPago() {
     document.getElementById('tarjetaCampos').classList.toggle('hidden', metodo !== 'tarjeta');
     document.getElementById('efectivoMensaje').classList.toggle('hidden', metodo !== 'efectivo');
     document.getElementById('efectivoCampos').classList.toggle('hidden', metodo !== 'efectivo');
+
+    const servicio = document.getElementById('servicio');
+    const cantidad = document.getElementById('cantidad');
+
+    if (metodo === 'tarjeta') {
+    const servicio = document.getElementById('servicio_tarjeta');
+    const cantidad = document.querySelector('input[name="cantidad_tarjeta"]');
+    if (servicio) servicio.disabled = false;
+    if (cantidad) cantidad.disabled = false;
+} else if (metodo === 'efectivo') {
+    const servicio = document.getElementById('servicio_efectivo');
+    const cantidad = document.querySelector('#efectivoCampos input[name="cantidad"]');
+    if (servicio) servicio.disabled = false;
+    if (cantidad) cantidad.disabled = false;
+} else {
+    // Opcional: deshabilitar todo si no hay método seleccionado
+    const servicioTarjeta = document.getElementById('servicio_tarjeta');
+    const cantidadTarjeta = document.querySelector('input[name="cantidad_tarjeta"]');
+    const servicioEfectivo = document.getElementById('servicio_efectivo');
+    const cantidadEfectivo = document.querySelector('#efectivoCampos input[name="cantidad"]');
+    if (servicioTarjeta) servicioTarjeta.disabled = true;
+    if (cantidadTarjeta) cantidadTarjeta.disabled = true;
+    if (servicioEfectivo) servicioEfectivo.disabled = true;
+    if (cantidadEfectivo) cantidadEfectivo.disabled = true;
+}
+
 
     const btnContainer = document.getElementById('btnContainer');
     btnContainer.innerHTML = '';

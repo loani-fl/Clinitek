@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Consulta;
 use App\Models\Pago;
+use App\Models\RayosxOrder;
+use App\Models\RayosxOrderExamen;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -23,23 +25,59 @@ class PagoController extends Controller
     public function create(Request $request)
 {
     $consulta_id = $request->query('consulta_id');
+    $rayosx_id = $request->query('rayosx_id');
+
+    $paciente = null;
+    $servicio = '';
+    $cantidad = 0;
+    $consulta = null;
+    $rayosx = null;
+
+    $preciosPorEspecialidad = [
+        "Cardiología" => 900.00,
+        "Pediatría" => 500.00,
+        "Dermatología" => 900.00,
+        "Medicina General" => 800.00,
+        "Psiquiatría" => 500.00,
+        "Neurología" => 1000.00,
+        "Radiología" => 700.00,
+    ];
 
     if ($consulta_id) {
-        // Buscar la consulta con su paciente relacionado
-        $consulta = Consulta::with('paciente')->find($consulta_id);
+        $consulta = Consulta::with('paciente', 'medico')->find($consulta_id);
 
         if ($consulta && $consulta->paciente) {
             $paciente = $consulta->paciente;
-        } else {
-            $paciente = null;
+            $servicio = 'Consulta médica';
+
+            $especialidad = $consulta->medico->especialidad ?? null;
+
+            if ($especialidad && isset($preciosPorEspecialidad[$especialidad])) {
+                $cantidad = $preciosPorEspecialidad[$especialidad];
+            } else {
+                $cantidad = $consulta->precio ?? 0; // fallback si no encuentra especialidad
+            }
         }
-    } else {
-        $consulta = null;
-        $paciente = null;
+    } elseif ($rayosx_id) {
+        $rayosx = RayosxOrderExamen::with('paciente')->find($rayosx_id);
+
+        if ($rayosx && $rayosx->paciente) {
+            $paciente = $rayosx->paciente;
+            $servicio = 'Rayos X';
+            $cantidad = $rayosx->precio ?? 0;
+        }
     }
 
-    return view('pago.create', compact('consulta', 'paciente'));
+    return view('pago.create', compact(
+        'consulta',
+        'paciente',
+        'rayosx',
+        'servicio',
+        'cantidad'
+    ));
 }
+
+
 
 
 public function store(Request $request)
@@ -58,50 +96,46 @@ public function store(Request $request)
 
         'cvv.required_if' => 'El código CVV es obligatorio.',
         'cvv.max' => 'El código CVV no puede tener más de 4 caracteres.',
-
-        'cantidad.required' => 'La cantidad es obligatoria.',
-        'cantidad.numeric' => 'La cantidad debe ser un número válido.',
-        'cantidad.min' => 'La cantidad debe ser mayor o igual a L. 1000.00.',
-        'cantidad.max' => 'La cantidad no puede superar L. 99999.99.',
-
-        'servicio.required' => 'El campo servicio es obligatorio.',
     ];
 
-    // Reglas de validación base y condicionales
     $rules = [
         'metodo_pago' => 'required|in:tarjeta,efectivo',
         'nombre_titular' => 'required_if:metodo_pago,tarjeta|max:50',
         'numero_tarjeta' => 'required_if:metodo_pago,tarjeta|max:19',
         'fecha_expiracion' => 'required_if:metodo_pago,tarjeta',
         'cvv' => 'required_if:metodo_pago,tarjeta|max:4',
-        'servicio' => 'required|string',
-        'cantidad' => ['required', 'numeric', 'min:0.01', 'max:99999.99'],
+        'cantidad' => 'nullable|string',
+        'servicio_tarjeta' => 'nullable|string',
+        'servicio_efectivo' => 'nullable|string',
     ];
 
     $request->validate($rules, $messages);
 
     $pago = new Pago();
 
-    // Guardar la fecha completa actual
     $pago->fecha = Carbon::now();
-
     $pago->metodo_pago = $request->metodo_pago;
-    $pago->servicio = $request->servicio;
-    $pago->descripcion = $request->descripcion_servicio ?? null;
-    $pago->cantidad = $request->cantidad;
 
+    // Asignar servicio y descripción según el método de pago
     if ($request->metodo_pago === 'tarjeta') {
+        $pago->servicio = $request->servicio_tarjeta;
+        $pago->descripcion = $request->descripcion_servicio ?? null;
+        $pago->cantidad = $request->cantidad ?? $request->cantidad_tarjeta;
+
         $pago->nombre_titular = $request->nombre_titular;
         $pago->numero_tarjeta = $request->numero_tarjeta;
         $pago->fecha_expiracion = $request->fecha_expiracion;
         $pago->cvv = $request->cvv;
+    } else {
+        $pago->servicio = $request->servicio_efectivo;
+        $pago->descripcion = $request->descripcion_servicio ?? null;
+        $pago->cantidad = $request->cantidad ?? $request->cantidad_efectivo;
     }
 
     $pago->consulta_id = $request->consulta_id;
 
     $pago->save();
 
-    // Actualizar cuenta solo si el pago es en efectivo y hay consulta relacionada
     if ($request->metodo_pago === 'efectivo' && $pago->consulta_id) {
         $consulta = Consulta::find($pago->consulta_id);
         if ($consulta) {
@@ -112,6 +146,7 @@ public function store(Request $request)
 
     return redirect()->route('pago.show', ['pago' => $pago->id]);
 }
+
 
      
      
