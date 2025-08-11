@@ -2,89 +2,35 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RayosxOrder extends Model
+class RayosxOrderExamen extends Model
 {
-  protected $fillable = [
-    'diagnostico_id',
-    'paciente_id',
-    'fecha',
-    'edad',
-    'identidad',
-    'nombres',
-    'apellidos',
-    'medico_solicitante',
-    'paciente_tipo',
-    'estado',
-      'medico_radiologo_id',
-        'medico_analista_id',
-];
+    use HasFactory;
 
+    protected $table = 'rayosx_order_examenes';
 
-    public function diagnostico()
+    protected $fillable = [
+        'rayosx_order_id',
+        'examen',
+        'examen_codigo',
+        'descripcion',
+        'imagen_path',
+    ];
+
+    public function orden()
     {
-        return $this->belongsTo(Diagnostico::class);
+        return $this->belongsTo(RayosxOrder::class, 'rayosx_order_id');
     }
 
-    public function pacienteClinica()
+    public function imagenes()
     {
-        return $this->belongsTo(Paciente::class, 'paciente_id');
+        return $this->hasMany(RayosxExamenImagen::class, 'rayosx_order_examen_id');
     }
 
-    public function pacienteRayosX()
+    public function paciente()
     {
-        return $this->belongsTo(PacienteRayosX::class, 'paciente_id');
+        return $this->belongsTo(Paciente::class);
     }
-
-    public function examenes()
-    {
-        return $this->hasMany(RayosxOrderExamen::class);
-    }
-
-       
-    
-    public function getAllExamenes()
-    {
-        // mantiene tu función existente (sin cambios)
-        $examenes = [];
-
-        $secciones = [
-            'cabeza' => 'RayosxCabeza',
-            'torax' => 'RayosxTorax',
-            'abdomen' => 'RayosxAbdomen',
-            'extremidadSuperior' => 'RayosxExtremidadSuperior',
-            'extremidadInferior' => 'RayosxExtremidadInferior',
-            'columnaPelvis' => 'RayosxColumnaPelvis',
-            'estudiosEspeciales' => 'RayosxEstudiosEspeciales',
-        ];
-
-        foreach ($secciones as $relacion => $modelo) {
-            if ($this->$relacion) {
-                foreach ($this->$relacion->getAttributes() as $campo => $valor) {
-                    if (in_array($campo, ['id', 'rayosx_order_id', 'created_at', 'updated_at'])) {
-                        continue;
-                    }
-                    if ($valor) {
-                        $examenes[] = ucwords(str_replace('_', ' ', $campo));
-                    }
-                }
-            }
-        }
-
-        return $examenes;
-    }
-    public function medicoAnalista()
-    {
-        return $this->belongsTo(Medico::class, 'medico_analista_id');
-    }
-
-    public function medicoRadiologo()
-    {
-        return $this->belongsTo(Medico::class, 'medico_radiologo_id');
-    }
-
-  
-
-    
 }
