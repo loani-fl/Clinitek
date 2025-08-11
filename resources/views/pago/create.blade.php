@@ -106,16 +106,6 @@
     </div>
 
     <h2>Nuevo Pago</h2>
-    @if ($errors->any())
-    <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
-        <strong>Se encontraron errores:</strong>
-        <ul style="margin: 5px 0 0 15px;">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
 
     <form action="{{ route('pago.store') }}" method="POST">
         @csrf
@@ -222,13 +212,6 @@
                         <div class="error-text">{{ $message }}</div>
                     @enderror
                 </div>
-                <div class="full-width" style="grid-column: span 2;">
-                    <label for="descripcion_servicio">Descripción breve(Opcional)</label>
-                    <input type="text" name="descripcion_servicio" maxlength="100" autocomplete="off" value="{{ old('descripcion_servicio') }}">
-                    @error('descripcion_servicio')
-                        <div class="error-text">{{ $message }}</div>
-                    @enderror
-                </div>
             </div>
         </div>
 
@@ -267,23 +250,12 @@
                 <div class="form-group">
                     <label for="cantidad">Cantidad</label>
                     <input type="text" name="cantidad" placeholder="L. 0.00" 
-                    value="{{ old('cantidad', number_format($cantidad, 2, '.', '')) }}" readonly>>
+                    value="{{ old('cantidad', number_format($cantidad, 2, '.', '')) }}" readonly>
                      @error('cantidad')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
                 </div>
-                    <div>
-                        <label for="descripcion_efectivo">Descripción breve</label>
-                        <input type="text" name="descripcion_servicio" maxlength="100" autocomplete="off" placeholder="Ej. Pago por consulta médica" value="{{ old('descripcion_servicio') }}">
-                        @error('descripcion_servicio')
-                            <div class="error-text">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-
-                <div class="grid-3-cols">
-                    <div>
+                <div>
                         <label for="fecha_efectivo">Fecha</label>
                         <input type="date" name="fecha" value="{{ old('fecha', date('Y-m-d')) }}" readonly>
                         @error('fecha')
@@ -362,6 +334,11 @@ function mostrarCamposPago() {
         btnGuardar.style.fontSize = '0.85rem';
         btnGuardar.innerHTML = '<i class="bi bi-plus-circle"></i> Guardar';
         btnContainer.appendChild(btnGuardar);
+        btnGuardar.addEventListener('click', function() {
+        this.disabled = true;
+        this.form.submit();
+    });
+
     }
 
     if (metodo === 'efectivo') {
@@ -372,6 +349,11 @@ function mostrarCamposPago() {
         btnGuardarEfectivo.style.fontSize = '0.85rem';
         btnGuardarEfectivo.innerHTML = '<i class="bi bi-check-circle"></i> Guardar';
         btnContainer.appendChild(btnGuardarEfectivo);
+
+        btnGuardarEfectivo.addEventListener('click', function() {
+            this.disabled = true;
+            this.form.submit();
+        });
     }
 }
 

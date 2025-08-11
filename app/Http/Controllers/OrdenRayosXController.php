@@ -128,13 +128,7 @@ public function index(Request $request)
                 'esternon_frontal',
                 'esternon_lateral',
             ],
-            'ABDOMEN' => [
-                'abdomen_simple',
-                'abdomen_agudo',
-                'abdomen_erecto',
-                'abdomen_decubito',
-            ],
-            'EXTREMIDAD SUPERIOR' => [
+              'EXTREMIDAD SUPERIOR' => [
                 'clavicula_izquierda',
                 'clavicula_derecha',
                 'hombro_anterior',
@@ -147,6 +141,13 @@ public function index(Request $request)
                 'muneca',
                 'mano',
             ],
+            'ABDOMEN' => [
+                'abdomen_simple',
+                'abdomen_agudo',
+                'abdomen_erecto',
+                'abdomen_decubito',
+            ],
+          
             'EXTREMIDAD INFERIOR' => [
                 'cadera_izquierda',
                 'cadera_derecha',
@@ -287,7 +288,7 @@ public function index(Request $request)
         ]);
 
         // Log para depurar qué exámenes llegan
-        \Log::info('Exámenes recibidos:', $request->examenes);
+        Log::info('Exámenes recibidos:', $request->examenes);
 
         $preciosExamenes = [
             'craneo_anterior_posterior' => 120.00,
@@ -363,11 +364,11 @@ public function index(Request $request)
             if (isset($preciosExamenes[$codigo])) {
                 $total += $preciosExamenes[$codigo];
             } else {
-                \Log::warning("Examen no encontrado en precios: $codigo");
+                Log::warning("Examen no encontrado en precios: $codigo");
             }
         }
 
-        \Log::info('Total calculado para la orden: ' . $total);
+        Log::info('Total calculado para la orden: ' . $total);
 
         $diagnostico_id = null;
         $paciente_id = null;
@@ -445,9 +446,8 @@ public function index(Request $request)
 
             DB::commit();
 
-          return redirect()->route('rayosx.index')
-    ->with('success', 'Orden creada correctamente, ahora puede analizarla.')
-    ->with('orden_id', $orden->id);
+            return redirect()->route('pago.create', ['rayosx_id' => $orden->examenes()->first()->id]);
+
 
         } catch (\Throwable $th) {
             DB::rollBack();
@@ -469,7 +469,7 @@ public function index(Request $request)
      */
     public function guardarDescripcion(Request $request)
     {
-        \Log::info('guardarDescripcion recibida:', $request->all());
+        Log::info('guardarDescripcion recibida:', $request->all());
 
         $validated = $request->validate([
             'examen' => 'required|string',
@@ -497,7 +497,7 @@ public function index(Request $request)
 
             return response()->json(['success' => true, 'message' => 'Descripción guardada correctamente.']);
         } catch (\Throwable $e) {
-            \Log::error('guardarDescripcion error: '.$e->getMessage());
+            Log::error('guardarDescripcion error: '.$e->getMessage());
             return response()->json(['success' => false, 'message' => 'Error al guardar descripción.'], 500);
         }
     }
@@ -735,7 +735,7 @@ public function guardarAnalisis(Request $request, RayosxOrder $orden)
 
         // Para cada examen (ID) las descripciones son arrays opcionales de strings con regex
         'examenes.*.descripciones' => 'nullable|array',
-        'examenes.*.descripciones.*' => [
+        'examenes..descripciones.' => [
             'nullable',
             'string',
             'max:10000',
@@ -744,9 +744,9 @@ public function guardarAnalisis(Request $request, RayosxOrder $orden)
 
         // Para cada examen las imagenes son arrays opcionales de imágenes
         'examenes.*.imagenes' => 'nullable|array',
-        'examenes.*.imagenes.*' => 'nullable|image|max:5120', // max 5MB
+        'examenes..imagenes.' => 'nullable|image|max:5120', // max 5MB
     ], [
-        'examenes.*.descripciones.*.regex' => 'La descripción contiene caracteres no permitidos.',
+        'examenes..descripciones..regex' => 'La descripción contiene caracteres no permitidos.',
     ]);
 
     // Actualizar médico analista

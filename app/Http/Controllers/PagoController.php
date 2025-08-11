@@ -32,6 +32,7 @@ class PagoController extends Controller
     $cantidad = 0;
     $consulta = null;
     $rayosx = null;
+    
 
     $preciosPorEspecialidad = [
         "Cardiología" => 900.00,
@@ -58,15 +59,29 @@ class PagoController extends Controller
                 $cantidad = $consulta->precio ?? 0; // fallback si no encuentra especialidad
             }
         }
-    } elseif ($rayosx_id) {
-        $rayosx = RayosxOrderExamen::with('paciente')->find($rayosx_id);
-
+        elseif ($rayosx_id) {
+            $rayosx = RayosxOrderExamen::with('orden')->find($rayosx_id);
+        
+            dd([
+                'rayosx' => $rayosx,
+                'orden' => $rayosx ? $rayosx->orden : null,
+                'paciente' => $rayosx && $rayosx->orden ? $rayosx->orden->paciente : null,
+            ]);
+        }
+        
+        
+        
+    
         if ($rayosx && $rayosx->paciente) {
             $paciente = $rayosx->paciente;
-            $servicio = 'Rayos X';
-            $cantidad = $rayosx->precio ?? 0;
+            $servicio = 'Exámenes rayos X'; // 🔹 Cambiado para que se muestre así
+    
+            // Si el precio ya está en la tabla RayosxOrderExamen, lo usamos directo
+            $cantidad = $rayosx->precio_total ?? $rayosx->precio ?? 0;
         }
     }
+    
+  
 
     return view('pago.create', compact(
         'consulta',
@@ -107,17 +122,20 @@ public function store(Request $request)
         'cantidad' => 'nullable|string',
         'servicio_tarjeta' => 'nullable|string',
         'servicio_efectivo' => 'nullable|string',
+        'rayosx_id' => 'nullable|integer|exists:rayosx_order_examens,id',
     ];
 
     $request->validate($rules, $messages);
 
     $pago = new Pago();
-
+    $pago->consulta_id = $request->consulta_id ?? null;
+    $pago->rayosx_order_examen_id = $request->rayosx_id ?? null;
     $pago->fecha = Carbon::now();
     $pago->metodo_pago = $request->metodo_pago;
 
-    // Asignar servicio y descripción según el método de pago
+    // ASIGNAR ESTADO SEGÚN MÉTODO
     if ($request->metodo_pago === 'tarjeta') {
+        $pago->estado_pago = 'pagada'; // Pago con tarjeta = pagada
         $pago->servicio = $request->servicio_tarjeta;
         $pago->descripcion = $request->descripcion_servicio ?? null;
         $pago->cantidad = $request->cantidad ?? $request->cantidad_tarjeta;
@@ -127,12 +145,11 @@ public function store(Request $request)
         $pago->fecha_expiracion = $request->fecha_expiracion;
         $pago->cvv = $request->cvv;
     } else {
+        $pago->estado_pago = 'pendiente'; // Pago en efectivo = pendiente
         $pago->servicio = $request->servicio_efectivo;
         $pago->descripcion = $request->descripcion_servicio ?? null;
         $pago->cantidad = $request->cantidad ?? $request->cantidad_efectivo;
     }
-
-    $pago->consulta_id = $request->consulta_id;
 
     $pago->save();
 
@@ -152,16 +169,23 @@ public function store(Request $request)
      
 
     
-    public function show(Pago $pago)
+public function show(Pago $pago)
 {
     $paciente = null;
 
     if ($pago->consulta) {
         $paciente = $pago->consulta->paciente;
+    } elseif ($pago->rayosx_order_examen_id) {
+        // Asumiendo que el modelo Pago tiene relación con RayosxOrderExamen
+        $rayosx = $pago->rayosxOrderExamen; 
+        if ($rayosx) {
+            $paciente = $rayosx->paciente;
+        }
     }
 
     return view('pago.show', compact('pago', 'paciente'));
 }
+
 
 
     
