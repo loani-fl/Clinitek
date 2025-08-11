@@ -22,13 +22,17 @@ public function index(Request $request)
 {
     try {
         $query = $request->input('search', '');
+        $fechaInicio = $request->input('fechaInicio');
+        $fechaFin = $request->input('fechaFin');
+
         $ordenesQuery = RayosxOrder::with(['examenes', 'pacienteClinica', 'pacienteRayosX', 'diagnostico.paciente'])
             ->orderBy('fecha', 'desc');
 
+        // Filtro por texto (paciente)
         if ($query) {
             $ordenesQuery->where(function ($q) use ($query) {
                 $q->where(function($q2) use ($query) {
-                    // Para pacientes tipo 'clinica'
+                    // Pacientes tipo 'clinica'
                     $q2->where('paciente_tipo', 'clinica')
                        ->whereHas('pacienteClinica', function ($q3) use ($query) {
                             $q3->where('nombre', 'like', "%$query%")
@@ -36,7 +40,7 @@ public function index(Request $request)
                        });
                 })
                 ->orWhere(function($q2) use ($query) {
-                    // Para pacientes tipo 'rayosx'
+                    // Pacientes tipo 'rayosx'
                     $q2->where('paciente_tipo', 'rayosx')
                        ->whereHas('pacienteRayosX', function ($q3) use ($query) {
                             $q3->where('nombre', 'like', "%$query%")
@@ -44,7 +48,7 @@ public function index(Request $request)
                        });
                 })
                 ->orWhere(function($q2) use ($query) {
-                    // Para órdenes con paciente directo sin relación
+                    // Paciente directo sin relación
                     $q2->whereNull('paciente_tipo')
                        ->where(function ($q3) use ($query) {
                            $q3->where('nombres', 'like', "%$query%")
@@ -52,10 +56,20 @@ public function index(Request $request)
                        });
                 });
             });
+        }
 
+        // Filtro por rango de fechas
+        if ($fechaInicio && $fechaFin) {
+            $ordenesQuery->whereBetween('fecha', [$fechaInicio, $fechaFin]);
+        }
+
+        // Paginación o listado limitado según búsqueda
+        if ($query || ($fechaInicio && $fechaFin)) {
+            // Si hay filtro de búsqueda o fechas, muestra hasta 50 resultados sin paginar
             $ordenes = $ordenesQuery->take(50)->get();
             $isSearch = true;
         } else {
+            // Si no hay filtro, paginar normal
             $ordenes = $ordenesQuery->paginate(5);
             $isSearch = false;
         }
@@ -69,7 +83,7 @@ public function index(Request $request)
             ]);
         }
 
-        return view('rayosx.index', compact('ordenes', 'isSearch'));
+        return view('rayosx.index', compact('ordenes', 'isSearch', 'fechaInicio', 'fechaFin'));
     } catch (\Exception $e) {
         if ($request->ajax()) {
             return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
@@ -77,9 +91,6 @@ public function index(Request $request)
         abort(500, $e->getMessage());
     }
 }
-
-
-
 
     /**
      * Mostrar formulario de creación.
