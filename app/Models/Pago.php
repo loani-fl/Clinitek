@@ -22,6 +22,7 @@ class Pago extends Model
         'estado_pago',
         'servicio',
         'descripcion',
+        'rayosx_order_id',
     ];
 
     protected $dates = ['fecha']; // <- agregar para que Laravel entienda que es fecha Carbon
@@ -30,6 +31,17 @@ class Pago extends Model
     {
         return $this->belongsTo(\App\Models\Consulta::class, 'consulta_id');
     }
+
+    public function rayosxOrder()
+{
+    return $this->belongsTo(\App\Models\RayosxOrder::class, 'rayosx_order_id');
+}
+public function rayosxOrderExamen()
+{
+    return $this->belongsTo(RayosxOrderExamen::class, 'rayosx_order_examen_id');
+}
+
+
 
   
 
