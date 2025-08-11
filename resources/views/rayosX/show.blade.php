@@ -1,118 +1,113 @@
 @extends('layouts.app')
 
 @section('content')
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
 <style>
-    .card {
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-        border: none;
+    .custom-card {
+        max-width: 1000px;
+        background-color: #fff;
+        margin: 40px auto;
+        border-radius: 1.5rem;
+        padding: 2rem 2.5rem;
+        box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
     }
     .section-title {
-        font-weight: bold;
-        color: #0d6efd;
-        margin-top: 15px;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #003366;
+        border-bottom: 3px solid #007BFF;
+        padding-bottom: 0.3rem;
+        margin-bottom: 1rem;
     }
-    .form-check-label {
-        font-weight: 500;
+    .underline-field {
+        border-bottom: 1px solid #000;
+        min-height: 1.4rem;
+        line-height: 1.4rem;
+        padding-left: 6px;
+        padding-right: 6px;
     }
-    .description-box {
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        padding: 8px;
-        border-radius: 6px;
-        font-size: 0.95rem;
-        margin-top: 5px;
+    .img-preview {
+        margin-top: 0.8rem;
+        max-width: 200px;
+        max-height: 150px;
+        border-radius: 0.4rem;
+        object-fit: contain;
+        border: 1px solid #ddd;
+    }
+    .examen-card {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid #007BFF;
     }
 </style>
 
-<div class="container mt-4">
-    <div class="card">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Detalle de Orden de Rayos X</h5>
-            <a href="{{ route('rayosx.index') }}" class="btn btn-light btn-sm">← Volver</a>
+<div class="custom-card">
+    <h2 class="section-title text-center mb-4">Área de radiología - Detalles</h2>
+
+    {{-- Datos del paciente --}}
+    @php
+        $paciente = $orden->pacienteClinica ?? $orden->pacienteRayosX;
+    @endphp
+
+    <div class="section-title">Datos del Paciente</div>
+<div class="mb-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div><strong>Nombres - Apellidos:</strong> {{ $paciente->nombre ?? 'N/A' }} {{ $paciente->apellidos ?? '' }}</div>
+            <div><strong>Fecha:</strong> {{ $orden->fecha ? \Carbon\Carbon::parse($orden->fecha)->format('d/m/Y') : 'N/A' }}</div>
         </div>
-        <div class="card-body">
-
-            {{-- Datos del paciente / diagnóstico --}}
-            <h6 class="section-title">Datos del Paciente</h6>
-            <div class="row mb-3">
-                <div class="col-md-4"><strong>Nombre:</strong>
-                    @if ($orden->nombres || $orden->apellidos)
-                        {{ $orden->nombres }} {{ $orden->apellidos }}
-                    @elseif ($orden->pacienteClinica)
-                        {{ $orden->pacienteClinica->nombre }} {{ $orden->pacienteClinica->apellidos }}
-                    @elseif ($orden->pacienteRayosX)
-                        {{ $orden->pacienteRayosX->nombre }} {{ $orden->pacienteRayosX->apellidos }}
-                    @else
-                        N/A
-                    @endif
-                </div>
-                <div class="col-md-3"><strong>Identidad:</strong>
-                    @if ($orden->identidad)
-                        {{ $orden->identidad }}
-                    @elseif ($orden->pacienteClinica)
-                        {{ $orden->pacienteClinica->identidad }}
-                    @elseif ($orden->pacienteRayosX)
-                        {{ $orden->pacienteRayosX->identidad }}
-                    @else
-                        N/A
-                    @endif
-                </div>
-                <div class="col-md-2"><strong>Edad:</strong> {{ $orden->edad ?? 'N/A' }}</div>
-                <div class="col-md-3"><strong>Fecha:</strong> {{ \Carbon\Carbon::parse($orden->fecha)->format('d/m/Y') }}</div>
-            </div>
-
-            @if($orden->diagnostico)
-                <div class="mb-3">
-                    <strong>Diagnóstico asociado:</strong> {{ $orden->diagnostico->descripcion ?? 'N/A' }}
-                </div>
-            @endif
-
-            @if($orden->datos_clinicos)
-                <div class="mb-3">
-                    <strong>Datos clínicos:</strong> {{ $orden->datos_clinicos }}
-                </div>
-            @endif
-
-            {{-- Lista de exámenes --}}
-            <h6 class="section-title">Exámenes solicitados</h6>
+        <div class="col-md-6">
             <div class="row">
-                @forelse($orden->examenes as $examen)
-                    <div class="col-md-4 mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" checked disabled>
-                            <label class="form-check-label">{{ $examen->examen }}</label>
-                        </div>
-                        @php
-                            // Obtener nombre completo paciente para buscar descripción
-                            $pacienteNombre = trim(
-                                ($orden->nombres && $orden->apellidos)
-                                    ? $orden->nombres . ' ' . $orden->apellidos
-                                    : ($orden->pacienteClinica
-                                        ? $orden->pacienteClinica->nombre . ' ' . $orden->pacienteClinica->apellidos
-                                        : ($orden->pacienteRayosX
-                                            ? $orden->pacienteRayosX->nombre . ' ' . $orden->pacienteRayosX->apellidos
-                                            : '')
-                                    )
-                            );
-
-                            $descripcion = DB::table('rayosx_descripciones')
-                                ->where('paciente', $pacienteNombre)
-                                ->where('examen', $examen->examen)
-                                ->value('descripcion');
-                        @endphp
-                        @if($descripcion)
-                            <div class="description-box">
-                                {{ $descripcion }}
-                            </div>
-                        @endif
-                    </div>
-                @empty
-                    <p class="text-muted">No hay exámenes registrados para esta orden.</p>
-                @endforelse
+                <div class="col-6">
+                    <strong>Identidad:</strong> {{ $paciente->identidad ?? 'N/A' }}
+                </div>
+                <div class="col-6">
+                    <strong>Edad:</strong>
+                    @if(!empty($paciente->fecha_nacimiento))
+                        {{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }} años
+                    @else
+                        N/A
+                    @endif
+                </div>
             </div>
-
+            <div class="mt-2">
+                <strong>Teléfono:</strong> {{ $paciente->telefono ?? 'N/A' }}
+            </div>
         </div>
+    </div>
+</div>
+
+    {{-- Médico Analista --}}
+    <div class="section-title">Médico Analista</div>
+    <div class="mb-4">
+        {{ optional($orden->medicoAnalista)->nombre ?? 'N/A' }}
+        {{ optional($orden->medicoAnalista)->apellidos ?? '' }}
+    </div>
+
+    {{-- Exámenes --}}
+    <div class="section-title">Rayos X realizados</div>
+    @foreach($orden->examenes as $examen)
+    <div class="examen-card mb-4">
+        <h5>{{ $examenes[$examen->examen_codigo] ?? ucfirst(str_replace('_', ' ', $examen->examen_codigo)) }}</h5>
+
+        @forelse($examen->imagenes as $imagen)
+            <div class="card" style="width: 18rem; margin-bottom: 1rem;">
+                <img src="{{ asset('storage/' . $imagen->ruta) }}" class="card-img-top" alt="Imagen examen">
+                <div class="card-body">
+                    <p class="card-text"><strong>Descripción:</strong> {{ $imagen->descripcion ?? 'Sin descripción' }}</p>
+                </div>
+            </div>
+        @empty
+            <p>Sin imágenes registradas</p>
+        @endforelse
+    </div>
+@endforeach
+
+    <div class="mt-4">
+        <a href="{{ route('rayosx.index') }}" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left-circle"></i> Regresar
+        </a>
     </div>
 </div>
 @endsection
