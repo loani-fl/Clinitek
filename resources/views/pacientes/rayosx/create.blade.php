@@ -31,24 +31,23 @@
     }
 
     .custom-card {
-        max-width: 900px;  /* más ancho */
+        max-width: 900px; 
         background-color: #fff;
         margin: 40px auto 60px;
         border-radius: 1.5rem;
-        padding: 2.5rem 3rem; /* un poco más espacioso */
+        padding: 2.5rem 3rem;
         position: relative;
         overflow: hidden;
         z-index: 1;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    /* Fondo con logo solo dentro de la tarjeta */
     .custom-card::before {
         content: "";
         position: absolute;
         top: 50%;
         left: 50%;
-        width: 1100px;  /* ajustado proporcional al nuevo tamaño */
+        width: 1100px;
         height: 1100px;
         background-image: url('{{ asset('images/logo2.jpg') }}');
         background-size: contain;
@@ -58,7 +57,7 @@
         transform: translate(-50%, -50%);
         pointer-events: none;
         z-index: 0;
-        border-radius: 1.5rem; /* para que no sobresalga de la tarjeta */
+        border-radius: 1.5rem;
     }
 
     .card-header {
@@ -99,12 +98,9 @@
         box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
     }
 
-    .btn-primary {
-        font-size: 0.95rem;
-        padding: 0.45rem 0.9rem;
-    }
-
-    .btn-warning, .btn-success {
+    .btn-primary,
+    .btn-warning,
+    .btn-success {
         font-size: 0.95rem;
         padding: 0.45rem 0.9rem;
     }
@@ -208,7 +204,6 @@
             </div>
         </div>
 
-        {{-- Botones centrados --}}
         <div class="d-flex justify-content-center gap-3 mt-4 w-100">
             <button type="submit" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Registrar

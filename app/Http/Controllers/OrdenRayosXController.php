@@ -27,25 +27,35 @@ public function index(Request $request)
 
         if ($query) {
             $ordenesQuery->where(function ($q) use ($query) {
-                $q->whereHas('pacienteClinica', function ($q2) use ($query) {
-                    $q2->where('nombre', 'like', "%$query%")
-                       ->orWhere('apellidos', 'like', "%$query%");
+                $q->where(function($q2) use ($query) {
+                    // Para pacientes tipo 'clinica'
+                    $q2->where('paciente_tipo', 'clinica')
+                       ->whereHas('pacienteClinica', function ($q3) use ($query) {
+                            $q3->where('nombre', 'like', "%$query%")
+                               ->orWhere('apellidos', 'like', "%$query%");
+                       });
                 })
-                ->orWhereHas('pacienteRayosX', function ($q2) use ($query) {
-                    $q2->where('nombre', 'like', "%$query%")
-                       ->orWhere('apellidos', 'like', "%$query%");
+                ->orWhere(function($q2) use ($query) {
+                    // Para pacientes tipo 'rayosx'
+                    $q2->where('paciente_tipo', 'rayosx')
+                       ->whereHas('pacienteRayosX', function ($q3) use ($query) {
+                            $q3->where('nombre', 'like', "%$query%")
+                               ->orWhere('apellidos', 'like', "%$query%");
+                       });
                 })
-                ->orWhere('nombres', 'like', "%$query%")
-                ->orWhere('apellidos', 'like', "%$query%");
+                ->orWhere(function($q2) use ($query) {
+                    // Para órdenes con paciente directo sin relación
+                    $q2->whereNull('paciente_tipo')
+                       ->where(function ($q3) use ($query) {
+                           $q3->where('nombres', 'like', "%$query%")
+                              ->orWhere('apellidos', 'like', "%$query%");
+                       });
+                });
             });
-        }
 
-        // Si hay búsqueda, traemos todos resultados sin paginar para listarlos todos
-        if ($query) {
-            $ordenes = $ordenesQuery->get();
+            $ordenes = $ordenesQuery->take(50)->get();
             $isSearch = true;
         } else {
-            // Paginación de 5 resultados cuando no hay filtro
             $ordenes = $ordenesQuery->paginate(5);
             $isSearch = false;
         }
@@ -67,7 +77,6 @@ public function index(Request $request)
         abort(500, $e->getMessage());
     }
 }
-
 
 
 
