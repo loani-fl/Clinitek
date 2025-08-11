@@ -88,6 +88,11 @@
         max-width: 300px;
         flex-grow: 1;
     }
+    .filtro-fecha {
+        font-size: 0.85rem;
+        max-width: 150px;
+        /* flex-grow removido para que no se estiren */
+    }
     .table {
         font-size: 0.85rem;
         width: 100%;
@@ -137,6 +142,8 @@
 
         <div class="d-flex filter-container">
             <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar paciente...">
+            <input type="date" id="fechaInicio" class="form-control filtro-fecha" placeholder="Desde">
+            <input type="date" id="fechaFin" class="form-control filtro-fecha" placeholder="Hasta">
         </div>
 
         <div id="tabla-container" class="table-responsive">
@@ -157,27 +164,55 @@
 
 <script>
 $(document).ready(function () {
-    // Actualiza el mensaje debajo de la tabla según resultados
-    function actualizarMensaje(total, all, query) {
-        if (query === '') {
+    const hoy = new Date();
+    const dosMesesAtras = new Date();
+    dosMesesAtras.setMonth(hoy.getMonth() - 2);
+
+    const formatoFecha = fecha => fecha.toISOString().split('T')[0];
+
+    const minFecha = formatoFecha(dosMesesAtras);
+    const maxFecha = formatoFecha(hoy);
+
+    $('#fechaInicio').attr('min', minFecha);
+    $('#fechaInicio').attr('max', maxFecha);
+    $('#fechaFin').attr('min', minFecha);
+    $('#fechaFin').attr('max', maxFecha);
+
+    // Inicializar con rango completo (dos meses atrás hasta hoy)
+    $('#fechaInicio').val(minFecha);
+    $('#fechaFin').val(maxFecha);
+
+    function actualizarMensaje(total, all, query, fechaInicio, fechaFin) {
+        const fechasDefault = 
+            (fechaInicio === '' || fechaInicio === minFecha) && 
+            (fechaFin === '' || fechaFin === maxFecha);
+        if (query === '' && fechasDefault) {
             $('#mensajeResultados').html('');
         } else if (total === 0) {
-            $('#mensajeResultados').html(`No se encontraron resultados para "<strong>${query}</strong>" de un total de ${all}.`);
+            $('#mensajeResultados').html(`No se encontraron resultados para "<strong>${query}</strong>" en las fechas seleccionadas.`);
         } else {
             $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
         }
     }
 
-    // Función para cargar datos con AJAX, según página y filtro
-    function cargarDatos(page = 1, query = '') {
+    function cargarDatos(page = 1, query = '', fechaInicio = '', fechaFin = '') {
+        // Asegurar que fechas no sean undefined o null
+        fechaInicio = fechaInicio || '';
+        fechaFin = fechaFin || '';
+
         $.ajax({
             url: "{{ route('rayosx.index') }}",
             type: 'GET',
-            data: { page: page, search: query },
+            data: {
+                page: page,
+                search: query,
+                fechaInicio: fechaInicio,
+                fechaFin: fechaFin
+            },
             success: function(data) {
                 $('#tabla-container').html(data.html);
                 $('#paginacion-container').html(data.pagination);
-                actualizarMensaje(data.total, data.all, query);
+                actualizarMensaje(data.total, data.all, query, fechaInicio, fechaFin);
             },
             error: function(xhr) {
                 let msg = 'Error al cargar los datos.';
@@ -189,29 +224,39 @@ $(document).ready(function () {
         });
     }
 
-    // Carga inicial sin filtro
-    cargarDatos();
+    // Carga inicial con rango de fechas completo
+    cargarDatos(1, '', minFecha, maxFecha);
 
-    // Filtrado con debounce para evitar saturar peticiones
+    // Manejo de filtro con debounce
     let typingTimer;
-    $('#filtroBusqueda').on('keyup', function () {
+    function aplicarFiltros() {
         clearTimeout(typingTimer);
-        let query = $(this).val();
-        typingTimer = setTimeout(() => cargarDatos(1, query), 300);
-    });
+        const query = $('#filtroBusqueda').val();
+        const fechaInicio = $('#fechaInicio').val();
+        const fechaFin = $('#fechaFin').val();
+        typingTimer = setTimeout(() => cargarDatos(1, query, fechaInicio, fechaFin), 300);
+    }
 
-    // Paginación dinámica con delegación para enlaces agregados dinámicamente
+    $('#filtroBusqueda').on('keyup', aplicarFiltros);
+    $('#fechaInicio').on('change', aplicarFiltros);
+    $('#fechaFin').on('change', aplicarFiltros);
+
+    // Paginación dinámica
     $(document).on('click', '.pagination a', function (e) {
         e.preventDefault();
-        let url = $(this).attr('href');
-        let params = new URLSearchParams(url.split('?')[1]);
-        let page = params.get('page') || 1;
-        let query = $('#filtroBusqueda').val();
-        cargarDatos(page, query);
+        const url = $(this).attr('href');
+        const params = new URLSearchParams(url.split('?')[1]);
+        const page = params.get('page') || 1;
+        const query = $('#filtroBusqueda').val();
+        const fechaInicio = $('#fechaInicio').val();
+        const fechaFin = $('#fechaFin').val();
+        cargarDatos(page, query, fechaInicio, fechaFin);
 
-        // Actualizar URL sin recargar para mantener el estado del filtro y página
+        // Actualizar URL sin recargar
         let newUrl = url.split('?')[0] + '?page=' + page;
         if (query) newUrl += '&search=' + encodeURIComponent(query);
+        if (fechaInicio) newUrl += '&fechaInicio=' + encodeURIComponent(fechaInicio);
+        if (fechaFin) newUrl += '&fechaFin=' + encodeURIComponent(fechaFin);
         window.history.pushState("", "", newUrl);
     });
 });
