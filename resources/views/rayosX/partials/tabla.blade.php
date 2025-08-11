@@ -1,18 +1,21 @@
 <table class="table table-bordered table-striped align-middle mb-0">
     <thead>
         <tr>
-            <th>#</th>
+            <th style="width: 40px;">#</th>
             <th>Paciente</th>
             <th>Fecha</th>
             <th>Total a Pagar</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+            <th class="text-center">Estado</th>
+            <th class="text-center">Acciones</th>
         </tr>
     </thead>
     <tbody>
         @forelse ($ordenes as $index => $orden)
         <tr>
-            <td>{{ ($ordenes instanceof \Illuminate\Pagination\LengthAwarePaginator) ? $ordenes->firstItem() + $index : $index + 1 }}</td>
+            <td>
+                {{ ($ordenes instanceof \Illuminate\Pagination\LengthAwarePaginator) ? $ordenes->firstItem() + $index : $index + 1 }}
+            </td>
+
             <td>
                 @if($orden->paciente_tipo === 'clinica' && $orden->paciente_id)
                     {{ optional($orden->pacienteClinica)->nombre ?? 'Sin nombre' }}
@@ -28,16 +31,24 @@
                     {{ $orden->apellidos ?? '' }}
                 @endif
             </td>
-            <td>{{ \Carbon\Carbon::parse($orden->fecha)->format('d/m/Y') }}</td>
-            <td>${{ number_format($orden->total_precio, 2) }}</td>
+
+            <td>
+                {{ \Carbon\Carbon::parse($orden->fecha)->format('d/m/Y') }}
+            </td>
+
+            <td>
+                ${{ number_format($orden->total_precio ?? 0, 2) }}
+            </td>
+
             <td class="text-center">
                 @php
-                    $estado = strtolower($orden->estado);
+                    $estado = strtolower($orden->estado ?? '');
                     $claseCirculo = $estado === 'realizado' ? 'estado-realizado' : 'estado-pendiente';
                 @endphp
                 <span class="estado-circulo {{ $claseCirculo }}" title="{{ ucfirst($estado) }}"></span>
             </td>
-            <td>
+
+            <td class="text-center">
                 <div class="d-flex gap-2 justify-content-center">
                     <a href="{{ route('rayosx.show', $orden->id) }}" class="btn btn-sm btn-outline-info" title="Ver orden">
                         <i class="bi bi-eye"></i>
@@ -45,6 +56,7 @@
                     <a href="{{ route('rayosx.analisis', $orden->id) }}" class="btn btn-sm btn-outline-success" title="Analizar orden">
                         <i class="bi bi-clipboard-data"></i>
                     </a>
+                  
                 </div>
             </td>
         </tr>
@@ -65,9 +77,9 @@
         margin-right: 6px;
     }
     .estado-realizado {
-        background-color: #28a745;
+        background-color: #28a745; /* verde */
     }
     .estado-pendiente {
-        background-color: #ffc107;
+        background-color: #ffc107; /* amarillo */
     }
 </style>
