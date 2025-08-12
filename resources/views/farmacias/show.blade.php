@@ -105,14 +105,7 @@
                         <div class="col-md-6 info-block">
                             <span class="info-label">Ubicación:</span><br>{{ $farmacia->ubicacion }}
                             <br>
-                            @if($farmacia->ubicacion)
-                                @php $direccionUrl = urlencode($farmacia->ubicacion); @endphp
-                                <a href="https://www.google.com/maps/search/?api=1&query={{ $direccionUrl }}" 
-                                   target="_blank" 
-                                   class="btn btn-outline-primary btn-sm mt-2">
-                                   Ver en Google Maps
-                                </a>
-                            @else
+                            @if(!$farmacia->ubicacion)
                                 <span>No hay ubicación disponible</span>
                             @endif
                         </div>
