@@ -69,13 +69,13 @@ class FarmaciaController extends Controller
                 'required',
                 'digits:8', // Exactamente 8 dígitos
                 'regex:/^[2389][0-9]{7}$/', // Debe comenzar con 2, 3, 8 o 9
-                'unique:farmacias,telefono'
+                'unique:pacientes,telefono'
             ],
 
             'horario' => [
                 'required',
                 'string',
-                'max:200',
+                'max:100',
                 'regex:/^[\pL0-9\s:\-,\.]+$/u'
             ],
             'descripcion' => [
@@ -87,6 +87,7 @@ class FarmaciaController extends Controller
                 'required',
                 'numeric',
                 'between:0,100',
+
             ],
             'foto' => [
                 'required',
@@ -119,6 +120,7 @@ class FarmaciaController extends Controller
             'telefono.digits' => 'El teléfono debe tener exactamente 8 dígitos.',
             'telefono.regex' => 'El teléfono debe iniciar con 2, 3, 8 o 9.',
             'telefono.unique' => 'Este teléfono ya está registrado.',
+
 
             // HORARIO
             'horario.required' => 'El horario es obligatorio.',

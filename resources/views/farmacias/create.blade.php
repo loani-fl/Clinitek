@@ -94,14 +94,15 @@
                         min="0"
                         max="100"
                         step="0.1"
-                        placeholder="Ej: 10.5">
+                        placeholder="Ej: 10.5"
+                        oninput="if(this.value < 0) this.value = 0; if(this.value > 100) this.value = 100;">
                     @error('descuento')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-            </div>
 
-            <div class="row mb-3">
+
+                <div class="row mb-3">
                 <div class="col-md-4">
                     <label for="horario" class="form-label">Horario:</label>
                     <input
