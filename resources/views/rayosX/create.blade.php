@@ -3,14 +3,16 @@
 @section('content')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-
 <style>
     body {
         background-color: #e8f4fc;
         margin: 0;
         padding: 0;
+        min-height: 100vh;
+        position: relative;
     }
 
+    /* Barra fija superior */
     .header {
         background-color: #007BFF;
         position: fixed;
@@ -19,14 +21,29 @@
         right: 0;
         z-index: 1100;
         padding: 0.5rem 1rem;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        color: white;
+        font-weight: 600;
+        font-size: 1.2rem;
+        text-align: center;
     }
 
+    /* Wrapper con margen para que no quede tapado por la barra */
     .content-wrapper {
         margin-top: 60px;
+        max-width: 1000px;
+        background-color: #fff;
+        margin-left: auto;
+        margin-right: auto;
+        border-radius: 1.5rem;
+        padding: 2rem 2.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
-    .custom-card::before {
+    /* Logo translúcido en fondo */
+    .content-wrapper::before {
         content: "";
         position: absolute;
         top: 50%;
@@ -43,118 +60,115 @@
         z-index: 0;
     }
 
-    .custom-card {
-        max-width: 1000px;
-        background-color: #fff;
-        margin: 40px auto;
-        border-radius: 1.5rem;
-        padding: 2rem;
+    /* Para que el contenido esté encima del fondo translúcido */
+    .content-inner {
         position: relative;
-        overflow: hidden;
         z-index: 1;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .card-header {
-        background-color: transparent !important;
-        border-bottom: 3px solid #007BFF;
-    }
-
-    .section-title {
-        font-size: 1.1rem;
-        margin-bottom: 0.7rem;
-        font-weight: 700;
+    h2 {
         color: #003366;
-    }
-
-    .seccion {
-        padding: 0.8rem;
-        border-radius: 0;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        text-align: center;
     }
 
     .underline-field {
         border-bottom: 1px dashed #333;
-        flex: 1;
         min-height: 1.5rem;
         padding-left: 4px;
         padding-right: 4px;
         user-select: none;
+        flex: 1;
     }
-
-    .btn-imprimir,
-    .btn-danger,
-    .btn-warning,
-    .btn-primary,
-    .btn-success {
-        font-size: 0.95rem;
-        padding: 0.45rem 0.9rem;
-    }
-
-    .patient-select-wrapper {
+    .datos-paciente-row {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
     }
-
-    .secciones-container {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.3rem 0.10rem; /* poco espacio entre secciones */
-        margin-top: 0.3rem;
-    }
-
-    .seccion {
-        padding: 0;
-    }
-
-    .section-title {
-        font-size: 1.5rem; /* más grande */
-        margin: 0 0 0.7rem;
-        color: rgb(6, 11, 17);
+    .datos-paciente-label {
         font-weight: 700;
-        line-height: 1.6rem; /* ajusta para que no quede muy apretado */
-    }
-
-    .examenes-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 0.15rem; /* menos espacio entre checkboxes */
-    }
-
-    .examenes-grid label {
-        font-size: 0.85rem;
-        line-height: 1rem;
-        cursor: pointer;
-    }
-
-    .examenes-grid input[type="checkbox"] {
-        margin-right: 6px;
-    }
-
-    .section-title:first-of-type {
-        margin-top: 3rem; /* Ajusta el valor a lo que necesites */
-    }
-
-    /* Título general (más grande) */
-    .section-title.general {
-        font-size: 1.5rem; /* tamaño mayor */
-        margin: 0 0 0.7rem;
-        color: rgb(6, 11, 17);
-        font-weight: 700;
-        line-height: 1.6rem;
-        text-align: center; /* CENTRAR */
-    }
-
-    /* Títulos de secciones (más pequeños) */
-    .section-title.seccion {
-        font-size: 1.1rem; /* tamaño menor */
-        margin-bottom: 0.5rem;
+        min-width: 120px;
         color: #003366;
-        font-weight: 700;
-        line-height: 1.3rem;
+        white-space: nowrap;
     }
 
-    /* Estilos para mensajes flash emergentes */
+    /* Cards para secciones de exámenes con sombra y borde azul */
+    .card {
+        border-radius: 0.6rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+    .card-header {
+        background-color: #007BFF !important;
+        color: white !important;
+        font-weight: 600;
+        font-size: 1.1rem;
+        border-bottom: none !important;
+        border-top-left-radius: 0.6rem;
+        border-top-right-radius: 0.6rem;
+        padding: 0.75rem 1rem;
+    }
+    .card-body {
+        padding: 1rem;
+    }
+
+    /* Lista de pacientes */
+    #listaPacientes {
+        z-index: 1150 !important; /* sobre la barra */
+    }
+
+    /* Botones */
+    button.btn-success, button.btn-primary, button.btn-warning, a.btn {
+        font-size: 1rem;
+        padding: 0.5rem 1.25rem;
+        font-weight: 600;
+        border-radius: 0.4rem;
+        margin-left: 0.5rem;
+    }
+
+    button.btn-warning {
+        color: #212529;
+        background-color: #ffc107;
+        border-color: #ffc107;
+    }
+    button.btn-warning:hover {
+        color: #212529;
+        background-color: #e0a800;
+        border-color: #d39e00;
+    }
+
+    button.btn-success {
+        background-color: #198754;
+        border-color: #198754;
+        color: white;
+    }
+    button.btn-success:hover {
+        background-color: #157347;
+        border-color: #146c43;
+        color: white;
+    }
+
+    a.btn-primary {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: white;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    a.btn-primary:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Mensajes emergentes estilo flash */
     .mensaje-flash {
         display: none; /* oculto por defecto */
         background-color: #f8d7da; /* rojo suave */
@@ -163,325 +177,392 @@
         padding: 8px 12px;
         border-radius: 0.4rem;
         font-weight: 600;
-        font-size: 0.9rem;
-        margin-top: 0.5rem;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
         max-width: 600px;
         user-select: none;
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Estilo personalizado para checkboxes de exámenes */
+    .form-check {
+        padding-left: 2rem; /* espacio para checkbox */
+        position: relative;
+        margin-bottom: 0.8rem;
+        cursor: pointer;
+        user-select: none;
+        font-weight: 600;
+        color: #003366;
+        font-size: 0.95rem;
+    }
+
+    .form-check-input {
+        position: absolute;
+        left: 0;
+        top: 0.3rem;
+        width: 1.4rem;
+        height: 1.4rem;
+        cursor: pointer;
+        border-radius: 0.25rem;
+        border: 2px solid #007BFF;
+        background-color: #fff;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .form-check-input:checked {
+        background-color: #007BFF;
+        border-color: #0056b3;
+    }
+
+    .form-check-input:checked::after {
+        content: "";
+        position: absolute;
+        left: 0.45rem;
+        top: 0.12rem;
+        width: 0.3rem;
+        height: 0.7rem;
+        border: solid white;
+        border-width: 0 0.18rem 0.18rem 0;
+        transform: rotate(45deg);
+    }
+
+    /* Hover para el checkbox */
+    .form-check-input:hover {
+        border-color: #0056b3;
+    }
+
+    /* Etiqueta para mejor alineación y espaciado */
+    .form-check-label {
+        cursor: pointer;
+        user-select: none;
+        padding-left: 0.3rem;
+    }
+
+    /* Contenedor para el filtro y botones arriba */
+    .top-controls {
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: flex-end;
+        gap: 0.5rem;
+        position: relative;
+    }
+    .top-controls label {
+        flex-basis: 100%;
+        font-weight: 700;
+        color: #003366;
+    }
+    .top-controls > * {
+        /* Para que input y botones queden alineados */
+        margin-bottom: 0;
     }
 </style>
 
-<div class="content-wrapper">
-    <div class="card custom-card">
-        <div class="card-header text-center">
-            <div class="row align-items-center">
-                <div class="col-md-3 text-center">
-                    <img src="{{ asset('images/logo2.jpg') }}" alt="Logo" style="height: 60px;">
-                    <div style="font-size: 1rem; font-weight: 700; color: #555;">
-                        Laboratorio Clínico Honduras
-                    </div>
-                </div>
-                <div class="col-md-9 text-center" style="transform: translateX(30%);">
-                    <h4 class="mb-0" style="font-size: 1.2rem; font-weight: 600; color: #333;">
-                        CREAR ORDEN DE RAYOS X
-                    </h4>
-                </div>
-            </div>
-        </div>
+<div class="header">Crear orden de rayos x</div>
 
-        <div class="card-body">
-            {{-- Flash messages --}}
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-                </div>
-            @endif
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-                </div>
-            @endif
-            @if ($errors->any())
-                <div class="alert alert-danger mb-4">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
+<div class="content-wrapper">
+    <div class="content-inner">
+
+        {{-- Mensajes de error del servidor --}}
+        @if ($errors->any())
+        <div class="alert alert-danger mb-4">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
+        {{-- Mensajes emergentes personalizados --}}
+        <div id="mensajePaciente" class="mensaje-flash"></div>
+        <div id="mensajeExamenes" class="mensaje-flash"></div>
+
+        <form action="{{ route('rayosx.store') }}" method="POST" id="formOrden" novalidate>
+            @csrf
+
+            {{-- FILTRO PACIENTE Y BOTÓN REGISTRAR --}}
+            <div class="top-controls">
+                <div style="flex-grow:1; position: relative;">
+                    <label for="buscarPaciente">Buscar paciente <span class="text-danger">*</span></label>
+                    <input 
+                        type="text" 
+                        id="buscarPaciente" 
+                        class="form-control" 
+                        placeholder="Escribe para buscar paciente..."
+                        autocomplete="off"
+                        value="{{ old('paciente_nombre', '') }}"
+                        required
+                    >
+                    <input type="hidden" name="paciente_id" id="paciente_id" value="{{ old('paciente_id') }}">
+
+                    <ul id="listaPacientes" class="list-group position-absolute w-100" style="max-height: 200px; overflow-y: auto; display:none;">
+                        @foreach ($pacientes as $paciente)
+                            <li 
+                                class="list-group-item list-group-item-action paciente-item" 
+                                data-id="{{ $paciente->id }}"
+                                data-nombre="{{ $paciente->nombre }}"
+                                data-apellidos="{{ $paciente->apellidos ?? '' }}"
+                                data-identidad="{{ $paciente->identidad ?? '' }}"
+                                data-genero="{{ $paciente->genero ?? '' }}"
+                                style="cursor:pointer;"
+                            >
+                                {{ $paciente->nombre }} {{ $paciente->apellidos ?? '' }}
+                            </li>
                         @endforeach
                     </ul>
                 </div>
-            @endif
 
-            {{-- Formulario --}}
-            <form method="POST" action="{{ route('rayosx.store') }}" id="formOrden" novalidate>
-                @csrf
+                <a href="{{ route('pacientes.create', ['returnUrl' => route('rayosx.create')]) }}" class="btn btn-primary" title="Registrar Paciente">
+                    <i class="bi bi-person-plus"></i> Registrar paciente
+                </a>
 
-                <div class="mb-4 row align-items-center">
-                    <label for="paciente_id" class="col-md-2 col-form-label fw-bold text-end">Seleccione Paciente</label>
-                    <div class="col-md-4">
-                        <select id="paciente_id" name="seleccion" class="form-select" required>
-                            <option value="" selected disabled>-- Seleccione un paciente --</option>
-                            @foreach($pacientesClinica as $paciente)
-                                <option value="clinica-{{ $paciente->id }}"
-                                    data-nombre="{{ $paciente->nombre }} {{ $paciente->apellidos }}"
-                                    data-identidad="{{ $paciente->identidad }}"
-                                    data-fecha_nacimiento="{{ $paciente->fecha_nacimiento }}"
-                                    data-edad="{{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }}"
-                                    data-datos_clinicos="{{ e($paciente->datos_clinicos ?? '') }}"
-                                    {{ (old('seleccion') == "clinica-{$paciente->id}") ? 'selected' : '' }}>
-                                    {{ $paciente->nombre }} {{ $paciente->apellidos }} - {{ $paciente->identidad }} (Clínica)
-                                </option>
-                            @endforeach
-                            @foreach($pacientesRayosX as $paciente)
-                                <option value="rayosx-{{ $paciente->id }}"
-                                    data-nombre="{{ $paciente->nombre }} {{ $paciente->apellidos }}"
-                                    data-identidad="{{ $paciente->identidad }}"
-                                    data-fecha_nacimiento="{{ $paciente->fecha_nacimiento }}"
-                                    data-edad="{{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }}"
-                                    data-datos_clinicos="{{ e($paciente->datos_clinicos ?? '') }}"
-                                    {{ (old('seleccion') == "rayosx-{$paciente->id}") ? 'selected' : '' }}>
-                                    {{ $paciente->nombre }} {{ $paciente->apellidos }} - {{ $paciente->identidad }} (Rayos X)
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+            </div>
 
-                    <label for="fecha" class="col-md-1 col-form-label fw-bold text-end">Fecha</label>
-                    <div class="col-md-2">
-                        <input type="date" id="fecha" name="fecha" class="form-control"
-                            value="{{ old('fecha', date('Y-m-d')) }}" required>
-                    </div>
-
-                    <div class="col-md-2">
-                        <a href="{{ route('pacientes.rayosx.create') }}" class="btn btn-primary w-100">
-                            Registrar
-                        </a>
-                    </div>
+            {{-- DATOS DEL PACIENTE CON ESTILO SUBRAYADO --}}
+            <div id="datosPaciente" style="display: {{ old('paciente_id') ? 'block' : 'none' }}; margin-bottom: 1.5rem;">
+                <div class="datos-paciente-row">
+                    <div class="datos-paciente-label">Nombres:</div>
+                    <div id="dp-nombres" class="underline-field">{{ old('nombres') }}</div>
                 </div>
-
-                {{-- Datos del paciente --}}
-                <div id="datosPaciente" class="mb-4" style="display:none;">
-                    <div class="section-title">DATOS DEL PACIENTE</div>
-                    <div class="row">
-                        <div class="col-md-6 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Nombre completo:</strong>
-                            <div class="underline-field" id="dp-nombre"></div>
-                        </div>
-                        <div class="col-md-6 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Identidad:</strong>
-                            <div class="underline-field" id="dp-identidad"></div>
-                        </div>
-                        <div class="col-md-4 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Edad:</strong>
-                            <div class="underline-field" id="dp-edad"></div>
-                        </div>
-                        <div class="col-md-4 mb-2 d-flex align-items-center">
-                            <strong class="me-2">Fecha Nacimiento:</strong>
-                            <div class="underline-field" id="dp-fecha-nac"></div>
-                        </div>
-                    </div>
+                <div class="datos-paciente-row">
+                    <div class="datos-paciente-label">Apellidos:</div>
+                    <div id="dp-apellidos" class="underline-field">{{ old('apellidos') }}</div>
                 </div>
-
-                {{-- Mensajes debajo de datos paciente --}}
-                <div id="mensajePaciente" class="mensaje-flash"></div>
-                <div id="mensajeExamenes" class="mensaje-flash"></div>
-
-                {{-- Datos clínicos --}}
-                <div class="mb-4 row align-items-center" id="datosClinicosContainer" style="display:none;">
-                    <label for="datos_clinicos" class="col-md-3 col-form-label fw-bold text-end">Datos Clínicos</label>
-                    <div class="col-md-6">
-                        <textarea name="datos_clinicos" id="datos_clinicos" rows="3" class="form-control">{{ old('datos_clinicos') }}</textarea>
-                    </div>
+                <div class="datos-paciente-row">
+                    <div class="datos-paciente-label">Identidad:</div>
+                    <div id="dp-identidad" class="underline-field">{{ old('identidad') }}</div>
                 </div>
+                <div class="datos-paciente-row">
+                    <div class="datos-paciente-label">Género:</div>
+                    <div id="dp-genero" class="underline-field">{{ old('genero') }}</div>
+                </div>
+            </div>
 
-                {{-- Exámenes --}}
-                <div class="section-title general">Estudios para rayos X</div>
+            {{-- FECHA --}}
+            <div class="mb-4" style="max-width: 200px; margin-left:auto; margin-right:auto;">
+                <label for="fecha" class="form-label fw-bold">Fecha <span class="text-danger">*</span></label>
+                <input type="date" id="fecha" name="fecha" class="form-control" value="{{ old('fecha', date('Y-m-d')) }}" required>
+            </div>
 
-                <div class="secciones-container">
-                    @foreach($secciones as $titulo => $examenesSeccion)
-                        <div class="seccion">
-                            <div class="section-title seccion">{{ $titulo }}</div>
-                            <div class="examenes-grid">
-                                @foreach($examenesSeccion as $clave)
-                                    <label>
-                                        <input type="checkbox" name="examenes[]" value="{{ $clave }}"
-                                            {{ (is_array(old('examenes')) && in_array($clave, old('examenes'))) ? 'checked' : '' }}>
-                                        {{ $examenes[$clave] ?? ucfirst(str_replace('_', ' ', $clave)) }}
-                                    </label>
+            {{-- SECCIONES Y EXÁMENES --}}
+            <div class="mb-3">
+               
+                @foreach($secciones as $categoria => $examenes)
+                    <div class="card">
+                        <div class="card-header">
+                            {{ $categoria }}
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                @foreach($examenes as $clave => $datos)
+                                    <div class="col-md-4 col-lg-3">
+                                        <div class="form-check">
+                                            <input 
+                                                class="form-check-input examen-checkbox" 
+                                                type="checkbox" 
+                                                name="examenes[]" 
+                                                value="{{ $clave }}" 
+                                                id="examen_{{ $clave }}"
+                                                data-precio="{{ $datos['precio'] }}"
+                                                {{ (is_array(old('examenes')) && in_array($clave, old('examenes'))) ? 'checked' : '' }}
+                                            >
+                                            <label class="form-check-label" for="examen_{{ $clave }}">
+                                                {{ $datos['nombre'] }}
+                                            </label>
+                                        </div>
+                                    </div>
                                 @endforeach
                             </div>
                         </div>
-                    @endforeach
-                </div>
+                    </div>
+                @endforeach
 
-                {{-- Total a pagar dinámico --}}
-                <div id="totalAPagar" class="mb-3 fw-bold fs-5 text-end">
-                    Total a pagar: $0.00
+                {{-- TOTAL DINÁMICO --}}
+                <div class="mb-3 text-end fw-bold fs-5">
+                    Total a pagar: L<span id="totalPrecio">0.00</span>
                 </div>
+            </div>
 
-                {{-- Botones --}}
-                <div class="d-flex justify-content-center gap-3 mt-4">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save"></i> Guardar Orden
-                    </button>
-                    <button type="button" id="btnLimpiar" class="btn btn-warning">
-                        <i class="bi bi-trash"></i> Limpiar
-                    </button>
-                    <a href="{{ route('rayosx.index') }}" class="btn btn-success">
-                        <i class="bi bi-arrow-left-circle"></i> Regresar
-                    </a>
-                      <a href="{{ route('pago.create', ['orden_id' => $orden->id ?? '']) }}" class="btn btn-info">
-        <i class="bi bi-cash-stack"></i> Pagar
-    </a>
-                </div>
-            </form>
-        </div>
+            {{-- BOTONES GUARDAR, LIMPIAR, VOLVER --}}
+            <div class="d-flex justify-content-center gap-3">
+                <button type="submit" class="btn btn-primary px-4 py-2">
+                    <i class="bi bi-save"></i> Guardar Orden
+                </button>
+                <button type="button" id="btnLimpiar" class="btn btn-warning px-4 py-2">
+                    <i class="bi bi-x-circle"></i> Limpiar
+                </button>
+                <a href="{{ route('rayosx.index') }}" class="btn btn-success px-4 py-2">
+                    <i class="bi bi-arrow-left-circle"></i> Volver
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const selectPaciente = document.getElementById('paciente_id');
-    const datosPacienteDiv = document.getElementById('datosPaciente');
-    const dpNombre = document.getElementById('dp-nombre');
-    const dpIdentidad = document.getElementById('dp-identidad');
-    const dpEdad = document.getElementById('dp-edad');
-    const dpFechaNac = document.getElementById('dp-fecha-nac');
-    const datosClinicosContainer = document.getElementById('datosClinicosContainer');
-    const datosClinicosTextarea = document.getElementById('datos_clinicos');
+    const inputBuscar = document.getElementById('buscarPaciente');
+    const lista = document.getElementById('listaPacientes');
+    const inputHiddenId = document.getElementById('paciente_id');
 
+    // Campos datos paciente estilo subrayado
+    const dpNombres = document.getElementById('dp-nombres');
+    const dpApellidos = document.getElementById('dp-apellidos');
+    const dpIdentidad = document.getElementById('dp-identidad');
+    const dpGenero = document.getElementById('dp-genero');
+
+    // Mensajes emergentes
     const mensajePaciente = document.getElementById('mensajePaciente');
     const mensajeExamenes = document.getElementById('mensajeExamenes');
-    const formOrden = document.getElementById('formOrden');
-    const checkboxes = formOrden.querySelectorAll('input[type=checkbox][name="examenes[]"]');
-    const MAX_EXAMENES = 7;
-    const totalAPagarDiv = document.getElementById('totalAPagar');
 
-    // Objeto con precios por examen (corregido con ':')
-    const preciosExamenes = {
-        'craneo_anterior_posterior': 120.00,
-        'craneo_lateral': 110.00,
-        'waters': 100.00,
-        'waters_lateral': 100.00,
-        'conductos_auditivos': 80.00,
-        'cavum': 90.00,
-        'senos_paranasales': 85.00,
-        'silla_turca': 95.00,
-        'huesos_nasales': 75.00,
-        'atm_tm': 90.00,
-        'mastoides': 88.00,
-        'mandibula': 85.00,
-        'torax_posteroanterior_pa': 150.00,
-        'torax_anteroposterior_ap': 150.00,
-        'torax_lateral': 140.00,
-        'torax_oblicuo': 130.00,
-        'torax_superior': 120.00,
-        'torax_inferior': 120.00,
-        'costillas_superiores': 110.00,
-        'costillas_inferiores': 110.00,
-        'esternon_frontal': 100.00,
-        'esternon_lateral': 100.00,
-        'abdomen_simple': 130.00,
-        'abdomen_agudo': 150.00,
-        'abdomen_erecto': 140.00,
-        'abdomen_decubito': 140.00,
-        'clavicula_izquierda': 90.00,
-        'clavicula_derecha': 90.00,
-        'hombro_anterior': 100.00,
-        'hombro_lateral': 100.00,
-        'humero_proximal': 110.00,
-        'humero_distal': 110.00,
-        'codo_anterior': 90.00,
-        'codo_lateral': 90.00,
-        'antebrazo': 80.00,
-        'muneca': 80.00,
-        'mano': 80.00,
-        'cadera_izquierda': 120.00,
-        'cadera_derecha': 120.00,
-        'femur_proximal': 130.00,
-        'femur_distal': 130.00,
-        'rodilla_anterior': 110.00,
-        'rodilla_lateral': 110.00,
-        'tibia': 100.00,
-        'pie': 90.00,
-        'calcaneo': 90.00,
-        'columna_cervical_lateral': 100.00,
-        'columna_cervical_anteroposterior': 100.00,
-        'columna_dorsal_lateral': 110.00,
-        'columna_dorsal_anteroposterior': 110.00,
-        'columna_lumbar_lateral': 110.00,
-        'columna_lumbar_anteroposterior': 110.00,
-        'sacro_coxis': 100.00,
-        'pelvis_anterior_posterior': 120.00,
-        'pelvis_oblicua': 120.00,
-        'escoliosis': 100.00,
-        'arteriograma_simple': 250.00,
-        'arteriograma_contraste': 300.00,
-        'histerosalpingograma_simple': 230.00,
-        'histerosalpingograma_contraste': 280.00,
-        'colecistograma_simple': 220.00,
-        'colecistograma_contraste': 270.00,
-        'fistulograma_simple': 210.00,
-        'fistulograma_contraste': 260.00,
-        'artrograma_simple': 200.00,
-        'artrograma_contraste': 250.00
-    };
-
-    // Mostrar datos paciente cuando cambie selección
-    function mostrarDatosPaciente() {
-        const selectedOption = selectPaciente.options[selectPaciente.selectedIndex];
-        if (selectPaciente.value && selectedOption) {
-            dpNombre.textContent = selectedOption.getAttribute('data-nombre') || '';
-            dpIdentidad.textContent = selectedOption.getAttribute('data-identidad') || '';
-            const fechaNacRaw = selectedOption.getAttribute('data-fecha_nacimiento') || '';
-            dpFechaNac.textContent = fechaNacRaw ? new Date(fechaNacRaw).toLocaleDateString('es-ES') : '';
-            const edad = selectedOption.getAttribute('data-edad') || '';
-            dpEdad.textContent = edad ? `${edad} años` : '';
-            datosPacienteDiv.style.display = 'block';
-
-            const datosClin = selectedOption.getAttribute('data-datos_clinicos') || '';
-            if (datosClin.trim() !== '') {
-                datosClinicosTextarea.value = datosClin;
-                datosClinicosContainer.style.display = 'flex';
-            } else {
-                datosClinicosTextarea.value = '';
-                datosClinicosContainer.style.display = 'none';
-            }
-        } else {
-            dpNombre.textContent = '';
-            dpIdentidad.textContent = '';
-            dpFechaNac.textContent = '';
-            dpEdad.textContent = '';
-            datosPacienteDiv.style.display = 'none';
-            datosClinicosContainer.style.display = 'none';
+    // Mostrar lista al enfocar input si tiene texto
+    inputBuscar.addEventListener('focus', () => {
+        if (inputBuscar.value.trim() !== '') {
+            lista.style.display = 'block';
         }
-        clearMensaje(mensajePaciente);
-    }
-    selectPaciente?.addEventListener('change', mostrarDatosPaciente);
-    if (selectPaciente && selectPaciente.value) {
-        mostrarDatosPaciente();
-    }
+    });
 
-    // Limpiar formulario
-    const btnLimpiar = document.getElementById('btnLimpiar');
-    if (btnLimpiar) {
-        btnLimpiar.addEventListener('click', () => {
-            formOrden.reset();
-            datosPacienteDiv.style.display = 'none';
-            datosClinicosContainer.style.display = 'none';
-            const fecha = document.getElementById('fecha');
-            if (fecha) fecha.value = new Date().toISOString().slice(0,10);
+    // Filtrar pacientes al escribir
+    inputBuscar.addEventListener('input', () => {
+        const filtro = inputBuscar.value.toLowerCase();
+        let visibleCount = 0;
+
+        Array.from(lista.children).forEach(li => {
+            const texto = li.textContent.toLowerCase();
+            if (texto.includes(filtro) && filtro !== '') {
+                li.style.display = 'block';
+                visibleCount++;
+            } else {
+                li.style.display = 'none';
+            }
+        });
+
+        lista.style.display = visibleCount > 0 ? 'block' : 'none';
+
+        // Limpiar id y campos si cambia texto
+        inputHiddenId.value = '';
+        dpNombres.textContent = '';
+        dpApellidos.textContent = '';
+        dpIdentidad.textContent = '';
+        dpGenero.textContent = '';
+
+        document.getElementById('datosPaciente').style.display = 'none';
+        clearMensaje(mensajePaciente);
+        clearMensaje(mensajeExamenes);
+    });
+
+    // Cuando el usuario clickea un paciente, ponerlo en el input y cargar datos
+    lista.querySelectorAll('.paciente-item').forEach(item => {
+        item.addEventListener('click', () => {
+            inputBuscar.value = item.textContent.trim();
+            inputHiddenId.value = item.getAttribute('data-id');
+            lista.style.display = 'none';
+
+            // Usar atributos data para rellenar sin hacer fetch
+            dpNombres.textContent = item.getAttribute('data-nombre') || '';
+            dpApellidos.textContent = item.getAttribute('data-apellidos') || '';
+            dpIdentidad.textContent = item.getAttribute('data-identidad') || '';
+            dpGenero.textContent = item.getAttribute('data-genero') || '';
+
+            document.getElementById('datosPaciente').style.display = 'block';
             clearMensaje(mensajePaciente);
             clearMensaje(mensajeExamenes);
+        });
+    });
+
+    // Cerrar lista si clic fuera
+    document.addEventListener('click', (e) => {
+        if (!inputBuscar.contains(e.target) && !lista.contains(e.target)) {
+            lista.style.display = 'none';
+        }
+    });
+
+    // Limitar selección a 7 exámenes
+    const checkboxes = document.querySelectorAll('.examen-checkbox');
+    const maxSeleccion = 7;
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const checkedCount = document.querySelectorAll('.examen-checkbox:checked').length;
+            if (checkedCount > maxSeleccion) {
+                this.checked = false;
+                showMensaje(mensajeExamenes, 'No puede seleccionar más de 7 exámenes.');
+            } else {
+                clearMensaje(mensajeExamenes);
+            }
             actualizarTotal();
         });
+    });
+
+    // Función para actualizar el total a pagar
+    function actualizarTotal() {
+        let total = 0;
+        checkboxes.forEach(chk => {
+            if (chk.checked) {
+                total += parseFloat(chk.getAttribute('data-precio')) || 0;
+            }
+        });
+        document.getElementById('totalPrecio').textContent = total.toFixed(2);
     }
 
-    // Mostrar mensaje emergente con scroll y autoclose
+    // Actualizar total al cargar la página (para mantener old inputs)
+    actualizarTotal();
+
+    // Validar que se haya seleccionado un paciente válido antes de enviar
+    const form = document.getElementById('formOrden');
+    form.addEventListener('submit', (e) => {
+        clearMensaje(mensajePaciente);
+        clearMensaje(mensajeExamenes);
+
+        if (!inputHiddenId.value) {
+            e.preventDefault();
+            showMensaje(mensajePaciente, 'Por favor selecciona un paciente válido de la lista.');
+            inputBuscar.focus();
+            return;
+        }
+
+        const seleccionados = document.querySelectorAll('.examen-checkbox:checked').length;
+        if (seleccionados === 0) {
+            e.preventDefault();
+            showMensaje(mensajeExamenes, 'Debe seleccionar al menos un examen para guardar.');
+            return;
+        }
+    });
+
+    // Botón Limpiar
+    document.getElementById('btnLimpiar').addEventListener('click', () => {
+        // Limpiar inputs
+        inputBuscar.value = '';
+        inputHiddenId.value = '';
+        dpNombres.textContent = '';
+        dpApellidos.textContent = '';
+        dpIdentidad.textContent = '';
+        dpGenero.textContent = '';
+        document.getElementById('datosPaciente').style.display = 'none';
+
+        // Limpiar fecha a hoy
+        document.getElementById('fecha').value = new Date().toISOString().slice(0, 10);
+
+        // Limpiar checkboxes
+        checkboxes.forEach(chk => chk.checked = false);
+
+        // Actualizar total
+        actualizarTotal();
+
+        // Limpiar mensajes
+        clearMensaje(mensajePaciente);
+        clearMensaje(mensajeExamenes);
+    });
+
+    // Funciones para mostrar y limpiar mensajes emergentes
     function showMensaje(mensajeElem, texto) {
         mensajeElem.textContent = texto;
-        mensajeElem.style.display = 'inline-block'; // para estilo tipo etiqueta
-
+        mensajeElem.style.display = 'inline-block';
         mensajeElem.scrollIntoView({behavior: 'smooth', block: 'center'});
 
         setTimeout(() => {
@@ -493,67 +574,7 @@ document.addEventListener('DOMContentLoaded', function() {
         mensajeElem.textContent = '';
         mensajeElem.style.display = 'none';
     }
-
-    // Control de límite de selección de rayos X
-    checkboxes.forEach(chk => {
-        chk.addEventListener('change', function() {
-            const seleccionados = [...checkboxes].filter(c => c.checked);
-            if (seleccionados.length > MAX_EXAMENES) {
-                // Deseleccionar último y mostrar mensaje
-                this.checked = false;
-                showMensaje(mensajeExamenes, `Solo se pueden seleccionar máximo ${MAX_EXAMENES} rayos X.`);
-            } else {
-                clearMensaje(mensajeExamenes);
-            }
-            actualizarTotal();
-        });
-    });
-
-    // Función para actualizar total a pagar
-    function actualizarTotal() {
-        let total = 0;
-        checkboxes.forEach(chk => {
-            if (chk.checked) {
-                const clave = chk.value;
-                if (preciosExamenes.hasOwnProperty(clave)) {
-                    total += preciosExamenes[clave];
-                }
-            }
-        });
-        totalAPagarDiv.textContent = `Total a pagar: $${total.toFixed(2)}`;
-    }
-
-    // Ejecutar al cargar para mostrar total si hay checkboxes preseleccionados
-    actualizarTotal();
-
-    // Validar formulario antes de enviar
-    formOrden.addEventListener('submit', function(e) {
-        clearMensaje(mensajePaciente);
-        clearMensaje(mensajeExamenes);
-
-        // Verificar paciente seleccionado
-        if (!selectPaciente.value) {
-            e.preventDefault();
-            showMensaje(mensajePaciente, 'Debe seleccionar un paciente antes de guardar.');
-            selectPaciente.focus();
-            return;
-        }
-
-        // Verificar al menos un examen seleccionado
-        const seleccionados = [...checkboxes].filter(c => c.checked);
-        if (seleccionados.length === 0) {
-            e.preventDefault();
-            showMensaje(mensajeExamenes, 'Debe seleccionar al menos un examen para guardar.');
-            mensajeExamenes.scrollIntoView({behavior: 'smooth', block: 'center'});
-            return;
-        }
-    });
-
-    // Para debug - puedes borrar
-    checkboxes.forEach(chk => {
-        console.log('Examen:', chk.value);
-    });
-
 });
 </script>
+
 @endsection

@@ -4,26 +4,22 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
-    public function up()
+class CreateRayosxOrderExamenesTable extends Migration
 {
-    if (!Schema::hasTable('rayosx_order_examenes')) {
+    public function up()
+    {
         Schema::create('rayosx_order_examenes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('rayosx_order_id')->constrained('rayosx_orders')->onDelete('cascade');
-            $table->string('examen_codigo'); // ejemplo: 'torax_pa'
-            $table->text('descripcion')->nullable();
-            $table->string('imagen_path')->nullable();
+            $table->unsignedBigInteger('rayosx_order_id');
+            $table->string('examen_codigo');
             $table->timestamps();
 
-            $table->unique(['rayosx_order_id', 'examen_codigo']);
+            $table->foreign('rayosx_order_id')->references('id')->on('rayosx_orders')->onDelete('cascade');
         });
     }
-}
-
 
     public function down()
     {
         Schema::dropIfExists('rayosx_order_examenes');
     }
-};
+}

@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('rayosx_orders', function (Blueprint $table) {
-            // Estado de la orden (Pendiente o Realizado)
-            $table->enum('estado', ['Pendiente', 'Realizado'])->default('Pendiente')->after('fecha');
+        Schema::table('examens', function (Blueprint $table) {
+            //
         });
     }
 
@@ -22,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('rayosx_orders', function (Blueprint $table) {
-            $table->dropColumn('estado');
+        Schema::table('examens', function (Blueprint $table) {
+            //
         });
     }
 };
