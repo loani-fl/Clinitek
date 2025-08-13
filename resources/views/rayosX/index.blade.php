@@ -125,7 +125,7 @@
         background-color: #28a745; /* verde */
     }
     .estado-pendiente {
-        background-color: #ffc107; /* amarillo */
+       background-color: yellow; /* amarillo */
     }
     /* Datos paciente estilo */
     #datosPaciente {
@@ -154,6 +154,42 @@
         flex: 1;
         user-select: none;
     }
+
+
+
+
+
+    .status-legend {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.status-legend span {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 20px;
+  font-weight: 500;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.status-circle {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+  border: 1px solid #ccc;
+}
+
+.status-pending {
+  background-color: yellow;
+}
+
+.status-done {
+  background-color: green;
+}
+
 </style>
 
 <div class="content-wrapper">
