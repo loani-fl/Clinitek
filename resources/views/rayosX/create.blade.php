@@ -240,29 +240,57 @@
         padding-left: 0.3rem;
     }
 
-    /* Contenedor para el filtro y botones arriba */
+    /* Contenedor para el filtro, botón y fecha en una fila */
     .top-controls {
-        max-width: 400px;
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 1.5rem;
         display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
         align-items: flex-end;
-        gap: 0.5rem;
-        position: relative;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
     }
-    .top-controls label {
-        flex-basis: 100%;
-        font-weight: 700;
-        color: #003366;
+
+    .top-controls > div,
+    .top-controls > a,
+    .top-controls > input[type="date"] {
+        flex-grow: 1;
+        min-width: 180px;
     }
-    .top-controls > * {
-        /* Para que input y botones queden alineados */
-        margin-bottom: 0;
+
+    /* Para el input de búsqueda con lista */
+    #buscarPaciente {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Ajustar la lista para que quede bajo el input */
+    #listaPacientes {
+        position: absolute;
+        z-index: 1150;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 0 0 0.4rem 0.4rem;
+        display: none;
+    }
+
+    @media (max-width: 767.98px) {
+        .top-controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .top-controls > div,
+        .top-controls > a,
+        .top-controls > input[type="date"] {
+            flex-grow: unset;
+            min-width: 100%;
+        }
     }
 </style>
 
-<div class="header">Crear orden de rayos x</div>
+
 
 <div class="content-wrapper">
     <div class="content-inner">
@@ -278,6 +306,8 @@
         </div>
         @endif
 
+            <h2 class="fw-bold mb-0 flex-grow-1 text-center">Listado de pacientes</h2>
+
         {{-- Mensajes emergentes personalizados --}}
         <div id="mensajePaciente" class="mensaje-flash"></div>
         <div id="mensajeExamenes" class="mensaje-flash"></div>
@@ -285,10 +315,10 @@
         <form action="{{ route('rayosx.store') }}" method="POST" id="formOrden" novalidate>
             @csrf
 
-            {{-- FILTRO PACIENTE Y BOTÓN REGISTRAR --}}
+            {{-- FILTRO PACIENTE, BOTÓN REGISTRAR, FECHA en misma fila --}}
             <div class="top-controls">
-                <div style="flex-grow:1; position: relative;">
-                    <label for="buscarPaciente">Buscar paciente <span class="text-danger">*</span></label>
+                <div style="position: relative;">
+                    <label for="buscarPaciente" class="form-label fw-bold">Buscar paciente <span class="text-danger">*</span></label>
                     <input 
                         type="text" 
                         id="buscarPaciente" 
@@ -300,7 +330,7 @@
                     >
                     <input type="hidden" name="paciente_id" id="paciente_id" value="{{ old('paciente_id') }}">
 
-                    <ul id="listaPacientes" class="list-group position-absolute w-100" style="max-height: 200px; overflow-y: auto; display:none;">
+                    <ul id="listaPacientes" class="list-group">
                         @foreach ($pacientes as $paciente)
                             <li 
                                 class="list-group-item list-group-item-action paciente-item" 
@@ -317,10 +347,14 @@
                     </ul>
                 </div>
 
-                <a href="{{ route('pacientes.create', ['returnUrl' => route('rayosx.create')]) }}" class="btn btn-primary" title="Registrar Paciente">
+                <a href="{{ route('pacientes.create', ['returnUrl' => route('rayosx.create')]) }}" class="btn btn-primary" title="Registrar Paciente" style="white-space: nowrap;">
                     <i class="bi bi-person-plus"></i> Registrar paciente
                 </a>
 
+                <div>
+                    <label for="fecha" class="form-label fw-bold">Fecha <span class="text-danger">*</span></label>
+                    <input type="date" id="fecha" name="fecha" class="form-control" value="{{ old('fecha', date('Y-m-d')) }}" required>
+                </div>
             </div>
 
             {{-- DATOS DEL PACIENTE CON ESTILO SUBRAYADO --}}
@@ -343,15 +377,8 @@
                 </div>
             </div>
 
-            {{-- FECHA --}}
-            <div class="mb-4" style="max-width: 200px; margin-left:auto; margin-right:auto;">
-                <label for="fecha" class="form-label fw-bold">Fecha <span class="text-danger">*</span></label>
-                <input type="date" id="fecha" name="fecha" class="form-control" value="{{ old('fecha', date('Y-m-d')) }}" required>
-            </div>
-
             {{-- SECCIONES Y EXÁMENES --}}
             <div class="mb-3">
-               
                 @foreach($secciones as $categoria => $examenes)
                     <div class="card">
                         <div class="card-header">

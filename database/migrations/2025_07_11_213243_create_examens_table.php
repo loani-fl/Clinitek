@@ -6,21 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-  public function up()
-{
-    Schema::table('examens', function (Blueprint $table) {
-        $table->decimal('precio', 10, 2)->default(0)->after('codigo');
-    });
-}
+    public function up()
+    {
+        Schema::create('examens', function (Blueprint $table) {
+            $table->id();
+            $table->string('codigo')->unique();       // Identificador único del examen
+            $table->decimal('precio', 10, 2)->default(0); // Precio del examen
+            $table->timestamps();
+        });
+    }
 
-public function down()
-{
-    Schema::table('examens', function (Blueprint $table) {
-        $table->dropColumn('precio');
-    });
-}
-
+    public function down()
+    {
+        Schema::dropIfExists('examens');
+    }
 };
