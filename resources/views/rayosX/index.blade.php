@@ -10,14 +10,6 @@
         padding: 0;
         overflow-x: hidden;
     }
-    .header {
-        background-color: #007BFF;
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        z-index: 1100;
-        padding: 0.5rem 1rem;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-    }
     .content-wrapper {
         margin-top: 50px;
         margin-left: auto;
@@ -62,18 +54,19 @@
         margin-bottom: 1rem;
         text-align: center;
         position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
     .card-header h2 {
         font-size: 1.8rem;
         font-weight: bold;
         color: #003366;
-        margin: 0;
+        margin: 0 auto;
+        flex-grow: 1;
+        text-align: center;
     }
     .btn-inicio {
-        position: absolute;
-        top: 50%;
-        right: 1rem;
-        transform: translateY(-50%);
         font-size: 0.9rem;
     }
     .d-flex.filter-container {
@@ -87,11 +80,6 @@
         font-size: 0.85rem;
         max-width: 300px;
         flex-grow: 1;
-    }
-    .filtro-fecha {
-        font-size: 0.85rem;
-        max-width: 150px;
-        /* flex-grow removido para que no se estiren */
     }
     .table {
         font-size: 0.85rem;
@@ -124,16 +112,58 @@
         display: flex;
         justify-content: center;
     }
+    /* Estado círculo */
+    .estado-circle {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    .estado-realizado {
+        background-color: #28a745; /* verde */
+    }
+    .estado-pendiente {
+        background-color: #ffc107; /* amarillo */
+    }
+    /* Datos paciente estilo */
+    #datosPaciente {
+        margin-top: 1.5rem;
+        background: #f8f9fa;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 0.95rem;
+        color: #444;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+    }
+    .datos-paciente-row {
+        display: flex;
+        margin-bottom: 0.6rem;
+    }
+    .datos-paciente-label {
+        flex: 0 0 100px;
+        font-weight: 700;
+        color: #007bff;
+    }
+    .underline-field {
+        border-bottom: 1px dashed #333;
+        flex: 1;
+        user-select: none;
+    }
 </style>
 
 <div class="content-wrapper">
     <div class="card custom-card shadow-sm">
-        <div class="card-header d-flex align-items-center justify-content-between">
-            <a href="{{ route('inicio') }}" class="btn btn-light me-3">
+        <div class="card-header">
+            <a href="{{ route('inicio') }}" class="btn btn-light btn-inicio me-3">
                 <i class="bi bi-house-door"></i> Inicio
             </a>
 
-            <h2 class="fw-bold mb-0 flex-grow-1 text-center">Órdenes de Rayos X</h2>
+            <h2>Órdenes de rayos x</h2>
 
             <a href="{{ route('rayosx.create') }}" class="btn btn-primary ms-3">
                 <i class="bi bi-plus-circle"></i> Registrar Orden
@@ -141,9 +171,14 @@
         </div>
 
         <div class="d-flex filter-container">
-            <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar paciente...">
-            <input type="date" id="fechaInicio" class="form-control filtro-fecha" placeholder="Desde">
-            <input type="date" id="fechaFin" class="form-control filtro-fecha" placeholder="Hasta">
+            <input
+                type="text"
+                id="filtroBusqueda"
+                class="form-control filtro-input"
+                placeholder="Buscar paciente..."
+                autocomplete="off"
+                value="{{ request('search') }}"
+            >
         </div>
 
         <div id="tabla-container" class="table-responsive">
@@ -157,6 +192,22 @@
                 {{ $ordenes->onEachSide(1)->links('pagination::bootstrap-5') }}
             @endif
         </div>
+
+        {{-- Mostrar datos del paciente si hay old --}}
+        <div id="datosPaciente" style="display: {{ old('paciente_id') ? 'block' : 'none' }};">
+            <div class="datos-paciente-row">
+                <div class="datos-paciente-label">Nombres:</div>
+                <div id="dp-nombres" class="underline-field">{{ old('nombres') }}</div>
+            </div>
+            <div class="datos-paciente-row">
+                <div class="datos-paciente-label">Apellidos:</div>
+                <div id="dp-apellidos" class="underline-field">{{ old('apellidos') }}</div>
+            </div>
+            <div class="datos-paciente-row">
+                <div class="datos-paciente-label">Género:</div>
+                <div id="dp-genero" class="underline-field">{{ old('genero') }}</div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -164,59 +215,29 @@
 
 <script>
 $(document).ready(function () {
-    const hoy = new Date();
-    const dosMesesAtras = new Date();
-    dosMesesAtras.setMonth(hoy.getMonth() - 2);
-
-    const formatoFecha = fecha => fecha.toISOString().split('T')[0];
-
-    const minFecha = formatoFecha(dosMesesAtras);
-    const maxFecha = formatoFecha(hoy);
-
-    $('#fechaInicio').attr('min', minFecha);
-    $('#fechaInicio').attr('max', maxFecha);
-    $('#fechaFin').attr('min', minFecha);
-    $('#fechaFin').attr('max', maxFecha);
-
-    // Inicializar con rango completo (dos meses atrás hasta hoy)
-    $('#fechaInicio').val(minFecha);
-    $('#fechaFin').val(maxFecha);
-
-    function actualizarMensaje(total, all, query, fechaInicio, fechaFin) {
-        const fechasDefault = 
-            (fechaInicio === '' || fechaInicio === minFecha) && 
-            (fechaFin === '' || fechaFin === maxFecha);
-        if (query === '' && fechasDefault) {
+    function actualizarMensaje(total, all, query) {
+        if (query === '') {
             $('#mensajeResultados').html('');
         } else if (total === 0) {
-            $('#mensajeResultados').html(`No se encontraron resultados para "<strong>${query}</strong>" en las fechas seleccionadas.`);
+            $('#mensajeResultados').html(`No se encontraron resultados para "<strong>${query}</strong>".`);
         } else {
             $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
         }
     }
 
-    function cargarDatos(page = 1, query = '', fechaInicio = '', fechaFin = '') {
-        // Asegurar que fechas no sean undefined o null
-        fechaInicio = fechaInicio || '';
-        fechaFin = fechaFin || '';
-
+    function cargarDatos(page = 1, query = '') {
         $.ajax({
             url: "{{ route('rayosx.index') }}",
             type: 'GET',
-            data: {
-                page: page,
-                search: query,
-                fechaInicio: fechaInicio,
-                fechaFin: fechaFin
-            },
+            data: { page, search: query },
             success: function(data) {
                 $('#tabla-container').html(data.html);
                 $('#paginacion-container').html(data.pagination);
-                actualizarMensaje(data.total, data.all, query, fechaInicio, fechaFin);
+                actualizarMensaje(data.total, data.all, query);
             },
             error: function(xhr) {
                 let msg = 'Error al cargar los datos.';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
+                if(xhr.responseJSON && xhr.responseJSON.message) {
                     msg += ' ' + xhr.responseJSON.message;
                 }
                 $('#mensajeResultados').html(msg);
@@ -224,39 +245,27 @@ $(document).ready(function () {
         });
     }
 
-    // Carga inicial con rango de fechas completo
-    cargarDatos(1, '', minFecha, maxFecha);
+    // Carga inicial sin filtro o con filtro de request
+    cargarDatos(1, $('#filtroBusqueda').val());
 
-    // Manejo de filtro con debounce
-    let typingTimer;
-    function aplicarFiltros() {
-        clearTimeout(typingTimer);
-        const query = $('#filtroBusqueda').val();
-        const fechaInicio = $('#fechaInicio').val();
-        const fechaFin = $('#fechaFin').val();
-        typingTimer = setTimeout(() => cargarDatos(1, query, fechaInicio, fechaFin), 300);
-    }
-
-    $('#filtroBusqueda').on('keyup', aplicarFiltros);
-    $('#fechaInicio').on('change', aplicarFiltros);
-    $('#fechaFin').on('change', aplicarFiltros);
+    // Filtrar al escribir
+    $('#filtroBusqueda').on('keyup', function () {
+        const query = $(this).val();
+        cargarDatos(1, query);
+    });
 
     // Paginación dinámica
-    $(document).on('click', '.pagination a', function (e) {
+    $(document).on('click', '.pagination a', function(e) {
         e.preventDefault();
         const url = $(this).attr('href');
         const params = new URLSearchParams(url.split('?')[1]);
         const page = params.get('page') || 1;
         const query = $('#filtroBusqueda').val();
-        const fechaInicio = $('#fechaInicio').val();
-        const fechaFin = $('#fechaFin').val();
-        cargarDatos(page, query, fechaInicio, fechaFin);
+        cargarDatos(page, query);
 
         // Actualizar URL sin recargar
         let newUrl = url.split('?')[0] + '?page=' + page;
         if (query) newUrl += '&search=' + encodeURIComponent(query);
-        if (fechaInicio) newUrl += '&fechaInicio=' + encodeURIComponent(fechaInicio);
-        if (fechaFin) newUrl += '&fechaFin=' + encodeURIComponent(fechaFin);
         window.history.pushState("", "", newUrl);
     });
 });

@@ -54,48 +54,37 @@
         user-select: none;
     }
 
-    .patient-data-grid {
-        margin-bottom: 2rem;
-    }
-
-    .patient-data-grid strong {
-        color: rgb(3, 12, 22);
-        font-weight: 600;
-    }
-
-    .underline-field {
-        border-bottom: 1px solid #000;
-        min-height: 1.4rem;
-        line-height: 1.4rem;
-        padding-left: 6px;
-        padding-right: 6px;
-        font-size: 1rem;
-        flex: 1;
+    h4 {
+        color: #003366;
+        font-weight: 700;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
         user-select: none;
-        color: #222;
     }
 
-    .patient-data-grid .row > div {
+    /* Flex container para Nombre e Identidad en línea */
+    .datos-paciente-flex {
         display: flex;
-        align-items: center;
-        margin-bottom: 0.8rem;
+        gap: 2rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+        padding-left: 0;
+        list-style: none;
     }
 
-    label {
-        font-weight: 600;
+    .datos-paciente-flex li {
+        flex: 1 1 200px;
+        padding: 0.3rem 0;
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        gap: 0.5rem;
         color: #222;
+        font-weight: 600;
     }
 
-    .form-control, .form-select {
-        border-radius: 0.375rem;
-        box-shadow: none;
-        border: 1px solid #ced4da;
-        font-size: 1rem;
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: #007BFF;
-        box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 0.25);
+    .datos-paciente-flex li strong {
+        width: 80px;
+        color: #004080;
     }
 
     .examen-card {
@@ -105,7 +94,7 @@
         border-bottom: 3px solid #007BFF;
     }
 
-    /* Quitamos la línea al último examen para que no quede extra */
+    /* Quitamos la línea al último examen */
     .examen-card:last-child {
         border-bottom: none;
         margin-bottom: 0;
@@ -123,12 +112,6 @@
         justify-content: space-between;
     }
 
-    .examen-nombre button {
-        font-size: 0.9rem;
-        padding: 0.25rem 0.75rem;
-        min-width: auto;
-    }
-
     .examen-content {
         display: flex;
         flex-direction: column;
@@ -136,22 +119,35 @@
         align-items: stretch;
     }
 
-    .image-description-block {
+    .input-file-container {
+        flex: 0 0 100%;
         display: flex;
-        gap: 1rem;
-        margin-bottom: 1rem;
-        align-items: flex-start;
+        flex-direction: column;
+        margin-top: 0.8rem;
     }
 
-    .input-file-container {
-        flex: 0 0 280px;
+    .textarea-container {
+        flex-grow: 1;
         display: flex;
         flex-direction: column;
     }
 
-    .preview-container {
-        flex: 0 0 160px;
-        text-align: center;
+    .textarea-container textarea {
+        font-size: 0.9rem;
+        color: rgba(34, 34, 34, 0.6);
+        min-height: 60px;
+        max-height: 100px;
+        resize: vertical;
+        border-radius: 0.375rem;
+        border: 1px solid #ced4da;
+        padding: 0.375rem 0.75rem;
+        transition: border-color 0.2s ease-in-out;
+    }
+
+    .textarea-container textarea:focus {
+        border-color: #007BFF;
+        box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 0.25);
+        outline: none;
     }
 
     .img-preview {
@@ -163,23 +159,12 @@
         border: 1px solid #ddd;
     }
 
-    .textarea-container {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
+    .row > .col-md-3 {
+        margin-bottom: 1rem;
     }
 
-    textarea.form-control {
-        font-size: 0.9rem;
-        color: rgba(34, 34, 34, 0.6);
-        min-height: 60px;
-        max-height: 100px;
-        resize: vertical;
-    }
-
-    .form-control-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
+    .form-check {
+        margin-top: 0.5rem;
     }
 
     .btn-group {
@@ -198,23 +183,6 @@
         font-size: 0.95rem;
     }
 
-    /* Estilo mensaje error validación dinámico */
-    #form-error-message {
-        color: #b22222; /* rojo quemado */
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-        padding: 0.75rem 1rem;
-        border: 2px solid #b22222;
-        border-radius: 0.5rem;
-        background-color: #ffe6e6;
-        opacity: 0;
-        transition: opacity 0.4s ease-in-out;
-        user-select: none;
-    }
-    #form-error-message.show {
-        opacity: 1;
-    }
-
     @media (max-width: 575px) {
         .custom-card {
             padding: 1rem 1rem;
@@ -224,7 +192,6 @@
             flex-direction: column !important;
         }
         .input-file-container,
-        .preview-container,
         .textarea-container {
             min-width: 100% !important;
         }
@@ -236,297 +203,149 @@
 </style>
 
 <div class="custom-card">
-
-    <h2 class="section-title text-center mb-4">Área de radiología</h2>
+    <h2 class="section-title">Análisis de drden rayos x</h2>
 
     {{-- Datos del paciente --}}
-    @php
-        $paciente = $orden->pacienteClinica ?? $orden->pacienteRayosX;
-    @endphp
-    <div class="section-title">Datos del Paciente</div>
-    <div class="patient-data-grid">
-        <div class="row">
-            <div class="col-md-8 d-flex align-items-center">
-                <strong class="me-2">Nombres - Apellidos:</strong>
-                <div class="underline-field no-select">
-                    {{ $paciente->nombre ?? 'N/A' }} {{ $paciente->apellidos ?? '' }}
-                </div>
-            </div>
-            <div class="col-md-4 d-flex align-items-center">
-                <strong class="me-2">Fecha:</strong>
-                <div class="underline-field no-select">
-                    {{ $orden->fecha ? \Carbon\Carbon::parse($orden->fecha)->format('d/m/Y') : 'N/A' }}
-                </div>
-            </div>
-        </div>
+    <h4>Datos del paciente</h4>
+   <ul class="datos-paciente-flex">
+    <li><strong>Nombre:</strong> {{ $orden->paciente->nombre ?? $orden->nombres ?? 'N/A' }}</li>
+    <li><strong>Apellidos:</strong> {{ $orden->paciente->apellidos ?? $orden->apellidos ?? 'N/A' }}</li>
+    <li><strong>Identidad:</strong> {{ $orden->paciente->identidad ?? $orden->identidad ?? 'N/A' }}</li>
+    <li><strong>Género:</strong> {{ $orden->paciente->genero ?? $orden->genero ?? 'N/A' }}</li>
+</ul>
 
-        <div class="row">
-            <div class="col-md-4 d-flex align-items-center">
-                <strong class="me-2">Identidad:</strong>
-                <div class="underline-field no-select">
-                    {{ $paciente->identidad ?? 'N/A' }}
-                </div>
-            </div>
-            <div class="col-md-4 d-flex align-items-center">
-                <strong class="me-2">Edad:</strong>
-                <div class="underline-field no-select">
-                    @if(!empty($paciente->fecha_nacimiento))
-                        {{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->age }} años
-                    @else
-                        N/A
-                    @endif
-                </div>
-            </div>
-            <div class="col-md-4 d-flex align-items-center">
-                <strong class="me-2">Teléfono:</strong>
-                <div class="underline-field no-select">
-                    {{ $paciente->telefono ?? 'N/A' }}
-                </div>
-            </div>
-        </div>
-    </div>
+    <hr>
 
-    {{-- Mensaje error validación (inicialmente oculto) --}}
-    <div id="form-error-message" role="alert" aria-live="assertive" aria-atomic="true"></div>
-
-    {{-- Formulario análisis --}}
-    <form method="POST" action="{{ route('rayosx.guardarAnalisis', $orden->id) }}" enctype="multipart/form-data">
+    {{-- Formulario --}}
+    <form action="{{ route('rayosx.storeAnalisis', $orden->id) }}" method="POST" enctype="multipart/form-data" id="form-analisis">
         @csrf
-        @method('PUT')
 
-        {{-- Médico Analista --}}
-        <div class="patient-data-grid mb-4">
-            <div class="row">
-                <div class="col-md-3 d-flex align-items-center">
-                    <strong>Médico analista:</strong>
-                </div>
-                <div class="col-md-9">
-                    <select
-                        name="medico_analista_id"
-                        class="form-select form-control-sm @error('medico_analista_id') is-invalid @enderror"
-                        style="max-width: 280px;"
-                        required
-                    >
-                        <option value="">Seleccione médico analista</option>
-                        @foreach($medicosRadiologos as $medico)
-                            <option value="{{ $medico->id }}"
-                                {{ old('medico_analista_id', $orden->medico_analista_id ?? '') == $medico->id ? 'selected' : '' }}>
-                                {{ $medico->nombre }} {{ $medico->apellidos }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('medico_analista_id')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
+        <div class="mb-3">
+            <label for="medico_analista_id" class="form-label"><strong>Médico analista:</strong></label>
+            <select name="medico_analista_id" id="medico_analista_id" class="form-select @error('medico_analista_id') is-invalid @enderror" required>
+                <option value="">Seleccionar Médico Analista (Radiológos)</option>
+                @foreach ($medicosRadiologos as $medico)
+                    <option value="{{ $medico->id }}"
+                        {{ (old('medico_analista_id', $orden->medico_analista_id ?? '') == $medico->id) ? 'selected' : '' }}>
+                        {{ $medico->nombre }} {{ $medico->apellidos }}
+                    </option>
+                @endforeach
+            </select>
+            @error('medico_analista_id')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
 
-        {{-- Exámenes --}}
-        <div class="section-title">Rayos x solicitados</div>
-
-        @foreach($orden->examenes as $examen)
+        <h4>Exámenes realizados</h4>
+        @forelse ($orden->examenes as $examen)
             <div class="examen-card">
-
                 <div class="examen-nombre">
-                    <span>{{ $examenes[$examen->examen_codigo] ?? ucfirst(str_replace('_', ' ', $examen->examen_codigo)) }}</span>
-                    <button type="button" class="btn btn-sm btn-success" onclick="addImageBlock({{ $examen->id }})">
-                        <i class="bi bi-plus-circle"></i> Agregar imagen
-                    </button>
+                    {{ $examenesNombres[$examen->examen_codigo] ?? $examen->examen_codigo }}
                 </div>
 
-                <div class="examen-content" id="examen-content-{{ $examen->id }}">
-
-                    <div class="image-description-block" data-block-index="0">
-                        <div class="input-file-container">
-                            <label for="imagen_{{ $examen->id }}_0" class="form-label mb-1">Subir imagen del examen (máx. 5MB):</label>
-                            <input
-                                type="file"
-                                name="examenes[{{ $examen->id }}][imagenes][]"
-                                id="imagen_{{ $examen->id }}_0"
-                                class="form-control form-control-sm @error('examenes.' . $examen->id . '.imagenes') is-invalid @enderror"
-                                accept="image/*"
-                                onchange="previewImage(event, '{{ $examen->id }}_0')"
-                            >
+                <div class="examen-content">
+                    {{-- Imágenes existentes con opción de eliminar --}}
+                    @if($examen->imagenes && $examen->imagenes->count() > 0)
+                        <div class="row">
+                            @foreach ($examen->imagenes as $imagen)
+                                <div class="col-md-3 mb-2 text-center">
+                                    <img src="{{ asset('storage/' . $imagen->imagen_ruta) }}" alt="Imagen examen" class="img-preview" />
+                                    <div class="form-check mt-1">
+                                        <input type="checkbox" name="eliminar_imagenes[]" value="{{ $imagen->id }}" class="form-check-input" id="eliminar_img_{{ $imagen->id }}">
+                                        <label for="eliminar_img_{{ $imagen->id }}" class="form-check-label">Eliminar</label>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
+                    @endif
 
-                        <div class="preview-container">
-                            @if($examen->imagen_path)
-                                <img
-                                    id="preview_{{ $examen->id }}_0"
-                                    src="{{ asset('storage/' . $examen->imagen_path) }}"
-                                    alt="Imagen de examen {{ $examenes[$examen->examen_codigo] ?? $examen->examen_codigo }}"
-                                    class="img-preview"
-                                >
-                            @else
-                                <img
-                                    id="preview_{{ $examen->id }}_0"
-                                    src="#"
-                                    alt="Vista previa de imagen"
-                                    class="img-preview"
-                                    style="display:none;"
-                                >
-                            @endif
-                        </div>
-
-                        <div class="textarea-container">
-                            <label for="descripcion_{{ $examen->id }}_0" class="form-label mb-1">Descripción:</label>
-                            <textarea
-                                name="examenes[{{ $examen->id }}][descripciones][]"
-                                id="descripcion_{{ $examen->id }}_0"
-                                class="form-control form-control-sm @error('examenes.' . $examen->id . '.descripciones') is-invalid @enderror"
-                                rows="3"
-                            >{{ old("examenes.$examen->id.descripciones.0", $examen->descripcion ?? '') }}</textarea>
-                        </div>
+                    {{-- Subida de nuevas imágenes --}}
+                    <div class="input-file-container">
+                        <label>Agregar imágenes:</label>
+                        <input type="file" name="imagenes[{{ $examen->id }}][]" class="form-control form-control-sm" accept="image/*" multiple>
                     </div>
 
+                    {{-- Campo descripción --}}
+                    <div class="textarea-container mt-2">
+                        <label>Descripción:</label>
+                        <textarea name="descripciones[{{ $examen->id }}]" class="form-control" rows="3">{{ old("descripciones.{$examen->id}", $examen->descripcion) }}</textarea>
+                    </div>
                 </div>
-
             </div>
-        @endforeach
+        @empty
+            <p>No hay exámenes registrados para esta orden.</p>
+        @endforelse
 
-        <div class="btn-group">
-            <button type="submit" class="btn btn-primary btn-sm">
-                <i class="bi bi-save"></i> Guardar Análisis
-            </button>
-
+        {{-- Botones --}}
+        <div class="btn-group mt-4">
             <a href="{{ route('rayosx.index') }}" class="btn btn-secondary btn-sm">
                 <i class="bi bi-arrow-left-circle"></i> Regresar
             </a>
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="bi bi-save"></i> Guardar cambios
+            </button>
         </div>
     </form>
 </div>
 
 <script>
-    function previewImage(event, examenIdIndex) {
-        const input = event.target;
-        const preview = document.getElementById('preview_' + examenIdIndex);
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-            }
-            reader.readAsDataURL(input.files[0]);
-        } else {
-            preview.src = '#';
-            preview.style.display = 'none';
-        }
-    }
-
-    function addImageBlock(examenId) {
-        const container = document.getElementById('examen-content-' + examenId);
-        if (!container) return;
-
-        const blocks = container.querySelectorAll('.image-description-block');
-        const index = blocks.length;
-
-        const blockDiv = document.createElement('div');
-        blockDiv.className = 'image-description-block';
-        blockDiv.setAttribute('data-block-index', index);
-
-        const inputFileDiv = document.createElement('div');
-        inputFileDiv.className = 'input-file-container';
-
-        const labelFile = document.createElement('label');
-        labelFile.className = 'form-label mb-1';
-        labelFile.setAttribute('for', `imagen_${examenId}_${index}`);
-        labelFile.textContent = 'Subir imagen del examen (máx. 5MB):';
-
-        const inputFile = document.createElement('input');
-        inputFile.type = 'file';
-        inputFile.name = `examenes[${examenId}][imagenes][]`;
-        inputFile.id = `imagen_${examenId}_${index}`;
-        inputFile.className = 'form-control form-control-sm';
-        inputFile.accept = 'image/*';
-        inputFile.setAttribute('onchange', `previewImage(event, '${examenId}_${index}')`);
-
-        inputFileDiv.appendChild(labelFile);
-        inputFileDiv.appendChild(inputFile);
-
-        const previewDiv = document.createElement('div');
-        previewDiv.className = 'preview-container';
-
-        const imgPreview = document.createElement('img');
-        imgPreview.id = `preview_${examenId}_${index}`;
-        imgPreview.className = 'img-preview';
-        imgPreview.style.display = 'none';
-        imgPreview.alt = 'Vista previa de imagen';
-
-        previewDiv.appendChild(imgPreview);
-
-        const textareaDiv = document.createElement('div');
-        textareaDiv.className = 'textarea-container';
-
-        const labelDesc = document.createElement('label');
-        labelDesc.className = 'form-label mb-1';
-        labelDesc.setAttribute('for', `descripcion_${examenId}_${index}`);
-        labelDesc.textContent = 'Descripción:';
-
-        const textarea = document.createElement('textarea');
-        textarea.name = `examenes[${examenId}][descripciones][]`;
-        textarea.id = `descripcion_${examenId}_${index}`;
-        textarea.className = 'form-control form-control-sm';
-        textarea.rows = 3;
-
-        textareaDiv.appendChild(labelDesc);
-        textareaDiv.appendChild(textarea);
-
-        blockDiv.appendChild(inputFileDiv);
-        blockDiv.appendChild(previewDiv);
-        blockDiv.appendChild(textareaDiv);
-
-        container.appendChild(blockDiv);
-    }
-
-    // Función que permite solo caracteres válidos en la descripción
-    function validarDescripcion(textarea) {
-        // Caracteres permitidos: letras (mayúsculas, minúsculas), números, espacios, tildes, ñ, ü, signos básicos: , . - ( ) :
-        const regexPermitidos = /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ ,.\-():]*$/;
-
-        if (!regexPermitidos.test(textarea.value)) {
-            // Quitar los caracteres no permitidos en tiempo real
-            textarea.value = textarea.value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ ,.\-():]/g, '');
-        }
-    }
-
-    // Aplicar validación a todos los textarea de descripción existentes y futuros (delegación)
-    document.addEventListener('input', function(e) {
-        if (e.target && e.target.tagName.toLowerCase() === 'textarea' && e.target.id.startsWith('descripcion_')) {
-            validarDescripcion(e.target);
-        }
-    });
-
-    document.querySelector('form').addEventListener('submit', function(event) {
+    document.getElementById('form-analisis').addEventListener('submit', function(event) {
         const form = this;
         const examenes = form.querySelectorAll('.examen-card');
-        const errorDiv = document.getElementById('form-error-message');
+        const errorId = 'form-error-message';
+        let errorDiv = document.getElementById(errorId);
 
-        let valido = false; // Indica si hay al menos 1 imagen + descripción válida
+        if (!errorDiv) {
+            errorDiv = document.createElement('div');
+            errorDiv.id = errorId;
+            errorDiv.style.color = '#b22222';
+            errorDiv.style.fontWeight = '700';
+            errorDiv.style.marginBottom = '1rem';
+            errorDiv.style.padding = '0.75rem 1rem';
+            errorDiv.style.border = '2px solid #b22222';
+            errorDiv.style.borderRadius = '0.5rem';
+            errorDiv.style.backgroundColor = '#ffe6e6';
+            errorDiv.style.userSelect = 'none';
+            form.prepend(errorDiv);
+        }
+        errorDiv.textContent = '';
+        errorDiv.style.display = 'none';
+
+        let todosValidos = true;
 
         examenes.forEach(examenCard => {
-            // Buscar todos los bloques de imagen y descripción dentro de este examen
-            const bloques = examenCard.querySelectorAll('.image-description-block');
-            for (const bloque of bloques) {
-                const inputFile = bloque.querySelector('input[type="file"]');
-                const textarea = bloque.querySelector('textarea');
+            const inputFile = examenCard.querySelector('input[type="file"]');
+            const textarea = examenCard.querySelector('textarea');
 
-                // Comprobar si hay archivo seleccionado y texto no vacío (tras trim)
-                if (inputFile && inputFile.files.length > 0 && textarea && textarea.value.trim() !== '') {
-                    valido = true;
-                    break; // Ya encontramos un bloque válido en este examen
+            // Verificamos imágenes seleccionadas y descripción no vacía
+            const tieneImagen = inputFile && inputFile.files.length > 0;
+            const descripcionValida = textarea && textarea.value.trim() !== '';
+
+            // Además puede haber imágenes ya existentes que no se eliminaron
+            const imagenesPrevias = examenCard.querySelectorAll('img.img-preview');
+            let imagenesPreviasNoEliminadas = false;
+            if (imagenesPrevias.length > 0) {
+                let eliminados = 0;
+                const checkboxesEliminar = examenCard.querySelectorAll('input[type="checkbox"][name="eliminar_imagenes[]"]');
+                checkboxesEliminar.forEach(cb => {
+                    if (cb.checked) eliminados++;
+                });
+                if ((imagenesPrevias.length - eliminados) > 0) {
+                    imagenesPreviasNoEliminadas = true;
                 }
+            }
+
+            // Validamos que haya al menos una imagen (nueva o previa no eliminada) y descripción
+            if (!((tieneImagen || imagenesPreviasNoEliminadas) && descripcionValida)) {
+                todosValidos = false;
             }
         });
 
-        if (!valido) {
-            event.preventDefault(); // Detener envío
-            errorDiv.textContent = 'Debe agregar al menos una imagen y su descripción para poder guardar el análisis.';
-            errorDiv.classList.add('show');
+        if (!todosValidos) {
+            event.preventDefault();
+            errorDiv.textContent = 'Cada examen debe tener al menos una imagen (existente o nueva) y una descripción no vacía para guardar.';
+            errorDiv.style.display = 'block';
             errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-            errorDiv.textContent = '';
-            errorDiv.classList.remove('show');
         }
     });
 </script>

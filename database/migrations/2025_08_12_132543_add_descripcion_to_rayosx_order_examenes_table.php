@@ -11,15 +11,15 @@ return new class extends Migration
      */
   public function up()
 {
-    Schema::table('examens', function (Blueprint $table) {
-        $table->decimal('precio', 10, 2)->default(0)->after('codigo');
+    Schema::table('rayosx_order_examenes', function (Blueprint $table) {
+        $table->text('descripcion')->nullable()->after('examen_codigo');
     });
 }
 
 public function down()
 {
-    Schema::table('examens', function (Blueprint $table) {
-        $table->dropColumn('precio');
+    Schema::table('rayosx_order_examenes', function (Blueprint $table) {
+        $table->dropColumn('descripcion');
     });
 }
 

@@ -2,35 +2,40 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class RayosxOrder extends Model
 {
     use HasFactory;
 
-    protected $table = 'rayosx_order_examenes';
-
     protected $fillable = [
-        'rayosx_order_id',
-        'examen',
-        'examen_codigo',
-        'descripcion',
-        'imagen_path',
+        'paciente_id',
+        'fecha',
+        'edad',
+        'identidad',
+        'nombres',
+        'apellidos',
+        'datos_clinicos',
+        'estado',
+        'total_precio',
     ];
 
-    public function orden()
-    {
-        return $this->belongsTo(RayosxOrder::class, 'rayosx_order_id');
-    }
+   
+ public function paciente()
+{
+    return $this->belongsTo(Paciente::class);
+}
 
-    public function imagenes()
-    {
-        return $this->hasMany(RayosxExamenImagen::class, 'rayosx_order_examen_id');
-    }
 
-    public function paciente()
+
+    public function examenes()
     {
-        return $this->belongsTo(Paciente::class);
+        return $this->hasMany(RayosxOrderExamen::class);
     }
+  public function medicoAnalista()
+    {
+        return $this->belongsTo(Medico::class, 'medico_analista_id');
+    }
+    
 }
