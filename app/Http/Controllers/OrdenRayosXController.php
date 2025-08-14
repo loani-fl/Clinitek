@@ -461,10 +461,8 @@ public function store(Request $request)
 
         return view('rayosx.show', compact('orden', 'examenesNombres'));
     }
-
 public function guardarAnalisis(Request $request, RayosxOrder $orden)
 {
-    // Validación básica inicial
     $request->validate([
         'medico_analista_id' => 'required|exists:medicos,id',
         'descripciones' => 'required|array',
@@ -481,31 +479,27 @@ public function guardarAnalisis(Request $request, RayosxOrder $orden)
 
     // Validar mínimo 1 y máximo 3 imágenes nuevas por examen
     if ($request->has('imagenes')) {
-        foreach ($request->imagenes as $examenCodigo => $imagenesArray) {
+        foreach ($request->imagenes as $examenId => $imagenesArray) {
             $count = is_array($imagenesArray) ? count($imagenesArray) : 0;
             if ($count < 1) {
-                return back()->withErrors(['imagenes' => "El examen '{$examenCodigo}' debe tener al menos 1 imagen nueva."])->withInput();
+                return back()->withErrors(['imagenes' => "El examen con ID '{$examenId}' debe tener al menos 1 imagen nueva."])->withInput();
             }
             if ($count > 3) {
-                return back()->withErrors(['imagenes' => "El examen '{$examenCodigo}' no puede tener más de 3 imágenes nuevas."])->withInput();
+                return back()->withErrors(['imagenes' => "El examen con ID '{$examenId}' no puede tener más de 3 imágenes nuevas."])->withInput();
             }
         }
     } else {
-        // Si no se suben imágenes nuevas, opcional: forzar al menos una?
         return back()->withErrors(['imagenes' => "Debe subir al menos una imagen para cada examen."])->withInput();
     }
 
-    // Guardar médico analista asignado
+    // Guardar médico analista y estado
     $orden->medico_analista_id = $request->medico_analista_id;
-
-    // Cambiar estado a 'realizado' al guardar el análisis
     $orden->estado = 'realizado';
-
     $orden->save();
 
-    // Guardar descripciones y subir imágenes examen por examen
-    foreach ($request->descripciones as $examenCodigo => $descripcion) {
-        $examen = $orden->examenes()->where('examen_codigo', $examenCodigo)->first();
+    // Guardar descripciones e imágenes
+    foreach ($request->descripciones as $examenId => $descripcion) {
+        $examen = $orden->examenes()->where('id', $examenId)->first();
         if (!$examen) {
             continue;
         }
@@ -513,13 +507,14 @@ public function guardarAnalisis(Request $request, RayosxOrder $orden)
         $examen->descripcion = $descripcion;
         $examen->save();
 
-        if ($request->hasFile("imagenes.$examenCodigo")) {
-            foreach ($request->file("imagenes.$examenCodigo") as $imagen) {
+        if ($request->hasFile("imagenes.$examenId")) {
+            foreach ($request->file("imagenes.$examenId") as $imagen) {
                 $ruta = $imagen->store('rayosx/imagenes', 'public');
 
                 RayosxOrderExamenImagen::create([
                     'rayosx_order_examen_id' => $examen->id,
-                    'ruta' => $ruta,
+                 'imagen_ruta' => $ruta,
+
                 ]);
             }
         }
@@ -528,6 +523,7 @@ public function guardarAnalisis(Request $request, RayosxOrder $orden)
     return redirect()->route('rayosx.show', $orden->id)
         ->with('success', 'Análisis guardado correctamente y estado actualizado a realizado.');
 }
+
 // Mostrar lista paginada de órdenes con paciente
  
 public function index(Request $request)
