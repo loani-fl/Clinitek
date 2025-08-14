@@ -7,18 +7,39 @@ use Illuminate\Database\Eloquent\Model;
 
 class Examen extends Model
 {
+    use HasFactory;
 
-    protected $table = 'examens'; // <- Aquí pones el nombre correcto
-    protected $fillable = ['paciente_id', 'consulta_id', 'nombre'];
+    protected $table = 'examens'; // Nombre de la tabla
+    protected $fillable = [
+        'paciente_id',
+        'consulta_id',
+        'nombre',
+        'precio',
+        'codigo'
+    ];
 
-
-    public function paciente() {
+    /**
+     * Relación con el paciente
+     */
+    public function paciente() 
+    {
         return $this->belongsTo(Paciente::class);
     }
 
-    public function consulta() {
+    /**
+     * Relación con la consulta
+     */
+    public function consulta() 
+    {
         return $this->belongsTo(Consulta::class);
     }
 
+    /**
+     * Relación con las imágenes del examen
+     */
+    public function imagenes()
+{
+    return $this->hasMany(RayosxExamenImagen::class, 'rayosx_order_examen_id');
 }
 
+}
