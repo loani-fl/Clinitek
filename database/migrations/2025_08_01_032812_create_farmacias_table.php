@@ -14,13 +14,14 @@ return new class extends Migration
         Schema::create('farmacias', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 50);
-            $table->string('ubicacion', 255)->nullable();
+            $table->string('departamento', 100);
+            $table->string('ciudad', 100);
+            $table->string('direccion', 255)->nullable(); // cambiado de ubicacion a direccion
             $table->string('telefono', 8)->nullable();
-            $table->string('horario', )->nullable();
             $table->text('descripcion')->nullable();
             $table->decimal('descuento', 5, 2)->nullable();
             $table->string('foto')->nullable();
-            $table->string('pagina_web', 100)->nullable(); // ⬅️ Campo para la página web
+            $table->string('pagina_web', 100)->nullable(); // Campo para la página web
             $table->timestamps();
         });
     }

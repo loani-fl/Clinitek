@@ -59,25 +59,30 @@ class FarmaciaController extends Controller
                 'max:50',
                 'regex:/^[\pL\s\-]+$/u'
             ],
-            'ubicacion' => [
-                'required',
-                'string',
-                'max:255',
-                'regex:/^([^,]+,\s*){2}[^,]+$/',
-            ],
+
+
             'telefono' => [
                 'required',
                 'digits:8', // Exactamente 8 dígitos
                 'regex:/^[2389][0-9]{7}$/', // Debe comenzar con 2, 3, 8 o 9
                 'unique:pacientes,telefono'
             ],
-
-            'horario' => [
+            'departamento' => [
                 'required',
                 'string',
-                'max:100',
-                'regex:/^[\pL0-9\s:\-,\.]+$/u'
+                'max:100'
             ],
+            'ciudad' => [
+                'required',
+                'string',
+                'max:100'
+            ],
+            'direccion' => [
+                'required',
+                'string',
+                'max:255'
+            ],
+
             'descripcion' => [
                 'required',
                 'string',
@@ -148,6 +153,9 @@ class FarmaciaController extends Controller
 
             'pagina_web.url' => 'La página web debe ser una URL válida (ej. https://ejemplo.com).',
             'pagina_web.max' => 'La URL no debe exceder los 255 caracteres.',
+
+            'departamento.required' => 'El departamento es obligatorio.',
+            'ciudad.required' => 'La ciudad es obligatoria.',
 
         ]);
 
