@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('farmacias', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 50);
-            $table->string('departamento', 100);
-            $table->string('ciudad', 100);
+            $table->string('departamento', 100)->nullable();;
+            $table->string('ciudad', 100)->nullable();;
             $table->string('direccion', 255)->nullable(); // cambiado de ubicacion a direccion
             $table->string('telefono', 8)->nullable();
             $table->text('descripcion')->nullable();

@@ -113,11 +113,11 @@ class FarmaciaController extends Controller
             'nombre.max' => 'El nombre no debe superar los 50 caracteres.',
             'nombre.regex' => 'El nombre solo puede contener letras, espacios y guiones.',
 
-            // UBICACIÓN
-            'ubicacion.required' => 'La ubicación es obligatoria.',
-            'ubicacion.string' => 'La ubicación debe ser texto válido.',
-            'ubicacion.max' => 'La ubicación no debe superar los 255 caracteres.',
-            'ubicacion.regex' => 'Debe incluir ciudad, departamento y país',
+            // DIRECCION
+            'direccion.required' => 'La direccion es obligatoria.',
+            'direcccion.string' => 'La direccion debe ser texto válido.',
+            'direccion.max' => 'La direccion no debe superar los 255 caracteres.',
+
 
 
             // TELÉFONO
@@ -127,11 +127,6 @@ class FarmaciaController extends Controller
             'telefono.unique' => 'Este teléfono ya está registrado.',
 
 
-            // HORARIO
-            'horario.required' => 'El horario es obligatorio.',
-            'horario.string' => 'El horario debe ser texto válido.',
-            'horario.max' => 'El horario no debe superar los 100 caracteres.',
-            'horario.regex' => 'El horario contiene caracteres inválidos. Usa solo letras, números y signos comunes.',
 
             // DESCRIPCIÓN
             'descripcion.required' => 'La descripción es obligatoria.',
