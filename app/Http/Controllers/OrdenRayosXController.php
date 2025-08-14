@@ -520,7 +520,7 @@ public function guardarAnalisis(Request $request, RayosxOrder $orden)
         }
     }
 
-    return redirect()->route('rayosx.show', $orden->id)
+    return redirect()->route('rayosx.index', $orden->id)
         ->with('success', 'Análisis guardado correctamente y estado actualizado a realizado.');
 }
 
