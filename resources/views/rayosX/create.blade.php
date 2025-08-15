@@ -394,10 +394,17 @@ a.btn-primary {
     </div>
 
     <!-- Fecha -->
-    <div>
-        <label for="fecha" class="form-label fw-bold">Fecha <span class="text-danger">*</span></label>
-        <input type="date" id="fecha" name="fecha" class="form-control" value="{{ old('fecha', date('Y-m-d')) }}" required>
-    </div>
+  <!-- Fecha -->
+<div>
+    <label for="fecha" class="form-label fw-bold">Fecha <span class="text-danger">*</span></label>
+    <input type="date" 
+           id="fecha" 
+           name="fecha" 
+           class="form-control" 
+           value="{{ old('fecha', date('Y-m-d')) }}" 
+           required>
+</div>
+
 
     <!-- Botón registrar paciente -->
     <div>
@@ -502,6 +509,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const dpApellidos = document.getElementById('dp-apellidos');
     const dpIdentidad = document.getElementById('dp-identidad');
     const dpGenero = document.getElementById('dp-genero');
+
+// Bloquear fechas anteriores al día de hoy
+
+
+
+
+
+// Fecha mínima y máxima
+const fechaInput = document.getElementById('fecha');
+const hoy = new Date();
+const dd = String(hoy.getDate()).padStart(2, '0');
+const mm = String(hoy.getMonth() + 1).padStart(2, '0'); // Mes actual (0-11)
+const yyyy = hoy.getFullYear();
+const fechaHoy = `${yyyy}-${mm}-${dd}`;
+fechaInput.setAttribute('min', fechaHoy);
+
+// Fecha máxima = 3 meses después
+const fechaMax = new Date();
+fechaMax.setMonth(fechaMax.getMonth() + 3);
+const ddMax = String(fechaMax.getDate()).padStart(2, '0');
+const mmMax = String(fechaMax.getMonth() + 1).padStart(2, '0');
+const yyyyMax = fechaMax.getFullYear();
+const fechaLimite = `${yyyyMax}-${mmMax}-${ddMax}`;
+fechaInput.setAttribute('max', fechaLimite);
+
+// Poner hoy por defecto si no hay old()
+fechaInput.value = fechaInput.value || fechaHoy;
+
 
     // Mensajes emergentes
     const mensajePaciente = document.getElementById('mensajePaciente');
@@ -662,6 +697,8 @@ document.addEventListener('DOMContentLoaded', function() {
         mensajeElem.style.display = 'none';
     }
 });
+
+
 </script>
 
 @endsection
