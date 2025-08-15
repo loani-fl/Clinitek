@@ -544,7 +544,7 @@ public function index(Request $request)
             $ordenes = $ordenesQuery->get();
             $isSearch = true;
         } else {
-            $ordenes = $ordenesQuery->paginate(1);
+            $ordenes = $ordenesQuery->paginate(5);
             $isSearch = false;
         }
 
