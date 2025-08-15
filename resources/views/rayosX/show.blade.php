@@ -22,25 +22,6 @@
         overflow: visible;
         z-index: 1;
         box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
-
-        background-image: url('/images/logo2.jpg');
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-    }
-
-    .custom-card::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: rgba(255,255,255,0.85);
-        border-radius: 1.5rem;
-        z-index: 0;
-    }
-
-    .custom-card > * {
-        position: relative;
-        z-index: 1;
     }
 
     .section-title {
@@ -112,8 +93,12 @@
     }
 </style>
 
+@php
+    use Illuminate\Support\Facades\Storage;
+@endphp
+
 <div class="custom-card">
-    <h2 class="section-title">Ver de análisis de Rayos X</h2>
+    <h2 class="section-title">Ver análisis de Rayos X</h2>
 
     {{-- Datos del paciente --}}
     <h4>Datos del paciente</h4>
@@ -144,7 +129,14 @@
                 <div class="row">
                     @foreach ($examen->imagenes as $imagen)
                         <div class="col-md-3 mb-2 text-center">
-                            <img src="{{ asset('storage/' . $imagen->imagen_ruta) }}" alt="Imagen examen" class="img-preview" />
+                            @if(file_exists(public_path('storage/' . $imagen->ruta)))
+                                <img src="{{ asset('storage/' . $imagen->ruta) }}" alt="Imagen examen" class="img-preview" />
+                            @else
+                                <p class="text-muted">Imagen no encontrada</p>
+                            @endif
+                            @if($imagen->descripcion)
+                                <p class="small mt-1">{{ $imagen->descripcion }}</p>
+                            @endif
                         </div>
                     @endforeach
                 </div>
@@ -152,9 +144,9 @@
                 <p>Sin imágenes registradas</p>
             @endif
 
-            {{-- Descripción --}}
+            {{-- Descripción del examen --}}
             <div class="mt-2">
-                <strong>Descripción:</strong>
+                <strong>Descripción del examen:</strong>
                 <p>{{ $examen->descripcion ?? 'Sin descripción' }}</p>
             </div>
         </div>

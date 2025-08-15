@@ -261,132 +261,63 @@ class OrdenRayosXController extends Controller
         ]);
     }
 
-public function store(Request $request)
-{
-    $request->validate([
-        'paciente_id' => ['required', 'exists:pacientes,id'],
-        'fecha' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:2025-10-31'],
-        'examenes' => ['required', 'array', 'min:1', 'max:10'],
-        'examenes.*' => ['string'],
-    ], [
-        'paciente_id.required' => 'Debe seleccionar un paciente.',
-        'paciente_id.exists' => 'El paciente seleccionado no existe.',
-        'fecha.required' => 'La fecha es obligatoria.',
-        'fecha.after_or_equal' => 'La fecha no puede ser anterior a hoy.',
-        'fecha.before_or_equal' => 'La fecha no puede ser posterior al 31 de octubre de 2025.',
-        'examenes.required' => 'Debe seleccionar al menos un examen.',
-        'examenes.array' => 'Los exámenes deben enviarse en formato de arreglo.',
-        'examenes.min' => 'Debe seleccionar al menos un examen.',
-        'examenes.max' => 'No puede seleccionar más de 10 exámenes.',
-    ]);
-
-    $orden = new RayosxOrder();
-    $orden->paciente_id = $request->paciente_id;
-    $orden->fecha = $request->fecha;
-
-    // Aquí calculamos el total de los precios de los exámenes seleccionados:
-    $examenesSeleccionados = $request->examenes;
-
-    // Suponiendo que tienes un modelo Examen con 'codigo' y 'precio'
-    $totalPrecio = \App\Models\Examen::whereIn('codigo', $examenesSeleccionados)->sum('precio');
-
-    $orden->total_precio = $totalPrecio; // Guardamos el total calculado
-
-    $orden->save();
-
-    // Guardar relación exámenes, si tienes una relación como examen_codigo o similar
-    foreach ($examenesSeleccionados as $codigoExamen) {
-        $orden->examenes()->create([
-            'examen_codigo' => $codigoExamen,
-        ]);
-    }
-
-    return redirect()->route('rayosx.index')->with('success', 'Orden de rayos X creada correctamente.');
-}
-
-
-
-    // Vista para analizar (editar) una orden existente
-    public function analisis(RayosxOrder $orden)
+    public function store(Request $request)
     {
-        // Cargar relación de exámenes con imágenes y paciente para mostrar todo junto
-        $orden->load(['examenes.imagenes', 'paciente']);
-
-        // Obtener médicos radiológos para asignación o referencia
-        $medicosRadiologos = Medico::where('especialidad', 'Radiología')->get();
-
-        // Nombres legibles para los códigos de exámenes (puedes ampliar según necesites)
-        $examenesNombres = [
-            'craneo_anterior_posterior' => 'Cráneo Anterior Posterior',
-            'craneo_lateral' => 'Cráneo Lateral',
-            'waters' => 'Waters',
-            'waters_lateral' => 'Waters Lateral',
-            'conductos_auditivos' => 'Conductos Auditivos',
-            'cavum' => 'Cavum',
-            'senos_paranasales' => 'Senos Paranasales',
-            'silla_turca' => 'Silla Turca',
-            'huesos_nasales' => 'Huesos Nasales',
-            'atm_tm' => 'ATM - TM',
-            'mastoides' => 'Mastoides',
-            'mandibula' => 'Mandíbula',
-            'torax_posteroanterior_pa' => 'Tórax PA',
-            'torax_anteroposterior_ap' => 'Tórax AP',
-            'torax_lateral' => 'Tórax Lateral',
-            'torax_oblicuo' => 'Tórax Oblicuo',
-            'torax_superior' => 'Tórax Superior',
-            'torax_inferior' => 'Tórax Inferior',
-            'costillas_superiores' => 'Costillas Superiores',
-            'costillas_inferiores' => 'Costillas Inferiores',
-            'esternon_frontal' => 'Esternón Frontal',
-            'esternon_lateral' => 'Esternón Lateral',
-            'abdomen_simple' => 'Abdomen Simple',
-            'abdomen_agudo' => 'Abdomen Agudo',
-            'abdomen_erecto' => 'Abdomen Ereto',
-            'abdomen_decubito' => 'Abdomen Decúbito',
-            'clavicula_izquierda' => 'Clavícula Izquierda',
-            'clavicula_derecha' => 'Clavícula Derecha',
-            'hombro_anterior' => 'Hombro Anterior',
-            'hombro_lateral' => 'Hombro Lateral',
-            'humero_proximal' => 'Húmero Próximal',
-            'humero_distal' => 'Húmero Distal',
-            'codo_anterior' => 'Codo Anterior',
-            'codo_lateral' => 'Codo Lateral',
-            'antebrazo' => 'Antebrazo',
-            'muneca' => 'Muñeca',
-            'mano' => 'Mano',
-            'cadera_izquierda' => 'Cadera Izquierda',
-            'cadera_derecha' => 'Cadera Derecha',
-            'femur_proximal' => 'Fémur Próximal',
-            'femur_distal' => 'Fémur Distal',
-            'rodilla_anterior' => 'Rodilla Anterior',
-            'rodilla_lateral' => 'Rodilla Lateral',
-            'tibia' => 'Tibia',
-            'pie' => 'Pie',
-            'calcaneo' => 'Calcáneo',
-            'columna_cervical_lateral' => 'Cervical Lateral',
-            'columna_cervical_anteroposterior' => 'Cervical Anteroposterior',
-            'columna_dorsal_lateral' => 'Dorsal Lateral',
-            'columna_dorsal_anteroposterior' => 'Dorsal Anteroposterior',
-            'columna_lumbar_lateral' => 'Lumbar Lateral',
-            'columna_lumbar_anteroposterior' => 'Lumbar Anteroposterior',
-            'sacro_coxis' => 'Sacro Coxis',
-            'pelvis_anterior_posterior' => 'Pelvis Anterior Posterior',
-            'pelvis_oblicua' => 'Pelvis Oblicua',
-            'escoliosis' => 'Escoliosis',
-            'arteriograma_simple' => 'Arteriograma Simple',
-            'arteriograma_contraste' => 'Arteriograma con Contraste',
-            'histerosalpingograma_simple' => 'Histerosalpingograma Simple',
-            'histerosalpingograma_contraste' => 'Histerosalpingograma con Contraste',
-            'colecistograma_simple' => 'Colecistograma Simple',
-            'colecistograma_contraste' => 'Colecistograma con Contraste',
-            'fistulograma_simple' => 'Fistulograma Simple',
-            'fistulograma_contraste' => 'Fistulograma con Contraste',
-            'artrograma_simple' => 'Artrograma Simple',
-            'artrograma_contraste' => 'Artrograma con Contraste',
-        ];
-
-        return view('rayosx.analisis', compact('orden', 'medicosRadiologos', 'examenesNombres'));
+        $request->validate([
+            'paciente_id' => ['required', 'exists:pacientes,id'],
+            'fecha' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:2025-10-31'],
+            'examenes' => ['required', 'array', 'min:1', 'max:10'],
+            'examenes.*' => ['string'],
+            'imagenes.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'], // Validación de imágenes
+        ], [
+            'paciente_id.required' => 'Debe seleccionar un paciente.',
+            'paciente_id.exists' => 'El paciente seleccionado no existe.',
+            'fecha.required' => 'La fecha es obligatoria.',
+            'fecha.after_or_equal' => 'La fecha no puede ser anterior a hoy.',
+            'fecha.before_or_equal' => 'La fecha no puede ser posterior al 31 de octubre de 2025.',
+            'examenes.required' => 'Debe seleccionar al menos un examen.',
+            'examenes.array' => 'Los exámenes deben enviarse en formato de arreglo.',
+            'examenes.min' => 'Debe seleccionar al menos un examen.',
+            'examenes.max' => 'No puede seleccionar más de 10 exámenes.',
+            'imagenes.*.image' => 'Cada archivo debe ser una imagen.',
+            'imagenes.*.mimes' => 'Solo se permiten imágenes jpg, jpeg o png.',
+            'imagenes.*.max' => 'Cada imagen no debe superar los 2MB.',
+        ]);
+    
+        $orden = new RayosxOrder();
+        $orden->paciente_id = $request->paciente_id;
+        $orden->fecha = $request->fecha;
+    
+        // Calcular total de precios de exámenes
+        $examenesSeleccionados = $request->examenes;
+        $totalPrecio = \App\Models\Examen::whereIn('codigo', $examenesSeleccionados)->sum('precio');
+        $orden->total_precio = $totalPrecio;
+        $orden->save();
+    
+        // Guardar relación de exámenes
+        foreach ($examenesSeleccionados as $codigoExamen) {
+            $examenRegistro = $orden->examenes()->create([
+                'examen_codigo' => $codigoExamen,
+            ]);
+    
+            // Guardar imágenes asociadas a este examen, si se suben
+            if ($request->hasFile('imagenes')) {
+                foreach ($request->file('imagenes') as $file) {
+                    $nombre = time() . '_' . $file->getClientOriginalName();
+                    $file->storeAs('public/rayosx_examenes', $nombre);
+    
+                    \App\Models\RayosxOrderExamenImagen::create([
+                        'rayosx_order_examen_id' => $examenRegistro->id,
+                        'ruta' => 'rayosx_examenes/' . $nombre,
+                        'descripcion' => null,
+                    ]);
+                }
+            }
+        }
+    
+        return redirect()->route('rayosx.index')->with('success', 'Orden de rayos X creada correctamente.');
     }
+    
 
     // Mostrar detalles de una orden
     public function show($id)
@@ -464,69 +395,70 @@ public function store(Request $request)
 
         return view('rayosx.show', compact('orden', 'examenesNombres'));
     }
-public function guardarAnalisis(Request $request, RayosxOrder $orden)
-{
-    $request->validate([
-        'medico_analista_id' => 'required|exists:medicos,id',
-        'descripciones' => 'required|array',
-        'descripciones.*' => 'nullable|string',
-        'imagenes' => 'nullable|array',
-        'imagenes.*.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
-    ], [
-        'medico_analista_id.required' => 'Debe seleccionar un médico analista válido.',
-        'medico_analista_id.exists' => 'El médico analista no existe.',
-        'descripciones.required' => 'Debe agregar descripciones para los exámenes.',
-        'imagenes.*.*.image' => 'Solo se permiten archivos de imagen.',
-        'imagenes.*.*.max' => 'Cada imagen no debe superar los 5MB.',
-    ]);
-
-    // Validar mínimo 1 y máximo 3 imágenes nuevas por examen
-    if ($request->has('imagenes')) {
+    public function guardarAnalisis(Request $request, RayosxOrder $orden)
+    {
+        $request->validate([
+            'medico_analista_id' => 'required|exists:medicos,id',
+            'descripciones' => 'required|array',
+            'descripciones.*' => 'nullable|string',
+            'imagenes' => 'required|array',
+            'imagenes.*.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
+        ], [
+            'medico_analista_id.required' => 'Debe seleccionar un médico analista válido.',
+            'medico_analista_id.exists' => 'El médico analista no existe.',
+            'descripciones.required' => 'Debe agregar descripciones para los exámenes.',
+            'imagenes.required' => 'Debe subir al menos una imagen para cada examen.',
+            'imagenes.*.*.image' => 'Solo se permiten archivos de imagen.',
+            'imagenes.*.*.max' => 'Cada imagen no debe superar los 5MB.',
+        ]);
+    
+        // Validar mínimo 1 y máximo 3 imágenes por examen
         foreach ($request->imagenes as $examenId => $imagenesArray) {
             $count = is_array($imagenesArray) ? count($imagenesArray) : 0;
             if ($count < 1) {
-                return back()->withErrors(['imagenes' => "El examen con ID '{$examenId}' debe tener al menos 1 imagen nueva."])->withInput();
+                return back()->withErrors(['imagenes' => "El examen con ID '{$examenId}' debe tener al menos 1 imagen."])->withInput();
             }
             if ($count > 3) {
-                return back()->withErrors(['imagenes' => "El examen con ID '{$examenId}' no puede tener más de 3 imágenes nuevas."])->withInput();
+                return back()->withErrors(['imagenes' => "El examen con ID '{$examenId}' no puede tener más de 3 imágenes."])->withInput();
             }
         }
-    } else {
-        return back()->withErrors(['imagenes' => "Debe subir al menos una imagen para cada examen."])->withInput();
-    }
-
-    // Guardar médico analista y estado
-    $orden->medico_analista_id = $request->medico_analista_id;
-    $orden->estado = 'realizado';
-    $orden->save();
-
-    // Guardar descripciones e imágenes
-    foreach ($request->descripciones as $examenId => $descripcion) {
-        $examen = $orden->examenes()->where('id', $examenId)->first();
-        if (!$examen) {
-            continue;
-        }
-
-        $examen->descripcion = $descripcion;
-        $examen->save();
-
-        if ($request->hasFile("imagenes.$examenId")) {
-            foreach ($request->file("imagenes.$examenId") as $imagen) {
-                $ruta = $imagen->store('rayosx/imagenes', 'public');
-
-                RayosxOrderExamenImagen::create([
-                    'rayosx_order_examen_id' => $examen->id,
-                 'imagen_ruta' => $ruta,
-
-                ]);
+    
+        // Guardar médico analista y estado
+        $orden->medico_analista_id = $request->medico_analista_id;
+        $orden->estado = 'realizado';
+        $orden->save();
+    
+        // Guardar descripciones e imágenes
+        foreach ($request->descripciones as $examenId => $descripcion) {
+            $examen = $orden->examenes()->where('id', $examenId)->first();
+            if (!$examen) {
+                continue;
+            }
+    
+            $examen->descripcion = $descripcion;
+            $examen->save();
+    
+            if ($request->hasFile("imagenes.$examenId")) {
+                foreach ($request->file("imagenes.$examenId") as $imagen) {
+                    // Generar nombre único para cada imagen
+                    $nombre = time() . '_' . uniqid() . '_' . $imagen->getClientOriginalName();
+    
+                    // Guardar en storage/app/public/rayosx_examenes
+                    $imagen->storeAs('public/rayosx_examenes', $nombre);
+    
+                    // Crear registro en la BD
+                    RayosxOrderExamenImagen::create([
+                        'rayosx_order_examen_id' => $examen->id,
+                        'ruta' => 'rayosx_examenes/' . $nombre,
+                    ]);
+                }
             }
         }
+    
+        return redirect()->route('rayosx.index', $orden->id)
+            ->with('success', 'Análisis guardado correctamente y estado actualizado a realizado.');
     }
-
-    return redirect()->route('rayosx.index', $orden->id)
-        ->with('success', 'Análisis guardado correctamente y estado actualizado a realizado.');
-}
-
+    
 // Mostrar lista paginada de órdenes con paciente
 
 public function index(Request $request)
@@ -588,5 +520,87 @@ public function index(Request $request)
         abort(500, $e->getMessage());
     }
 }
+
+public function analisis(RayosxOrder $orden)
+{
+    // Cargar relación de exámenes con imágenes y paciente
+    $orden->load(['examenes.imagenes', 'paciente']);
+
+    // Obtener médicos radiológos para asignación o referencia
+    $medicosRadiologos = \App\Models\Medico::where('especialidad', 'Radiología')->get();
+
+    // Nombres legibles para los códigos de exámenes
+    $examenesNombres = [
+        'craneo_anterior_posterior' => 'Cráneo Anterior Posterior',
+        'craneo_lateral' => 'Cráneo Lateral',
+        'waters' => 'Waters',
+        'waters_lateral' => 'Waters Lateral',
+        'conductos_auditivos' => 'Conductos Auditivos',
+        'cavum' => 'Cavum',
+        'senos_paranasales' => 'Senos Paranasales',
+        'silla_turca' => 'Silla Turca',
+        'huesos_nasales' => 'Huesos Nasales',
+        'atm_tm' => 'ATM - TM',
+        'mastoides' => 'Mastoides',
+        'mandibula' => 'Mandíbula',
+        'torax_posteroanterior_pa' => 'Tórax PA',
+        'torax_anteroposterior_ap' => 'Tórax AP',
+        'torax_lateral' => 'Tórax Lateral',
+        'torax_oblicuo' => 'Tórax Oblicuo',
+        'torax_superior' => 'Tórax Superior',
+        'torax_inferior' => 'Tórax Inferior',
+        'costillas_superiores' => 'Costillas Superiores',
+        'costillas_inferiores' => 'Costillas Inferiores',
+        'esternon_frontal' => 'Esternón Frontal',
+        'esternon_lateral' => 'Esternón Lateral',
+        'abdomen_simple' => 'Abdomen Simple',
+        'abdomen_agudo' => 'Abdomen Agudo',
+        'abdomen_erecto' => 'Abdomen Ereto',
+        'abdomen_decubito' => 'Abdomen Decúbito',
+        'clavicula_izquierda' => 'Clavícula Izquierda',
+        'clavicula_derecha' => 'Clavícula Derecha',
+        'hombro_anterior' => 'Hombro Anterior',
+        'hombro_lateral' => 'Hombro Lateral',
+        'humero_proximal' => 'Húmero Próximal',
+        'humero_distal' => 'Húmero Distal',
+        'codo_anterior' => 'Codo Anterior',
+        'codo_lateral' => 'Codo Lateral',
+        'antebrazo' => 'Antebrazo',
+        'muneca' => 'Muñeca',
+        'mano' => 'Mano',
+        'cadera_izquierda' => 'Cadera Izquierda',
+        'cadera_derecha' => 'Cadera Derecha',
+        'femur_proximal' => 'Fémur Próximal',
+        'femur_distal' => 'Fémur Distal',
+        'rodilla_anterior' => 'Rodilla Anterior',
+        'rodilla_lateral' => 'Rodilla Lateral',
+        'tibia' => 'Tibia',
+        'pie' => 'Pie',
+        'calcaneo' => 'Calcáneo',
+        'columna_cervical_lateral' => 'Cervical Lateral',
+        'columna_cervical_anteroposterior' => 'Cervical Anteroposterior',
+        'columna_dorsal_lateral' => 'Dorsal Lateral',
+        'columna_dorsal_anteroposterior' => 'Dorsal Anteroposterior',
+        'columna_lumbar_lateral' => 'Lumbar Lateral',
+        'columna_lumbar_anteroposterior' => 'Lumbar Anteroposterior',
+        'sacro_coxis' => 'Sacro Coxis',
+        'pelvis_anterior_posterior' => 'Pelvis Anterior Posterior',
+        'pelvis_oblicua' => 'Pelvis Oblicua',
+        'escoliosis' => 'Escoliosis',
+        'arteriograma_simple' => 'Arteriograma Simple',
+        'arteriograma_contraste' => 'Arteriograma con Contraste',
+        'histerosalpingograma_simple' => 'Histerosalpingograma Simple',
+        'histerosalpingograma_contraste' => 'Histerosalpingograma con Contraste',
+        'colecistograma_simple' => 'Colecistograma Simple',
+        'colecistograma_contraste' => 'Colecistograma con Contraste',
+        'fistulograma_simple' => 'Fistulograma Simple',
+        'fistulograma_contraste' => 'Fistulograma con Contraste',
+        'artrograma_simple' => 'Artrograma Simple',
+        'artrograma_contraste' => 'Artrograma con Contraste',
+    ];
+
+    return view('rayosx.analisis', compact('orden', 'medicosRadiologos', 'examenesNombres'));
+}
+
 
 }
