@@ -249,7 +249,8 @@
                         <div class="row">
                             @foreach ($examen->imagenes as $imagen)
                                 <div class="col-md-3 mb-2 text-center">
-                                <img src="{{ asset('storage/' . $imagen->ruta) }}" alt="Imagen examen" class="img-preview" />
+                                    <img src="{{ asset('storage/' . $imagen->ruta) }}" alt="Imagen examen" class="img-preview" />
+
                                     <div class="form-check mt-1">
                                         <input type="checkbox" name="eliminar_imagenes[]" value="{{ $imagen->id }}" class="form-check-input" id="eliminar_img_{{ $imagen->id }}">
                                         <label for="eliminar_img_{{ $imagen->id }}" class="form-check-label">Eliminar</label>

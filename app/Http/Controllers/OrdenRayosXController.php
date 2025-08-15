@@ -260,65 +260,64 @@ class OrdenRayosXController extends Controller
             'secciones' => $secciones_completas,
         ]);
     }
+public function store(Request $request)
+{
+    $request->validate([
+        'paciente_id' => ['required', 'exists:pacientes,id'],
+        'fecha' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:2025-10-31'],
+        'examenes' => ['required', 'array', 'min:1', 'max:10'],
+        'examenes.*' => ['string'],
+        'imagenes.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'], // Validación de imágenes
+    ], [
+        'paciente_id.required' => 'Debe seleccionar un paciente.',
+        'paciente_id.exists' => 'El paciente seleccionado no existe.',
+        'fecha.required' => 'La fecha es obligatoria.',
+        'fecha.after_or_equal' => 'La fecha no puede ser anterior a hoy.',
+        'fecha.before_or_equal' => 'La fecha no puede ser posterior al 31 de octubre de 2025.',
+        'examenes.required' => 'Debe seleccionar al menos un examen.',
+        'examenes.array' => 'Los exámenes deben enviarse en formato de arreglo.',
+        'examenes.min' => 'Debe seleccionar al menos un examen.',
+        'examenes.max' => 'No puede seleccionar más de 10 exámenes.',
+        'imagenes.*.image' => 'Cada archivo debe ser una imagen.',
+        'imagenes.*.mimes' => 'Solo se permiten imágenes jpg, jpeg o png.',
+        'imagenes.*.max' => 'Cada imagen no debe superar los 2MB.',
+    ]);
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'paciente_id' => ['required', 'exists:pacientes,id'],
-            'fecha' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:2025-10-31'],
-            'examenes' => ['required', 'array', 'min:1', 'max:10'],
-            'examenes.*' => ['string'],
-            'imagenes.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'], // Validación de imágenes
-        ], [
-            'paciente_id.required' => 'Debe seleccionar un paciente.',
-            'paciente_id.exists' => 'El paciente seleccionado no existe.',
-            'fecha.required' => 'La fecha es obligatoria.',
-            'fecha.after_or_equal' => 'La fecha no puede ser anterior a hoy.',
-            'fecha.before_or_equal' => 'La fecha no puede ser posterior al 31 de octubre de 2025.',
-            'examenes.required' => 'Debe seleccionar al menos un examen.',
-            'examenes.array' => 'Los exámenes deben enviarse en formato de arreglo.',
-            'examenes.min' => 'Debe seleccionar al menos un examen.',
-            'examenes.max' => 'No puede seleccionar más de 10 exámenes.',
-            'imagenes.*.image' => 'Cada archivo debe ser una imagen.',
-            'imagenes.*.mimes' => 'Solo se permiten imágenes jpg, jpeg o png.',
-            'imagenes.*.max' => 'Cada imagen no debe superar los 2MB.',
+    $orden = new RayosxOrder();
+    $orden->paciente_id = $request->paciente_id;
+    $orden->fecha = $request->fecha;
+
+    // Calcular total de precios de exámenes
+    $examenesSeleccionados = $request->examenes;
+    $totalPrecio = \App\Models\Examen::whereIn('codigo', $examenesSeleccionados)->sum('precio');
+    $orden->total_precio = $totalPrecio;
+    $orden->save();
+
+    // Guardar relación de exámenes
+    foreach ($examenesSeleccionados as $codigoExamen) {
+        $examenRegistro = $orden->examenes()->create([
+            'examen_codigo' => $codigoExamen,
         ]);
-    
-        $orden = new RayosxOrder();
-        $orden->paciente_id = $request->paciente_id;
-        $orden->fecha = $request->fecha;
-    
-        // Calcular total de precios de exámenes
-        $examenesSeleccionados = $request->examenes;
-        $totalPrecio = \App\Models\Examen::whereIn('codigo', $examenesSeleccionados)->sum('precio');
-        $orden->total_precio = $totalPrecio;
-        $orden->save();
-    
-        // Guardar relación de exámenes
-        foreach ($examenesSeleccionados as $codigoExamen) {
-            $examenRegistro = $orden->examenes()->create([
-                'examen_codigo' => $codigoExamen,
-            ]);
-    
-            // Guardar imágenes asociadas a este examen, si se suben
-            if ($request->hasFile('imagenes')) {
-                foreach ($request->file('imagenes') as $file) {
-                    $nombre = time() . '_' . $file->getClientOriginalName();
-                    $file->storeAs('public/rayosx_examenes', $nombre);
-    
-                    \App\Models\RayosxOrderExamenImagen::create([
-                        'rayosx_order_examen_id' => $examenRegistro->id,
-                        'ruta' => 'rayosx_examenes/' . $nombre,
-                        'descripcion' => null,
-                    ]);
-                }
+
+        // Guardar imágenes asociadas a este examen, si se suben
+        if ($request->hasFile('imagenes')) {
+            foreach ($request->file('imagenes') as $file) {
+                $nombre = time() . '_' . $file->getClientOriginalName();
+                $file->storeAs('public/rayosx_examenes', $nombre);
+
+                \App\Models\RayosxOrderExamenImagen::create([
+                    'rayosx_order_examen_id' => $examenRegistro->id,
+                    'ruta' => 'rayosx_examenes/' . $nombre,
+                    'descripcion' => null,
+                ]);
             }
         }
-    
-        return redirect()->route('rayosx.index')->with('success', 'Orden de rayos X creada correctamente.');
     }
-    
 
+    return redirect()->route('rayosx.index')->with('success', 'Orden de rayos X creada correctamente.');
+}
+
+    
     // Mostrar detalles de una orden
     public function show($id)
     {

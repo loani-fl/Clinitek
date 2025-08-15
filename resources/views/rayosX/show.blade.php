@@ -93,10 +93,6 @@
     }
 </style>
 
-@php
-    use Illuminate\Support\Facades\Storage;
-@endphp
-
 <div class="custom-card">
     <h2 class="section-title">Ver análisis de Rayos X</h2>
 
@@ -129,8 +125,8 @@
                 <div class="row">
                     @foreach ($examen->imagenes as $imagen)
                         <div class="col-md-3 mb-2 text-center">
-                            @if(file_exists(public_path('storage/' . $imagen->ruta)))
-                                <img src="{{ asset('storage/' . $imagen->ruta) }}" alt="Imagen examen" class="img-preview" />
+                            @if($imagen->ruta)
+                            <img src="{{ asset('storage/' . $imagen->ruta) }}" class="img-preview" />
                             @else
                                 <p class="text-muted">Imagen no encontrada</p>
                             @endif
