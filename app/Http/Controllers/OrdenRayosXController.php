@@ -17,7 +17,7 @@ class OrdenRayosXController extends Controller
         $pacientes = Paciente::orderBy('nombre')->get();
 
         // Definir secciones con claves para los exámenes
-        $secciones = [ 
+        $secciones = [
             'CABEZA' => [
                 'craneo_anterior_posterior',
                 'craneo_lateral',
@@ -302,7 +302,7 @@ public function store(Request $request)
 }
 
 
-    
+
     // Vista para analizar (editar) una orden existente
     public function analisis(RayosxOrder $orden)
     {
@@ -525,7 +525,7 @@ public function guardarAnalisis(Request $request, RayosxOrder $orden)
 }
 
 // Mostrar lista paginada de órdenes con paciente
- 
+
 public function index(Request $request)
 {
     try {
@@ -533,6 +533,7 @@ public function index(Request $request)
 
         $ordenesQuery = RayosXOrder::with('paciente')->orderBy('fecha', 'desc');
 
+        // Filtro por búsqueda de paciente (ya existente)
         if ($query) {
             $ordenesQuery->whereHas('paciente', function ($q) use ($query) {
                 $q->where('nombre', 'like', "%$query%")
@@ -540,6 +541,22 @@ public function index(Request $request)
             });
         }
 
+        // >>> NUEVOS FILTROS: fecha y estado <<<
+        $fechaInicio = $request->input('fecha_desde');
+        $fechaFin = $request->input('fecha_hasta');
+        $estadoFiltro = $request->input('estado');
+
+        if ($fechaInicio) {
+            $ordenesQuery->where('fecha', '>=', $fechaInicio);
+        }
+        if ($fechaFin) {
+            $ordenesQuery->where('fecha', '<=', $fechaFin);
+        }
+        if ($estadoFiltro) {
+            $ordenesQuery->where('estado', $estadoFiltro);
+        }
+
+        // Obtener resultados
         if ($query) {
             $ordenes = $ordenesQuery->get();
             $isSearch = true;
@@ -550,6 +567,7 @@ public function index(Request $request)
 
         $all = RayosXOrder::count();
 
+        // Respuesta AJAX
         if ($request->ajax()) {
             return response()->json([
                 'html' => view('rayosx.partials.tabla', compact('ordenes', 'isSearch'))->render(),

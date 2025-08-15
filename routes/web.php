@@ -211,3 +211,5 @@ Route::post('rayosx/{id}/analisis', [RayosxController::class, 'storeAnalisis'])-
 
 Route::get('/rayosx/{id}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
 
+
+Route::post('/farmacias/foto-temporal', [FarmaciaController::class, 'fotoTemporal'])->name('farmacias.foto-temporal');

@@ -11,10 +11,13 @@ class CreateRayosxExamenImagenesTable extends Migration
         Schema::create('rayosx_order_examen_imagenes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('rayosx_order_examen_id');
-            $table->string('imagen_ruta');
+            $table->string('ruta'); // renombrado para ser consistente con el modelo
+            $table->text('descripcion')->nullable(); // campo para la descripción
             $table->timestamps();
-
-            $table->foreign('rayosx_order_examen_id')->references('id')->on('rayosx_order_examenes')->onDelete('cascade');
+        
+            $table->foreign('rayosx_order_examen_id')
+                  ->references('id')->on('rayosx_order_examenes')
+                  ->onDelete('cascade');
         });
     }
 

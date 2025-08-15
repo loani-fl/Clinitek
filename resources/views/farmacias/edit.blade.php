@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-
     <style>
         .custom-card {
             max-width: 1000px;
@@ -42,19 +41,19 @@
             <h2 class="fw-bold text-black mb-0">Editar Farmacia</h2>
         </div>
 
-        <form id="formularioFarmacia" action="{{ route('farmacias.update', $farmacia->id) }}" method="POST" enctype="multipart/form-data" novalidate>
+        <form id="editFarmaciaForm" action="{{ route('farmacias.update', $farmacia->id) }}" method="POST" enctype="multipart/form-data" novalidate>
             @csrf
             @method('PUT')
 
+            <!-- Primera fila: Nombre, Teléfono, Descuento -->
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label for="nombre" class="form-label">Nombre: <span class="text-danger">*</span></label>
                     <input type="text" name="nombre" id="nombre"
                            class="form-control @error('nombre') is-invalid @enderror"
                            value="{{ old('nombre', $farmacia->nombre) }}"
-                           required maxlength="50"
-                           pattern="^[\pL\s\-]+$"
-                           title="Solo letras, espacios y guiones">
+                           data-original="{{ $farmacia->nombre }}"
+                           required maxlength="50">
                     @error('nombre')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
@@ -63,10 +62,8 @@
                     <input type="tel" name="telefono" id="telefono"
                            class="form-control @error('telefono') is-invalid @enderror"
                            value="{{ old('telefono', $farmacia->telefono) }}"
-                           required maxlength="8"
-                           pattern="^\d{8}$"
-                           inputmode="numeric"
-                           title="Debe ingresar exactamente 8 dígitos numéricos.">
+                           data-original="{{ $farmacia->telefono }}"
+                           maxlength="8" pattern="^\d{8}$">
                     @error('telefono')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
@@ -75,102 +72,182 @@
                     <input type="number" name="descuento" id="descuento"
                            class="form-control @error('descuento') is-invalid @enderror"
                            value="{{ old('descuento', $farmacia->descuento) }}"
-                           min="0" max="100" step="0.1" placeholder="Ej: 10.5">
+                           data-original="{{ $farmacia->descuento }}"
+                           min="0" max="100" step="0.1">
                     @error('descuento')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
             </div>
 
+            <!-- Segunda fila: Página web, Departamento, Ciudad -->
             <div class="row mb-3">
                 <div class="col-md-4">
-                    <label for="horario" class="form-label">Horario:</label>
-                    <input type="text" name="horario" id="horario"
-                           class="form-control @error('horario') is-invalid @enderror"
-                           value="{{ old('horario', $farmacia->horario) }}"
-                           maxlength="200"
-                           placeholder="Ejemplo: Lun a Vie 8:00 AM - 6:00 PM">
-                    @error('horario')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-
-                <div class="col-md-4">
-                    <label for="pagina_web" class="form-label">Página web: (Opcional)</label>
+                    <label for="pagina_web" class="form-label">Página web (Opcional):</label>
                     <input type="url" name="pagina_web" id="pagina_web"
                            class="form-control @error('pagina_web') is-invalid @enderror"
                            value="{{ old('pagina_web', $farmacia->pagina_web) }}"
-                           maxlength="100"
+                           data-original="{{ $farmacia->pagina_web }}"
                            placeholder="https://ejemplo.com">
                     @error('pagina_web')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="col-md-4">
-                    <label for="ubicacion" class="form-label">Ubicación:</label>
-                    <textarea name="ubicacion" id="ubicacion" rows="2"
-                              class="form-control @error('ubicacion') is-invalid @enderror"
-                              maxlength="255"
-                              style="resize: vertical;"
-                              placeholder="Ciudad, Departamento, País">{{ old('ubicacion', $farmacia->ubicacion) }}</textarea>
-                    @error('ubicacion')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-md-8">
-                    <label for="descripcion" class="form-label">Descripción:</label>
-                    <textarea name="descripcion" id="descripcion" rows="3"
-                              class="form-control @error('descripcion') is-invalid @enderror"
-                              maxlength="200"
-                              placeholder="Descripción breve de la farmacia">{{ old('descripcion', $farmacia->descripcion) }}</textarea>
-                    @error('descripcion')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    <label for="departamento" class="form-label">Departamento:</label>
+                    <select name="departamento" id="departamento" class="form-control @error('departamento') is-invalid @enderror" data-original="{{ $farmacia->departamento }}">
+                        <option value="">Seleccione un departamento</option>
+                        @foreach($departamento as $dep)
+                            <option value="{{ $dep }}" {{ old('departamento', $farmacia->departamento) == $dep ? 'selected' : '' }}>
+                                {{ $dep }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('departamento')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="col-md-4">
-                    <label for="foto" class="form-label">Foto:</label>
-
-                    @if ($farmacia->foto)
-                        <div class="mb-2">
-                            <img src="{{ asset('storage/' . $farmacia->foto) }}" alt="Foto actual" class="img-thumbnail" style="max-width: 120px;">
-                        </div>
-                    @endif
-
-                    <input
-                        type="file"
-                        name="foto"
-                        id="foto"
-                        accept=".jpg,.jpeg,.png,.webp"
-                        class="form-control @error('foto') is-invalid @enderror">
-
-                    @error('foto')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <label for="ciudad" class="form-label">Ciudad:</label>
+                    <select name="ciudad" id="ciudad" class="form-control @error('ciudad') is-invalid @enderror" data-original="{{ $farmacia->ciudad }}">
+                        <option value="">Seleccione una ciudad</option>
+                    </select>
+                    @error('ciudad')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
-
             </div>
 
+            <!-- Tercera fila: Dirección y Descripción -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="direccion" class="form-label">Dirección específica:</label>
+                    <textarea name="direccion" id="direccion" rows="2"
+                              class="form-control @error('direccion') is-invalid @enderror"
+                              data-original="{{ $farmacia->direccion }}"
+                              placeholder="Ej: Barrio El Centro, Casa #45, frente a la escuela">{{ old('direccion', $farmacia->direccion) }}</textarea>
+                    @error('direccion')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="col-md-6">
+                    <label for="descripcion" class="form-label">Descripción:</label>
+                    <textarea name="descripcion" id="descripcion" rows="2"
+                              class="form-control @error('descripcion') is-invalid @enderror"
+                              data-original="{{ $farmacia->descripcion }}"
+                              placeholder="Descripción breve de la farmacia">{{ old('descripcion', $farmacia->descripcion) }}</textarea>
+                    @error('descripcion')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+            </div>
+
+
+            <!-- Foto -->
+            <div class="mb-3" style="max-width: 400px;">
+                <label for="foto" class="form-label">Foto:</label>
+                <div class="mb-2">
+                    @php
+                        // Mostrar foto temporal de sesión si existe, si no la original
+                        $fotoMostrar = session('foto_temporal')
+                            ? asset('storage/' . session('foto_temporal'))
+                            : ($farmacia->foto ? asset('storage/' . $farmacia->foto) : '');
+                    @endphp
+
+                    <img src="{{ $fotoMostrar }}"
+                         alt="Foto actual"
+                         class="img-thumbnail"
+                         id="fotoPreview"
+                         data-original="{{ $farmacia->foto ? asset('storage/' . $farmacia->foto) : '' }}"
+                         style="max-width: 120px; {{ $fotoMostrar ? '' : 'display:none;' }}">
+                </div>
+                <input type="file" name="foto" id="foto" class="form-control @error('foto') is-invalid @enderror">
+                @error('foto')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
+
+            <!-- Botones -->
             <div class="d-flex justify-content-center gap-3 mt-4">
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-save"></i> Guardar Cambios
-                </button>
-
-                <button type="reset" class="btn btn-warning" id="btnResetear">
-                    <i class="bi bi-arrow-counterclockwise"></i> Restablecer
-                </button>
-
-                <a href="{{ route('farmacias.index') }}" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> Cancelar
-                </a>
+                <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Guardar Cambios</button>
+                <button type="button" class="btn btn-warning" id="restablecerBtn"><i class="bi bi-arrow-counterclockwise"></i> Restablecer</button>
+                <a href="{{ route('farmacias.index') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Cancelar</a>
             </div>
         </form>
     </div>
 
     <script>
-        // Restringir números en nombre
-        document.getElementById("nombre").addEventListener("input", function(e) {
+        // Validaciones de nombre y teléfono
+        document.getElementById("nombre").addEventListener("input", function() {
             this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]/g, '');
         });
-
-        // Solo números en teléfono
-        document.getElementById("telefono").addEventListener("input", function(e) {
+        document.getElementById("telefono").addEventListener("input", function() {
             this.value = this.value.replace(/\D/g, '').slice(0, 8);
         });
-    </script>
 
+        // Manejo dinámico de ciudades
+        const ciudadData = @json($ciudad);
+        const departamentoSelect = document.getElementById('departamento');
+        const ciudadSelect = document.getElementById('ciudad');
+
+        function actualizarCiudades(selectedDepartamento, selectedCiudad = null) {
+            ciudadSelect.innerHTML = '<option value="">Seleccione una ciudad</option>';
+            if(ciudadData[selectedDepartamento]) {
+                ciudadData[selectedDepartamento].forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c;
+                    opt.textContent = c;
+                    if(selectedCiudad && selectedCiudad === c) opt.selected = true;
+                    ciudadSelect.appendChild(opt);
+                });
+            }
+        }
+
+        actualizarCiudades("{{ old('departamento', $farmacia->departamento) }}", "{{ old('ciudad', $farmacia->ciudad) }}");
+        departamentoSelect.addEventListener('change', function() {
+            actualizarCiudades(this.value);
+        });
+
+
+        // Preview de la foto nueva al instante
+        const fotoInput = document.getElementById('foto');
+        const fotoPreview = document.getElementById('fotoPreview');
+
+        fotoInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    fotoPreview.src = e.target.result;
+                    fotoPreview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                fotoPreview.src = fotoPreview.getAttribute('data-original');
+                fotoPreview.style.display = fotoPreview.src ? 'block' : 'none';
+            }
+        });
+
+        // Botón Restablecer
+        document.getElementById('restablecerBtn').addEventListener('click', function() {
+            const form = document.getElementById('editFarmaciaForm');
+
+            form.querySelectorAll('input, textarea, select').forEach(input => {
+                const original = input.getAttribute('data-original');
+                if(original !== null) {
+                    if(input.tagName === 'SELECT') {
+                        input.value = original;
+                        input.dispatchEvent(new Event('change'));
+                    } else {
+                        input.value = original;
+                    }
+                }
+                if(input.type === 'file') input.value = '';
+                input.classList.remove('is-invalid');
+            });
+
+            // Restaurar la foto original de la base de datos
+            fotoPreview.src = fotoPreview.getAttribute('data-original');
+            fotoPreview.style.display = fotoPreview.src ? 'block' : 'none';
+            fotoInput.value = '';
+
+            // Eliminar mensajes de validación
+            form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
+            // Foco en el primer campo editable
+            setTimeout(() => {
+                const primerCampo = form.querySelector('input:not([type=file]), textarea, select');
+                if(primerCampo) primerCampo.focus();
+            }, 10);
+        });
+    </script>
 @endsection

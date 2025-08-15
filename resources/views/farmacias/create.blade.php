@@ -46,6 +46,7 @@
             @csrf
 
             <div class="row mb-3">
+                <!-- Nombre -->
                 <div class="col-md-4">
                     <label for="nombre" class="form-label">Nombre: <span class="text-danger">*</span></label>
                     <input
@@ -58,12 +59,12 @@
                         maxlength="50"
                         pattern="^[\pL\s\-]+$"
                         title="Solo letras, espacios y guiones">
-
                     @error('nombre')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
+                <!-- Teléfono -->
                 <div class="col-md-4">
                     <label for="telefono" class="form-label">Teléfono: <span class="text-danger">*</span></label>
                     <input
@@ -77,12 +78,12 @@
                         pattern="^\d{8}$"
                         inputmode="numeric"
                         title="Debe ingresar exactamente 8 dígitos numéricos.">
-
                     @error('telefono')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
+                <!-- Descuento -->
                 <div class="col-md-4">
                     <label for="descuento" class="form-label">Descuento (%):</label>
                     <input
@@ -94,7 +95,8 @@
                         min="0"
                         max="100"
                         step="0.1"
-                        placeholder="Ej: 10.5">
+                        placeholder="Ej: 10.5"
+                        oninput="if(this.value < 0) this.value = 0; if(this.value > 100) this.value = 100;">
                     @error('descuento')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -102,23 +104,9 @@
             </div>
 
             <div class="row mb-3">
+                <!-- Página web -->
                 <div class="col-md-4">
-                    <label for="horario" class="form-label">Horario:</label>
-                    <input
-                        type="text"
-                        name="horario"
-                        id="horario"
-                        class="form-control @error('horario') is-invalid @enderror"
-                        value="{{ old('horario') }}"
-                        maxlength="200"
-                        placeholder="Ejemplo: Lun a Vie 8:00 AM - 6:00 PM">
-                    @error('horario')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="col-md-4">
-                    <label for="pagina_web" class="form-label">Página web:(Opcional)</label>
+                    <label for="pagina_web" class="form-label">Página web (Opcional):</label>
                     <input
                         type="url"
                         name="pagina_web"
@@ -132,25 +120,71 @@
                     @enderror
                 </div>
 
+                <!-- Departamento -->
                 <div class="col-md-4">
-                    <label for="ubicacion" class="form-label">Ubicación:</label>
-                    <textarea
-                        name="ubicacion"
-                        id="ubicacion"
-                        rows="2"
-                        maxlength="255"
-                        class="form-control @error('ubicacion') is-invalid @enderror"
-                        style="resize: vertical;"
-                        placeholder="Ciudad, Departamento, País">{{ old('ubicacion') }}</textarea>
-                    @error('ubicacion')
+                    <label for="departamento" class="form-label">Departamento:</label>
+                    <select
+                        name="departamento"
+                        id="departamento"
+                        class="form-control @error('departamento') is-invalid @enderror">
+                        <option value="">Seleccione un departamento</option>
+                        <option value="Atlántida" {{ old('departamento') == 'Atlántida' ? 'selected' : '' }}>Atlántida</option>
+                        <option value="Choluteca" {{ old('departamento') == 'Choluteca' ? 'selected' : '' }}>Choluteca</option>
+                        <option value="Colón" {{ old('departamento') == 'Colón' ? 'selected' : '' }}>Colón</option>
+                        <option value="Comayagua" {{ old('departamento') == 'Comayagua' ? 'selected' : '' }}>Comayagua</option>
+                        <option value="Copán" {{ old('departamento') == 'Copán' ? 'selected' : '' }}>Copán</option>
+                        <option value="Cortés" {{ old('departamento') == 'Cortés' ? 'selected' : '' }}>Cortés</option>
+                        <option value="El Paraíso" {{ old('departamento') == 'El Paraíso' ? 'selected' : '' }}>El Paraíso</option>
+                        <option value="Francisco Morazán" {{ old('departamento') == 'Francisco Morazán' ? 'selected' : '' }}>Francisco Morazán</option>
+                        <option value="Gracias a Dios" {{ old('departamento') == 'Gracias a Dios' ? 'selected' : '' }}>Gracias a Dios</option>
+                        <option value="Intibucá" {{ old('departamento') == 'Intibucá' ? 'selected' : '' }}>Intibucá</option>
+                        <option value="Islas de la Bahía" {{ old('departamento') == 'Islas de la Bahía' ? 'selected' : '' }}>Islas de la Bahía</option>
+                        <option value="La Paz" {{ old('departamento') == 'La Paz' ? 'selected' : '' }}>La Paz</option>
+                        <option value="Lempira" {{ old('departamento') == 'Lempira' ? 'selected' : '' }}>Lempira</option>
+                        <option value="Ocotepeque" {{ old('departamento') == 'Ocotepeque' ? 'selected' : '' }}>Ocotepeque</option>
+                        <option value="Olancho" {{ old('departamento') == 'Olancho' ? 'selected' : '' }}>Olancho</option>
+                        <option value="Santa Bárbara" {{ old('departamento') == 'Santa Bárbara' ? 'selected' : '' }}>Santa Bárbara</option>
+                        <option value="Valle" {{ old('departamento') == 'Valle' ? 'selected' : '' }}>Valle</option>
+                        <option value="Yoro" {{ old('departamento') == 'Yoro' ? 'selected' : '' }}>Yoro</option>
+                    </select>
+                    @error('departamento')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Ciudad -->
+                <div class="col-md-4">
+                    <label for="ciudad" class="form-label">Ciudad:</label>
+                    <select
+                        name="ciudad"
+                        id="ciudad"
+                        class="form-control @error('ciudad') is-invalid @enderror">
+                        <option value="">Seleccione una ciudad</option>
+                    </select>
+                    @error('ciudad')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
 
 
-
             <div class="row mb-3">
+                <!-- Dirección específica -->
+                <div class="col-md-4">
+                    <label for="direccion" class="form-label">Dirección específica:</label>
+                    <textarea
+                        name="direccion"
+                        id="direccion"
+                        rows="3"
+                        maxlength="255"
+                        class="form-control @error('direccion') is-invalid @enderror"
+                        placeholder="Ej: Barrio El Centro, Casa #45, frente a la escuela">{{ old('direccion') }}</textarea>
+                    @error('direccion')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Descripción -->
                 <div class="col-md-8">
                     <label for="descripcion" class="form-label">Descripción:</label>
                     <textarea
@@ -164,7 +198,10 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
+            </div>
 
+
+            <!-- Foto -->
                 <div class="col-md-4">
                     <label for="foto" class="form-label">Foto:</label>
                     <input
@@ -179,21 +216,20 @@
                 </div>
             </div>
 
-
-        <div class="d-flex justify-content-center gap-3 mt-4">
+            <div class="d-flex justify-content-center gap-3 mt-4">
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-plus-circle"></i> Registrar
                 </button>
-            <button type="button" id="btnLimpiar" class="btn btn-warning">
-                <i class="bi bi-trash"></i> Limpiar
-            </button>
-            <a href="{{ route('farmacias.index') }}" class="btn btn-success">
-                <i class="bi bi-arrow-left"></i> Regresar
-            </a>
+                <button type="button" id="btnLimpiar" class="btn btn-warning">
+                    <i class="bi bi-trash"></i> Limpiar
+                </button>
+                <a href="{{ route('farmacias.index') }}" class="btn btn-success">
+                    <i class="bi bi-arrow-left"></i> Regresar
+                </a>
             </div>
-
         </form>
     </div>
+
     <script>
         document.getElementById('telefono').addEventListener('keydown', function(e) {
             // Permitir teclas especiales: Backspace, Tab, Arrow keys, Delete, etc.
@@ -245,6 +281,43 @@
             form.querySelectorAll('.is-invalid').forEach(el => {
                 el.classList.remove('is-invalid');
             });
+        });
+    </script>
+    <script>
+        const ciudadesPorDepartamento = {
+            "Atlántida": ["La Ceiba", "Tela", "Jutiapa"],
+            "Choluteca": ["Choluteca", "El Triunfo", "San Marcos de Colón"],
+            "Colón": ["Trujillo", "Tocoa", "Sabá"],
+            "Comayagua": ["Comayagua", "Siguatepeque", "La Libertad"],
+            "Copán": ["Santa Rosa de Copán", "La Entrada"],
+            "Cortés": ["San Pedro Sula", "Puerto Cortés", "La Lima", "Choloma", "Villanueva"],
+            "El Paraíso": ["Yuscarán", "Danlí", "El Paraiso"],
+            "Francisco Morazán": ["Tegucigalpa", "Valle de Ángeles", "Santa Lucía"],
+            "Gracias a Dios": ["Puerto Lempira"],
+            "Intibucá": ["La Esperanza", "Intibucá"],
+            "Islas de la Bahía": ["Roatán", "Utila", "Guanaja"],
+            "La Paz": ["La Paz", "Marcala"],
+            "Lempira": ["Gracias", "Erandique"],
+            "Ocotepeque": ["Nueva Ocotepeque"],
+            "Olancho": ["Juticalpa", "Catacamas"],
+            "Santa Bárbara": ["Santa Bárbara", "Trinidad", "Gualala"],
+            "Valle": ["Nacaome", "San Lorenzo"],
+            "Yoro": ["Yoro", "El Progreso", "Olanchito"]
+        };
+
+        document.getElementById('departamento').addEventListener('change', function() {
+            let depto = this.value;
+            let ciudadSelect = document.getElementById('ciudad');
+            ciudadSelect.innerHTML = '<option value="">Seleccione una ciudad</option>';
+
+            if (ciudadesPorDepartamento[depto]) {
+                ciudadesPorDepartamento[depto].forEach(function(ciudad) {
+                    let option = document.createElement('option');
+                    option.value = ciudad;
+                    option.textContent = ciudad;
+                    ciudadSelect.appendChild(option);
+                });
+            }
         });
     </script>
 
