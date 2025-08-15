@@ -9,7 +9,6 @@
         margin: 0;
         padding: 0;
         min-height: 100vh;
-        position: relative;
     }
 
     .custom-card {
@@ -18,10 +17,7 @@
         margin: 40px auto 60px auto;
         border-radius: 1.5rem;
         padding: 2rem 2.5rem;
-        position: relative;
-        overflow: visible;
-        z-index: 1;
-        box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     .section-title {
@@ -83,13 +79,105 @@
         margin-bottom: 0.5rem;
     }
 
+    /* Galería imágenes en fila */
+    .img-gallery {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .img-card {
+        flex: 1 1 calc(33.33% - 1rem);
+        max-width: calc(33.33% - 1rem);
+        border-radius: 0.6rem;
+        overflow: hidden;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transform-origin: center center;
+    }
+
+    @media (hover: hover) {
+        .img-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        }
+    }
+
+    @media (max-width: 992px) {
+        .img-card {
+            flex: 1 1 calc(50% - 1rem);
+            max-width: calc(50% - 1rem);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .img-card {
+            flex: 1 1 100%;
+            max-width: 100%;
+        }
+    }
+
     .img-preview {
-        margin-top: 0.8rem;
-        max-width: 150px;
-        max-height: 110px;
+        width: 100%;
+        display: block;
         border-radius: 0.4rem;
+        object-fit: cover;
+    }
+
+    /* Descripción de la imagen */
+    .img-description {
+        font-size: 0.8rem;
+        color: #555;
+        margin-top: 0.3rem;
+        text-align: center;
+        max-height: 3rem;      /* máximo 2 líneas */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    /* Descripción del examen */
+    .examen-card p {
+        max-height: 5rem;      /* altura máxima de la descripción del examen */
+        overflow: auto;        /* scroll si es muy larga */
+        padding-right: 0.25rem;
+        line-height: 1.3rem;
+    }
+
+   /* Modal navegación */
+.modal-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2rem;
+    color: #ff8c00; /* color naranja brillante */
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.7); /* sombra para resaltar */
+    cursor: pointer;
+    z-index: 1055;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.modal-nav:hover {
+    color: #ffa500; /* más brillante al pasar el mouse */
+}
+
+
+    .modal-prev {
+        left: 10px;
+    }
+
+    .modal-next {
+        right: 10px;
+    }
+
+    .modal-content img {
+        width: 100%;
+        height: auto;
         object-fit: contain;
-        border: 1px solid #ddd;
     }
 </style>
 
@@ -122,19 +210,31 @@
 
             {{-- Imágenes --}}
             @if($examen->imagenes && $examen->imagenes->count() > 0)
-                <div class="row">
-                    @foreach ($examen->imagenes as $imagen)
-                        <div class="col-md-3 mb-2 text-center">
-                            @if($imagen->ruta)
-                            <img src="{{ asset('storage/' . $imagen->ruta) }}" class="img-preview" />
-                            @else
-                                <p class="text-muted">Imagen no encontrada</p>
-                            @endif
+                <div class="img-gallery" id="gallery-{{ $examen->id }}">
+                    @foreach ($examen->imagenes as $index => $imagen)
+                        @if($imagen->ruta)
+                        <div class="img-card" onclick="openModal({{ $examen->id }}, {{ $index }})">
+                            <img src="{{ asset('storage/' . $imagen->ruta) }}" 
+                                 class="img-preview" 
+                                 alt="{{ $imagen->descripcion ?? 'Imagen de examen' }}" />
                             @if($imagen->descripcion)
-                                <p class="small mt-1">{{ $imagen->descripcion }}</p>
+                                <p class="img-description">{{ $imagen->descripcion }}</p>
                             @endif
                         </div>
+                        @endif
                     @endforeach
+                </div>
+
+                <!-- Modal -->
+                <div class="modal fade" id="modal-{{ $examen->id }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content position-relative bg-dark">
+                        <span class="modal-nav modal-prev" onclick="prevImage({{ $examen->id }})">&lt;</span>
+                        <span class="modal-nav modal-next" onclick="nextImage({{ $examen->id }})">&gt;</span>
+                        <img id="modal-img-{{ $examen->id }}" src="" alt="">
+                        <div id="modal-desc-{{ $examen->id }}" class="p-2 text-center text-white"></div>
+                    </div>
+                  </div>
                 </div>
             @else
                 <p>Sin imágenes registradas</p>
@@ -156,4 +256,42 @@
         </a>
     </div>
 </div>
+
+<script>
+    const examsImages = {};
+    @foreach ($orden->examenes as $examen)
+        examsImages[{{ $examen->id }}] = [
+            @foreach ($examen->imagenes as $imagen)
+                {
+                    src: "{{ asset('storage/' . $imagen->ruta) }}",
+                    desc: "{{ $imagen->descripcion ?? '' }}"
+                },
+            @endforeach
+        ];
+    @endforeach
+
+    const currentIndex = {};
+
+    function openModal(examenId, index) {
+        currentIndex[examenId] = index;
+        const modal = new bootstrap.Modal(document.getElementById(`modal-${examenId}`));
+        document.getElementById(`modal-img-${examenId}`).src = examsImages[examenId][index].src;
+        document.getElementById(`modal-desc-${examenId}`).innerText = examsImages[examenId][index].desc;
+        modal.show();
+    }
+
+    function nextImage(examenId) {
+        currentIndex[examenId]++;
+        if(currentIndex[examenId] >= examsImages[examenId].length) currentIndex[examenId] = 0;
+        document.getElementById(`modal-img-${examenId}`).src = examsImages[examenId][currentIndex[examenId]].src;
+        document.getElementById(`modal-desc-${examenId}`).innerText = examsImages[examenId][currentIndex[examenId]].desc;
+    }
+
+    function prevImage(examenId) {
+        currentIndex[examenId]--;
+        if(currentIndex[examenId] < 0) currentIndex[examenId] = examsImages[examenId].length - 1;
+        document.getElementById(`modal-img-${examenId}`).src = examsImages[examenId][currentIndex[examenId]].src;
+        document.getElementById(`modal-desc-${examenId}`).innerText = examsImages[examenId][currentIndex[examenId]].desc;
+    }
+</script>
 @endsection
