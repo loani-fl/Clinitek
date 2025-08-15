@@ -71,15 +71,20 @@
     }
     .d-flex.filter-container {
         justify-content: flex-start;
-        align-items: center;
+        align-items: flex-end;
         gap: 0.5rem;
         flex-wrap: wrap;
         margin-bottom: 1rem;
     }
     .filtro-input {
         font-size: 0.85rem;
-        max-width: 300px;
+        max-width: 200px;
         flex-grow: 1;
+    }
+    .filtro-label {
+        font-size: 0.85rem;
+        margin-bottom: 0;
+        font-weight: 500;
     }
     .table {
         font-size: 0.85rem;
@@ -112,7 +117,6 @@
         display: flex;
         justify-content: center;
     }
-    /* Estado círculo */
     .estado-circle {
         width: 14px;
         height: 14px;
@@ -122,12 +126,11 @@
         vertical-align: middle;
     }
     .estado-realizado {
-        background-color: #28a745; /* verde */
+        background-color: #28a745;
     }
     .estado-pendiente {
-       background-color: yellow; /* amarillo */
+        background-color: yellow;
     }
-    /* Datos paciente estilo */
     #datosPaciente {
         margin-top: 1.5rem;
         background: #f8f9fa;
@@ -154,42 +157,32 @@
         flex: 1;
         user-select: none;
     }
-
-
-
-
-
     .status-legend {
-  text-align: center;
-  margin-top: 15px;
-}
-
-.status-legend span {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 20px;
-  font-weight: 500;
-  font-family: Arial, sans-serif;
-  color: #333;
-}
-
-.status-circle {
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 8px;
-  border: 1px solid #ccc;
-}
-
-.status-pending {
-  background-color: yellow;
-}
-
-.status-done {
-  background-color: green;
-}
-
+        text-align: center;
+        margin-top: 15px;
+    }
+    .status-legend span {
+        display: inline-flex;
+        align-items: center;
+        margin-right: 20px;
+        font-weight: 500;
+        font-family: Arial, sans-serif;
+        color: #333;
+    }
+    .status-circle {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+        border: 1px solid #ccc;
+    }
+    .status-pending {
+        background-color: yellow;
+    }
+    .status-done {
+        background-color: green;
+    }
 </style>
 
 <div class="content-wrapper">
@@ -206,15 +199,37 @@
             </a>
         </div>
 
+        {{-- Filtros --}}
         <div class="d-flex filter-container">
-            <input
-                type="text"
-                id="filtroBusqueda"
-                class="form-control filtro-input"
-                placeholder="Buscar paciente..."
-                autocomplete="off"
-                value="{{ request('search') }}"
-            >
+            <div>
+                <label class="filtro-label" for="filtroBusqueda">Paciente</label>
+                <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar paciente..." autocomplete="off" value="{{ request('search') }}">
+            </div>
+
+            <div>
+                <label class="filtro-label" for="fechaDesde">Desde</label>
+                <input type="date" id="fechaDesde" class="form-control filtro-input" value="{{ request('fecha_desde') }}">
+            </div>
+
+            <div>
+                <label class="filtro-label" for="fechaHasta">Hasta</label>
+                <input type="date" id="fechaHasta" class="form-control filtro-input" value="{{ request('fecha_hasta') }}">
+            </div>
+
+            <div>
+                <label class="filtro-label" for="filtroEstado">Estado</label>
+                <select id="filtroEstado" class="form-control filtro-input">
+                    <option value="">-- Todos --</option>
+                    <option value="Pendiente" {{ request('estado') == 'Pendiente' ? 'selected' : '' }}>Pendiente</option>
+                    <option value="Realizado" {{ request('estado') == 'Realizado' ? 'selected' : '' }}>Realizado</option>
+                </select>
+            </div>
+
+            <div style="align-self: flex-end;">
+                <button id="btnRecargar" class="btn btn-secondary">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
         </div>
 
         <div id="tabla-container" class="table-responsive">
@@ -229,7 +244,6 @@
             @endif
         </div>
 
-        {{-- Mostrar datos del paciente si hay old --}}
         <div id="datosPaciente" style="display: {{ old('paciente_id') ? 'block' : 'none' }};">
             <div class="datos-paciente-row">
                 <div class="datos-paciente-label">Nombres:</div>
@@ -251,6 +265,7 @@
 
 <script>
 $(document).ready(function () {
+
     function actualizarMensaje(total, all, query) {
         if (query === '') {
             $('#mensajeResultados').html('');
@@ -262,10 +277,20 @@ $(document).ready(function () {
     }
 
     function cargarDatos(page = 1, query = '') {
+        const fechaDesde = $('#fechaDesde').val();
+        const fechaHasta = $('#fechaHasta').val();
+        const estado = $('#filtroEstado').val();
+
         $.ajax({
             url: "{{ route('rayosx.index') }}",
             type: 'GET',
-            data: { page, search: query },
+            data: {
+                page,
+                search: query,
+                fecha_desde: fechaDesde,
+                fecha_hasta: fechaHasta,
+                estado: estado
+            },
             success: function(data) {
                 $('#tabla-container').html(data.html);
                 $('#paginacion-container').html(data.pagination);
@@ -281,13 +306,20 @@ $(document).ready(function () {
         });
     }
 
-    // Carga inicial sin filtro o con filtro de request
+    // Carga inicial
     cargarDatos(1, $('#filtroBusqueda').val());
 
-    // Filtrar al escribir
-    $('#filtroBusqueda').on('keyup', function () {
-        const query = $(this).val();
-        cargarDatos(1, query);
+    // Eventos de filtro
+    $('#filtroBusqueda').on('keyup', function () { cargarDatos(1, $(this).val()); });
+    $('#fechaDesde, #fechaHasta, #filtroEstado').on('change', function () { cargarDatos(1, $('#filtroBusqueda').val()); });
+
+    // Botón recargar
+    $('#btnRecargar').on('click', function () {
+        $('#filtroBusqueda').val('');
+        $('#fechaDesde').val('');
+        $('#fechaHasta').val('');
+        $('#filtroEstado').val('');
+        cargarDatos(1, '');
     });
 
     // Paginación dinámica
@@ -297,11 +329,17 @@ $(document).ready(function () {
         const params = new URLSearchParams(url.split('?')[1]);
         const page = params.get('page') || 1;
         const query = $('#filtroBusqueda').val();
+        const fechaDesde = $('#fechaDesde').val();
+        const fechaHasta = $('#fechaHasta').val();
+        const estado = $('#filtroEstado').val();
+
         cargarDatos(page, query);
 
-        // Actualizar URL sin recargar
         let newUrl = url.split('?')[0] + '?page=' + page;
-        if (query) newUrl += '&search=' + encodeURIComponent(query);
+        if(query) newUrl += '&search=' + encodeURIComponent(query);
+        if(fechaDesde) newUrl += '&fecha_desde=' + encodeURIComponent(fechaDesde);
+        if(fechaHasta) newUrl += '&fecha_hasta=' + encodeURIComponent(fechaHasta);
+        if(estado) newUrl += '&estado=' + encodeURIComponent(estado);
         window.history.pushState("", "", newUrl);
     });
 });
