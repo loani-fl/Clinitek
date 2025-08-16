@@ -127,25 +127,23 @@
 
     /* Descripción de la imagen */
     .img-description {
-        font-size: 0.8rem;
-        color: #555;
-        margin-top: 0.3rem;
-        text-align: center;
-        max-height: 3rem;      /* máximo 2 líneas */
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-    }
+    font-size: 0.8rem;
+    color: #555;
+    margin-top: 0.3rem;
+    text-align: center;
+    white-space: normal;   /* permite saltos de línea */
+    overflow-wrap: break-word; /* rompe palabras largas si es necesario */
+}
+
 
     /* Descripción del examen */
     .examen-card p {
-        max-height: 5rem;      /* altura máxima de la descripción del examen */
-        overflow: auto;        /* scroll si es muy larga */
-        padding-right: 0.25rem;
-        line-height: 1.3rem;
-    }
+    max-height: none;      /* sin límite de altura */
+    overflow: visible;     /* nada de scroll */
+    line-height: 1.4rem;   /* un poco más de espacio entre líneas */
+}
+
+
 
    /* Modal navegación */
 .modal-nav {
@@ -179,6 +177,17 @@
         height: auto;
         object-fit: contain;
     }
+
+    /* Descripción dentro del modal */
+[id^="modal-desc-"] {
+    max-height: none;           /* sin límite de altura */
+    overflow-y: auto;           /* scroll vertical si fuera muy largo */
+    white-space: normal;        /* texto normal */
+    overflow-wrap: break-word;  /* evita que palabras largas rompan el diseño */
+    line-height: 1.4rem;
+    font-size: 0.9rem;
+}
+
 </style>
 
 <div class="custom-card">
@@ -245,11 +254,13 @@
 @endforelse
 
 
-    <div class="mt-4">
-        <a href="{{ route('rayosx.index') }}" class="btn btn-secondary btn-sm">
-            <i class="bi bi-arrow-left-circle"></i> Regresar
-        </a>
-    </div>
+<div class="mt-4 text-center">
+    <a href="{{ route('rayosx.index') }}" class="btn btn-success">
+        <i class="bi bi-arrow-left-circle"></i> Regresar
+    </a>
+</div>
+
+
 </div>
 
 <script>
