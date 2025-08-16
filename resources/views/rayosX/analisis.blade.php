@@ -46,11 +46,11 @@
         @endforeach
         </ul>
     </div>
-@endif
+    @endif
 
-@if(session('error'))
-    <div class="alert alert-danger">{{ session('error') }}</div>
-@endif
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
 
     <h4>Datos del paciente</h4>
     <ul class="datos-paciente-flex">
@@ -80,69 +80,35 @@
         </div>
 
         <h4>Exámenes realizados</h4>
-        @forelse ($orden->examenes as $examen)
-            <div class="examen-card">
-                <div class="examen-nombre">
-                    {{ $examenesNombres[$examen->examen_codigo] ?? $examen->examen_codigo }}
-                    <button type="button" class="btn btn-sm btn-success" id="btn-agregar-{{ $examen->id }}" onclick="addImageBlock({{ $examen->id }})">
-                        <i class="bi bi-plus-circle"></i> Agregar imagen
-                    </button>
-                </div>
-                <div class="examen-content" id="examen-content-{{ $examen->id }}">
-@foreach ($orden->examenes as $examen)
-    <div class="examen-content" id="examen-content-{{ $examen->id }}">
-      @php
-    $bloquesImagenes = $examen->imagenes ?? collect();
-    $oldDescripciones = old("descripciones.{$examen->id}", []);
-    $totalBloques = max($bloquesImagenes->count(), count($oldDescripciones), 1);
-@endphp
-
-@for($i = 0; $i < $totalBloques; $i++)
-    <div class="image-description-block" data-block-index="{{ $i }}" 
-         @if($i > 0 && empty($bloquesImagenes[$i]) && empty($oldDescripciones[$i])) style="display:none;" @endif>
-
-        {{-- Imagen --}}
-        <div class="preview-container text-center">
-            @if(isset($bloquesImagenes[$i]))
-                <img src="{{ asset('storage/'.$bloquesImagenes[$i]->ruta) }}" class="img-preview" alt="Imagen existente">
-            @else
-                <img id="preview_{{ $examen->id }}_{{ $i }}" class="img-preview" style="display:none" alt="Vista previa">
-                <div class="input-file-container mt-2">
-                    <input type="file" 
-                           name="imagenes[{{ $examen->id }}][]" 
-                           id="imagen_{{ $examen->id }}_{{ $i }}" 
-                           class="form-control form-control-sm" 
-                           accept=".jpg,.jpeg,.png" 
-                           onchange="previewImage(event, '{{ $examen->id }}_{{ $i }}')">
-                </div>
-            @endif
+@forelse ($orden->examenes as $examen)
+    @php
+        $bloquesImagenes = $examen->imagenes ?? collect();
+    @endphp
+    <div class="examen-card">
+        <div class="examen-nombre">
+            {{ $examenesNombres[$examen->examen_codigo] ?? $examen->examen_codigo }}
+            <button type="button" class="btn btn-sm btn-success" id="btn-agregar-{{ $examen->id }}" onclick="addImageBlock({{ $examen->id }})">
+                <i class="bi bi-plus-circle"></i> Agregar imagen
+            </button>
         </div>
-
-        {{-- Descripción individual por imagen --}}
-        <div class="textarea-container mt-2">
-            <label class="form-label mb-1">Descripción:</label>
-            <textarea 
-                name="descripciones[{{ $examen->id }}][]" 
-                class="form-control descripcion-textarea" 
-                rows="3" 
-                maxlength="200">{{ old("descripciones.{$examen->id}.{$i}", $bloquesImagenes[$i]->descripcion ?? '') }}</textarea>
+        <div class="examen-content" id="examen-content-{{ $examen->id }}">
+            @foreach($bloquesImagenes as $i => $bloque)
+                <div class="image-description-block" data-block-index="{{ $i }}">
+                    <div class="preview-container text-center mb-2">
+                        <img src="{{ asset('storage/'.$bloque->ruta) }}" class="img-preview" alt="Imagen existente">
+                    </div>
+                    <div class="textarea-container mt-2">
+                        <label class="form-label mb-1">Descripción:</label>
+                        <textarea name="descripciones[{{ $examen->id }}][]" class="form-control descripcion-textarea" rows="3" maxlength="200">{{ $bloque->descripcion }}</textarea>
+                    </div>
+                </div>
+            @endforeach
         </div>
     </div>
-@endfor
+@empty
+    <p>No hay exámenes registrados para esta orden.</p>
+@endforelse
 
-    </div>
-@endforeach
-
-
-
-
-
-
-                </div>
-            </div>
-        @empty
-            <p>No hay exámenes registrados para esta orden.</p>
-        @endforelse
 
         <div class="btn-group mt-4">
             <a href="{{ route('rayosx.index') }}" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-left-circle"></i> Regresar</a>
@@ -150,7 +116,6 @@
         </div>
     </form>
 </div>
-
 <script>
 function mostrarMensaje(mensaje, tipo='error') {
     const container = document.getElementById('mensaje-dinamico-container');
@@ -185,37 +150,69 @@ function addImageBlock(examenId){
     const container = document.getElementById('examen-content-'+examenId);
     if(!container) return;
     const blocks = container.querySelectorAll('.image-description-block');
-    if(blocks.length >= 3){ document.getElementById('btn-agregar-'+examenId).disabled=true; mostrarMensaje('Máximo 3 imágenes por examen.', 'info'); return; }
+    if(blocks.length >= 3){ 
+        document.getElementById('btn-agregar-'+examenId).disabled=true; 
+        mostrarMensaje('Máximo 3 imágenes por examen.', 'info'); 
+        return; 
+    }
 
     const index = blocks.length;
-    const blockDiv = document.createElement('div'); blockDiv.className='image-description-block'; blockDiv.setAttribute('data-block-index', index);
+    const blockDiv = document.createElement('div'); 
+    blockDiv.className='image-description-block'; 
+    blockDiv.setAttribute('data-block-index', index);
 
-    const inputFileDiv = document.createElement('div'); inputFileDiv.className='input-file-container mt-2';
-    const inputFile = document.createElement('input'); inputFile.type='file'; inputFile.name=`imagenes[${examenId}][]`; inputFile.id=`imagen_${examenId}_${index}`; inputFile.className='form-control form-control-sm'; inputFile.accept='.jpg,.jpeg,.png'; 
+    const previewDiv=document.createElement('div'); 
+    previewDiv.className='preview-container text-center mb-2';
+    const imgPreview=document.createElement('img'); 
+    imgPreview.id=`preview_${examenId}_${index}`; 
+    imgPreview.className='img-preview'; 
+    imgPreview.style.display='none'; 
+    imgPreview.alt='Vista previa de imagen';
+
+    const inputFileDiv=document.createElement('div'); 
+    inputFileDiv.className='input-file-container mt-2';
+    const inputFile=document.createElement('input'); 
+    inputFile.type='file'; 
+    inputFile.name=`imagenes[${examenId}][]`; 
+    inputFile.id=`imagen_${examenId}_${index}`; 
+    inputFile.className='form-control form-control-sm'; 
+    inputFile.accept='.jpg,.jpeg,.png'; 
     inputFile.addEventListener('change', function(e){ previewImage(e, `${examenId}_${index}`); });
     inputFileDiv.appendChild(inputFile);
 
-    const previewDiv=document.createElement('div'); previewDiv.className='preview-container text-center';
-    const imgPreview=document.createElement('img'); imgPreview.id=`preview_${examenId}_${index}`; imgPreview.className='img-preview'; imgPreview.style.display='none'; imgPreview.alt='Vista previa de imagen';
-    previewDiv.appendChild(imgPreview); previewDiv.appendChild(inputFileDiv);
+    previewDiv.appendChild(imgPreview); 
+    previewDiv.appendChild(inputFileDiv);
 
-    const textareaDiv=document.createElement('div'); textareaDiv.className='textarea-container mt-2';
-    const textarea=document.createElement('textarea'); textarea.name=`descripciones[${examenId}][]`; textarea.className='form-control descripcion-textarea'; textarea.rows=3; textarea.maxLength=200;
+    const textareaDiv=document.createElement('div'); 
+    textareaDiv.className='textarea-container mt-2';
+    const textarea=document.createElement('textarea'); 
+    textarea.name=`descripciones[${examenId}][]`; 
+    textarea.className='form-control descripcion-textarea'; 
+    textarea.rows=3; 
+    textarea.maxLength=200;
     textareaDiv.appendChild(textarea);
 
     blockDiv.appendChild(previewDiv);
     blockDiv.appendChild(textareaDiv);
     container.appendChild(blockDiv);
 
-    if(container.querySelectorAll('.image-description-block').length >= 3) document.getElementById('btn-agregar-'+examenId).disabled=true;
+    if(container.querySelectorAll('.image-description-block').length >= 3) 
+        document.getElementById('btn-agregar-'+examenId).disabled=true;
 }
 
 document.addEventListener('DOMContentLoaded', function(){
     const examenes=@json($orden->examenes->pluck('id'));
     examenes.forEach(examenId=>{
         const container=document.getElementById('examen-content-'+examenId);
-        if(container && container.querySelectorAll('.image-description-block').length===0){ addImageBlock(examenId); }
-        if(container && container.querySelectorAll('.image-description-block').length >= 3){ document.getElementById('btn-agregar-'+examenId).disabled=true; }
+        if(container){
+            const bloquesExistentes = container.querySelectorAll('.image-description-block');
+            if(bloquesExistentes.length===0){ 
+                addImageBlock(examenId); 
+            }
+            if(bloquesExistentes.length >= 3){ 
+                document.getElementById('btn-agregar-'+examenId).disabled=true; 
+            }
+        }
     });
 });
 
@@ -252,4 +249,5 @@ document.getElementById('form-analisis').addEventListener('submit', function(eve
     if(errores) event.preventDefault();
 });
 </script>
+
 @endsection
