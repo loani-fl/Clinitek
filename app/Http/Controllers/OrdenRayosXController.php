@@ -267,7 +267,8 @@ public function store(Request $request)
         'fecha' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:2025-10-31'],
         'examenes' => ['required', 'array', 'min:1', 'max:10'],
         'examenes.*' => ['string'],
-        'imagenes.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'], // Validación de imágenes
+        'imagenes.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+        'imagenes.*.*' => 'nullable|mimes:jpg,jpeg,png|max:5120', // Validación de imágenes
     ], [
         'paciente_id.required' => 'Debe seleccionar un paciente.',
         'paciente_id.exists' => 'El paciente seleccionado no existe.',
@@ -393,70 +394,103 @@ public function store(Request $request)
         ];
 
         return view('rayosx.show', compact('orden', 'examenesNombres'));
-    }
-    public function guardarAnalisis(Request $request, RayosxOrder $orden)
-    {
-        $request->validate([
-            'medico_analista_id' => 'required|exists:medicos,id',
-            'descripciones' => 'required|array',
-            'descripciones.*' => 'nullable|string',
-            'imagenes' => 'required|array',
-            'imagenes.*.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
-        ], [
-            'medico_analista_id.required' => 'Debe seleccionar un médico analista válido.',
-            'medico_analista_id.exists' => 'El médico analista no existe.',
-            'descripciones.required' => 'Debe agregar descripciones para los exámenes.',
-            'imagenes.required' => 'Debe subir al menos una imagen para cada examen.',
-            'imagenes.*.*.image' => 'Solo se permiten archivos de imagen.',
-            'imagenes.*.*.max' => 'Cada imagen no debe superar los 5MB.',
-        ]);
-    
-        // Validar mínimo 1 y máximo 3 imágenes por examen
-        foreach ($request->imagenes as $examenId => $imagenesArray) {
-            $count = is_array($imagenesArray) ? count($imagenesArray) : 0;
-            if ($count < 1) {
-                return back()->withErrors(['imagenes' => "El examen con ID '{$examenId}' debe tener al menos 1 imagen."])->withInput();
-            }
-            if ($count > 3) {
-                return back()->withErrors(['imagenes' => "El examen con ID '{$examenId}' no puede tener más de 3 imágenes."])->withInput();
-            }
+
         }
-    
-        // Guardar médico analista y estado
-        $orden->medico_analista_id = $request->medico_analista_id;
-        $orden->estado = 'realizado';
-        $orden->save();
-    
-        // Guardar descripciones e imágenes
-        foreach ($request->descripciones as $examenId => $descripcion) {
-            $examen = $orden->examenes()->where('id', $examenId)->first();
-            if (!$examen) {
-                continue;
-            }
-    
-            $examen->descripcion = $descripcion;
-            $examen->save();
-    
-            if ($request->hasFile("imagenes.$examenId")) {
-                foreach ($request->file("imagenes.$examenId") as $imagen) {
-                    // Generar nombre único para cada imagen
-                    $nombre = time() . '_' . uniqid() . '_' . $imagen->getClientOriginalName();
-    
-                    // Guardar en storage/app/public/rayosx_examenes
-                    $imagen->storeAs('public/rayosx_examenes', $nombre);
-    
-                    // Crear registro en la BD
-                    RayosxOrderExamenImagen::create([
-                        'rayosx_order_examen_id' => $examen->id,
-                        'ruta' => 'rayosx_examenes/' . $nombre,
-                    ]);
+public function guardarAnalisis(Request $request, RayosxOrder $orden)
+{
+    // Validación
+    $request->validate([
+        'medico_analista_id' => 'required|exists:medicos,id',
+        'descripciones' => 'required|array',
+        'descripciones.*' => 'required|array',
+        'descripciones.*.*' => 'required|string|max:200',
+        'imagenes' => 'sometimes|array',
+        'imagenes.*.*' => 'sometimes|image|mimes:jpeg,png,jpg|max:5120',
+        'eliminar_imagenes' => 'sometimes|array',
+        'eliminar_imagenes.*' => 'integer|exists:rayosx_order_examen_imagenes,id'
+    ], [
+        'medico_analista_id.required' => 'Debe seleccionar un médico analista válido.',
+        'medico_analista_id.exists' => 'El médico analista no existe.',
+        'descripciones.*.*.required' => 'Cada bloque de descripción es obligatorio.',
+        'imagenes.*.*.image' => 'Solo se permiten archivos de imagen JPG, JPEG o PNG.',
+        'imagenes.*.*.max' => 'Cada imagen no debe superar los 5MB.',
+    ]);
+
+    // Guardar médico analista y estado
+    $orden->medico_analista_id = $request->medico_analista_id;
+    $orden->estado = 'realizado';
+    $orden->save();
+
+    foreach ($orden->examenes as $examen) {
+        $examenId = $examen->id;
+
+        // 1️⃣ Guardar descripciones (máximo 3 bloques)
+        $descripcionesBloques = $request->input("descripciones.$examenId", []);
+        $texto = [];
+
+        foreach ($descripcionesBloques as $desc) {
+            $desc = trim($desc);
+            if ($desc) $texto[] = $desc;
+        }
+
+        // Validar máximo 3 descripciones
+        if (count($texto) > 3) {
+            return back()->withErrors([
+                "descripciones.$examenId" => "El examen con ID '{$examenId}' no puede tener más de 3 bloques de descripción."
+            ])->withInput();
+        }
+
+        $examen->descripcion = implode("\n", $texto);
+        $examen->save();
+
+        // 2️⃣ Eliminar imágenes marcadas
+        if ($request->filled("eliminar_imagenes")) {
+            $imagenesEliminar = $request->input("eliminar_imagenes", []);
+            foreach ($imagenesEliminar as $imgId) {
+                $imagen = RayosxOrderExamenImagen::find($imgId);
+                if ($imagen && $imagen->rayosx_order_examen_id == $examenId) {
+                    \Storage::delete('public/'.$imagen->ruta);
+                    $imagen->delete();
                 }
             }
         }
-    
-        return redirect()->route('rayosx.index', $orden->id)
-            ->with('success', 'Análisis guardado correctamente y estado actualizado a realizado.');
+
+        // 3️⃣ Guardar nuevas imágenes (máximo 3 en total)
+        if ($request->hasFile("imagenes.$examenId")) {
+            $imagenesExistentes = $examen->imagenes()->count();
+            $imagenesNuevas = $request->file("imagenes.$examenId");
+            $total = $imagenesExistentes + count($imagenesNuevas);
+
+            if ($total > 3) {
+                return back()->withErrors([
+                    "imagenes" => "El examen con ID '{$examenId}' no puede tener más de 3 imágenes en total."
+                ])->withInput();
+            }
+
+            foreach ($imagenesNuevas as $imagen) {
+                $nombre = time() . '_' . uniqid() . '_' . $imagen->getClientOriginalName();
+                $imagen->storeAs('public/rayosx_examenes', $nombre);
+
+                RayosxOrderExamenImagen::create([
+                    'rayosx_order_examen_id' => $examenId,
+                    'ruta' => 'rayosx_examenes/' . $nombre,
+                ]);
+            }
+        }
+
+        // 4️⃣ Validar mínimo 1 imagen por examen
+        if ($examen->imagenes()->count() < 1) {
+            return back()->withErrors([
+                "imagenes" => "El examen con ID '{$examenId}' debe tener al menos 1 imagen."
+            ])->withInput();
+        }
     }
+
+    return redirect()->route('rayosx.index')
+        ->with('success', 'Análisis guardado correctamente y estado actualizado a realizado.');
+}
+
+
     
 // Mostrar lista paginada de órdenes con paciente
 
