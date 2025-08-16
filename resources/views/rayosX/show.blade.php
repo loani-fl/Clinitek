@@ -203,52 +203,47 @@
     {{-- Exámenes realizados --}}
     <h4>Exámenes realizados</h4>
     @forelse ($orden->examenes as $examen)
-        <div class="examen-card">
-            <div class="examen-nombre">
-                {{ $examenesNombres[$examen->examen_codigo] ?? $examen->examen_codigo }}
-            </div>
+    <div class="examen-card">
+        <div class="examen-nombre">
+            {{ $examenesNombres[$examen->examen_codigo] ?? $examen->examen_codigo }}
+        </div>
 
-            {{-- Imágenes --}}
-            @if($examen->imagenes && $examen->imagenes->count() > 0)
-                <div class="img-gallery" id="gallery-{{ $examen->id }}">
-                    @foreach ($examen->imagenes as $index => $imagen)
-                        @if($imagen->ruta)
+        {{-- Imágenes --}}
+        @if($examen->imagenes && $examen->imagenes->count() > 0)
+            <div class="img-gallery" id="gallery-{{ $examen->id }}">
+                @foreach ($examen->imagenes as $index => $imagen)
+                    @if($imagen->ruta)
                         <div class="img-card" onclick="openModal({{ $examen->id }}, {{ $index }})">
                             <img src="{{ asset('storage/' . $imagen->ruta) }}" 
                                  class="img-preview" 
                                  alt="{{ $imagen->descripcion ?? 'Imagen de examen' }}" />
-                            @if($imagen->descripcion)
-                                <p class="img-description">{{ $imagen->descripcion }}</p>
-                            @endif
+                            <p class="img-description">
+                                {{ $imagen->descripcion ?? 'Sin descripción' }}
+                            </p>
                         </div>
-                        @endif
-                    @endforeach
-                </div>
+                    @endif
+                @endforeach
+            </div>
 
-                <!-- Modal -->
-                <div class="modal fade" id="modal-{{ $examen->id }}" tabindex="-1" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered modal-lg">
+            <!-- Modal -->
+            <div class="modal fade" id="modal-{{ $examen->id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content position-relative bg-dark">
                         <span class="modal-nav modal-prev" onclick="prevImage({{ $examen->id }})">&lt;</span>
                         <span class="modal-nav modal-next" onclick="nextImage({{ $examen->id }})">&gt;</span>
                         <img id="modal-img-{{ $examen->id }}" src="" alt="">
                         <div id="modal-desc-{{ $examen->id }}" class="p-2 text-center text-white"></div>
                     </div>
-                  </div>
                 </div>
-            @else
-                <p>Sin imágenes registradas</p>
-            @endif
-
-            {{-- Descripción del examen --}}
-            <div class="mt-2">
-                <strong>Descripción del examen:</strong>
-                <p>{{ $examen->descripcion ?? 'Sin descripción' }}</p>
             </div>
-        </div>
-    @empty
-        <p>No hay exámenes registrados para esta orden.</p>
-    @endforelse
+        @else
+            <p>Sin imágenes registradas</p>
+        @endif
+    </div>
+@empty
+    <p>No hay exámenes registrados para esta orden.</p>
+@endforelse
+
 
     <div class="mt-4">
         <a href="{{ route('rayosx.index') }}" class="btn btn-secondary btn-sm">

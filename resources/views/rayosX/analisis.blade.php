@@ -89,38 +89,51 @@
                     </button>
                 </div>
                 <div class="examen-content" id="examen-content-{{ $examen->id }}">
- @php
+@foreach ($orden->examenes as $examen)
+    <div class="examen-content" id="examen-content-{{ $examen->id }}">
+      @php
     $bloquesImagenes = $examen->imagenes ?? collect();
-    $bloquesDescripciones = explode("\n", $examen->descripcion ?? '');
     $oldDescripciones = old("descripciones.{$examen->id}", []);
-    // Inicialmente mostramos solo 1 bloque, aunque pueda haber hasta 3
-    $totalBloques = max($bloquesImagenes->count(), count($bloquesDescripciones), count($oldDescripciones), 1);
+    $totalBloques = max($bloquesImagenes->count(), count($oldDescripciones), 1);
 @endphp
 
 @for($i = 0; $i < $totalBloques; $i++)
-    <div class="image-description-block" data-block-index="{{ $i }}" @if($i > 0 && empty($bloquesImagenes[$i]) && empty($oldDescripciones[$i])) style="display:none;" @endif>
+    <div class="image-description-block" data-block-index="{{ $i }}" 
+         @if($i > 0 && empty($bloquesImagenes[$i]) && empty($oldDescripciones[$i])) style="display:none;" @endif>
+
+        {{-- Imagen --}}
         <div class="preview-container text-center">
             @if(isset($bloquesImagenes[$i]))
                 <img src="{{ asset('storage/'.$bloquesImagenes[$i]->ruta) }}" class="img-preview" alt="Imagen existente">
             @else
                 <img id="preview_{{ $examen->id }}_{{ $i }}" class="img-preview" style="display:none" alt="Vista previa">
                 <div class="input-file-container mt-2">
-                    <input type="file" name="imagenes[{{ $examen->id }}][]" id="imagen_{{ $examen->id }}_{{ $i }}" class="form-control form-control-sm" accept=".jpg,.jpeg,.png" onchange="previewImage(event, '{{ $examen->id }}_{{ $i }}')">
+                    <input type="file" 
+                           name="imagenes[{{ $examen->id }}][]" 
+                           id="imagen_{{ $examen->id }}_{{ $i }}" 
+                           class="form-control form-control-sm" 
+                           accept=".jpg,.jpeg,.png" 
+                           onchange="previewImage(event, '{{ $examen->id }}_{{ $i }}')">
                 </div>
             @endif
         </div>
 
-        {{-- Descripción --}}
+        {{-- Descripción individual por imagen --}}
         <div class="textarea-container mt-2">
             <label class="form-label mb-1">Descripción:</label>
             <textarea 
                 name="descripciones[{{ $examen->id }}][]" 
                 class="form-control descripcion-textarea" 
                 rows="3" 
-                maxlength="200">{{ old("descripciones.{$examen->id}.{$i}", $oldDescripciones[$i] ?? $bloquesDescripciones[$i] ?? '') }}</textarea>
+                maxlength="200">{{ old("descripciones.{$examen->id}.{$i}", $bloquesImagenes[$i]->descripcion ?? '') }}</textarea>
         </div>
     </div>
 @endfor
+
+    </div>
+@endforeach
+
+
 
 
 
