@@ -162,7 +162,7 @@
 }
 
 .modal-nav:hover {
-    color: #ffa500; /* más brillante al pasar el mouse */
+    color: #ffa500; 
 }
 
 
