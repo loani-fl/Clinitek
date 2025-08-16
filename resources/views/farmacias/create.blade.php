@@ -92,18 +92,27 @@
                         id="descuento"
                         class="form-control @error('descuento') is-invalid @enderror"
                         value="{{ old('descuento') }}"
-                        min="0"
+                        placeholder="Ej: 10.5"
+                        min="1"
                         max="100"
                         step="0.1"
-                        placeholder="Ej: 10.5"
-                        oninput="if(this.value < 0) this.value = 0; if(this.value > 100) this.value = 100;">
+                        oninput="
+            let val = this.value;
+            // Limita máximo 2 dígitos antes del punto y 1 decimal
+            val = val.replace(/^(\d{0,2})(\.\d?)?.*$/,'$1$2');
+            // Bloquea valores mayores a 100
+            if(val !== '' && parseFloat(val) > 100) val = '100';
+            // Bloquea valores menores a 1
+            if(val !== '' && parseFloat(val) < 1) val = '1';
+            this.value = val;
+        ">
                     @error('descuento')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-            </div>
 
-            <div class="row mb-3">
+
+                <div class="row mb-3">
                 <!-- Página web -->
                 <div class="col-md-4">
                     <label for="pagina_web" class="form-label">Página web (Opcional):</label>
@@ -200,21 +209,37 @@
                 </div>
             </div>
 
+                @php
+                    // Mostrar foto temporal de sesión si existe
+                    $fotoMostrar = session('foto_temporal')
+                        ? asset('storage/' . session('foto_temporal'))
+                        : '';
+                @endphp
 
-            <!-- Foto -->
+                    <!-- Foto -->
                 <div class="col-md-4">
                     <label for="foto" class="form-label">Foto:</label>
+
+                    <div class="mb-2">
+                        <img src="{{ $fotoMostrar }}"
+                             alt="Foto seleccionada"
+                             id="fotoPreview"
+                             class="img-thumbnail"
+                             style="max-width: 120px; {{ $fotoMostrar ? '' : 'display:none;' }}">
+                    </div>
+
                     <input
                         type="file"
                         name="foto"
                         id="foto"
                         accept=".jpg,.jpeg,.png,.webp"
                         class="form-control @error('foto') is-invalid @enderror">
+
                     @error('foto')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-            </div>
+
 
             <div class="d-flex justify-content-center gap-3 mt-4">
                 <button type="submit" class="btn btn-primary">
@@ -321,6 +346,25 @@
         });
     </script>
 
+    <script>
+        const fotoInput = document.getElementById('foto');
+        const fotoPreview = document.getElementById('fotoPreview');
+
+        fotoInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    fotoPreview.src = e.target.result;
+                    fotoPreview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                fotoPreview.src = '';
+                fotoPreview.style.display = 'none';
+            }
+        });
+    </script>
 
 @endsection
 

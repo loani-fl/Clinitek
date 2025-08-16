@@ -153,13 +153,15 @@
                          style="max-width: 120px; {{ $fotoMostrar ? '' : 'display:none;' }}">
                 </div>
                 <input type="file" name="foto" id="foto" class="form-control @error('foto') is-invalid @enderror">
+                <input type="hidden" name="restablecer_foto" id="restablecer_foto" value="0">
                 @error('foto')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
             <!-- Botones -->
             <div class="d-flex justify-content-center gap-3 mt-4">
                 <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Guardar Cambios</button>
-                <button type="button" class="btn btn-warning" id="restablecerBtn"><i class="bi bi-arrow-counterclockwise"></i> Restablecer</button>
+                <button type="button" class="btn btn-secondary" id="restablecerBtn">Restablecer</button>
+
                 <a href="{{ route('farmacias.index') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Cancelar</a>
             </div>
         </form>
@@ -248,6 +250,23 @@
                 const primerCampo = form.querySelector('input:not([type=file]), textarea, select');
                 if(primerCampo) primerCampo.focus();
             }, 10);
+        });
+    </script>
+
+    <script>
+        document.getElementById('restablecerBtn').addEventListener('click', function () {
+            const fotoPreview = document.getElementById('fotoPreview');
+            const fotoInput = document.getElementById('foto');
+
+            // Restaurar la foto original
+            fotoPreview.src = fotoPreview.getAttribute('data-original');
+            fotoPreview.style.display = fotoPreview.src ? 'block' : 'none';
+
+            // Resetear input
+            fotoInput.value = '';
+
+            // Marcar que se debe restablecer en el backend
+            document.getElementById('restablecer_foto').value = "1";
         });
     </script>
 @endsection
