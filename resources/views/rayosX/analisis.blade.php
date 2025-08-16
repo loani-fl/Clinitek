@@ -203,16 +203,16 @@
 </style>
 
 <div class="custom-card">
-    <h2 class="section-title">Análisis de drden rayos x</h2>
+    <h2 class="section-title">Análisis de orden rayos x</h2>
 
     {{-- Datos del paciente --}}
     <h4>Datos del paciente</h4>
-   <ul class="datos-paciente-flex">
-    <li><strong>Nombre:</strong> {{ $orden->paciente->nombre ?? $orden->nombres ?? 'N/A' }}</li>
-    <li><strong>Apellidos:</strong> {{ $orden->paciente->apellidos ?? $orden->apellidos ?? 'N/A' }}</li>
-    <li><strong>Identidad:</strong> {{ $orden->paciente->identidad ?? $orden->identidad ?? 'N/A' }}</li>
-    <li><strong>Género:</strong> {{ $orden->paciente->genero ?? $orden->genero ?? 'N/A' }}</li>
-</ul>
+    <ul class="datos-paciente-flex">
+        <li><strong>Nombre:</strong> {{ $orden->paciente->nombre ?? $orden->nombres ?? 'N/A' }}</li>
+        <li><strong>Apellidos:</strong> {{ $orden->paciente->apellidos ?? $orden->apellidos ?? 'N/A' }}</li>
+        <li><strong>Identidad:</strong> {{ $orden->paciente->identidad ?? $orden->identidad ?? 'N/A' }}</li>
+        <li><strong>Género:</strong> {{ $orden->paciente->genero ?? $orden->genero ?? 'N/A' }}</li>
+    </ul>
 
     <hr>
 
@@ -220,21 +220,22 @@
     <form action="{{ route('rayosx.storeAnalisis', $orden->id) }}" method="POST" enctype="multipart/form-data" id="form-analisis">
         @csrf
 
-        <div class="mb-3">
-            <label for="medico_analista_id" class="form-label"><strong>Médico analista:</strong></label>
-            <select name="medico_analista_id" id="medico_analista_id" class="form-select @error('medico_analista_id') is-invalid @enderror" required>
-                <option value="">Seleccionar Médico Analista (Radiológos)</option>
-                @foreach ($medicosRadiologos as $medico)
-                    <option value="{{ $medico->id }}"
-                        {{ (old('medico_analista_id', $orden->medico_analista_id ?? '') == $medico->id) ? 'selected' : '' }}>
-                        {{ $medico->nombre }} {{ $medico->apellidos }}
-                    </option>
-                @endforeach
-            </select>
-            @error('medico_analista_id')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
+       <div class="mb-3">
+    <label for="medico_analista_id" class="form-label"><strong>Médico analista:</strong></label>
+    <select name="medico_analista_id" id="medico_analista_id" class="form-select @error('medico_analista_id') is-invalid @enderror">
+        <option value="">Seleccionar Médico Analista (Radiológos)</option>
+        @foreach ($medicosRadiologos as $medico)
+            <option value="{{ $medico->id }}"
+                {{ (old('medico_analista_id', $orden->medico_analista_id ?? '') == $medico->id) ? 'selected' : '' }}>
+                {{ $medico->nombre }} {{ $medico->apellidos }}
+            </option>
+        @endforeach
+    </select>
+    @error('medico_analista_id')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>
+
 
         <h4>Exámenes realizados</h4>
         @forelse ($orden->examenes as $examen)
@@ -262,14 +263,20 @@
 
                     {{-- Subida de nuevas imágenes --}}
                     <div class="input-file-container">
-                        <label>Agregar imágenes:</label>
-                        <input type="file" name="imagenes[{{ $examen->id }}][]" class="form-control form-control-sm" accept="image/*" multiple>
+                        <label>Agregar imágenes formato jpg, jpeg y pnj:</label>
+                        <input 
+                            type="file" 
+                            name="imagenes[{{ $examen->id }}][]" 
+                            class="form-control form-control-sm input-imagen" 
+                            accept=".jpg,.jpeg,.png" 
+                            multiple>
                     </div>
 
                     {{-- Campo descripción --}}
-                    <div class="textarea-container mt-2">
+                     <div class="textarea-container mt-2">
                         <label>Descripción:</label>
-                        <textarea name="descripciones[{{ $examen->id }}]" class="form-control" rows="3">{{ old("descripciones.{$examen->id}", $examen->descripcion) }}</textarea>
+                        <textarea name="descripciones[{{ $examen->id }}]" class="form-control descripcion-textarea" rows="3" maxlength="200">{{ old("descripciones.{$examen->id}", $examen->descripcion) }}</textarea>
+                        <small class="text-muted">Máximo 200 caracteres.</small>
                     </div>
                 </div>
             </div>
@@ -290,64 +297,125 @@
 </div>
 
 <script>
-    document.getElementById('form-analisis').addEventListener('submit', function(event) {
-        const form = this;
-        const examenes = form.querySelectorAll('.examen-card');
-        const errorId = 'form-error-message';
-        let errorDiv = document.getElementById(errorId);
+    const form = document.getElementById('form-analisis');
 
-        if (!errorDiv) {
-            errorDiv = document.createElement('div');
-            errorDiv.id = errorId;
-            errorDiv.style.color = '#b22222';
-            errorDiv.style.fontWeight = '700';
-            errorDiv.style.marginBottom = '1rem';
-            errorDiv.style.padding = '0.75rem 1rem';
-            errorDiv.style.border = '2px solid #b22222';
-            errorDiv.style.borderRadius = '0.5rem';
-            errorDiv.style.backgroundColor = '#ffe6e6';
-            errorDiv.style.userSelect = 'none';
-            form.prepend(errorDiv);
-        }
-        errorDiv.textContent = '';
-        errorDiv.style.display = 'none';
+// Crear div de error dinámico
+let errorDiv = document.createElement('div');
+errorDiv.id = 'form-error-message';
+errorDiv.style.color = '#b22222';
+errorDiv.style.fontWeight = '700';
+errorDiv.style.marginBottom = '1rem';
+errorDiv.style.padding = '0.5rem 1rem';
+errorDiv.style.border = '2px solid #b22222';
+errorDiv.style.borderRadius = '0.5rem';
+errorDiv.style.backgroundColor = '#ffe6e6';
+errorDiv.style.userSelect = 'none';
+errorDiv.style.display = 'none';
+errorDiv.style.width = 'fit-content';
+errorDiv.style.maxWidth = '100%';
+errorDiv.style.transition = 'opacity 0.3s';
+form.prepend(errorDiv);
 
-        let todosValidos = true;
+// Función para mostrar mensaje temporal
+function mostrarError(mensaje) {
+    errorDiv.textContent = mensaje;
+    errorDiv.style.display = 'block';
+    errorDiv.style.opacity = '1';
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-        examenes.forEach(examenCard => {
-            const inputFile = examenCard.querySelector('input[type="file"]');
-            const textarea = examenCard.querySelector('textarea');
+    setTimeout(() => {
+        errorDiv.style.opacity = '0';
+        setTimeout(() => errorDiv.style.display = 'none', 300);
+    }, 4000);
+}
 
-            // Verificamos imágenes seleccionadas y descripción no vacía
-            const tieneImagen = inputFile && inputFile.files.length > 0;
-            const descripcionValida = textarea && textarea.value.trim() !== '';
-
-            // Además puede haber imágenes ya existentes que no se eliminaron
-            const imagenesPrevias = examenCard.querySelectorAll('img.img-preview');
-            let imagenesPreviasNoEliminadas = false;
-            if (imagenesPrevias.length > 0) {
-                let eliminados = 0;
-                const checkboxesEliminar = examenCard.querySelectorAll('input[type="checkbox"][name="eliminar_imagenes[]"]');
-                checkboxesEliminar.forEach(cb => {
-                    if (cb.checked) eliminados++;
-                });
-                if ((imagenesPrevias.length - eliminados) > 0) {
-                    imagenesPreviasNoEliminadas = true;
-                }
+// Validación en tiempo real para archivos
+const inputsImagen = form.querySelectorAll('.input-imagen');
+inputsImagen.forEach(input => {
+    input.addEventListener('change', function() {
+        for (let i = 0; i < this.files.length; i++) {
+            const tipo = this.files[i].type;
+            if (!['image/jpeg', 'image/png'].includes(tipo)) {
+                this.value = ''; // Limpiar archivo inválido
+                mostrarError('Solo se permiten imágenes JPG o PNG.');
             }
-
-            // Validamos que haya al menos una imagen (nueva o previa no eliminada) y descripción
-            if (!((tieneImagen || imagenesPreviasNoEliminadas) && descripcionValida)) {
-                todosValidos = false;
-            }
-        });
-
-        if (!todosValidos) {
-            event.preventDefault();
-            errorDiv.textContent = 'Cada examen debe tener al menos una imagen (existente o nueva) y una descripción no vacía para guardar.';
-            errorDiv.style.display = 'block';
-            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     });
+});
+
+// Validación en tiempo real para textarea (descripción)
+const textareas = form.querySelectorAll('textarea');
+textareas.forEach(textarea => {
+    textarea.addEventListener('input', function(e) {
+        // Limitar a 200 caracteres
+        if (this.value.length > 200) {
+            this.value = this.value.substring(0, 200);
+            mostrarError('Máximo 200 caracteres permitidos.');
+        }
+
+        // Permitir solo caracteres válidos para descripción radiografías
+        const regex = /[^a-zA-Z0-9 .,;:()\/-]/g;
+        if (regex.test(this.value)) {
+            this.value = this.value.replace(regex, '');
+            mostrarError('Caracteres no permitidos eliminados.');
+        }
+    });
+});
+
+// Validación al enviar formulario
+form.addEventListener('submit', function(event) {
+    let todosValidos = true;
+    let errorMensaje = '';
+
+    // Validar que se seleccione un médico analista
+    const medicoAnalista = form.querySelector('#medico_analista_id');
+    if (!medicoAnalista.value) {
+        todosValidos = false;
+        mostrarError('El médico analista es obligatorio.');
+    }
+
+    const examenes = form.querySelectorAll('.examen-card');
+    examenes.forEach(examenCard => {
+        const inputFile = examenCard.querySelector('input[type="file"]');
+        const textarea = examenCard.querySelector('textarea');
+
+        // Validar imágenes nuevas
+        let tieneImagenValida = false;
+        if (inputFile && inputFile.files.length > 0) {
+            for (let i = 0; i < inputFile.files.length; i++) {
+                if (['image/jpeg', 'image/png'].includes(inputFile.files[i].type)) {
+                    tieneImagenValida = true;
+                } else {
+                    todosValidos = false;
+                    errorMensaje = 'Solo se permiten imágenes JPG o PNG.';
+                }
+            }
+        }
+
+        // Imágenes previas no eliminadas
+        const imagenesPrevias = examenCard.querySelectorAll('img.img-preview');
+        let imagenesPreviasNoEliminadas = false;
+        if (imagenesPrevias.length > 0) {
+            let eliminados = 0;
+            const checkboxesEliminar = examenCard.querySelectorAll('input[type="checkbox"][name="eliminar_imagenes[]"]');
+            checkboxesEliminar.forEach(cb => { if (cb.checked) eliminados++; });
+            if ((imagenesPrevias.length - eliminados) > 0) imagenesPreviasNoEliminadas = true;
+        }
+
+        // Descripción
+        const descripcionValida = textarea && textarea.value.trim() !== '';
+
+        if (!((tieneImagenValida || imagenesPreviasNoEliminadas) && descripcionValida)) {
+            todosValidos = false;
+            if (!errorMensaje) errorMensaje = 'Cada examen debe tener al menos una imagen válida y una descripción no vacía.';
+        }
+    });
+
+    if (!todosValidos) {
+        event.preventDefault();
+        if (!errorDiv.textContent) mostrarError(errorMensaje);
+    }
+});
+
 </script>
 @endsection

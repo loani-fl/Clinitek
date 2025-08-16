@@ -267,7 +267,8 @@ public function store(Request $request)
         'fecha' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:2025-10-31'],
         'examenes' => ['required', 'array', 'min:1', 'max:10'],
         'examenes.*' => ['string'],
-        'imagenes.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'], // Validación de imágenes
+       
+        'imagenes.*.*' => 'nullable|mimes:jpg,jpeg,png|max:5120', // Validación de imágenes
     ], [
         'paciente_id.required' => 'Debe seleccionar un paciente.',
         'paciente_id.exists' => 'El paciente seleccionado no existe.',
