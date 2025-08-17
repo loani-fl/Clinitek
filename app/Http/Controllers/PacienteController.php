@@ -132,6 +132,8 @@ class PacienteController extends Controller
 
         Paciente::create($request->all());
 
+        
+
         return redirect()->route('pacientes.index')->with('success', 'Paciente registrado exitosamente.');
     }
 
@@ -326,6 +328,52 @@ class PacienteController extends Controller
         return view('recetas.show', compact('paciente', 'recetas'));
     }
 
+public function filtro(Request $request)
+{
+    $busqueda = $request->input('busqueda');
+
+    $pacientes = \App\Models\Paciente::where('nombre', 'LIKE', "%{$busqueda}%")
+        ->orWhere('identidad', 'LIKE', "%{$busqueda}%")
+        ->orderBy('nombre')
+        ->get();
+
+    // Retornamos la tabla parcial
+    return view('pacientes.tabla', compact('pacientes'))->render();
+}
+
+
+public function buscarPacientesAjax(Request $request)
+{
+    $query = $request->input('search', '');
+
+    if (!$query) {
+        return response()->json(['pacientes' => []]);
+    }
+
+    $pacientes = Paciente::where('nombre', 'like', "%$query%")
+        ->orWhere('apellidos', 'like', "%$query%")
+        ->orWhere('identidad', 'like', "%$query%")
+        ->limit(10)
+        ->get(['id', 'nombre', 'apellidos', 'identidad']);
+
+    return response()->json(['pacientes' => $pacientes]);
+}
+
+public function obtenerDatosPaciente($id)
+{
+    $paciente = Paciente::find($id);
+
+    if (!$paciente) {
+        return response()->json([], 404);
+    }
+
+    return response()->json([
+        'nombre' => $paciente->nombre,
+        'apellidos' => $paciente->apellidos,
+        'identidad' => $paciente->identidad,
+        'genero' => $paciente->genero,
+    ]);
+}
 
 
 

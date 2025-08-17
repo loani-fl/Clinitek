@@ -52,32 +52,44 @@ class FarmaciaController extends Controller
      */
     public function store(Request $request)
     {
+
+        if ($request->hasFile('foto')) {
+            $path = $request->file('foto')->store('temp', 'public');
+            session(['foto_temporal' => $path]);
+        }
         $request->validate([
             'nombre' => [
                 'required',
                 'string',
                 'max:50',
-                'regex:/^[\pL\s\-]+$/u'
+                'regex:/^[\pL\s\-]+$/u',
+                Rule::unique('farmacias', 'nombre')
+
             ],
-            'ubicacion' => [
-                'required',
-                'string',
-                'max:255',
-                'regex:/^([^,]+,\s*){2}[^,]+$/',
-            ],
+
+
             'telefono' => [
                 'required',
                 'digits:8', // Exactamente 8 dígitos
                 'regex:/^[2389][0-9]{7}$/', // Debe comenzar con 2, 3, 8 o 9
-                'unique:farmacias,telefono'
+                Rule::unique('farmacias', 'telefono')
             ],
-
-            'horario' => [
+            'departamento' => [
                 'required',
                 'string',
-                'max:200',
-                'regex:/^[\pL0-9\s:\-,\.]+$/u'
+                'max:100'
             ],
+            'ciudad' => [
+                'required',
+                'string',
+                'max:100'
+            ],
+            'direccion' => [
+                'required',
+                'string',
+                'max:255'
+            ],
+
             'descripcion' => [
                 'required',
                 'string',
@@ -86,7 +98,8 @@ class FarmaciaController extends Controller
             'descuento' => [
                 'required',
                 'numeric',
-                'between:0,100',
+                'between:1,100',
+
             ],
             'foto' => [
                 'required',
@@ -97,7 +110,8 @@ class FarmaciaController extends Controller
             'pagina_web' => [
                 'nullable',
                 'url',
-                'max:255'
+                'max:255',
+                Rule::unique('farmacias', 'pagina_web')
             ],
 
         ], [
@@ -106,12 +120,13 @@ class FarmaciaController extends Controller
             'nombre.string' => 'El nombre debe ser una cadena de texto.',
             'nombre.max' => 'El nombre no debe superar los 50 caracteres.',
             'nombre.regex' => 'El nombre solo puede contener letras, espacios y guiones.',
+            'nombre.unique' => 'Este nombre de farmacia ya está registrado.',
 
-            // UBICACIÓN
-            'ubicacion.required' => 'La ubicación es obligatoria.',
-            'ubicacion.string' => 'La ubicación debe ser texto válido.',
-            'ubicacion.max' => 'La ubicación no debe superar los 255 caracteres.',
-            'ubicacion.regex' => 'Debe incluir ciudad, departamento y país',
+            // DIRECCION
+            'direccion.required' => 'La direccion es obligatoria.',
+            'direcccion.string' => 'La direccion debe ser texto válido.',
+            'direccion.max' => 'La direccion no debe superar los 255 caracteres.',
+
 
 
             // TELÉFONO
@@ -120,11 +135,7 @@ class FarmaciaController extends Controller
             'telefono.regex' => 'El teléfono debe iniciar con 2, 3, 8 o 9.',
             'telefono.unique' => 'Este teléfono ya está registrado.',
 
-            // HORARIO
-            'horario.required' => 'El horario es obligatorio.',
-            'horario.string' => 'El horario debe ser texto válido.',
-            'horario.max' => 'El horario no debe superar los 100 caracteres.',
-            'horario.regex' => 'El horario contiene caracteres inválidos. Usa solo letras, números y signos comunes.',
+
 
             // DESCRIPCIÓN
             'descripcion.required' => 'La descripción es obligatoria.',
@@ -134,7 +145,7 @@ class FarmaciaController extends Controller
             // DESCUENTO
             'descuento.required' => 'El descuento es obligatorio.',
             'descuento.numeric' => 'El descuento debe ser un número.',
-            'descuento.between' => 'El descuento debe estar entre 0 y 100%.',
+            'descuento.between' => 'El descuento debe estar entre 1 y 100%.',
 
             // FOTO
             'foto.required' => 'La foto es obligatoria.',
@@ -146,14 +157,23 @@ class FarmaciaController extends Controller
 
             'pagina_web.url' => 'La página web debe ser una URL válida (ej. https://ejemplo.com).',
             'pagina_web.max' => 'La URL no debe exceder los 255 caracteres.',
+            'pagina_web.unique' => 'Esta página web ya está registrada.',
+
+            'departamento.required' => 'El departamento es obligatorio.',
+            'ciudad.required' => 'La ciudad es obligatoria.',
 
         ]);
 
         $data = $request->except('foto');
 
-        if ($request->hasFile('foto')) {
-            $fotoPath = $request->file('foto')->store('farmacias', 'public');
-            $data['foto'] = $fotoPath;
+        if (session('foto_temporal')) {
+            $tempPath = session('foto_temporal');
+            $finalPath = 'farmacias/' . basename($tempPath);
+            \Storage::disk('public')->move($tempPath, $finalPath);
+            $data['foto'] = $finalPath;
+
+            // Limpiar sesión
+            session()->forget('foto_temporal');
         }
 
         Farmacia::create($data);
@@ -177,7 +197,36 @@ class FarmaciaController extends Controller
     public function edit(string $id)
     {
         $farmacia = Farmacia::findOrFail($id);
-        return view('farmacias.edit', compact('farmacia'));
+
+        // Lista de departamentos
+        $departamento = [
+            'Atlántida', 'Choluteca', 'Colón', 'Comayagua', 'Copán', 'Cortés',
+            'El Paraíso', 'Francisco Morazán', 'Gracias a Dios', 'Intibucá',
+            'Islas de la Bahía', 'La Paz', 'Lempira', 'Ocotepeque', 'Olancho',
+            'Santa Bárbara', 'Valle', 'Yoro'
+        ];
+        $ciudad = [
+            'Atlántida' => ['La Ceiba', 'Tela', 'Jutiapa'],
+            'Choluteca' => ['Choluteca', 'San Marcos de Colón'],
+            'Colón' => ['Trujillo', 'Tocoa'],
+            'Comayagua' => ['Comayagua', 'Siguatepeque'],
+            'Copán' => ['Santa Rosa de Copán', 'La Entrada'],
+            'Cortés' => ['San Pedro Sula', 'Puerto Cortés', 'La Lima'],
+            'El Paraíso' => ['Yuscarán', 'Danlí', 'El Paraiso'],
+            'Francisco Morazán' => ['Tegucigalpa', 'Valle de Ángeles', 'Santa Lucía'],
+            'Gracias a Dios' => ['Puerto Lempira'],
+            'Intibucá' => ['La Esperanza', 'Intibucá'],
+            'Islas de la Bahía' => ['Roatán', 'Utila'],
+            'La Paz' => ['La Paz', 'Marcala'],
+            'Lempira' => ['Gracias', 'La Campa'],
+            'Ocotepeque' => ['Ocotepeque', 'San Marcos'],
+            'Olancho' => ['Juticalpa', 'Catacamas'],
+            'Santa Bárbara' => ['Santa Bárbara', 'Trinidad'],
+            'Valle' => ['Nacaome', 'San Lorenzo'],
+            'Yoro' => ['Yoro', 'El Progreso']
+        ];
+
+        return view('farmacias.edit', compact('farmacia', 'departamento', 'ciudad'));
     }
 
     /**
@@ -188,6 +237,12 @@ class FarmaciaController extends Controller
 
         $farmacia = Farmacia::findOrFail($id);
 
+        if ($request->hasFile('foto')) {
+            // Guardar foto temporal en storage/public/temp
+            $path = $request->file('foto')->store('temp', 'public');
+            session(['foto_temporal' => $path]);
+        }
+
         $request->validate([
             // NOMBRE
             'nombre' => [
@@ -197,12 +252,25 @@ class FarmaciaController extends Controller
                 'regex:/^[\pL\s\-]+$/u'
             ],
 
-            // UBICACIÓN
-            'ubicacion' => [
+            // DEPARTAMENTO
+            'departamento' => [
                 'required',
                 'string',
-                'max:255',
-                'regex:/^([^,]+,\s*){2}[^,]+$/',
+                'max:100'
+            ],
+
+            // CIUDAD
+            'ciudad' => [
+                'required',
+                'string',
+                'max:100'
+            ],
+
+            // DIRECCIÓN
+            'direccion' => [
+                'required',
+                'string',
+                'max:255'
             ],
 
             // TELÉFONO
@@ -213,13 +281,7 @@ class FarmaciaController extends Controller
                 Rule::unique('farmacias', 'telefono')->ignore($farmacia->id),
             ],
 
-            // HORARIO
-            'horario' => [
-                'required',
-                'string',
-                'max:200',
-                'regex:/^[\pL0-9\s:\-,\.]+$/u'
-            ],
+
 
             // DESCRIPCIÓN
             'descripcion' => [
@@ -257,11 +319,21 @@ class FarmaciaController extends Controller
             'nombre.max' => 'El nombre no debe superar los 50 caracteres.',
             'nombre.regex' => 'El nombre solo puede contener letras, espacios y guiones.',
 
-            // UBICACIÓN
-            'ubicacion.required' => 'La ubicación es obligatoria.',
-            'ubicacion.string' => 'La ubicación debe ser texto válido.',
-            'ubicacion.max' => 'La ubicación no debe superar los 255 caracteres.',
-            'ubicacion.regex' => 'Debe incluir ciudad, departamento y país',
+
+            // DEPARTAMENTO
+            'departamento.required' => 'El departamento es obligatorio.',
+            'departamento.string' => 'El departamento debe ser texto válido.',
+
+            // CIUDAD
+            'ciudad.required' => 'La ciudad es obligatoria.',
+            'ciudad.string' => 'La ciudad debe ser texto válido.',
+
+
+            // DIRECCIÓN
+            'direccion.required' => 'La dirección es obligatoria.',
+            'direccion.string' => 'La dirección debe ser texto válido.',
+            'direccion.max' => 'La dirección no debe superar los 255 caracteres.',
+
 
             // TELÉFONO
             'telefono.required' => 'El teléfono es obligatorio.',
@@ -269,11 +341,6 @@ class FarmaciaController extends Controller
             'telefono.regex' => 'El teléfono debe iniciar con 2, 3, 8 o 9.',
             'telefono.unique' => 'Este teléfono ya está registrado.',
 
-            // HORARIO
-            'horario.required' => 'El horario es obligatorio.',
-            'horario.string' => 'El horario debe ser texto válido.',
-            'horario.max' => 'El horario no debe superar los 100 caracteres.',
-            'horario.regex' => 'El horario contiene caracteres inválidos. Usa solo letras, números y signos comunes.',
 
             // DESCRIPCIÓN
             'descripcion.required' => 'La descripción es obligatoria.',
@@ -297,7 +364,12 @@ class FarmaciaController extends Controller
 
         $data = $request->except('foto');
 
-        if ($request->hasFile('foto')) {
+
+        if ($request->restablecer_foto == "1") {
+            // El usuario pidió restablecer → dejamos la foto original
+            $data['foto'] = $farmacia->getOriginal('foto');
+        } elseif ($request->hasFile('foto')) {
+            // Subió nueva foto → reemplazamos
             if ($farmacia->foto && \Storage::exists($farmacia->foto)) {
                 \Storage::delete($farmacia->foto);
             }
@@ -305,6 +377,8 @@ class FarmaciaController extends Controller
         }
 
         $farmacia->update($data);
+        // 🔥 Limpiar foto temporal para que no aparezca al volver a editar
+        session()->forget('foto_temporal');
 
         return redirect()->route('farmacias.index')->with('success', 'Farmacia actualizada correctamente.');
     }
@@ -322,5 +396,25 @@ class FarmaciaController extends Controller
         return redirect()->route('farmacias.index')
             ->with('success', 'Farmacia eliminada correctamente.');
     }
+
+    public function fotoTemporal(Request $request)
+    {
+        $request->validate([
+            'foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Guardar archivo temporal en storage/app/public/temp
+        $path = $request->file('foto')->store('temp', 'public');
+
+        // Guardar la ruta temporal en la sesión
+        session(['foto_temporal' => $path]);
+
+        // Devolver la URL pública
+        return response()->json([
+            'url' => asset('storage/' . $path),
+            'path' => $path
+        ]);
+    }
+
 
 }

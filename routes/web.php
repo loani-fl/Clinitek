@@ -194,8 +194,30 @@ Route::put('/rayosx/{orden}/guardar-analisis', [OrdenRayosXController::class, 'g
 
 
 
+//AQUI ABJAO
 Route::get('/rayosx/{id}/analizar', [OrdenRayosXController::class, 'analizar'])->name('rayosx.analizar');
 
 
+
+
+
+Route::get('/pacientes/buscar-ajax', [PacienteController::class, 'buscarPacientesAjax'])->name('pacientes.buscarAjax');
+
+
+
+Route::get('/pacientes/{id}/datos', [PacienteController::class, 'datos'])->name('pacientes.datos');
+Route::get('/pacientes/{id}/datos', [PacienteController::class, 'obtenerDatosPaciente'])->name('pacientes.datos');
+Route::get('rayosx', [OrdenRayosXController::class, 'index'])->name('rayosx.index');
+Route::get('rayosx/{orden}/analisis', [OrdenRayosXController::class, 'analisis'])->name('rayosx.analisis');
+
+Route::get('/rayosx/{orden}/analisis', [OrdenRayosXController::class, 'analisis'])->name('rayosx.analisis');
+
+
+
+Route::get('rayosx/{id}/analisis', [RayosxController::class, 'analisis'])->name('rayosx.analisis');
+Route::post('rayosx/{id}/analisis', [RayosxController::class, 'storeAnalisis'])->name('rayosx.storeAnalisis');
+
+
+Route::get('/rayosx/{id}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
 
 

@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class RayosxOrder extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+
         'diagnostico_id',
         'paciente_id',
         'fecha',
@@ -43,6 +45,19 @@ class RayosxOrder extends Model
         return $this->belongsToMany(Examen::class, 'rayosx_order_examen', 'rayosx_order_id', 'examen_id')
         ->withPivot('precio'); // si en la pivot tienes precio
     }
+=======
+        'datos_clinicos',
+        'estado',
+        'total_precio',
+    ];
+
+   
+ public function paciente()
+{
+    return $this->belongsTo(Paciente::class);
+}
+
+
 
     // Relación con médicos
     public function medicoAnalista()
@@ -54,6 +69,7 @@ class RayosxOrder extends Model
     {
         return $this->belongsTo(Medico::class, 'medico_radiologo_id');
     }
+
 
     // Función para obtener todos los exámenes de las secciones (opcional)
     public function getAllExamenes()
@@ -85,4 +101,11 @@ class RayosxOrder extends Model
 
         return $examenes;
     }
+
+  public function medicoAnalista()
+    {
+        return $this->belongsTo(Medico::class, 'medico_analista_id');
+    }
+    
+
 }

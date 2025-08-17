@@ -52,4 +52,10 @@ public function diagnosticos()
 }
 
 
+public function ordenesRayosX()
+{
+    return $this->hasMany(RayosxOrder::class);
+}
+
+
 }
