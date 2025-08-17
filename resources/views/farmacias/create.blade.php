@@ -114,22 +114,25 @@
 
                 <div class="row mb-3">
                 <!-- Página web -->
-                <div class="col-md-4">
-                    <label for="pagina_web" class="form-label">Página web (Opcional):</label>
-                    <input
-                        type="url"
-                        name="pagina_web"
-                        id="pagina_web"
-                        class="form-control @error('pagina_web') is-invalid @enderror"
-                        value="{{ old('pagina_web') }}"
-                        maxlength="100"
-                        placeholder="https://ejemplo.com">
-                    @error('pagina_web')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
+                    <div class="col-md-4">
+                        <label for="pagina_web" class="form-label">Página web (Opcional):</label>
+                        <input
+                            type="url"
+                            name="pagina_web"
+                            id="pagina_web"
+                            class="form-control @error('pagina_web') is-invalid @enderror"
+                            value="{{ old('pagina_web') }}"
+                            maxlength="100"
+                            placeholder="https://ejemplo.com"
+                            pattern="https?://.+"
+                            title="Ingrese una URL válida, comenzando con http:// o https://">
+                        @error('pagina_web')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
-                <!-- Departamento -->
+
+                    <!-- Departamento -->
                 <div class="col-md-4">
                     <label for="departamento" class="form-label">Departamento:</label>
                     <select
@@ -162,22 +165,26 @@
                 </div>
 
                 <!-- Ciudad -->
-                <div class="col-md-4">
-                    <label for="ciudad" class="form-label">Ciudad:</label>
-                    <select
-                        name="ciudad"
-                        id="ciudad"
-                        class="form-control @error('ciudad') is-invalid @enderror">
-                        <option value="">Seleccione una ciudad</option>
-                    </select>
-                    @error('ciudad')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <!-- Ciudad -->
+                    <div class="col-md-4">
+                        <label for="ciudad" class="form-label">Ciudad:</label>
+                        <select name="ciudad" id="ciudad" class="form-select @error('ciudad') is-invalid @enderror">
+                            <option value="">Seleccione una ciudad</option>
+                            @if(old('departamento'))
+                                @foreach($ciudadesPorDepartamento[old('departamento')] as $ciudad)
+                                    <option value="{{ $ciudad }}" {{ old('ciudad') == $ciudad ? 'selected' : '' }}>
+                                        {{ $ciudad }}
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+                        @error('ciudad')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
-            </div>
 
-
-            <div class="row mb-3">
+                    <div class="row mb-3">
                 <!-- Dirección específica -->
                 <div class="col-md-4">
                     <label for="direccion" class="form-label">Dirección específica:</label>
@@ -209,23 +216,17 @@
                 </div>
             </div>
 
-                @php
-                    // Mostrar foto temporal de sesión si existe
-                    $fotoMostrar = session('foto_temporal')
-                        ? asset('storage/' . session('foto_temporal'))
-                        : '';
-                @endphp
 
-                    <!-- Foto -->
+                <!-- Foto -->
                 <div class="col-md-4">
                     <label for="foto" class="form-label">Foto:</label>
 
                     <div class="mb-2">
-                        <img src="{{ $fotoMostrar }}"
+                        <img id="fotoPreview"
+                             src="{{ session('foto_temporal') ? asset('storage/' . session('foto_temporal')) : '' }}"
                              alt="Foto seleccionada"
-                             id="fotoPreview"
                              class="img-thumbnail"
-                             style="max-width: 120px; {{ $fotoMostrar ? '' : 'display:none;' }}">
+                             style="max-width: 120px; {{ session('foto_temporal') ? '' : 'display:none;' }}">
                     </div>
 
                     <input
@@ -241,7 +242,9 @@
                 </div>
 
 
-            <div class="d-flex justify-content-center gap-3 mt-4">
+
+
+                <div class="d-flex justify-content-center gap-3 mt-4">
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-plus-circle"></i> Registrar
                 </button>
@@ -254,114 +257,76 @@
             </div>
         </form>
     </div>
-
     <script>
-        document.getElementById('telefono').addEventListener('keydown', function(e) {
-            // Permitir teclas especiales: Backspace, Tab, Arrow keys, Delete, etc.
-            const specialKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Home', 'End'];
-            if (specialKeys.includes(e.key)) {
-                return; // permitir estas teclas
-            }
+        const specialKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Home', 'End'];
 
-            // Permitir solo números (0-9)
-            if (!e.key.match(/[0-9]/)) {
-                e.preventDefault(); // bloquear cualquier otra tecla
-            }
-
-            // Limitar máximo 8 caracteres
-            if (this.value.length >= 8 && !specialKeys.includes(e.key)) {
-                e.preventDefault();
-            }
+        // Validación del teléfono
+        document.getElementById('telefono').addEventListener('keydown', function(e){
+            if(specialKeys.includes(e.key)) return;
+            if(!/[0-9]/.test(e.key) || this.value.length >= 8) e.preventDefault();
         });
-    </script>
-    <script>
-        document.getElementById('nombre').addEventListener('keydown', function(e) {
-            // Permitir teclas especiales
-            const specialKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Home', 'End'];
-            if (specialKeys.includes(e.key)) {
-                return; // permitir estas teclas
-            }
 
-            // Permitir letras (A-Z, a-z), espacios y guiones
-            const regex = /^[a-zA-Z\s\-]$/;
-
-            if (!regex.test(e.key)) {
-                e.preventDefault();
-            }
+        // Validación del nombre
+        document.getElementById('nombre').addEventListener('keydown', function(e){
+            if(specialKeys.includes(e.key)) return;
+            if(!/^[a-zA-Z\s\-]$/.test(e.key)) e.preventDefault();
         });
-    </script>
-    <script>
-        document.getElementById('btnLimpiar').addEventListener('click', function () {
+
+        // Validación de dirección
+        document.getElementById('direccion').addEventListener('keydown', function(e){
+            if(specialKeys.includes(e.key)) return;
+            if(!/^[a-zA-Z0-9\s.,#]$/.test(e.key)) e.preventDefault();
+        });
+
+        // Validación de descripción
+        document.getElementById('descripcion').addEventListener('keydown', function(e){
+            if(specialKeys.includes(e.key)) return;
+            if(!/^[a-zA-Z0-9\s.,%]$/.test(e.key)) e.preventDefault();
+        });
+
+        // Botón Limpiar formulario
+        document.getElementById('btnLimpiar').addEventListener('click', function(){
             const form = this.closest('form');
             form.reset();
-
-            // Limpia manualmente los campos con valores por defecto (como old('') en Blade)
-            Array.from(form.querySelectorAll('input, textarea')).forEach(input => {
-                if (input.type !== 'hidden' && input.type !== 'submit' && input.type !== 'button') {
-                    input.value = '';
-                }
-            });
-
-            // Elimina posibles mensajes de error visuales (como .is-invalid)
-            form.querySelectorAll('.is-invalid').forEach(el => {
-                el.classList.remove('is-invalid');
-            });
-        });
-    </script>
-    <script>
-        const ciudadesPorDepartamento = {
-            "Atlántida": ["La Ceiba", "Tela", "Jutiapa"],
-            "Choluteca": ["Choluteca", "El Triunfo", "San Marcos de Colón"],
-            "Colón": ["Trujillo", "Tocoa", "Sabá"],
-            "Comayagua": ["Comayagua", "Siguatepeque", "La Libertad"],
-            "Copán": ["Santa Rosa de Copán", "La Entrada"],
-            "Cortés": ["San Pedro Sula", "Puerto Cortés", "La Lima", "Choloma", "Villanueva"],
-            "El Paraíso": ["Yuscarán", "Danlí", "El Paraiso"],
-            "Francisco Morazán": ["Tegucigalpa", "Valle de Ángeles", "Santa Lucía"],
-            "Gracias a Dios": ["Puerto Lempira"],
-            "Intibucá": ["La Esperanza", "Intibucá"],
-            "Islas de la Bahía": ["Roatán", "Utila", "Guanaja"],
-            "La Paz": ["La Paz", "Marcala"],
-            "Lempira": ["Gracias", "Erandique"],
-            "Ocotepeque": ["Nueva Ocotepeque"],
-            "Olancho": ["Juticalpa", "Catacamas"],
-            "Santa Bárbara": ["Santa Bárbara", "Trinidad", "Gualala"],
-            "Valle": ["Nacaome", "San Lorenzo"],
-            "Yoro": ["Yoro", "El Progreso", "Olanchito"]
-        };
-
-        document.getElementById('departamento').addEventListener('change', function() {
-            let depto = this.value;
-            let ciudadSelect = document.getElementById('ciudad');
-            ciudadSelect.innerHTML = '<option value="">Seleccione una ciudad</option>';
-
-            if (ciudadesPorDepartamento[depto]) {
-                ciudadesPorDepartamento[depto].forEach(function(ciudad) {
-                    let option = document.createElement('option');
-                    option.value = ciudad;
-                    option.textContent = ciudad;
-                    ciudadSelect.appendChild(option);
-                });
+            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            const fotoPreview = document.getElementById('fotoPreview');
+            if(fotoPreview){
+                fotoPreview.src = '';
+                fotoPreview.style.display = 'none';
             }
         });
-    </script>
 
-    <script>
+        // Previsualización de foto
         const fotoInput = document.getElementById('foto');
         const fotoPreview = document.getElementById('fotoPreview');
-
-        fotoInput.addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if(file) {
+        fotoInput.addEventListener('change', function(e){
+            const file = e.target.files[0];
+            if(file){
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    fotoPreview.src = e.target.result;
+                reader.onload = function(ev){
+                    fotoPreview.src = ev.target.result;
                     fotoPreview.style.display = 'block';
                 }
                 reader.readAsDataURL(file);
             } else {
                 fotoPreview.src = '';
                 fotoPreview.style.display = 'none';
+            }
+        });
+
+        // Cambio dinámico de ciudades según departamento
+        const ciudadesPorDepartamento = @json($ciudadesPorDepartamento);
+        document.getElementById('departamento').addEventListener('change', function(){
+            const depto = this.value;
+            const ciudadSelect = document.getElementById('ciudad');
+            ciudadSelect.innerHTML = '<option value="">Seleccione una ciudad</option>';
+            if(ciudadesPorDepartamento[depto]){
+                ciudadesPorDepartamento[depto].forEach(function(ciudad){
+                    const option = document.createElement('option');
+                    option.value = ciudad;
+                    option.textContent = ciudad;
+                    ciudadSelect.appendChild(option);
+                });
             }
         });
     </script>

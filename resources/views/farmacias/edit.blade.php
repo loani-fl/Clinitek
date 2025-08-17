@@ -69,16 +69,33 @@
 
                 <div class="col-md-4">
                     <label for="descuento" class="form-label">Descuento (%):</label>
-                    <input type="number" name="descuento" id="descuento"
-                           class="form-control @error('descuento') is-invalid @enderror"
-                           value="{{ old('descuento', $farmacia->descuento) }}"
-                           data-original="{{ $farmacia->descuento }}"
-                           min="0" max="100" step="0.1">
-                    @error('descuento')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    <input
+                        type="number"
+                        name="descuento"
+                        id="descuento"
+                        class="form-control @error('descuento') is-invalid @enderror"
+                        value="{{ old('descuento', $farmacia->descuento) }}"
+                        placeholder="Ej: 10.5"
+                        min="1"
+                        max="100"
+                        step="0.1"
+                        oninput="
+            let val = this.value;
+            // Limita máximo 2 dígitos antes del punto y 1 decimal
+            val = val.replace(/^(\d{0,2})(\.\d?)?.*$/,'$1$2');
+            // Bloquea valores mayores a 100
+            if(val !== '' && parseFloat(val) > 100) val = '100';
+            // Bloquea valores menores a 1
+            if(val !== '' && parseFloat(val) < 1) val = '1';
+            this.value = val;
+        ">
+                    @error('descuento')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
-            </div>
 
-            <!-- Segunda fila: Página web, Departamento, Ciudad -->
+
+                <!-- Segunda fila: Página web, Departamento, Ciudad -->
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label for="pagina_web" class="form-label">Página web (Opcional):</label>
@@ -117,6 +134,7 @@
                 <div class="col-md-6">
                     <label for="direccion" class="form-label">Dirección específica:</label>
                     <textarea name="direccion" id="direccion" rows="2"
+                              maxlength="255"
                               class="form-control @error('direccion') is-invalid @enderror"
                               data-original="{{ $farmacia->direccion }}"
                               placeholder="Ej: Barrio El Centro, Casa #45, frente a la escuela">{{ old('direccion', $farmacia->direccion) }}</textarea>
@@ -126,6 +144,7 @@
                 <div class="col-md-6">
                     <label for="descripcion" class="form-label">Descripción:</label>
                     <textarea name="descripcion" id="descripcion" rows="2"
+                              maxlength="255"
                               class="form-control @error('descripcion') is-invalid @enderror"
                               data-original="{{ $farmacia->descripcion }}"
                               placeholder="Descripción breve de la farmacia">{{ old('descripcion', $farmacia->descripcion) }}</textarea>
@@ -269,4 +288,29 @@
             document.getElementById('restablecer_foto').value = "1";
         });
     </script>
+    <script>
+        // Bloquear caracteres no permitidos en Dirección
+        document.getElementById('direccion').addEventListener('keydown', function(e) {
+            const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Home', 'End'];
+            if (allowedKeys.includes(e.key)) return;
+
+            const regex = /^[a-zA-Z0-9\s.,#]$/; // Solo letras, números, espacios, punto, coma y numeral
+            if (!regex.test(e.key)) {
+                e.preventDefault(); // Bloquea cualquier otra tecla
+            }
+        });
+
+        // Bloquear caracteres no permitidos en Descripción
+        document.getElementById('descripcion').addEventListener('keydown', function(e) {
+            const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Home', 'End'];
+            if (allowedKeys.includes(e.key)) return;
+
+            const regex = /^[a-zA-Z0-9\s.,%]$/; // Solo letras, números, espacios, punto, coma y %
+            if (!regex.test(e.key)) {
+                e.preventDefault(); // Bloquea cualquier otra tecla
+            }
+        });
+
+    </script>
+
 @endsection

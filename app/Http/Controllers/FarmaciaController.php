@@ -13,10 +13,10 @@ class FarmaciaController extends Controller
     public function index(Request $request)
     {
         $query = Farmacia::query();
-    
+
         if ($request->filled('filtro')) {
             $search = $request->filtro;
-        
+
             if (is_numeric($search)) {
                 $query->where('descuento', $search);
             } else {
@@ -27,31 +27,51 @@ class FarmaciaController extends Controller
                 });
             }
         }
-        
-    
+
+
         $farmacias = $query->orderBy('nombre')->paginate(2);
-    
+
         $farmacias->appends($request->only('filtro'));
-    
+
         if ($request->ajax()) {
             $html = view('farmacias.partials.tabla', compact('farmacias'))->render();
-    
+
             return response()->json([
                 'html' => $html,
                 'total' => $farmacias->total(),
                 'all' => Farmacia::count(),
             ]);
         }
-    
+
         return view('farmacias.index', compact('farmacias'));
     }
-    
+
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        return view('farmacias.create');
+        $ciudadesPorDepartamento = [
+            "Atlántida" => ["La Ceiba", "Tela", "Jutiapa"],
+            "Choluteca" => ["Choluteca", "El Triunfo", "San Marcos de Colón"],
+            "Colón" => ["Trujillo", "Tocoa", "Sabá"],
+            "Comayagua" => ["Comayagua", "Siguatepeque", "La Libertad"],
+            "Copán" => ["Santa Rosa de Copán", "La Entrada"],
+            "Cortés" => ["San Pedro Sula", "Puerto Cortés", "La Lima", "Choloma", "Villanueva"],
+            "El Paraíso" => ["Yuscarán", "Danlí", "El Paraiso"],
+            "Francisco Morazán" => ["Tegucigalpa", "Valle de Ángeles", "Santa Lucía"],
+            "Gracias a Dios" => ["Puerto Lempira"],
+            "Intibucá" => ["La Esperanza", "Intibucá"],
+            "Islas de la Bahía" => ["Roatán", "Utila", "Guanaja"],
+            "La Paz" => ["La Paz", "Marcala"],
+            "Lempira" => ["Gracias", "Erandique"],
+            "Ocotepeque" => ["Nueva Ocotepeque"],
+            "Olancho" => ["Juticalpa", "Catacamas"],
+            "Santa Bárbara" => ["Santa Bárbara", "Trinidad", "Gualala"],
+            "Valle" => ["Nacaome", "San Lorenzo"],
+            "Yoro" => ["Yoro", "El Progreso", "Olanchito"]
+        ];
+        return view('farmacias.create', compact('ciudadesPorDepartamento'));
     }
 
     /**
@@ -94,13 +114,15 @@ class FarmaciaController extends Controller
             'direccion' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
+                  'regex:/^[A-Za-z0-9\s\.,#-]+$/'
             ],
 
             'descripcion' => [
                 'required',
                 'string',
-                'max:500',
+                'max:255',
+                'regex:/^[A-Za-z0-9\s\.,%áéíóúÁÉÍÓÚñÑ()-]+$/u'
             ],
             'descuento' => [
                 'required',
@@ -109,11 +131,12 @@ class FarmaciaController extends Controller
 
             ],
             'foto' => [
-                'required',
+                session('foto_temporal') ? 'nullable' : 'required', // Si ya hay foto temporal, no la requiere
                 'image',
                 'mimes:jpg,jpeg,png,webp',
                 'max:2048',
             ],
+
             'pagina_web' => [
                 'nullable',
                 'url',
@@ -256,7 +279,8 @@ class FarmaciaController extends Controller
                 'required',
                 'string',
                 'max:50',
-                'regex:/^[\pL\s\-]+$/u'
+                'regex:/^[\pL\s\-]+$/u',
+                Rule::unique('farmacias', 'nombre')->ignore($farmacia->id),
             ],
 
             // DEPARTAMENTO
@@ -277,7 +301,8 @@ class FarmaciaController extends Controller
             'direccion' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
+                'regex:/^[A-Za-z0-9\s\.,#-]+$/'
             ],
 
             // TELÉFONO
@@ -294,7 +319,8 @@ class FarmaciaController extends Controller
             'descripcion' => [
                 'required',
                 'string',
-                'max:500',
+                'max:255',
+                'regex:/^[A-Za-z0-9\s\.,%áéíóúÁÉÍÓÚñÑ()-]+$/u'
             ],
 
             // DESCUENTO
@@ -316,7 +342,8 @@ class FarmaciaController extends Controller
             'pagina_web' => [
                 'nullable',
                 'url',
-                'max:255'
+                'max:255',
+                Rule::unique('farmacias', 'pagina_web')->ignore($farmacia->id),
             ],
 
         ], [
@@ -325,6 +352,7 @@ class FarmaciaController extends Controller
             'nombre.string' => 'El nombre debe ser una cadena de texto.',
             'nombre.max' => 'El nombre no debe superar los 50 caracteres.',
             'nombre.regex' => 'El nombre solo puede contener letras, espacios y guiones.',
+            'nombre.unique' => 'Este nombre de farmacia ya está registrado.',
 
 
             // DEPARTAMENTO
@@ -367,6 +395,8 @@ class FarmaciaController extends Controller
             // PÁGINA WEB
             'pagina_web.url' => 'La página web debe ser una URL válida (ej. https://ejemplo.com).',
             'pagina_web.max' => 'La URL no debe exceder los 255 caracteres.',
+            'pagina_web.unique' => 'Esta página web ya está registrada.',
+
         ]);
 
         $data = $request->except('foto');
@@ -395,14 +425,7 @@ class FarmaciaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        $farmacia = Farmacia::findOrFail($id);
-        $farmacia->delete();
 
-        return redirect()->route('farmacias.index')
-            ->with('success', 'Farmacia eliminada correctamente.');
-    }
 
     public function fotoTemporal(Request $request)
     {
