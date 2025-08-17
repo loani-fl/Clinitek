@@ -9,11 +9,17 @@ class AddMedicoAnalistaIdToRayosxOrdersTable extends Migration
     public function up()
     {
         Schema::table('rayosx_orders', function (Blueprint $table) {
-            $table->unsignedBigInteger('medico_analista_id')->nullable()->after('paciente_id');
-            $table->foreign('medico_analista_id')->references('id')->on('medicos')->onDelete('set null');
+            // Solo agregar si la columna no existe
+            if (!Schema::hasColumn('rayosx_orders', 'medico_analista_id')) {
+                $table->unsignedBigInteger('medico_analista_id')->nullable()->after('paciente_id');
+                $table->foreign('medico_analista_id')
+                      ->references('id')
+                      ->on('medicos')
+                      ->onDelete('set null');
+            }
         });
     }
-
+    
     public function down()
     {
         Schema::table('rayosx_orders', function (Blueprint $table) {

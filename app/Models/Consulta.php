@@ -28,6 +28,8 @@ class Consulta extends Model
         return $this->belongsTo(Paciente::class);
     }
 
+
+
     // Relación con Médico
     public function medico()
     {

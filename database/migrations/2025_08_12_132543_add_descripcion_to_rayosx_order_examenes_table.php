@@ -9,12 +9,15 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-  public function up()
-{
-    Schema::table('rayosx_order_examenes', function (Blueprint $table) {
-        $table->text('descripcion')->nullable()->after('examen_codigo');
-    });
-}
+    public function up()
+    {
+        Schema::table('rayosx_order_examenes', function (Blueprint $table) {
+            if (!Schema::hasColumn('rayosx_order_examenes', 'descripcion')) {
+                $table->text('descripcion')->nullable()->after('examen_codigo');
+            }
+        });
+    }
+    
 
 public function down()
 {

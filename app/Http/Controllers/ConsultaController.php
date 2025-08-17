@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Consulta;
 use App\Models\Paciente;
 use App\Models\Medico;
+use App\Models\Pago;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -136,8 +137,22 @@ class ConsultaController extends Controller
         'total_pagar' => $esInmediata ? $validated['total_pagar'] : 0,
         'estado' => 'pendiente',
     ]);
+
+    $pago = Pago::create([
+        'consulta_id' => $consulta->id,
+        'paciente_id' => $consulta->paciente_id,
+        'total' => $consulta->total_pagar,
+        'estado' => 'pendiente',
+        'metodo_pago' => 'pendiente',
+        'fecha' => $consulta->fecha,
+        'origen' => 'consulta', 
+        'referencia_id' => $consulta->id, // <- ejemplo de referencia
+    ]);
     
-    return redirect()->route('pago.create', ['consulta_id' => $consulta->id])
+    
+    
+    
+    return redirect()->route('pagos.show', ['id' => $pago->id])
                  ->with('success', 'Consulta registrada correctamente.');
 
     
