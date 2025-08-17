@@ -113,24 +113,25 @@
         </ul>
     </div>
 </div>
-
 <div class="contenedor-principal">
     <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 90px;">
-        <div class="card-header py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-            <div class="d-flex align-items-center justify-content-between">
-                <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">
-                    Listado de Médicos
-                </h5>
+        <div class="card-header py-2 d-flex align-items-center justify-content-between"
+             style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
 
-                <div class="d-flex gap-2">
-                    <a href="{{ route('inicio') }}" class="btn btn-light">
-                        <i class="bi bi-house-door"></i> Inicio
-                    </a>
-                    <a href="{{ route('medicos.create') }}" class="btn btn-primary">
-                        <i class="bi bi-person-plus"></i> Registrar Médico
-                    </a>
-                </div>
-            </div>
+            <!-- Botón Inicio a la izquierda -->
+            <a href="{{ route('inicio') }}" class="btn btn-light">
+                <i class="bi bi-house-door"></i> Inicio
+            </a>
+
+            <!-- Título centrado -->
+            <h5 class="mb-0 fw-bold text-dark flex-grow-1 text-center" style="font-size: 2.25rem;">
+                Listado de Médicos
+            </h5>
+
+            <!-- Botón Registrar a la derecha -->
+            <a href="{{ route('medicos.create') }}" class="btn btn-primary">
+                <i class="bi bi-person-plus"></i> Registrar Médico
+            </a>
         </div>
         <div class="row px-3 py-2">
             <div class="col-md-4 mb-2 mb-md-0">
@@ -144,127 +145,85 @@
                 </select>
             </div>
         </div>
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped mb-0">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th class="text-center">Nombre</th>
-                    <th class="text-center">Identidad</th>
-                    <th class="text-center">Especialidad</th>
-                    <th class="text-center">Estado</th>
-                    <th class="text-center">Acciones</th>
-                </tr>
-                </thead>
-                <tbody id="tabla-medicos">
-                @forelse($medicos as $index => $medico)
-                    <tr data-estado="{{ $medico->estado }}">
-                        <td>{{ $medicos->firstItem() + $index }}</td>
-                        <td class="nombre">{{ $medico->nombre }} {{ $medico->apellidos }}</td>
-                        <td>{{ $medico->numero_identidad }}</td>
-                        <td class="especialidad">{{ $medico->especialidad }}</td>
-                        <td class="text-center">
-                            @if($medico->estado)
-                                <span class="estado-activo"><i class="bi bi-circle-fill"></i></span>
-                            @else
-                                <span class="estado-inactivo"><i class="bi bi-circle-fill"></i></span>
-                            @endif
-                        </td>
-                        <td>
-                            <div class="d-flex gap-2 justify-content-center">
-                                <a href="{{ route('medicos.show', $medico->id) }}" class="btn btn-white-border btn-outline-info btn-sm" title="Ver">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <a href="{{ route('medicos.edit', $medico->id) }}" class="btn btn-white-border btn-outline-warning btn-sm" title="Editar">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="text-center">No hay médicos registrados.</td>
-                    </tr>
-                @endforelse
-                <tr id="sin-resultados" style="display: none;">
-                    <td colspan="6" class="text-center text-muted">No hay médicos que coincidan con la búsqueda.</td>
-                </tr>
-                </tbody>
-            </table>
+        {{-- Contenedor donde se cargará la tabla vía AJAX --}}
+        <div id="tabla-container">
+            @include('medicos.partials.tabla', ['medicos' => $medicos])
         </div>
-        <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
-        <div class="px-3 pb-3">
-            <div class="d-flex justify-content-center" id="paginacion-container">
-                {{ $medicos->onEachSide(1)->links('pagination::bootstrap-4') }}
-            </div>
+
+
+        <div id="paginacion-container" class="d-flex justify-content-center mt-2">
+            {{ $medicos->onEachSide(1)->links('pagination::bootstrap-4', ['prevText' => 'Anterior', 'nextText' => 'Siguiente']) }}
         </div>
-    </div>
-</div>
-<footer>
+        <!-- Mensaje de resultados -->
+        <div id="mensajeResultados" class="text-center mt-2" style="min-height: 1.2em;"></div>
+
+
+        <footer>
     © 2025 Clínitek. Todos los derechos reservados.
 </footer>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function () {
-        function actualizarMensajeResultados(totalVisibles, filtroVacio) {
-            if (totalVisibles === 0 && !filtroVacio) {
-                $('#mensajeResultados').text('No hay médicos que coincidan con la búsqueda.');
-            } else if (filtroVacio) {
-                $('#mensajeResultados').text('');
-            } else {
-                $('#mensajeResultados').text(`Se encontraron ${totalVisibles} resultado${totalVisibles > 1 ? 's' : ''}.`);
-            }
-        }
+        <script>
+            $(document).ready(function () {
 
-
-        function cargarDatos(page = 1, filtro = '', estado = '') {
-            $.ajax({
-                url: "{{ route('medicos.index') }}",
-                type: 'GET',
-                data: {
-                    page: page,
-                    search: filtro,
-                    estado: estado
-                },
-                success: function(data) {
-                    $('#tabla-container').html(data.html);
-                    $('#paginacion-container').html(data.pagination);
-                    actualizarMensajeResultados(data.total, filtro === '');
-                },
-                error: function(xhr) {
-                    $('#mensajeResultados').text('Error al cargar los datos.');
+                function cargarDatos(page = 1, query = '', estado = '') {
+                    $.ajax({
+                        url: "{{ route('medicos.index') }}",
+                        type: 'GET',
+                        data: { page, search: query, estado: estado },
+                        success: function(data) {
+                            $('#tabla-container').html(data.html);          // Inserta la tabla actualizada
+                            $('#paginacion-container').html(data.pagination); // Inserta la paginación
+                            $('#mensajeResultados').text(
+                                data.total > 0
+                                    ? `Mostrando del ${data.from} al ${data.to} de ${data.total} resultados.`
+                                    : 'No se encontraron resultados.'
+                            );
+                        },
+                        error: function() {
+                            $('#mensajeResultados').text('Error al cargar los datos.');
+                        }
+                    });
                 }
+
+
+                // Filtros
+                $('#filtro-medico, #filtro-estado').on('input change', function() {
+                    let query = $('#filtro-medico').val();
+                    let estado = $('#filtro-estado').val();
+                    cargarDatos(1, query, estado);
+                });
+
+                // Paginación dinámica
+                $(document).on('click', '.pagination a', function(e) {
+                    e.preventDefault();
+                    let url = $(this).attr('href');
+                    let params = new URLSearchParams(url.split('?')[1]);
+                    let page = params.get('page') || 1;
+                    let query = $('#filtro-medico').val();
+                    let estado = $('#filtro-estado').val();
+                    cargarDatos(page, query, estado);
+                    window.history.pushState("", "", url);
+                });
+                function actualizarFlechas() {
+                    $('.pagination li:first-child a').text('Anterior');
+                    $('.pagination li:last-child a').text('Siguiente');
+                }
+
+// Llamar después de cargar la tabla y la paginación
+                $(document).ready(function () {
+                    actualizarFlechas();
+
+                    // También después de cada carga AJAX
+                    $(document).on('click', '.pagination a', function() {
+                        setTimeout(actualizarFlechas, 10);
+                    });
+                });
+
             });
-        }
+        </script>
 
-        // Carga inicial
-        cargarDatos();
 
-        // Filtrar al escribir o cambiar estado
-        $('#filtro-medico, #filtro-estado').on('input change', function () {
-            let filtro = $('#filtro-medico').val();
-            let estado = $('#filtro-estado').val();
-            cargarDatos(1, filtro, estado);
-        });
 
-        // Paginación con delegación (links dinámicos)
-        $(document).on('click', '.pagination a', function(e) {
-            e.preventDefault();
-            let url = $(this).attr('href');
-            let params = new URLSearchParams(url.split('?')[1]);
-            let page = params.get('page') || 1;
-            let filtro = $('#filtro-medico').val();
-            let estado = $('#filtro-estado').val();
-            cargarDatos(page, filtro, estado);
-
-            // Actualiza la URL en la barra sin recargar
-            let newUrl = url.split('?')[0] + '?page=' + page;
-            if(filtro) newUrl += '&search=' + encodeURIComponent(filtro);
-            if(estado) newUrl += '&estado=' + estado;
-            window.history.pushState("", "", newUrl);
-        });
-    });
-</script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
