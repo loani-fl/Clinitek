@@ -22,11 +22,44 @@
     .img-preview { margin-top:0.8rem; max-width:100%; max-height:150px; height:auto; border-radius:0.4rem; object-fit:contain; border:1px solid #ddd; margin-bottom:0.5rem; }
     .btn-group { display:flex !important; justify-content:center !important; gap:0.75rem; margin-top:1.5rem; align-items:center; }
     .btn-group .btn { min-width:140px; max-width:auto; flex:0 0 auto; padding:0.4rem 1rem; font-size:0.95rem; }
-    #mensaje-dinamico-container { margin-bottom: 1rem; }
-    .alert-dinamico { opacity:0; transition: opacity 0.5s ease-in-out; padding:0.6rem 1rem; margin-bottom:0.5rem; border-radius:0.5rem; font-weight:600; font-size:0.95rem; color:#fff; white-space: pre-line; }
-    .alert-dinamico.error { background-color:#dc3545; }
-    .alert-dinamico.success { background-color:#28a745; }
-    .alert-dinamico.info { background-color:#007BFF; }
+   #mensaje-dinamico-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra horizontalmente todos los mensajes */
+    gap: 0.5rem; /* Separación entre mensajes */
+    margin-bottom: 1rem;
+}
+
+.alert-dinamico {
+    display: inline-block; /* puedes dejarlo */
+    text-align: center;
+    padding: 8px 12px;
+    border-radius: 6px;
+    /* margin: 10px auto; */ /* eliminar */
+    max-width: fit-content;
+    transition: opacity 0.4s, transform 0.4s;
+    opacity: 0;
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: pre-line;
+}
+
+.alert-dinamico.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+.alert-dinamico.exito {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.alert-dinamico.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
     @media(max-width:991px) { .examen-content { flex-direction:column; } .image-description-block { flex:1 1 100%; } }
 </style>
 
@@ -119,13 +152,48 @@
 <script>
 function mostrarMensaje(mensaje, tipo='error') {
     const container = document.getElementById('mensaje-dinamico-container');
+    container.innerHTML = ''; // Limpiar mensajes anteriores
+
     const div = document.createElement('div');
     div.className = 'alert-dinamico ' + tipo;
     div.textContent = mensaje;
+
+    // Estilos centrados y animación
+    div.style.display = 'inline-block';
+    div.style.textAlign = 'center';
+    div.style.padding = '8px 12px';
+    div.style.borderRadius = '6px';
+    div.style.margin = '10px auto';
+    div.style.maxWidth = 'fit-content';
+    div.style.transition = 'opacity 0.4s, transform 0.4s';
+    div.style.opacity = '0';
+    div.style.fontWeight = '600';
+    div.style.fontSize = '0.95rem';
+    div.style.whiteSpace = 'pre-line';
+
+    if(tipo === 'error'){
+        div.style.backgroundColor = '#f8d7da';
+        div.style.color = '#721c24';
+        div.style.border = '1px solid #f5c6cb';
+    } else if(tipo === 'exito'){
+        div.style.backgroundColor = '#d4edda';
+        div.style.color = '#155724';
+        div.style.border = '1px solid #c3e6cb';
+    } else if(tipo === 'info'){
+        div.style.backgroundColor = '#d1ecf1';
+        div.style.color = '#0c5460';
+        div.style.border = '1px solid #bee5eb';
+    }
+
     container.appendChild(div);
     div.scrollIntoView({ behavior:'smooth', block:'center' });
-    setTimeout(()=>{ div.style.opacity='1'; },50);
-    setTimeout(()=>{ div.style.opacity='0'; setTimeout(()=>container.removeChild(div),500); },4000);
+
+    setTimeout(() => { div.style.opacity = '1'; div.style.transform = 'translateY(0)'; }, 50);
+
+    setTimeout(() => {
+        div.style.opacity = '0';
+        setTimeout(() => { if(div.parentNode) container.removeChild(div); }, 400);
+    }, 4000);
 }
 
 function previewImage(event, examenIdIndex) {
@@ -217,21 +285,33 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 document.getElementById('form-analisis').addEventListener('submit', function(event){
-    const containerMensajes = document.getElementById('mensaje-dinamico-container');
-    containerMensajes.innerHTML = '';
+    const medicoAnalista = this.querySelector('#medico_analista_id');
+    const examenesCards = this.querySelectorAll('.examen-card');
+
+    if(!medicoAnalista.value && examenesCards.length === 0){
+        mostrarMensaje('El médico analista es obligatorio y todas las imágenes y descripciones son obligatorias.', 'error');
+        event.preventDefault();
+        return;
+    }
+
     let errores=false;
 
-    const medicoAnalista = this.querySelector('#medico_analista_id');
-    if(!medicoAnalista.value){ mostrarMensaje('El médico analista es obligatorio.','error'); errores=true; }
+    // Validar médico
+    if(!medicoAnalista.value){ mostrarMensaje('El médico analista es obligatorio.', 'error'); errores=true; }
 
-    this.querySelectorAll('.examen-card').forEach(card=>{
+    // Validar bloques de imágenes y descripciones
+    examenesCards.forEach(card=>{
         const bloques = card.querySelectorAll('.image-description-block');
         bloques.forEach((bloque,j)=>{
             const fileInput = bloque.querySelector('input[type="file"]');
             const textarea = bloque.querySelector('textarea');
             const nombreExamen = card.querySelector('.examen-nombre').childNodes[0].textContent.trim();
 
-            if(fileInput && fileInput.files.length>0){
+            // Validar imagen: si está vacía, no dejar enviar
+            if(!fileInput || fileInput.files.length===0){
+                mostrarMensaje(`El bloque ${j+1} del examen "${nombreExamen}" debe tener una imagen.`, 'error');
+                errores=true;
+            } else {
                 const ext = fileInput.files[0].name.split('.').pop().toLowerCase();
                 if(!['jpg','jpeg','png'].includes(ext)){
                     mostrarMensaje(`Solo se permiten imágenes JPG, JPEG o PNG en "${nombreExamen}" bloque ${j+1}.`, 'error');
@@ -239,6 +319,7 @@ document.getElementById('form-analisis').addEventListener('submit', function(eve
                 }
             }
 
+            // Validar descripción
             if(!textarea.value.trim()){
                 mostrarMensaje(`La descripción del bloque ${j+1} del examen "${nombreExamen}" es obligatoria.`, 'error');
                 errores=true;
@@ -249,5 +330,7 @@ document.getElementById('form-analisis').addEventListener('submit', function(eve
     if(errores) event.preventDefault();
 });
 </script>
+
+
 
 @endsection
