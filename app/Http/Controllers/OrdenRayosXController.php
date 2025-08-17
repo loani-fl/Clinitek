@@ -7,7 +7,6 @@ use App\Models\RayosxOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\RayosxOrderExamenImagen;
-
 use App\Models\Medico;
 
 class OrdenRayosXController extends Controller
@@ -269,7 +268,7 @@ public function store(Request $request)
         'examenes' => ['required', 'array', 'min:1', 'max:10'],
         'examenes.*' => ['string'],
         'imagenes.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-        'imagenes..' => 'nullable|mimes:jpg,jpeg,png|max:5120', // Validación de imágenes
+        'imagenes.*.*' => 'nullable|mimes:jpg,jpeg,png|max:5120', // Validación de imágenes
     ], [
         'paciente_id.required' => 'Debe seleccionar un paciente.',
         'paciente_id.exists' => 'El paciente seleccionado no existe.',
@@ -315,20 +314,8 @@ public function store(Request $request)
             }
         }
     }
-    $pago = \App\Models\Pago::create([
-        'consulta_id' => null,
-        'paciente_id' => $orden->paciente_id,
-        'total' => $orden->total_precio,
-        'estado' => 'pendiente',
-        'metodo_pago' => 'pendiente',
-        'fecha' => $orden->fecha,
-        'origen' => 'rayosx',
-        'referencia_id' => $orden->id,
-    ]);
-    
-    return redirect()->route('pagos.show', ['id' => $pago->id])
-                     ->with('success', 'Orden de rayos X creada y pago generado correctamente.');
 
+    return redirect()->route('rayosx.index')->with('success', 'Orden de rayos X creada correctamente.');
 }
 
     
@@ -416,17 +403,17 @@ public function guardarAnalisis(Request $request, RayosxOrder $orden)
         'medico_analista_id' => 'required|exists:medicos,id',
         'descripciones' => 'required|array',
         'descripciones.*' => 'required|array',
-        'descripciones..' => 'required|string|max:200',
+        'descripciones.*.*' => 'required|string|max:200',
         'imagenes' => 'sometimes|array',
-        'imagenes..' => 'sometimes|image|mimes:jpeg,png,jpg|max:5120',
+        'imagenes.*.*' => 'sometimes|image|mimes:jpeg,png,jpg|max:5120',
         'eliminar_imagenes' => 'sometimes|array',
         'eliminar_imagenes.*' => 'integer|exists:rayosx_order_examen_imagenes,id',
     ], [
         'medico_analista_id.required' => 'Debe seleccionar un médico analista válido.',
         'medico_analista_id.exists' => 'El médico analista no existe.',
-        'descripciones...required' => 'Cada bloque de descripción es obligatorio.',
-        'imagenes...image' => 'Solo se permiten archivos de imagen JPG, JPEG o PNG.',
-        'imagenes...max' => 'Cada imagen no debe superar los 5MB.',
+        'descripciones.*.*.required' => 'Cada bloque de descripción es obligatorio.',
+        'imagenes.*.*.image' => 'Solo se permiten archivos de imagen JPG, JPEG o PNG.',
+        'imagenes.*.*.max' => 'Cada imagen no debe superar los 5MB.',
     ]);
 
     // 2️⃣ Guardar médico analista y actualizar estado
@@ -444,7 +431,7 @@ public function guardarAnalisis(Request $request, RayosxOrder $orden)
             foreach ($request->input("eliminar_imagenes", []) as $imgId) {
                 $imagen = RayosxOrderExamenImagen::find($imgId);
                 if ($imagen && $imagen->rayosx_order_examen_id == $examenId) {
-                    Storage::delete('public/'.$imagen->ruta);
+                    \Storage::delete('public/'.$imagen->ruta);
                     $imagen->delete();
                 }
             }
@@ -454,7 +441,7 @@ public function guardarAnalisis(Request $request, RayosxOrder $orden)
         if ($request->hasFile("imagenes.$examenId")) {
             $imagenesNuevas = $request->file("imagenes.$examenId");
             foreach ($imagenesNuevas as $index => $imagen) {
-                $nombre = time().''.uniqid().''.$imagen->getClientOriginalName();
+                $nombre = time().'_'.uniqid().'_'.$imagen->getClientOriginalName();
                 $imagen->storeAs('public/rayosx_examenes', $nombre);
 
                 RayosxOrderExamenImagen::create([
@@ -482,6 +469,12 @@ public function guardarAnalisis(Request $request, RayosxOrder $orden)
         ->with('success', 'Análisis guardado correctamente y estado actualizado a realizado.');
 }
 
+
+
+
+
+    
+// Mostrar lista paginada de órdenes con paciente
 
 public function index(Request $request)
 {

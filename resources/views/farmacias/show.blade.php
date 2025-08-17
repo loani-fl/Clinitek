@@ -31,7 +31,7 @@
         position: relative;
         overflow: hidden;
         margin: 2rem auto;
-        padding: 1rem;
+        padding: 1.5rem;
         border: 1px solid #91cfff;
         border-radius: 12px;
         z-index: 1;
@@ -52,10 +52,29 @@
 
     .info-label {
         font-weight: bold;
+        font-size: 0.95rem;
     }
 
     .info-block {
         margin-bottom: 1rem;
+        word-wrap: break-word;
+        word-break: break-word;
+    }
+
+    .ubicacion-descripcion {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .ubicacion-descripcion > div {
+        flex: 1 1 48%;
+    }
+
+    @media (max-width: 768px) {
+        .ubicacion-descripcion > div {
+            flex: 1 1 100%;
+        }
     }
 </style>
 
@@ -101,27 +120,37 @@
                                 No disponible
                             @endif
                         </div>
+                    </div>
 
-                        <div class="col-md-6 info-block">
-                            <span class="info-label">Ubicación:</span><br>{{ $farmacia->ubicacion }}
-                            <br>
-                            @if(!$farmacia->ubicacion)
+                    <!-- Ubicación y Descripción en la misma fila -->
+                    <div class="ubicacion-descripcion mt-3">
+                        <div class="info-block">
+                            <span class="info-label">Ubicación:</span><br>
+                            @php
+                                $ubicacion = [];
+                                if (!empty($farmacia->departamento)) $ubicacion[] = $farmacia->departamento;
+                                if (!empty($farmacia->ciudad)) $ubicacion[] = $farmacia->ciudad;
+                                if (!empty($farmacia->direccion)) $ubicacion[] = $farmacia->direccion;
+                            @endphp
+
+                            @if(count($ubicacion) > 0)
+                                {{ implode(', ', $ubicacion) }}
+                            @else
                                 <span>No hay ubicación disponible</span>
                             @endif
                         </div>
-                    </div>
-                </div>
-            </div>
 
-            <div class="row gy-3 mt-4">
-                <div class="col-12">
-                    <span class="info-label">Descripción:</span><br>
-                    <span style="white-space: pre-line;">{{ $farmacia->descripcion ?: 'Sin descripción.' }}</span>
+                        <div class="info-block">
+                            <span class="info-label">Descripción:</span><br>
+                            <span style="white-space: pre-line;">{{ $farmacia->descripcion ?: 'Sin descripción.' }}</span>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
 
-        <div class="text-center pb-4">
+        <div class="text-center pb-4 mt-3">
             <a href="{{ route('farmacias.index') }}" 
                class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2" 
                style="font-size: 0.85rem;">

@@ -11,34 +11,41 @@ class FarmaciaController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-{
-    $query = Farmacia::query();
-
-    if ($request->filled('filtro')) {
-        $search = $request->filtro;
-        $query->where(function($q) use ($search) {
-            $q->where('nombre', 'like', "%{$search}%")
-              ->orWhere('ubicacion', 'like', "%{$search}%");
-        });
+    {
+        $query = Farmacia::query();
+    
+        if ($request->filled('filtro')) {
+            $search = $request->filtro;
+        
+            if (is_numeric($search)) {
+                $query->where('descuento', $search);
+            } else {
+                $query->where(function($q) use ($search) {
+                    $q->where('nombre', 'like', "%{$search}%")
+                      ->orWhere('departamento', 'like', "%{$search}%")
+                      ->orWhere('ciudad', 'like', "%{$search}%");
+                });
+            }
+        }
+        
+    
+        $farmacias = $query->orderBy('nombre')->paginate(2);
+    
+        $farmacias->appends($request->only('filtro'));
+    
+        if ($request->ajax()) {
+            $html = view('farmacias.partials.tabla', compact('farmacias'))->render();
+    
+            return response()->json([
+                'html' => $html,
+                'total' => $farmacias->total(),
+                'all' => Farmacia::count(),
+            ]);
+        }
+    
+        return view('farmacias.index', compact('farmacias'));
     }
-
-    $farmacias = $query->orderBy('nombre')->paginate(2);
-
-    $farmacias->appends($request->only('filtro'));
-
-    if ($request->ajax()) {
-        $html = view('farmacias.partials.tabla', compact('farmacias'))->render();
-
-        return response()->json([
-            'html' => $html,
-            'total' => $farmacias->total(),
-            'all' => Farmacia::count(),
-        ]);
-    }
-
-    return view('farmacias.index', compact('farmacias'));
-}
-
+    
     /**
      * Show the form for creating a new resource.
      */

@@ -136,7 +136,7 @@
                 <form id="formFiltro" onsubmit="return false;">
                     <div class="d-flex gap-2">
                         <input type="text" name="filtro" id="inputFiltro" class="form-control w-50"
-                            placeholder="Buscar por nombre o ubicación" value="{{ request('filtro') }}">
+                            placeholder="Buscar por nombre, departamento, municipio y descuento" value="{{ request('filtro') }}">
                     </div>
                 </form>
             </div>
