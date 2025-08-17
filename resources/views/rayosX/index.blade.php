@@ -106,6 +106,7 @@
     .table th, .table td {
         padding: 0.4rem 0.75rem;
         vertical-align: middle;
+        border: 1px solid #dee2e6;
     }
     table th:nth-child(1), table td:nth-child(1) {
         width: 40px;
@@ -130,32 +131,6 @@
     }
     .estado-pendiente {
         background-color: yellow;
-    }
-    #datosPaciente {
-        margin-top: 1.5rem;
-        background: #f8f9fa;
-        padding: 1rem 1.5rem;
-        border-radius: 10px;
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-        font-size: 0.95rem;
-        color: #444;
-        box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-    }
-    .datos-paciente-row {
-        display: flex;
-        margin-bottom: 0.6rem;
-    }
-    .datos-paciente-label {
-        flex: 0 0 100px;
-        font-weight: 700;
-        color: #007bff;
-    }
-    .underline-field {
-        border-bottom: 1px dashed #333;
-        flex: 1;
-        user-select: none;
     }
     .status-legend {
         text-align: center;
@@ -233,7 +208,57 @@
         </div>
 
         <div id="tabla-container" class="table-responsive">
-            @include('rayosx.partials.tabla', ['ordenes' => $ordenes, 'isSearch' => $isSearch ?? false])
+            @php
+                $perPage = $ordenes->perPage();
+                $currentPage = $ordenes->currentPage();
+                $startIndex = ($currentPage - 1) * $perPage + 1;
+            @endphp
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Paciente</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($ordenes as $index => $orden)
+                        <tr>
+                            <td>{{ $startIndex + $index }}</td>
+                            <td>{{ $orden->paciente->nombre ?? $orden->nombres ?? 'N/A' }} {{ $orden->paciente->apellidos ?? $orden->apellidos ?? '' }}</td>
+                            <td>{{ \Carbon\Carbon::parse($orden->fecha)->format('d/m/Y') }}</td>
+                            <td>
+                                @if($orden->estado == 'Realizado')
+                                    <span class="estado-circle estado-realizado"></span> Realizado
+                                @else
+                                    <span class="estado-circle estado-pendiente"></span> Pendiente
+                                @endif
+                            </td>
+                            <td>
+                                <a href="{{ route('rayosx.show', $orden->id) }}" class="btn btn-sm btn-info">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ route('rayosx.edit', $orden->id) }}" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center">No hay órdenes registradas.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+
+            {{-- Leyenda de estados debajo de la tabla --}}
+            <div class="status-legend">
+                <span><span class="status-circle status-pending"></span> Pendiente</span>
+                <span><span class="status-circle status-done"></span> Realizado</span>
+            </div>
         </div>
 
         <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
