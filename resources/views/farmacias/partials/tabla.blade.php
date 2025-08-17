@@ -4,7 +4,8 @@
             <th>#</th>
             <th>Nombre</th>
             <th>Teléfono</th>
-            <th>Ubicación</th>
+            <th>Departamento</th>
+            <th>Municipio</th>
             <th>Descuento</th>
             <th>Acciones</th>
         </tr>
@@ -15,7 +16,8 @@
                 <td>{{ $farmacias->firstItem() + $index }}</td>
                 <td>{{ $farmacia->nombre }}</td>
                 <td>{{ $farmacia->telefono }}</td>
-                <td>{{ $farmacia->ubicacion }}</td>
+                <td>{{ $farmacia->departamento ?? '—' }}</td>
+                <td>{{ $farmacia->ciudad ?? '—' }}</td>
                 <td>{{ $farmacia->descuento ?? '—' }}%</td>
                 <td>
                     <a href="{{ route('farmacias.show', $farmacia) }}" class="btn btn-ver btn-sm" title="Ver">
@@ -31,12 +33,11 @@
                             <i class="bi bi-trash"></i>
                         </button>
                     </form>
-
                 </td>
             </tr>
         @empty
             <tr>
-                <td colspan="6" class="text-center">No hay farmacias registradas.</td>
+                <td colspan="7" class="text-center">No hay farmacias registradas.</td>
             </tr>
         @endforelse
     </tbody>
@@ -45,6 +46,7 @@
 <div class="d-flex justify-content-center mt-3">
     {!! $farmacias->links() !!}
 </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const forms = document.querySelectorAll('.form-eliminar');
