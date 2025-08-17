@@ -19,11 +19,7 @@ class RayosxOrderExamen extends Model
         return $this->belongsTo(RayosxOrder::class, 'rayosx_order_id');
     }
     
-
-    public function paciente()
-
      public function imagenes()
-
     {
         return $this->hasMany(RayosxOrderExamenImagen::class, 'rayosx_order_examen_id');
     }

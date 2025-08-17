@@ -486,23 +486,6 @@ a.btn-primary {
 
 
 
-                {{-- Botones --}}
-                <div class="d-flex justify-content-center gap-3 mt-4">
-    <button type="submit" class="btn btn-primary">
-        <i class="bi bi-save"></i> Guardar y pagar orden
-    </button>
-    <button type="button" id="btnLimpiar" class="btn btn-warning">
-        <i class="bi bi-trash"></i> Limpiar
-    </button>
-    <a href="{{ route('rayosx.index') }}" class="btn btn-success">
-        <i class="bi bi-arrow-left-circle"></i> Regresar
-    </a>
-
-  
-                </div>
-            </form>
-        </div>
-
             {{-- BOTONES GUARDAR, LIMPIAR, VOLVER --}}
             <div class="d-flex justify-content-center gap-3">
                 <button type="submit" class="btn btn-primary px-4 py-2">
@@ -516,7 +499,6 @@ a.btn-primary {
                 </a>
             </div>
         </form>
-
     </div>
 </div>
  </div>

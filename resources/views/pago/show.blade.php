@@ -97,180 +97,161 @@
         text-align: center;
         margin-top: 2rem;
         font-size: 0.85rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
     }
 </style>
 
 <div class="factura-container">
 
-    <!-- Encabezado -->
     <div class="factura-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
-        <!-- Lado izquierdo: logo y nombre -->
-        <div style="display: flex; align-items: center;">
-            <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 60px; margin-right: 10px;">
-            <h1 style="margin: 0; font-weight: bold; font-style: italic;">CLINITEK</h1>
-        </div>
-
-        <!-- Lado derecho: dirección y título -->
-        <div style="text-align: right;">
-            <p style="margin: 0;">Uniplaza, Bo. Gualiqueme,<br>Gasolinera Texaco, Frente a, Danlí</p>
-            <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 14px;">FACTURA DE PAGO</p>
-        </div>
+    <!-- Lado izquierdo: logo y nombre -->
+    <div style="display: flex; align-items: center;">
+        <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 60px; margin-right: 10px;">
+        <h1 style="margin: 0; font-weight: bold; font-style: italic;">CLINITEK</h1>
     </div>
 
-    <div class="factura-divider"></div>
-
-    <!-- Datos del paciente y pago -->
-    <div class="factura-section">
-        <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
-            <p style="flex: 1; margin: 0;">
-                <strong>Nombre completo:</strong> {{ $paciente->nombre ?? 'N/A' }} {{ $paciente->apellidos ?? '' }}
-            </p>
-            <p style="flex: 1; margin: 0;">
-                <strong>Identidad:</strong> {{ $paciente->identidad ?? 'N/A' }}
-            </p>
-        </div>
-
-        @if($origen !== 'rayosx')
-        <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
-            <p style="flex: 1; margin: 0;">
-                <strong>Médico:</strong> {{ $medico->nombre ?? 'N/A' }} {{ $medico->apellidos ?? '' }}
-            </p>
-            <p style="flex: 1; margin: 0;">
-                <strong>Especialidad:</strong> {{ $medico->especialidad ?? 'N/A' }}
-            </p>
-        </div>
-        @endif
-
-        <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
-            <p style="flex: 1; margin: 0;">
-                <strong>Método de pago:</strong> {{ ucfirst($pago->metodo_pago) }}
-            </p>
-            <p style="flex: 1; margin: 0;">
-                <strong>Fecha:</strong> {{ \Carbon\Carbon::parse($pago->fecha)->format('d/m/Y') }}
-            </p>
-        </div>
-
-        <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
-            <p style="flex: 1; margin: 0;">
-                <strong>Hora:</strong> {{ \Carbon\Carbon::now('America/Tegucigalpa')->format('h:i A') }}
-            </p>
-            <p style="flex: 1; margin: 0;">
-                <!-- columna vacía -->
-            </p>
-        </div>
+    <!-- Lado derecho: dirección y título -->
+    <div style="text-align: right;">
+        <p style="margin: 0;">Uniplaza, Bo. Gualiqueme,<br>Gasolinera Texaco, Frente a, Danlí</p>
+        <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 14px;">FACTURA DE PAGO</p>
     </div>
-
-    <div class="factura-divider"></div>
-
-    <!-- Tabla con servicios y precios -->
-    <table class="factura-table">
-        <thead>
-            <tr>
-                <th>Descripción</th>
-                <th>Valor</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if($origen === 'consulta')
-                <tr>
-                    <td>Consulta médica</td>
-                    <td>L. {{ number_format($pago->cantidad, 2) }}</td>
-                </tr>
-            @elseif($origen === 'rayosx')
-                @if($examenesConPrecio && count($examenesConPrecio) > 0)
-                    @foreach($examenesConPrecio as $examen)
-                        <tr>
-                            <td>{{ $examen['descripcion'] }}</td>
-                            <td>L. {{ number_format($examen['precio'], 2) }}</td>
-                        </tr>
-                    @endforeach
-                @else
-                    <tr>
-                        <td>Exámenes de Rayos X</td>
-                        <td>L. {{ number_format($pago->cantidad, 2) }}</td>
-                    </tr>
-                @endif
-            @endif
-        </tbody>
-    </table>
-
-    <div class="factura-divider"></div>
-
-    <!-- Subtotales -->
-    <div class="factura-section">
-        @php
-            $isv = round($pago->cantidad * 0.15, 2);
-            $subtotal = round($pago->cantidad - $isv, 2);
-            $total = $subtotal + $isv;
-        @endphp
-
-        <p><strong>Subtotal:</strong> L. {{ number_format($subtotal, 2) }}</p>
-        <p><strong>ISV (15%):</strong> L. {{ number_format($isv, 2) }}</p>
-        <p><strong>Total a pagar:</strong> L. {{ number_format($total, 2) }}</p>
-    </div>
-
-    <div class="factura-divider"></div>
-
-    <!-- Pie de factura -->
-    <div class="factura-footer">
-    <div style="display: flex; gap: 10px;">
-    <!-- Botón Inicio -->
-    <a href="{{ route('inicio') }}" 
-       style="
-           display: flex;
-           align-items: center;
-           justify-content: center;
-           width: 80px;
-           height: 40px;
-           background-color: #888; /* gris más pálido */
-           color: #fff;
-           text-decoration: none;
-           border-radius: 6px;
-           font-weight: bold;
-           border: 1px solid #666;
-           transition: background-color 0.2s;
-       "
-       onmouseover="this.style.backgroundColor='#999';"
-       onmouseout="this.style.backgroundColor='#888';"
-    >
-        Inicio
-    </a>
-
-    <!-- Botón Regresar (solo si es Rayos X) -->
-    @if($origen === 'rayosx')
-    <a href="{{ route('rayosx.index') }}" 
-       style="
-           display: flex;
-           align-items: center;
-           justify-content: center;
-           width: 80px;
-           height: 40px;
-           background-color: #888; /* gris más pálido */
-           color: #fff;
-           text-decoration: none;
-           border-radius: 6px;
-           font-weight: bold;
-           border: 1px solid #666;
-           transition: background-color 0.2s;
-       "
-       onmouseover="this.style.backgroundColor='#999';"
-       onmouseout="this.style.backgroundColor='#888';"
-    >
-        Regresar
-    </a>
-    @endif
 </div>
 
 
+    <div class="factura-divider"></div>
 
-        <div style="text-align: right;">
-            *** ¡AGRADECEMOS SU PREFERENCIA! ***<br>
-            Gracias por confiar en nosotros <strong>CLINITEK</strong>.
+    <div class="factura-section">
+        <div class="factura-section">
+    {{-- Datos comunes --}}
+    @if($paciente)
+        {{-- Fila 1 --}}
+        <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Nombre completo:</strong> {{ $paciente->nombre }} {{ $paciente->apellidos }}
+            </p>
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Identidad:</strong> {{ $paciente->identidad }}
+            </p>
         </div>
+    @endif
+
+    @if($pago->metodo_pago === 'efectivo')
+        {{-- Fila 2 --}}
+        <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Método de pago:</strong> {{ ucfirst($pago->metodo_pago) }}
+            </p>
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Fecha:</strong> {{ \Carbon\Carbon::parse($pago->fecha)->format('d/m/Y')}}
+            </p>
+        </div>
+
+        {{-- Fila 3 --}}
+        <div style="margin-bottom: 0.3rem;">
+            <p style="margin: 0; display: flex; align-items: center;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Hora:</strong> {{ \Carbon\Carbon::now('America/Tegucigalpa')->format('h:i A') }}
+            </p>
+        </div>
+
+    @elseif($pago->metodo_pago === 'tarjeta')
+        {{-- Fila 2 --}}
+        <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Método de pago:</strong> {{ ucfirst($pago->metodo_pago) }}
+            </p>
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Nombre del titular:</strong> {{ $pago->nombre_titular ?? 'No disponible' }}
+            </p>
+        </div>
+
+        {{-- Fila 3 --}}
+        <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Número de tarjeta:</strong> {{ $pago->numero_tarjeta ?? 'No disponible' }}
+            </p>
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Fecha de expiración:</strong> {{ $pago->fecha_expiracion ?? 'No disponible' }}
+            </p>
+        </div>
+
+        {{-- Fila 4 --}}
+        <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Fecha:</strong> {{ \Carbon\Carbon::parse($pago->fecha)->format('d/m/Y')}}
+            </p>
+            <p style="flex: 1; display: flex; align-items: center; margin: 0;">
+                <strong style="width: 130px; margin-right: 0.3rem;">Hora:</strong> {{ \Carbon\Carbon::now('America/Tegucigalpa')->format('h:i A') }}
+            </p>
+        </div>
+    @endif
+
+</div>
+
     </div>
+
+    <div class="factura-divider"></div>
+   
+
+    <table class="factura-table">
+    <thead>
+        <tr>
+            <th>Descripción</th>
+            <th>Valor</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+        <td>
+  {{ $pago->servicio ?? 'Sin servicio' }}
+        @if(!empty($pago->descripcion))
+            <br><small style="color: #555;">{{ $pago->descripcion }}</small>
+        @endif
+
+</td>
+
+
+
+            <td>L. {{ number_format($pago->cantidad, 2) }}</td>
+        </tr>
+    </tbody>
+</table>
+
+
+    <div class="factura-divider"></div>
+
+    <div class="factura-section">
+    @php
+        $isv = round($pago->cantidad * 0.15, 2);
+        $subtotal = round($pago->cantidad - $isv, 2);
+        $total = $subtotal + $isv;
+    @endphp
+
+    <p><strong>Subtotal:</strong> L. {{ number_format($subtotal, 2) }}</p>
+    <p><strong>ISV (15%):</strong> L. {{ number_format($isv, 2) }}</p>
+    <p><strong>Total a pagar:</strong> L. {{ number_format($total, 2) }}</p>
+</div>
+
+
+    <div class="factura-divider"></div>
+    <!-- Pie de factura: botón + texto alineados horizontalmente -->
+<div class="factura-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px;">
+    <!-- Botón a la izquierda -->
+    <a href="{{ route('inicio') }}" style="
+        display: inline-block;
+        background-color: #ccc;
+        color: black;
+        padding: 8px 16px;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+        border: 1px solid #999;
+    ">Inicio</a>
+
+    <!-- Texto a la derecha -->
+    <div style="text-align: right;">
+        *** ¡AGRADECEMOS SU PREFERENCIA! ***<br>
+        Gracias por confiar en nosotros <strong>CLINITEK</strong>.
+    </div>
+</div>
 
 </div>
 @endsection

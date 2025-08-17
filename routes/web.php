@@ -72,6 +72,7 @@ Route::get('/consultas/horas-ocupadas', [ConsultaController::class, 'horasOcupad
 Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('consultas.show');
 Route::patch('/consultas/{consulta}/cancelar', [ConsultaController::class, 'cancelar'])->name('consultas.cancelar');
 Route::patch('/consultas/{consulta}/cambiar-estado', [ConsultaController::class, 'cambiarEstado'])->name('consultas.cambiarEstado');
+Route::get('/pago/create', [PagoController::class, 'create'])->name('pago.create');
 
 
 Route::resource('diagnosticos', DiagnosticoController::class);
@@ -125,16 +126,9 @@ Route::prefix('rayosx')->group(function () {
 });
 
 // Rutas para pago
-// Desde consulta → crea el pago y redirige a show
-Route::get('/pago/consulta/{consulta_id}', [PagoController::class, 'createFromConsulta'])->name('pagos.consulta');
-// Desde rayos X → crea el pago y redirige a show
-Route::get('/pago/rayosx/{rayosx_id}', [PagoController::class, 'createFromRayosx'])->name('pagos.rayosx');
-// Mostrar factura
-Route::get('/pago/{id}', [PagoController::class, 'show'])->name('pagos.show');
-// Guardar pago
-Route::post('/pago/store', [PagoController::class, 'store'])->name('pagos.store');
-
-
+Route::get('/pago/create', [App\Http\Controllers\PagoController::class, 'create'])->name('pago.create');
+Route::post('/pago', [App\Http\Controllers\PagoController::class, 'store'])->name('pago.store');
+Route::get('/pago/{pago}', [App\Http\Controllers\PagoController::class, 'show'])->name('pago.show');
 
 // Rutas para farmacia
 Route::resource('farmacias', FarmaciaController::class);
@@ -169,8 +163,7 @@ Route::post('/rayosx/descripcion-guardar', [OrdenRayosXController::class, 'guard
 
 
     //OOTRAS
-
-Route::get('/rayosx', [OrdenRayosXController::class, 'index'])->name('rayosx.index');
+    Route::get('/rayosx', [OrdenRayosXController::class, 'index'])->name('rayosx.index');
 Route::get('/rayosx/create', [OrdenRayosXController::class, 'create'])->name('rayosx.create');
 Route::post('/rayosx', [OrdenRayosXController::class, 'store'])->name('rayosx.store');
 Route::get('/rayosx/{id}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
@@ -199,8 +192,6 @@ Route::get('/rayosx/{id}/analizar', [OrdenRayosXController::class, 'analizar'])-
 
 
 
-
-
 Route::get('/pacientes/buscar-ajax', [PacienteController::class, 'buscarPacientesAjax'])->name('pacientes.buscarAjax');
 
 
@@ -221,3 +212,4 @@ Route::post('rayosx/{id}/analisis', [RayosxController::class, 'storeAnalisis'])-
 Route::get('/rayosx/{id}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
 
 
+Route::post('/farmacias/foto-temporal', [FarmaciaController::class, 'fotoTemporal'])->name('farmacias.foto-temporal');
