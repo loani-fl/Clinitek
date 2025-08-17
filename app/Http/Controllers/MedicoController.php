@@ -125,37 +125,44 @@ class MedicoController extends Controller
     {
         $query = Medico::query();
 
-        if ($request->filled('buscar')) {
-            $buscar = $request->buscar;
+        // Búsqueda
+        if ($request->filled('search')) {
+            $buscar = $request->search;
             $query->where(function ($q) use ($buscar) {
                 $q->where('nombre', 'like', "%{$buscar}%")
                     ->orWhere('apellidos', 'like', "%{$buscar}%")
                     ->orWhere('especialidad', 'like', "%{$buscar}%")
-                    ->orWhere('numero_identidad', 'like', "%{$buscar}%")
-                    ->orWhere('correo', 'like', "%{$buscar}%")
-                    ->orWhere('telefono', 'like', "%{$buscar}%");
+                    ->orWhere('numero_identidad', 'like', "%{$buscar}%");
             });
         }
 
-        if ($request->has('estado') && $request->estado !== '') {
+        // Filtro por estado
+        if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
         }
 
-        $medicos = $query->orderBy('nombre')->paginate(4)->appends($request->all());
+        $totalAll = Medico::count();
 
-        // Si la petición es AJAX, enviar solo la tabla y paginación en JSON
+        $medicos = $query->orderBy('nombre')->paginate(2)->appends($request->all());
+
         if ($request->ajax()) {
             $html = view('medicos.partials.tabla', compact('medicos'))->render();
-            $pagination = $medicos->links('pagination::bootstrap-5')->render();
+            $pagination = $medicos->links('pagination::bootstrap-4')->render();
 
             return response()->json([
                 'html' => $html,
                 'pagination' => $pagination,
                 'total' => $medicos->total(),
+                'all' => $totalAll,
+                'from' => $medicos->firstItem(),
+                'to' => $medicos->lastItem(),
             ]);
         }
+
         return view('medicos.index', compact('medicos'));
     }
+
+
 
     public function show($id)
     {

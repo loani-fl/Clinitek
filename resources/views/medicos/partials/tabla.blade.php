@@ -1,32 +1,41 @@
-@forelse($medicos as $medico)
-    <tr>
-        <td>{{ $medico->id }}</td>
-        <td class="text-center">
-            @if($medico->estado)
-                <i class="bi bi-circle-fill text-success" title="Activo"></i>
-            @else
-                <i class="bi bi-circle-fill text-danger" title="Inactivo"></i>
-            @endif
-        </td>
-        <td>{{ $medico->nombre }}</td>
-        <td>{{ $medico->apellidos }}</td>
-        <td>{{ $medico->telefono }}</td>
-        <td>{{ $medico->correo }}</td>
-        <td>{{ $medico->especialidad }}</td>
-        <td>{{ $medico->genero }}</td>
-        <td>
-            <a href="{{ route('medicos.show', $medico->id) }}" class="btn btn-sm btn-outline-info">
-                <i class="bi bi-eye"></i>
-            </a>
-            <a href="{{ route('medicos.edit', $medico->id) }}" class="btn btn-sm btn-outline-warning">
-                <i class="bi bi-pencil-square"></i>
-            </a>
-        </td>
-    </tr>
-@empty
-    <tr>
-        <td colspan="9" class="text-center">
-            <div class="alert alert-info">No se encontraron resultados.</div>
-        </td>
-    </tr>
-@endforelse
+<div class="table-responsive">
+    <table class="table table-bordered table-striped mb-0">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th class="text-center">Nombre</th>
+            <th class="text-center">Identidad</th>
+            <th class="text-center">Especialidad</th>
+            <th class="text-center">Estado</th>
+            <th class="text-center">Acciones</th>
+        </tr>
+        </thead>
+        <tbody id="tabla-medicos">
+        @forelse($medicos as $index => $medico)
+            <tr>
+                <td>{{ $medicos->firstItem() + $index }}</td>
+                <td>{{ $medico->nombre }} {{ $medico->apellidos }}</td>
+                <td>{{ $medico->numero_identidad }}</td>
+                <td>{{ $medico->especialidad }}</td>
+                <td class="text-center">
+                    @if($medico->estado)
+                        <span class="estado-activo"><i class="bi bi-circle-fill"></i></span>
+                    @else
+                        <span class="estado-inactivo"><i class="bi bi-circle-fill"></i></span>
+                    @endif
+                </td>
+                <td>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <a href="{{ route('medicos.show', $medico->id) }}" class="btn btn-outline-info btn-sm"><i class="bi bi-eye"></i></a>
+                        <a href="{{ route('medicos.edit', $medico->id) }}" class="btn btn-outline-warning btn-sm"><i class="bi bi-pencil"></i></a>
+                    </div>
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="6" class="text-center">No hay médicos registrados.</td>
+            </tr>
+        @endforelse
+        </tbody>
+    </table>
+</div>

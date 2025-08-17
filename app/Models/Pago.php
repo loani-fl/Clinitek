@@ -34,5 +34,12 @@ class Pago extends Model
     {
         return $this->belongsTo(\App\Models\Medico::class);
     }
+
+            
+        public function consulta()
+        {
+            return $this->belongsTo(\App\Models\Consulta::class, 'referencia_id');
+        }
+
     
 }

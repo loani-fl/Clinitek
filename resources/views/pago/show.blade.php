@@ -174,26 +174,27 @@
         </tr>
     </thead>
     <tbody>
-        @if($origen === 'consulta')
+    @if($origen === 'consulta')
+    <tr>
+        <td>Consulta médica</td>
+        <td>L. {{ number_format($pago->cantidad, 2) }}</td>
+    </tr>
+@elseif($origen === 'rayosx')
+    @if($examenesConPrecio && count($examenesConPrecio) > 0)
+        @foreach($examenesConPrecio as $examen)
             <tr>
-                <td>Consulta médica</td>
-                <td>L. {{ number_format($pago->cantidad, 2) }}</td>
+                <td>{{ $examen['descripcion'] }}</td>
+                <td>L. {{ number_format($examen['precio'], 2) }}</td>
             </tr>
-        @elseif($origen === 'rayosx')
-            @if($examenesConPrecio && count($examenesConPrecio) > 0)
-                @foreach($examenesConPrecio as $examen)
-                    <tr>
-                    <td>{{ $examen['descripcion'] }}</td>
-                    <td>L. {{ number_format($examen['precio'], 2) }}</td>
-                    </tr>
-                @endforeach
-            @else
-                <tr>
-                    <td>Exámenes de Rayos X</td>
-                    <td>L. {{ number_format($pago->cantidad, 2) }}</td>
-                </tr>
-            @endif
-        @endif
+        @endforeach
+    @else
+        <tr>
+            <td>Exámenes de Rayos X</td>
+            <td>L. {{ number_format($pago->cantidad, 2) }}</td>
+        </tr>
+    @endif
+@endif
+
     </tbody>
 </table>
 
