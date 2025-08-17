@@ -321,16 +321,18 @@
 
                 {{-- Botones --}}
                 <div class="d-flex justify-content-center gap-3 mt-4">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save"></i> Guardar Orden
-                    </button>
-                    <button type="button" id="btnLimpiar" class="btn btn-warning">
-                        <i class="bi bi-trash"></i> Limpiar
-                    </button>
-                    <a href="{{ route('rayosx.index') }}" class="btn btn-success">
-                        <i class="bi bi-arrow-left-circle"></i> Regresar
-                    </a>
-                      <a href="{{ route('pago.create', ['orden_id' => $orden->id ?? '']) }}" class="btn btn-info">
+    <button type="submit" class="btn btn-primary">
+        <i class="bi bi-save"></i> Guardar y pagar orden
+    </button>
+    <button type="button" id="btnLimpiar" class="btn btn-warning">
+        <i class="bi bi-trash"></i> Limpiar
+    </button>
+    <a href="{{ route('rayosx.index') }}" class="btn btn-success">
+        <i class="bi bi-arrow-left-circle"></i> Regresar
+    </a>
+
+    <!-- Botón Pagar habilitado -->
+    <a href="{{ route('pagos.rayosx', $orden->id ?? 0) }}" class="btn btn-info">
         <i class="bi bi-cash-stack"></i> Pagar
     </a>
                 </div>

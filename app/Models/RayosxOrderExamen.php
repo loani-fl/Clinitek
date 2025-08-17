@@ -22,6 +22,7 @@ class RayosxOrderExamen extends Model
     {
         return $this->belongsTo(RayosxOrder::class, 'rayosx_order_id');
     }
+    
     public function paciente()
     {
         return $this->belongsTo(Paciente::class);

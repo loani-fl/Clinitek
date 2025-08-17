@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Medico;
 use App\Models\RayosxOrderExamen;
+use App\Models\Pago;
 use App\Models\Paciente;
 use App\Models\Diagnostico;
 use App\Models\RayosxOrder;
@@ -69,14 +70,9 @@ public function index(Request $request)
 }
 
 
-
-
-
-    /**
-     * Mostrar formulario de creación.
-     */
   public function create(Request $request)
     {
+        
         $pacientesClinica = Paciente::orderBy('nombre')->get();
         $pacientesRayosX = PacienteRayosX::orderBy('nombre')->get();
         $diagnosticos = Diagnostico::orderBy('id', 'desc')->get();
@@ -398,7 +394,7 @@ public function index(Request $request)
         }
 
         DB::beginTransaction();
-        try {
+        try {            
             $orden = RayosxOrder::create([
                 'diagnostico_id' => $diagnostico_id,
                 'paciente_id' => $paciente_id,
@@ -411,6 +407,17 @@ public function index(Request $request)
                 'datos_clinicos' => $request->datos_clinicos,
                 'estado' => 'Pendiente',
                 'total_precio' => $total,
+            ]);
+             $pago = Pago::create([
+                'paciente_id'   => $paciente_id,
+                'medico_id'     => null, // si no aplica
+                'servicio'      => 'Rayos X',
+                'descripcion'   => implode(', ', $request->examenes), // opcional
+                'cantidad'      => $total,
+                'metodo_pago'   => 'efectivo', // o tarjeta si quieres
+                'fecha'         => now(),
+                'origen'        => 'rayosx',
+                'referencia_id' => $orden->id,
             ]);
 
             $examenesToInsert = collect($request->examenes)
@@ -426,8 +433,9 @@ public function index(Request $request)
 
             DB::commit();
 
-            return redirect()->route('pago.create', ['rayosx_id' => $orden->examenes()->first()->id]);
-
+          return redirect()->route('pagos.show', $pago->id)
+          ->with('success', 'Orden creada correctamente y pago registrado.');
+      
 
         } catch (\Throwable $th) {
             DB::rollBack();

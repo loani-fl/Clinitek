@@ -2,52 +2,62 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class RayosxOrder extends Model
 {
-  protected $fillable = [
-    'diagnostico_id',
-    'paciente_id',
-    'fecha',
-    'edad',
-    'identidad',
-    'nombres',
-    'apellidos',
-    'medico_solicitante',
-    'paciente_tipo',
-    'estado',
-      'medico_radiologo_id',
+    use HasFactory;
+
+    protected $fillable = [
+        'diagnostico_id',
+        'paciente_id',
+        'fecha',
+        'edad',
+        'identidad',
+        'nombres',
+        'apellidos',
+        'medico_solicitante',
+        'paciente_tipo',
+        'estado',
+        'medico_radiologo_id',
         'medico_analista_id',
-         'total_precio',   // <- aquí debe estar
-];
+        'total_precio',
+    ];
 
-
+    // Relación con diagnóstico
     public function diagnostico()
     {
         return $this->belongsTo(Diagnostico::class);
     }
 
-    public function pacienteClinica()
+    // Relación con paciente
+    public function paciente()
     {
         return $this->belongsTo(Paciente::class, 'paciente_id');
     }
 
-    public function pacienteRayosX()
-    {
-        return $this->belongsTo(PacienteRayosX::class, 'paciente_id');
-    }
-
+    // Relación con exámenes (muchos a muchos)
     public function examenes()
     {
-        return $this->hasMany(RayosxOrderExamen::class);
+        return $this->belongsToMany(Examen::class, 'rayosx_order_examen', 'rayosx_order_id', 'examen_id')
+        ->withPivot('precio'); // si en la pivot tienes precio
     }
 
-       
-    
+    // Relación con médicos
+    public function medicoAnalista()
+    {
+        return $this->belongsTo(Medico::class, 'medico_analista_id');
+    }
+
+    public function medicoRadiologo()
+    {
+        return $this->belongsTo(Medico::class, 'medico_radiologo_id');
+    }
+
+    // Función para obtener todos los exámenes de las secciones (opcional)
     public function getAllExamenes()
     {
-        // mantiene tu función existente (sin cambios)
         $examenes = [];
 
         $secciones = [
@@ -75,23 +85,4 @@ class RayosxOrder extends Model
 
         return $examenes;
     }
-    public function medicoAnalista()
-    {
-        return $this->belongsTo(Medico::class, 'medico_analista_id');
-    }
-
-    public function medicoRadiologo()
-    {
-        return $this->belongsTo(Medico::class, 'medico_radiologo_id');
-    }
-
-    public function paciente()
-{
-    return $this->belongsTo(Paciente::class, 'paciente_id'); // O la FK correcta que uses
-}
-
-
-  
-
-    
 }
