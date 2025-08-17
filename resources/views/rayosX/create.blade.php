@@ -164,23 +164,37 @@ a.btn-primary:hover {
     text-decoration: none;
 }
 
-/* Mensajes emergentes */
-.mensaje-flash {
-    display: none;
-    background-color: #f8d7da;
-    color: #842029;
-    border: 1px solid #f5c2c7;
-    padding: 8px 12px;
-    border-radius: 0.4rem;
-    font-weight: 600;
-    font-size: 0.95rem;
-    margin-bottom: 1rem;
+/* Mensajes emergentes */.mensaje-flash {
+    min-width: 280px;
     max-width: 600px;
-    user-select: none;
     text-align: center;
-    margin-left: auto;
-    margin-right: auto;
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin: 5px auto;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
+
+.mensaje-flash.mostrar {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mensaje-flash.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.mensaje-flash.exito {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
 
 /* Hover para checkbox */
 .form-check-input:hover {
@@ -335,27 +349,28 @@ a.btn-primary {
 
 
 
-
 <div class="content-wrapper">
 
-
-            <div class="row align-items-center">
-                <div class="col-md-3 text-center">
-                     <img src="{{ asset('images/logo2.jpg') }}" alt="Logo Clinitek" style="height: 60px; width: auto;">
-                    <div style="font-size: 1rem; font-weight: 700; color: #555;">
-                        Laboratorio Clínico Honduras
-                    </div>
-                </div>
-                <div class="col-md-9 text-center" style="transform: translateX(30%);">
-                    <h4 class="mb-0" style="font-size: 1.2rem; font-weight: 600; color: #333; line-height: 1.3;">
-                        CREAR ORDEN DE RAYOS X
-                    </h4>
-                </div>
+    <div class="row align-items-center">
+        <div class="col-md-3 text-center">
+            <img src="{{ asset('images/logo2.jpg') }}" alt="Logo Clinitek" style="height: 60px; width: auto;">
+            <div style="font-size: 1rem; font-weight: 700; color: #555;">
+                Laboratorio Clínico Honduras
             </div>
-<div class="linea-azul"></div>
+        </div>
+        <div class="col-md-9 text-center" style="transform: translateX(30%);">
+            <h4 class="mb-0" style="font-size: 1.2rem; font-weight: 600; color: #333; line-height: 1.3;">
+                CREAR ORDEN DE RAYOS X
+            </h4>
+        </div>
+    </div>
 
-               <div class="card-body">
-       
+    <div class="linea-azul"></div>
+
+    {{-- Contenedor de mensajes emergentes, justo debajo de la línea azul --}}
+    <div id="mensajes-container" style="text-align: center; margin: 10px 0;"></div>
+
+    <div class="card-body">
 
         {{-- Mensajes de error del servidor --}}
         @if ($errors->any())
@@ -368,52 +383,44 @@ a.btn-primary {
         </div>
         @endif
 
-          
-
-        {{-- Mensajes emergentes personalizados --}}
-        <div id="mensajePaciente" class="mensaje-flash"></div>
-        <div id="mensajeExamenes" class="mensaje-flash"></div>
-
         <form action="{{ route('rayosx.store') }}" method="POST" id="formOrden" novalidate>
             @csrf
 
             {{-- FILTRO PACIENTE, BOTÓN REGISTRAR, FECHA en misma fila --}}
             <div class="top-controls">
-    <!-- Buscar paciente -->
-    <div style="position: relative;">
-        <label for="buscarPaciente" class="form-label fw-bold">Buscar paciente <span class="text-danger">*</span></label>
-        <input type="text" id="buscarPaciente" class="form-control" placeholder="Escribe para buscar paciente..." autocomplete="off" value="{{ old('paciente_nombre', '') }}" required>
-        <input type="hidden" name="paciente_id" id="paciente_id" value="{{ old('paciente_id') }}">
-        <ul id="listaPacientes" class="list-group">
-            @foreach ($pacientes as $paciente)
-                <li class="list-group-item list-group-item-action paciente-item" data-id="{{ $paciente->id }}" data-nombre="{{ $paciente->nombre }}" data-apellidos="{{ $paciente->apellidos ?? '' }}" data-identidad="{{ $paciente->identidad ?? '' }}" data-genero="{{ $paciente->genero ?? '' }}" style="cursor:pointer;">
-                    {{ $paciente->nombre }} {{ $paciente->apellidos ?? '' }}
-                </li>
-            @endforeach
-        </ul>
-    </div>
+                <!-- Buscar paciente -->
+                <div style="position: relative;">
+                    <label for="buscarPaciente" class="form-label fw-bold">Buscar paciente <span class="text-danger">*</span></label>
+                    <input type="text" id="buscarPaciente" class="form-control" placeholder="Escribe para buscar paciente..." autocomplete="off" value="{{ old('paciente_nombre', '') }}" required>
+                    <input type="hidden" name="paciente_id" id="paciente_id" value="{{ old('paciente_id') }}">
+                    <ul id="listaPacientes" class="list-group">
+                        @foreach ($pacientes as $paciente)
+                            <li class="list-group-item list-group-item-action paciente-item" data-id="{{ $paciente->id }}" data-nombre="{{ $paciente->nombre }}" data-apellidos="{{ $paciente->apellidos ?? '' }}" data-identidad="{{ $paciente->identidad ?? '' }}" data-genero="{{ $paciente->genero ?? '' }}" style="cursor:pointer;">
+                                {{ $paciente->nombre }} {{ $paciente->apellidos ?? '' }}
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
 
-    <!-- Fecha -->
-  <!-- Fecha -->
-<div>
-    <label for="fecha" class="form-label fw-bold">Fecha <span class="text-danger">*</span></label>
-    <input type="date" 
-           id="fecha" 
-           name="fecha" 
-           class="form-control" 
-           value="{{ old('fecha', date('Y-m-d')) }}" 
-           required>
-</div>
+                <!-- Fecha -->
+                <div>
+                    <label for="fecha" class="form-label fw-bold">Fecha <span class="text-danger">*</span></label>
+                    <input type="date" 
+                           id="fecha" 
+                           name="fecha" 
+                           class="form-control" 
+                           value="{{ old('fecha', date('Y-m-d')) }}" 
+                           required>
+                </div>
 
-
-    <!-- Botón registrar paciente -->
-    <div>
-        <label class="d-block">&nbsp;</label>
-        <a href="{{ route('pacientes.create', ['returnUrl' => route('rayosx.create')]) }}" class="btn btn-primary">
-            <i class="bi bi-person-plus"></i> Registrar
-        </a>
-    </div>
-</div>
+                <!-- Botón registrar paciente -->
+                <div>
+                    <label class="d-block">&nbsp;</label>
+                    <a href="{{ route('pacientes.create', ['returnUrl' => route('rayosx.create')]) }}" class="btn btn-primary">
+                        <i class="bi bi-person-plus"></i> Registrar
+                    </a>
+                </div>
+            </div>
 
                 
 {{-- DATOS DEL PACIENTE CON ESTILO SUBRAYADO --}}
@@ -497,63 +504,93 @@ a.btn-primary {
  </div>
 
  </div>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const inputBuscar = document.getElementById('buscarPaciente');
     const lista = document.getElementById('listaPacientes');
     const inputHiddenId = document.getElementById('paciente_id');
 
-    // Campos datos paciente estilo subrayado
     const dpNombres = document.getElementById('dp-nombres');
     const dpApellidos = document.getElementById('dp-apellidos');
     const dpIdentidad = document.getElementById('dp-identidad');
     const dpGenero = document.getElementById('dp-genero');
 
-// Bloquear fechas anteriores al día de hoy
+    const fechaInput = document.getElementById('fecha');
+    const hoy = new Date();
+    const dd = String(hoy.getDate()).padStart(2, '0');
+    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+    const yyyy = hoy.getFullYear();
+    fechaInput.setAttribute('min', `${yyyy}-${mm}-${dd}`);
 
+    const fechaMax = new Date();
+    fechaMax.setMonth(fechaMax.getMonth() + 3);
+    const ddMax = String(fechaMax.getDate()).padStart(2, '0');
+    const mmMax = String(fechaMax.getMonth() + 1).padStart(2, '0');
+    const yyyyMax = fechaMax.getFullYear();
+    fechaInput.setAttribute('max', `${yyyyMax}-${mmMax}-${ddMax}`);
 
+    fechaInput.value = fechaInput.value || `${yyyy}-${mm}-${dd}`;
 
+    const mensajesContainer = document.getElementById('mensajes-container');
 
+    function showMensaje(texto, tipo = 'error') {
+        const div = document.createElement('div');
+        div.textContent = texto;
+        div.className = `mensaje-flash ${tipo} mostrar`;
+        div.style.display = 'inline-block';
+        div.style.textAlign = 'center';
+        div.style.padding = '8px 12px';
+        div.style.borderRadius = '6px';
+        div.style.margin = '10px auto';
+        div.style.maxWidth = 'fit-content';
+        div.style.transition = 'opacity 0.4s, transform 0.4s';
+        div.style.opacity = '0';
+        if(tipo === 'error') {
+            div.style.backgroundColor = '#f8d7da';
+            div.style.color = '#721c24';
+            div.style.border = '1px solid #f5c6cb';
+        } else if(tipo === 'exito') {
+            div.style.backgroundColor = '#d4edda';
+            div.style.color = '#155724';
+            div.style.border = '1px solid #c3e6cb';
+        }
 
-// Fecha mínima y máxima
-const fechaInput = document.getElementById('fecha');
-const hoy = new Date();
-const dd = String(hoy.getDate()).padStart(2, '0');
-const mm = String(hoy.getMonth() + 1).padStart(2, '0'); // Mes actual (0-11)
-const yyyy = hoy.getFullYear();
-const fechaHoy = `${yyyy}-${mm}-${dd}`;
-fechaInput.setAttribute('min', fechaHoy);
+        mensajesContainer.appendChild(div);
 
-// Fecha máxima = 3 meses después
-const fechaMax = new Date();
-fechaMax.setMonth(fechaMax.getMonth() + 3);
-const ddMax = String(fechaMax.getDate()).padStart(2, '0');
-const mmMax = String(fechaMax.getMonth() + 1).padStart(2, '0');
-const yyyyMax = fechaMax.getFullYear();
-const fechaLimite = `${yyyyMax}-${mmMax}-${ddMax}`;
-fechaInput.setAttribute('max', fechaLimite);
+        // Hacer scroll hacia el mensaje
+        div.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-// Poner hoy por defecto si no hay old()
-fechaInput.value = fechaInput.value || fechaHoy;
+        setTimeout(() => { div.style.opacity = '1'; div.style.transform = 'translateY(0)'; }, 50);
 
+        setTimeout(() => {
+            div.style.opacity = '0';
+            setTimeout(() => {
+                if (div.parentNode) mensajesContainer.removeChild(div);
+            }, 400);
+        }, 4000);
+    }
 
-    // Mensajes emergentes
-    const mensajePaciente = document.getElementById('mensajePaciente');
-    const mensajeExamenes = document.getElementById('mensajeExamenes');
+    function clearMensajes() {
+        mensajesContainer.innerHTML = '';
+    }
 
-    // Mostrar lista al enfocar input si tiene texto
-    inputBuscar.addEventListener('focus', () => {
-        if (inputBuscar.value.trim() !== '') {
-            lista.style.display = 'block';
+    // Validación específica de fecha máxima: 31 de octubre de 2025
+    fechaInput.addEventListener('change', () => {
+        const fechaLimite = new Date('2025-10-31');
+        const fechaSeleccionada = new Date(fechaInput.value);
+        if(fechaSeleccionada > fechaLimite) {
+            showMensaje('La fecha no puede ser posterior al 31 de octubre de 2025.', 'error');
+            fechaInput.value = `${yyyy}-${mm}-${dd}`; // reset a hoy
         }
     });
 
-    // Filtrar pacientes al escribir
+    inputBuscar.addEventListener('focus', () => {
+        if (inputBuscar.value.trim() !== '') lista.style.display = 'block';
+    });
+
     inputBuscar.addEventListener('input', () => {
         const filtro = inputBuscar.value.toLowerCase();
         let visibleCount = 0;
-
         Array.from(lista.children).forEach(li => {
             const texto = li.textContent.toLowerCase();
             if (texto.includes(filtro) && filtro !== '') {
@@ -563,48 +600,34 @@ fechaInput.value = fechaInput.value || fechaHoy;
                 li.style.display = 'none';
             }
         });
-
         lista.style.display = visibleCount > 0 ? 'block' : 'none';
-
-        // Limpiar id y campos si cambia texto
         inputHiddenId.value = '';
         dpNombres.textContent = '';
         dpApellidos.textContent = '';
         dpIdentidad.textContent = '';
         dpGenero.textContent = '';
-
         document.getElementById('datosPaciente').style.display = 'none';
-        clearMensaje(mensajePaciente);
-        clearMensaje(mensajeExamenes);
+        clearMensajes();
     });
 
-    // Cuando el usuario clickea un paciente, ponerlo en el input y cargar datos
     lista.querySelectorAll('.paciente-item').forEach(item => {
         item.addEventListener('click', () => {
             inputBuscar.value = item.textContent.trim();
-            inputHiddenId.value = item.getAttribute('data-id');
+            inputHiddenId.value = item.dataset.id;
             lista.style.display = 'none';
-
-            // Usar atributos data para rellenar sin hacer fetch
-            dpNombres.textContent = item.getAttribute('data-nombre') || '';
-            dpApellidos.textContent = item.getAttribute('data-apellidos') || '';
-            dpIdentidad.textContent = item.getAttribute('data-identidad') || '';
-            dpGenero.textContent = item.getAttribute('data-genero') || '';
-
+            dpNombres.textContent = item.dataset.nombre || '';
+            dpApellidos.textContent = item.dataset.apellidos || '';
+            dpIdentidad.textContent = item.dataset.identidad || '';
+            dpGenero.textContent = item.dataset.genero || '';
             document.getElementById('datosPaciente').style.display = 'block';
-            clearMensaje(mensajePaciente);
-            clearMensaje(mensajeExamenes);
+            clearMensajes();
         });
     });
 
-    // Cerrar lista si clic fuera
     document.addEventListener('click', (e) => {
-        if (!inputBuscar.contains(e.target) && !lista.contains(e.target)) {
-            lista.style.display = 'none';
-        }
+        if (!inputBuscar.contains(e.target) && !lista.contains(e.target)) lista.style.display = 'none';
     });
 
-    // Limitar selección a 7 exámenes
     const checkboxes = document.querySelectorAll('.examen-checkbox');
     const maxSeleccion = 7;
 
@@ -613,52 +636,38 @@ fechaInput.value = fechaInput.value || fechaHoy;
             const checkedCount = document.querySelectorAll('.examen-checkbox:checked').length;
             if (checkedCount > maxSeleccion) {
                 this.checked = false;
-                showMensaje(mensajeExamenes, 'No puede seleccionar más de 7 exámenes.');
-            } else {
-                clearMensaje(mensajeExamenes);
+                showMensaje('No puede seleccionar más de 7 exámenes.', 'error');
             }
             actualizarTotal();
         });
     });
 
-    // Función para actualizar el total a pagar
     function actualizarTotal() {
         let total = 0;
         checkboxes.forEach(chk => {
-            if (chk.checked) {
-                total += parseFloat(chk.getAttribute('data-precio')) || 0;
-            }
+            if (chk.checked) total += parseFloat(chk.dataset.precio) || 0;
         });
         document.getElementById('totalPrecio').textContent = total.toFixed(2);
     }
-
-    // Actualizar total al cargar la página (para mantener old inputs)
     actualizarTotal();
 
-    // Validar que se haya seleccionado un paciente válido antes de enviar
     const form = document.getElementById('formOrden');
     form.addEventListener('submit', (e) => {
-        clearMensaje(mensajePaciente);
-        clearMensaje(mensajeExamenes);
-
+        clearMensajes();
         if (!inputHiddenId.value) {
             e.preventDefault();
-            showMensaje(mensajePaciente, 'Por favor selecciona un paciente válido de la lista.');
+            showMensaje('Por favor selecciona un paciente válido de la lista.', 'error');
             inputBuscar.focus();
             return;
         }
-
         const seleccionados = document.querySelectorAll('.examen-checkbox:checked').length;
         if (seleccionados === 0) {
             e.preventDefault();
-            showMensaje(mensajeExamenes, 'Debe seleccionar al menos un examen para guardar.');
-            return;
+            showMensaje('Debe seleccionar al menos un examen para guardar.', 'error');
         }
     });
 
-    // Botón Limpiar
     document.getElementById('btnLimpiar').addEventListener('click', () => {
-        // Limpiar inputs
         inputBuscar.value = '';
         inputHiddenId.value = '';
         dpNombres.textContent = '';
@@ -666,39 +675,13 @@ fechaInput.value = fechaInput.value || fechaHoy;
         dpIdentidad.textContent = '';
         dpGenero.textContent = '';
         document.getElementById('datosPaciente').style.display = 'none';
-
-        // Limpiar fecha a hoy
-        document.getElementById('fecha').value = new Date().toISOString().slice(0, 10);
-
-        // Limpiar checkboxes
+        fechaInput.value = `${yyyy}-${mm}-${dd}`;
         checkboxes.forEach(chk => chk.checked = false);
-
-        // Actualizar total
         actualizarTotal();
-
-        // Limpiar mensajes
-        clearMensaje(mensajePaciente);
-        clearMensaje(mensajeExamenes);
+        clearMensajes();
     });
-
-    // Funciones para mostrar y limpiar mensajes emergentes
-    function showMensaje(mensajeElem, texto) {
-        mensajeElem.textContent = texto;
-        mensajeElem.style.display = 'inline-block';
-        mensajeElem.scrollIntoView({behavior: 'smooth', block: 'center'});
-
-        setTimeout(() => {
-            mensajeElem.style.display = 'none';
-            mensajeElem.textContent = '';
-        }, 4000);
-    }
-    function clearMensaje(mensajeElem) {
-        mensajeElem.textContent = '';
-        mensajeElem.style.display = 'none';
-    }
 });
-
-
 </script>
+
 
 @endsection
