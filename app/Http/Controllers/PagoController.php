@@ -17,26 +17,26 @@ class PagoController extends Controller
     {
         $consulta = Consulta::with(['paciente', 'medico'])->findOrFail($consulta_id);
 
-            $precios = [
-                'Cardiología' => 900,
-                'Pediatría'   => 500,
-                'Radiologia'  => 700,
-                'Psiquiatría'  => 500,
-                'Radiologia'  => 700,
-                'Dermatología'  => 900,
-                'Neurología'  => 1000,
-                
-            ];
+        $precios = [
+            'Cardiología'       => 900,
+            'Pediatría'         => 500,
+            'Radiología'        => 700,
+            'Psiquiatría'       => 500,
+            'Dermatología'      => 900,
+            'Neurología'        => 1000,
+            'Medicina General'  => 800
+        ];
+        
 
             $cantidad = $precios[$consulta->especialidad] ?? 0;
 
             // Crear el pago directamente
             $pago = Pago::create([
-                'paciente_id'   => $consulta->paciente->id,   // debe existir
-                'medico_id'     => $consulta->medico->id ?? null, // si no hay médico, queda null
+                'paciente_id'   => $consulta->paciente->id,
+                'medico_id'     => $consulta->medico->id ?? null,
                 'servicio'      => 'Consulta médica',
                 'descripcion'   => null,
-                'cantidad'      => $cantidad, // viene de especialidad
+                'cantidad'      => $cantidad,
                 'metodo_pago'   => 'efectivo',
                 'fecha'         => Carbon::now(),
                 'origen'        => 'consulta',
@@ -160,17 +160,21 @@ class PagoController extends Controller
      */
     public function show($id)
     {
-        $pago = Pago::with(['paciente', 'medico'])->findOrFail($id);
-
-    $paciente = $pago->paciente;
-    $medico   = $pago->medico;
-
-    $examenesConPrecio = collect();
-
-    if ($pago->origen === 'rayosx') {
-        $orden = RayosxOrder::with('examenes')->find($pago->referencia_id);
+        $pago = Pago::with(['paciente', 'consulta.medico'])->findOrFail($id);
     
-            // Lista de precios de los exámenes
+        $paciente = $pago->paciente;
+        $medico = null;
+    
+        // Si es pago por consulta, traer el médico desde la consulta
+        if ($pago->origen === 'consulta' && $pago->consulta) {
+            $medico = $pago->consulta->medico;
+        }
+    
+        $examenesConPrecio = collect();
+    
+        if ($pago->origen === 'rayosx') {
+            $orden = RayosxOrder::with('examenes')->find($pago->referencia_id);
+    
             $preciosExamenes = [
                 'craneo_anterior_posterior' => 120.00,
                 'craneo_lateral' => 110.00,
@@ -258,6 +262,8 @@ class PagoController extends Controller
             'examenesConPrecio' => $examenesConPrecio,
         ]);
     }
+    
+
     
 
 }
