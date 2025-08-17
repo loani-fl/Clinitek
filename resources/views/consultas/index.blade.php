@@ -198,7 +198,6 @@
                             <th>Médico</th>
                             <th>Fecha</th>
                             <th>Hora</th>
-                            <th>Cuenta</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -211,14 +210,6 @@
                                 <td>{{ $consulta->medico->nombre ?? '' }} {{ $consulta->medico->apellidos ?? '' }}</td>
                                 <td>{{ \Carbon\Carbon::parse($consulta->fecha)->format('d/m/Y') }}</td>
                                 <td>{{ $consulta->hora ? \Carbon\Carbon::parse($consulta->hora)->format('g:i A') : 'Inmediata' }}</td>
-                                <td>
-                                    @if ($consulta->cuenta > 0)
-                                        <span class="badge bg-warning text-dark">Pendiente</span>
-                                    @else
-                                        <span class="badge bg-success">Pagada</span>
-                                    @endif
-                                </td>
-
                                 <td>
                                     @php
                                         $estado = strtolower($consulta->estado);
