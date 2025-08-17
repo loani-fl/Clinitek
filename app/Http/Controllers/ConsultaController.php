@@ -137,7 +137,7 @@ class ConsultaController extends Controller
         'estado' => 'pendiente',
     ]);
     
-    return redirect()->route('pago.create', ['consulta_id' => $consulta->id])
+    return redirect()->route('pagos.consulta', $consulta->id)
                  ->with('success', 'Consulta registrada correctamente.');
 
     

@@ -2,215 +2,262 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Consulta;
 use App\Models\Pago;
+use App\Models\Consulta;
 use App\Models\RayosxOrder;
-use App\Models\RayosxOrderExamen;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class PagoController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Crear pago desde consulta y mostrar factura
      */
-    public function index()
+    public function createFromConsulta($consulta_id)
     {
-        //
+        $consulta = Consulta::with(['paciente', 'medico'])->findOrFail($consulta_id);
+
+            $precios = [
+                'Cardiología' => 900,
+                'Pediatría'   => 500,
+                'Radiologia'  => 700,
+                'Psiquiatría'  => 500,
+                'Radiologia'  => 700,
+                'Dermatología'  => 900,
+                'Neurología'  => 1000,
+                
+            ];
+
+            $cantidad = $precios[$consulta->especialidad] ?? 0;
+
+            // Crear el pago directamente
+            $pago = Pago::create([
+                'paciente_id'   => $consulta->paciente->id,   // debe existir
+                'medico_id'     => $consulta->medico->id ?? null, // si no hay médico, queda null
+                'servicio'      => 'Consulta médica',
+                'descripcion'   => null,
+                'cantidad'      => $cantidad, // viene de especialidad
+                'metodo_pago'   => 'efectivo',
+                'fecha'         => Carbon::now(),
+                'origen'        => 'consulta',
+                'referencia_id' => $consulta->id,
+            ]);
+
+        
+
+        return redirect()->route('pagos.show', $pago->id)
+            ->with('success', 'Pago registrado exitosamente.');
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Crear pago desde rayos X y mostrar factura
      */
-    public function create(Request $request)
-{
-    $consulta_id = $request->query('consulta_id');
-    $rayosx_id = $request->query('rayosx_id');
-
-    $paciente = null;
-    $servicio = '';
-    $cantidad = 0;
-    $consulta = null;
-    $rayosx = null;
+    public function createFromRayosx($rayosx_id)
+    {
+        $orden = RayosxOrder::with(['paciente', 'examenes'])->findOrFail($rayosx_id);
     
-
-    $preciosPorEspecialidad = [
-        "Cardiología" => 900.00,
-        "Pediatría" => 500.00,
-        "Dermatología" => 900.00,
-        "Medicina General" => 800.00,
-        "Psiquiatría" => 500.00,
-        "Neurología" => 1000.00,
-        "Radiología" => 700.00,
-    ];
-
-    if ($consulta_id) {
-        $consulta = Consulta::with('paciente', 'medico')->find($consulta_id);
-
-        if ($consulta && $consulta->paciente) {
-            $paciente = $consulta->paciente;
-            $servicio = 'Consulta médica';
-
-            $especialidad = $consulta->medico->especialidad ?? null;
-
-            if ($especialidad && isset($preciosPorEspecialidad[$especialidad])) {
-                $cantidad = $preciosPorEspecialidad[$especialidad];
-            } else {
-                $cantidad = $consulta->precio ?? 0; // fallback si no encuentra especialidad
+        // Lista de precios
+        $preciosExamenes = [
+            'craneo_anterior_posterior' => 120.00,
+            'craneo_lateral' => 110.00,
+            'waters' => 100.00,
+            'waters_lateral' => 100.00,
+            'conductos_auditivos' => 80.00,
+            'cavum' => 90.00,
+            'senos_paranasales' => 85.00,
+            'silla_turca' => 95.00,
+            'huesos_nasales' => 75.00,
+            'atm_tm' => 90.00,
+            'mastoides' => 88.00,
+            'mandibula' => 85.00,
+            'torax_posteroanterior_pa' => 150.00,
+            'torax_anteroposterior_ap' => 150.00,
+            'torax_lateral' => 140.00,
+            'torax_oblicuo' => 130.00,
+            'torax_superior' => 120.00,
+            'torax_inferior' => 120.00,
+            'costillas_superiores' => 110.00,
+            'costillas_inferiores' => 110.00,
+            'esternon_frontal' => 100.00,
+            'esternon_lateral' => 100.00,
+            'abdomen_simple' => 130.00,
+            'abdomen_agudo' => 150.00,
+            'abdomen_erecto' => 140.00,
+            'abdomen_decubito' => 140.00,
+            'clavicula_izquierda' => 90.00,
+            'clavicula_derecha' => 90.00,
+            'hombro_anterior' => 100.00,
+            'hombro_lateral' => 100.00,
+            'humero_proximal' => 110.00,
+            'humero_distal' => 110.00,
+            'codo_anterior' => 90.00,
+            'codo_lateral' => 90.00,
+            'antebrazo' => 80.00,
+            'muneca' => 80.00,
+            'mano' => 80.00,
+            'cadera_izquierda' => 120.00,
+            'cadera_derecha' => 120.00,
+            'femur_proximal' => 130.00,
+            'femur_distal' => 130.00,
+            'rodilla_anterior' => 110.00,
+            'rodilla_lateral' => 110.00,
+            'tibia' => 100.00,
+            'pie' => 90.00,
+            'calcaneo' => 90.00,
+            'columna_cervical_lateral' => 100.00,
+            'columna_cervical_anteroposterior' => 100.00,
+            'columna_dorsal_lateral' => 110.00,
+            'columna_dorsal_anteroposterior' => 110.00,
+            'columna_lumbar_lateral' => 110.00,
+            'columna_lumbar_anteroposterior' => 110.00,
+            'sacro_coxis' => 100.00,
+            'pelvis_anterior_posterior' => 120.00,
+            'pelvis_oblicua' => 120.00,
+            'escoliosis' => 100.00,
+            'arteriograma_simple' => 250.00,
+            'arteriograma_contraste' => 300.00,
+            'histerosalpingograma_simple' => 230.00,
+            'histerosalpingograma_contraste' => 280.00,
+            'colecistograma_simple' => 220.00,
+            'colecistograma_contraste' => 270.00,
+            'fistulograma_simple' => 210.00,
+            'fistulograma_contraste' => 260.00,
+            'artrograma_simple' => 200.00,
+            'artrograma_contraste' => 250.00,
+        ];
+    
+        // Calcular total en base a los exámenes seleccionados
+        $total = 0;
+        foreach ($orden->examenes as $examen) {
+            if (isset($preciosExamenes[$examen->codigo])) {
+                $total += $preciosExamenes[$examen->codigo];
             }
         }
-        elseif ($rayosx_id) {
-            $rayosx = RayosxOrderExamen::with('orden')->find($rayosx_id);
-        
-            dd([
-                'rayosx' => $rayosx,
-                'orden' => $rayosx ? $rayosx->orden : null,
-                'paciente' => $rayosx && $rayosx->orden ? $rayosx->orden->paciente : null,
-            ]);
-        }
-        
-        
-        
     
-        if ($rayosx && $rayosx->paciente) {
-            $paciente = $rayosx->paciente;
-            $servicio = 'Exámenes rayos X'; // 🔹 Cambiado para que se muestre así
+        // Crear descripción con los nombres de los exámenes
+        $descripcion = $orden->examenes->pluck('nombre')->implode(', ');
     
-            // Si el precio ya está en la tabla RayosxOrderExamen, lo usamos directo
-            $cantidad = $rayosx->precio_total ?? $rayosx->precio ?? 0;
-        }
-    }
+        // Crear el pago
+        $pago = Pago::create([
+            'paciente_id'    => $orden->paciente->id,
+            'medico_id'      => null,
+            'servicio'       => 'Rayos X',
+            'descripcion'    => $descripcion,
+            'cantidad'       => $total, // usamos el calculado
+            'metodo_pago'    => 'efectivo',
+            'fecha'          => Carbon::now(),
+            'origen'         => 'rayosx',
+            'referencia_id'  => $orden->id,
+        ]);
     
-  
-
-    return view('pago.create', compact(
-        'consulta',
-        'paciente',
-        'rayosx',
-        'servicio',
-        'cantidad'
-    ));
-}
-
-
-
-
-public function store(Request $request)
-{
-    $messages = [
-        'metodo_pago.required' => 'El método de pago es obligatorio.',
-        'metodo_pago.in' => 'El método de pago seleccionado no es válido.',
-
-        'nombre_titular.required_if' => 'El nombre del titular es obligatorio.',
-        'nombre_titular.max' => 'El nombre del titular no puede tener más de 50 caracteres.',
-
-        'numero_tarjeta.required_if' => 'El número de tarjeta es obligatorio.',
-        'numero_tarjeta.max' => 'El número de tarjeta no puede tener más de 19 caracteres.',
-
-        'fecha_expiracion.required_if' => 'La fecha de expiración es obligatoria.',
-
-        'cvv.required_if' => 'El código CVV es obligatorio.',
-        'cvv.max' => 'El código CVV no puede tener más de 4 caracteres.',
-    ];
-
-    $rules = [
-        'metodo_pago' => 'required|in:tarjeta,efectivo',
-        'nombre_titular' => 'required_if:metodo_pago,tarjeta|max:50',
-        'numero_tarjeta' => 'required_if:metodo_pago,tarjeta|max:19',
-        'fecha_expiracion' => 'required_if:metodo_pago,tarjeta',
-        'cvv' => 'required_if:metodo_pago,tarjeta|max:4',
-        'cantidad' => 'nullable|string',
-        'servicio_tarjeta' => 'nullable|string',
-        'servicio_efectivo' => 'nullable|string',
-        'rayosx_id' => 'nullable|integer|exists:rayosx_order_examens,id',
-    ];
-
-    $request->validate($rules, $messages);
-
-    $pago = new Pago();
-    $pago->consulta_id = $request->consulta_id ?? null;
-    $pago->rayosx_order_examen_id = $request->rayosx_id ?? null;
-    $pago->fecha = Carbon::now();
-    $pago->metodo_pago = $request->metodo_pago;
-
-    // ASIGNAR ESTADO SEGÚN MÉTODO
-    if ($request->metodo_pago === 'tarjeta') {
-        $pago->estado_pago = 'pagada'; // Pago con tarjeta = pagada
-        $pago->servicio = $request->servicio_tarjeta;
-        $pago->descripcion = $request->descripcion_servicio ?? null;
-        $pago->cantidad = $request->cantidad ?? $request->cantidad_tarjeta;
-
-        $pago->nombre_titular = $request->nombre_titular;
-        $pago->numero_tarjeta = $request->numero_tarjeta;
-        $pago->fecha_expiracion = $request->fecha_expiracion;
-        $pago->cvv = $request->cvv;
-    } else {
-        $pago->estado_pago = 'pendiente'; // Pago en efectivo = pendiente
-        $pago->servicio = $request->servicio_efectivo;
-        $pago->descripcion = $request->descripcion_servicio ?? null;
-        $pago->cantidad = $request->cantidad ?? $request->cantidad_efectivo;
+        return redirect()->route('pago.show', $pago->id)
+            ->with('success', 'Pago registrado exitosamente.');
     }
-
-    $pago->save();
-
-    if ($request->metodo_pago === 'efectivo' && $pago->consulta_id) {
-        $consulta = Consulta::find($pago->consulta_id);
-        if ($consulta) {
-            $consulta->cuenta = $pago->cantidad;
-            $consulta->save();
-        }
-    }
-
-    return redirect()->route('pago.show', ['pago' => $pago->id]);
-}
-
-
-     
-     
-
-    
-public function show(Pago $pago)
-{
-    $paciente = null;
-
-    if ($pago->consulta) {
-        $paciente = $pago->consulta->paciente;
-    } elseif ($pago->rayosx_order_examen_id) {
-        // Asumiendo que el modelo Pago tiene relación con RayosxOrderExamen
-        $rayosx = $pago->rayosxOrderExamen; 
-        if ($rayosx) {
-            $paciente = $rayosx->paciente;
-        }
-    }
-
-    return view('pago.show', compact('pago', 'paciente'));
-}
-
-
-
     
 
     /**
-     * Show the form for editing the specified resource.
+     * Mostrar factura
      */
-    public function edit(Pago $pago)
+    public function show($id)
     {
-        //
-    }
+        $pago = Pago::with(['paciente', 'medico'])->findOrFail($id);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Pago $pago)
-    {
-        //
-    }
+    $paciente = $pago->paciente;
+    $medico   = $pago->medico;
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Pago $pago)
-    {
-        //
+    $examenesConPrecio = collect();
+
+    if ($pago->origen === 'rayosx') {
+        $orden = RayosxOrder::with('examenes')->find($pago->referencia_id);
+    
+            // Lista de precios de los exámenes
+            $preciosExamenes = [
+                'craneo_anterior_posterior' => 120.00,
+                'craneo_lateral' => 110.00,
+                'waters' => 100.00,
+                'waters_lateral' => 100.00,
+                'conductos_auditivos' => 80.00,
+                'cavum' => 90.00,
+                'senos_paranasales' => 85.00,
+                'silla_turca' => 95.00,
+                'huesos_nasales' => 75.00,
+                'atm_tm' => 90.00,
+                'mastoides' => 88.00,
+                'mandibula' => 85.00,
+                'torax_posteroanterior_pa' => 150.00,
+                'torax_anteroposterior_ap' => 150.00,
+                'torax_lateral' => 140.00,
+                'torax_oblicuo' => 130.00,
+                'torax_superior' => 120.00,
+                'torax_inferior' => 120.00,
+                'costillas_superiores' => 110.00,
+                'costillas_inferiores' => 110.00,
+                'esternon_frontal' => 100.00,
+                'esternon_lateral' => 100.00,
+                'abdomen_simple' => 130.00,
+                'abdomen_agudo' => 150.00,
+                'abdomen_erecto' => 140.00,
+                'abdomen_decubito' => 140.00,
+                'clavicula_izquierda' => 90.00,
+                'clavicula_derecha' => 90.00,
+                'hombro_anterior' => 100.00,
+                'hombro_lateral' => 100.00,
+                'humero_proximal' => 110.00,
+                'humero_distal' => 110.00,
+                'codo_anterior' => 90.00,
+                'codo_lateral' => 90.00,
+                'antebrazo' => 80.00,
+                'muneca' => 80.00,
+                'mano' => 80.00,
+                'cadera_izquierda' => 120.00,
+                'cadera_derecha' => 120.00,
+                'femur_proximal' => 130.00,
+                'femur_distal' => 130.00,
+                'rodilla_anterior' => 110.00,
+                'rodilla_lateral' => 110.00,
+                'tibia' => 100.00,
+                'pie' => 90.00,
+                'calcaneo' => 90.00,
+                'columna_cervical_lateral' => 100.00,
+                'columna_cervical_anteroposterior' => 100.00,
+                'columna_dorsal_lateral' => 110.00,
+                'columna_dorsal_anteroposterior' => 110.00,
+                'columna_lumbar_lateral' => 110.00,
+                'columna_lumbar_anteroposterior' => 110.00,
+                'sacro_coxis' => 100.00,
+                'pelvis_anterior_posterior' => 120.00,
+                'pelvis_oblicua' => 120.00,
+                'escoliosis' => 100.00,
+                'arteriograma_simple' => 250.00,
+                'arteriograma_contraste' => 300.00,
+                'histerosalpingograma_simple' => 230.00,
+                'histerosalpingograma_contraste' => 280.00,
+                'colecistograma_simple' => 220.00,
+                'colecistograma_contraste' => 270.00,
+                'fistulograma_simple' => 210.00,
+                'fistulograma_contraste' => 260.00,
+                'artrograma_simple' => 200.00,
+                'artrograma_contraste' => 250.00,
+            ];
+    
+            if ($orden) {
+                $examenesConPrecio = $orden->examenes->map(function($examen) use ($preciosExamenes) {
+                    return [
+                        'descripcion' => $examen->nombre,
+                        'precio' => $preciosExamenes[$examen->codigo] ?? 0,
+                    ];
+                });
+            }
+        }
+    
+        return view('pago.show', [
+            'pago' => $pago,
+            'paciente' => $paciente,
+            'medico' => $medico,
+            'origen' => $pago->origen,
+            'examenesConPrecio' => $examenesConPrecio,
+        ]);
     }
+    
+
 }

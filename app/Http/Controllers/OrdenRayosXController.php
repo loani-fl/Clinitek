@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Medico;
+use App\Models\RayosxOrderExamen;
+use App\Models\Pago;
 use App\Models\Paciente;
 use App\Models\RayosxOrder;
 use Illuminate\Http\Request;
@@ -11,10 +14,71 @@ use App\Models\Medico;
 
 class OrdenRayosXController extends Controller
 {
+    /**
+     * Mostrar listado paginado.
+     */
+public function index(Request $request)
+{
+    try {
+        $query = $request->input('search', '');
+        $ordenesQuery = RayosxOrder::with(['examenes', 'pacienteClinica', 'pacienteRayosX', 'diagnostico.paciente'])
+            ->orderBy('fecha', 'desc');
+
+        if ($query) {
+            $ordenesQuery->where(function ($q) use ($query) {
+                $q->whereHas('pacienteClinica', function ($q2) use ($query) {
+                    $q2->where('nombre', 'like', "%$query%")
+                       ->orWhere('apellidos', 'like', "%$query%");
+                })
+                ->orWhereHas('pacienteRayosX', function ($q2) use ($query) {
+                    $q2->where('nombre', 'like', "%$query%")
+                       ->orWhere('apellidos', 'like', "%$query%");
+                })
+                ->orWhere('nombres', 'like', "%$query%")
+                ->orWhere('apellidos', 'like', "%$query%");
+            });
+        }
+
+        // Si hay búsqueda, traemos todos resultados sin paginar para listarlos todos
+        if ($query) {
+            $ordenes = $ordenesQuery->get();
+            $isSearch = true;
+        } else {
+            // Paginación de 5 resultados cuando no hay filtro
+            $ordenes = $ordenesQuery->paginate(5);
+            $isSearch = false;
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('rayosx.partials.tabla', compact('ordenes', 'isSearch'))->render(),
+                'pagination' => $isSearch ? '' : $ordenes->links('pagination::bootstrap-5')->render(),
+                'total' => $ordenes->count(),
+                'all' => RayosxOrder::count(),
+            ]);
+        }
+
+        return view('rayosx.index', compact('ordenes', 'isSearch'));
+    } catch (\Exception $e) {
+        if ($request->ajax()) {
+            return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
+        }
+        abort(500, $e->getMessage());
+    }
+}
+
+
+  public function create(Request $request)
+    {
+        
+        $pacientesClinica = Paciente::orderBy('nombre')->get();
+        $pacientesRayosX = PacienteRayosX::orderBy('nombre')->get();
+        $diagnosticos = Diagnostico::orderBy('id', 'desc')->get();
     // Mostrar formulario para crear nueva orden (sin variable $orden)
     public function create()
     {
         $pacientes = Paciente::orderBy('nombre')->get();
+
 
         // Definir secciones con claves para los exámenes
         $secciones = [
@@ -255,10 +319,110 @@ class OrdenRayosXController extends Controller
             }
         }
 
+
+        Log::info('Total calculado para la orden: ' . $total);
+
+        $diagnostico_id = null;
+        $paciente_id = null;
+        $paciente_tipo = null;
+
+        if (str_starts_with($request->seleccion, 'diagnostico-')) {
+            $diagnostico_id = (int) str_replace('diagnostico-', '', $request->seleccion);
+        } elseif (str_starts_with($request->seleccion, 'clinica-')) {
+            $paciente_id = (int) str_replace('clinica-', '', $request->seleccion);
+            $paciente_tipo = 'clinica';
+        } elseif (str_starts_with($request->seleccion, 'rayosx-')) {
+            $paciente_id = (int) str_replace('rayosx-', '', $request->seleccion);
+            $paciente_tipo = 'rayosx';
+        } elseif ($request->seleccion === 'manual') {
+            // manual, no id
+        } else {
+            return back()->withInput()->with('error', 'Selección inválida.');
+        }
+
+        if ($diagnostico_id && !Diagnostico::find($diagnostico_id)) {
+            return back()->withInput()->with('error', 'Diagnóstico no encontrado.');
+        }
+        if ($paciente_tipo === 'clinica' && !Paciente::find($paciente_id)) {
+            return back()->withInput()->with('error', 'Paciente (clínica) no encontrado.');
+        }
+        if ($paciente_tipo === 'rayosx' && !PacienteRayosX::find($paciente_id)) {
+            return back()->withInput()->with('error', 'Paciente (Rayos X) no encontrado.');
+        }
+
+        $identidad = $request->identidad ?? null;
+        $edad = $request->edad ?? null;
+        $nombres = $request->nombres ?? null;
+        $apellidos = $request->apellidos ?? null;
+
+        if ($paciente_tipo === 'clinica') {
+            $p = Paciente::find($paciente_id);
+            $identidad = $p->identidad ?? $identidad;
+            $edad = $p->edad ?? $edad;
+            $nombres = $p->nombre ?? $nombres;
+            $apellidos = $p->apellidos ?? $apellidos;
+        } elseif ($paciente_tipo === 'rayosx') {
+            $p = PacienteRayosX::find($paciente_id);
+            $identidad = $p->identidad ?? $identidad;
+            $edad = $p->edad ?? $edad;
+            $nombres = $p->nombre ?? $nombres;
+            $apellidos = $p->apellidos ?? $apellidos;
+        }
+
+        DB::beginTransaction();
+        try {            
+            $orden = RayosxOrder::create([
+                'diagnostico_id' => $diagnostico_id,
+                'paciente_id' => $paciente_id,
+                'paciente_tipo' => $paciente_tipo,
+                'fecha' => $request->fecha,
+                'edad' => $edad,
+                'identidad' => $identidad,
+                'nombres' => $nombres,
+                'apellidos' => $apellidos,
+                'datos_clinicos' => $request->datos_clinicos,
+                'estado' => 'Pendiente',
+                'total_precio' => $total,
+            ]);
+             $pago = Pago::create([
+                'paciente_id'   => $paciente_id,
+                'medico_id'     => null, // si no aplica
+                'servicio'      => 'Rayos X',
+                'descripcion'   => implode(', ', $request->examenes), // opcional
+                'cantidad'      => $total,
+                'metodo_pago'   => 'efectivo', // o tarjeta si quieres
+                'fecha'         => now(),
+                'origen'        => 'rayosx',
+                'referencia_id' => $orden->id,
+            ]);
+
+            $examenesToInsert = collect($request->examenes)
+                ->map(fn($codigo) => [
+                    'rayosx_order_id' => $orden->id,
+                    'examen_codigo' => $codigo,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ])
+                ->toArray();
+
+            RayosxOrderExamen::insert($examenesToInsert);
+
+            DB::commit();
+
+          return redirect()->route('pagos.show', $pago->id)
+          ->with('success', 'Orden creada correctamente y pago registrado.');
+      
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return back()->withInput()->with('error', 'Error al guardar la orden: ' . $th->getMessage());
+        }
+
         return view('rayosx.create', [
             'pacientes' => $pacientes,
             'secciones' => $secciones_completas,
         ]);
+
     }
 public function store(Request $request)
 {
