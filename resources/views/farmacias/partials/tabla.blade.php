@@ -26,13 +26,7 @@
                     <a href="{{ route('farmacias.edit', $farmacia) }}" class="btn btn-editar btn-sm" title="Editar">
                         <i class="bi bi-pencil-square"></i>
                     </a>
-                    <form action="{{ route('farmacias.destroy', $farmacia) }}" method="POST" class="form-eliminar d-inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </form>
+
                 </td>
             </tr>
         @empty
