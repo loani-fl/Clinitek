@@ -431,7 +431,7 @@ public function guardarAnalisis(Request $request, RayosxOrder $orden)
             foreach ($request->input("eliminar_imagenes", []) as $imgId) {
                 $imagen = RayosxOrderExamenImagen::find($imgId);
                 if ($imagen && $imagen->rayosx_order_examen_id == $examenId) {
-                    \Storage::delete('public/'.$imagen->ruta);
+                    Storage::delete('public/'.$imagen->ruta);
                     $imagen->delete();
                 }
             }
