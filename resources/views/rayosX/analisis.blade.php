@@ -248,8 +248,12 @@
         @endforelse
 
         <div class="btn-group mt-4">
-            <a href="{{ route('rayosx.index') }}" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-left-circle"></i> Regresar</a>
-            <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-save"></i> Guardar cambios</button>
+
+            <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-save"></i> Guardar análisis</button>
+            <a href="{{ route('rayosx.index') }}" class="btn btn-success btn-sm">
+    <i class="bi bi-arrow-left-circle"></i> volver
+</a>
+
         </div>
     </form>
 </div>
