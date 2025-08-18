@@ -171,17 +171,22 @@
                     <label class="form-label">Dirección</label>
                     <textarea name="direccion" maxlength="150" rows="3"
                               class="form-control @error('direccion') is-invalid @enderror"
-                              required>{{ old('direccion', $medico->direccion) }}</textarea>
-                    @error('direccion') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                              required
+                              onkeypress="return validarEntrada(event)">{{ old('direccion', $medico->direccion) }}</textarea>
+                    @error('direccion')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label">Observaciones</label>
+                    <label class="form-label">Observaciones(Opcional)</label>
                     <textarea name="observaciones" maxlength="100" rows="3"
-                              class="form-control @error('observaciones') is-invalid @enderror">{{ old('observaciones', $medico->observaciones) }}</textarea>
-                    @error('observaciones') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                              class="form-control @error('observaciones') is-invalid @enderror"
+                              onkeypress="return validarEntrada(event)">{{ old('observaciones', $medico->observaciones) }}</textarea>
+                    @error('observaciones')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
-
                 <div class="col-md-3">
                     {{-- Foto actual --}}
 
@@ -213,9 +218,11 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-save"></i> Guardar Cambios
                 </button>
-                <button type="reset" class="btn btn-warning">
-                    <i class="bi bi-arrow-counterclockwise"></i> Restablecer
-                </button>
+                    {{-- Aquí el truco: volver a cargar la vista original desde BD --}}
+                    <a href="{{ route('medicos.edit', $medico->id) }}" class="btn btn-warning">
+                        <i class="bi bi-arrow-counterclockwise"></i> Restablecer
+                    </a>
+
                 <a href="{{ route('medicos.index') }}" class="btn btn-success">
                     <i class="bi bi-arrow-left"></i> Regresar
                 </a>
@@ -291,5 +298,18 @@
             actualizarSalario();
         });
     </script>
+    <script>
+        function validarEntrada(e) {
+            let char = String.fromCharCode(e.which);
 
+            // Solo permite letras, números, espacio, punto, coma y punto y coma
+            let regex = /^[a-zA-Z0-9ÁÉÍÓÚáéíóúÑñ.,; ]$/;
+
+            if (!regex.test(char)) {
+                e.preventDefault(); // Bloquea la tecla
+                return false;
+            }
+            return true;
+        }
+    </script>
 @endsection
