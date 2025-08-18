@@ -132,6 +132,7 @@
     </div>
 
     <!-- Fila 2: Médico y Especialidad -->
+@if($origen === 'consulta')
     <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
         <p style="flex: 1; margin: 0;">
             <strong>Médico:</strong> {{ $medico->nombre ?? 'N/A' }} {{ $medico->apellidos ?? '' }}
@@ -140,16 +141,23 @@
             <strong>Especialidad:</strong> {{ $medico->especialidad ?? 'N/A' }}
         </p>
     </div>
+@endif
 
-    <!-- Fila 3: Método de pago y Fecha -->
-    <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
-        <p style="flex: 1; margin: 0;">
-            <strong>Método de pago:</strong> {{ ucfirst($pago->metodo_pago) }}
-        </p>
-        <p style="flex: 1; margin: 0;">
-            <strong>Fecha:</strong> {{ \Carbon\Carbon::parse($pago->fecha)->format('d/m/Y') }}
-        </p>
-    </div>
+<!-- Fila 3: Método de pago y Fecha -->
+<div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
+    <p style="flex: 1; margin: 0;">
+        <strong>Método de pago:</strong> 
+        @if($origen === 'consulta')
+            Efectivo
+        @else
+            {{ ucfirst($pago->metodo_pago) }}
+        @endif
+    </p>
+    <p style="flex: 1; margin: 0;">
+        <strong>Fecha:</strong> {{ \Carbon\Carbon::parse($pago->fecha)->format('d/m/Y') }}
+    </p>
+</div>
+
 
     <!-- Fila 4: Hora -->
     <div style="display: flex; gap: 1rem; margin-bottom: 0.3rem;">
@@ -174,39 +182,37 @@
         </tr>
     </thead>
     <tbody>
+    @php
+        $isv = round($pago->total_precio * 0.15, 2);
+        $subtotal = round($pago->total_precio - $isv, 2);
+        $total = $subtotal + $isv;
+    @endphp
+
     @if($origen === 'consulta')
-    <tr>
-        <td>Consulta médica</td>
-        <td>L. {{ number_format($pago->cantidad, 2) }}</td>
-    </tr>
-@elseif($origen === 'rayosx')
-    @if($examenesConPrecio && count($examenesConPrecio) > 0)
-        @foreach($examenesConPrecio as $examen)
-            <tr>
-                <td>{{ $examen['descripcion'] }}</td>
-                <td>L. {{ number_format($examen['precio'], 2) }}</td>
-            </tr>
-        @endforeach
-    @else
         <tr>
-            <td>Exámenes de Rayos X</td>
-            <td>L. {{ number_format($pago->cantidad, 2) }}</td>
+            <td>Consulta médica</td>
+            <td>L. {{ number_format($total, 2) }}</td>
+        </tr>
+    @elseif($origen === 'rayosx')
+        <tr>
+            <td>Realización de exámenes de Rayos X</td>
+            <td>L. {{ number_format($total, 2) }}</td>
         </tr>
     @endif
-@endif
-
     </tbody>
 </table>
+
 
     <div class="factura-divider"></div>
 
     <!-- Subtotales -->
     <div class="factura-section">
-        @php
-            $isv = round($pago->cantidad * 0.15, 2);
-            $subtotal = round($pago->cantidad - $isv, 2);
-            $total = $subtotal + $isv;
-        @endphp
+    @php
+    $isv = round($pago->total_precio * 0.15, 2);
+    $subtotal = round($pago->total_precio - $isv, 2);
+    $total = $subtotal + $isv;
+@endphp
+
 
         <p><strong>Subtotal:</strong> L. {{ number_format($subtotal, 2) }}</p>
         <p><strong>ISV (15%):</strong> L. {{ number_format($isv, 2) }}</p>

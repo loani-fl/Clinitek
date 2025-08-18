@@ -106,9 +106,6 @@
                         </div>
 
                         <div class="col-md-6 info-block">
-                            <span class="info-label">Horario:</span><br>{{ $farmacia->horario }}
-                        </div>
-                        <div class="col-md-6 info-block">
                             <span class="info-label">Descuento:</span><br>{{ $farmacia->descuento ?? '—' }}%
                         </div>
 
@@ -125,7 +122,7 @@
                     <!-- Ubicación y Descripción en la misma fila -->
                     <div class="ubicacion-descripcion mt-3">
                         <div class="info-block">
-                            <span class="info-label">Ubicación:</span><br>
+                            <span class="info-label">Dirección:</span><br>
                             @php
                                 $ubicacion = [];
                                 if (!empty($farmacia->departamento)) $ubicacion[] = $farmacia->departamento;
@@ -145,6 +142,7 @@
                             <span style="white-space: pre-line;">{{ $farmacia->descripcion ?: 'Sin descripción.' }}</span>
                         </div>
                     </div>
+                    
 
                 </div>
             </div>
