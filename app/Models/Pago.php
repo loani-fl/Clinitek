@@ -15,6 +15,7 @@ class Pago extends Model
         'servicio',
         'descripcion',
         'cantidad',
+        'total',
         'metodo_pago',
         'fecha',
         'nombre_titular',
