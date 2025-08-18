@@ -10,9 +10,19 @@
     .custom-card > * { position:relative; z-index:1; }
     .section-title { font-size:1.3rem; font-weight:700; color:#003366; border-bottom:3px solid #007BFF; padding-bottom:0.3rem; margin-bottom:1rem; user-select:none; }
     h4 { color:#003366; font-weight:700; margin-top:1.5rem; margin-bottom:1rem; user-select:none; }
-    .datos-paciente-flex { display:flex; gap:2rem; flex-wrap:wrap; margin-bottom:1rem; padding-left:0; list-style:none; }
-    .datos-paciente-flex li { flex:1 1 200px; padding:0.3rem 0; border-bottom:1px solid #ccc; display:flex; gap:0.5rem; color:#222; font-weight:600; }
-    .datos-paciente-flex li strong { width:80px; color:#004080; }
+
+    /* Datos del paciente estilo subrayado */
+    .patient-data-row { display:flex; gap:2rem; flex-wrap:wrap; margin-bottom:1rem; }
+    .patient-data-field { display:flex; flex-direction:column; flex:0 0 200px; }
+    .patient-data-field strong { font-weight:700; color:#004080; margin-bottom:0.25rem; }
+    .underline-field-solid { border-bottom:1px solid #004080; padding:0 4px; min-height:1.8rem; font-weight:600; color:#000; }
+
+    /* Flex fila select + fecha */
+    .form-row { display:flex; flex-wrap:wrap; gap:1.5rem; align-items:flex-end; margin-bottom:1.5rem; }
+    .form-row > div { flex:1 1 250px; }
+
+    #medico_analista_id { width:100%; font-size:1rem; padding:0.25rem 0.5rem; }
+
     .examen-card { margin-bottom:2.5rem; padding-bottom:1rem; border-bottom:3px solid #007BFF; }
     .examen-card:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
     .examen-nombre { font-weight:700; font-size:1.3rem; color:#004080; user-select:none; margin-bottom:0.5rem; display:flex; align-items:center; justify-content:space-between; }
@@ -22,44 +32,9 @@
     .img-preview { margin-top:0.8rem; max-width:100%; max-height:150px; height:auto; border-radius:0.4rem; object-fit:contain; border:1px solid #ddd; margin-bottom:0.5rem; }
     .btn-group { display:flex !important; justify-content:center !important; gap:0.75rem; margin-top:1.5rem; align-items:center; }
     .btn-group .btn { min-width:140px; max-width:auto; flex:0 0 auto; padding:0.4rem 1rem; font-size:0.95rem; }
-   #mensaje-dinamico-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centra horizontalmente todos los mensajes */
-    gap: 0.5rem; /* Separación entre mensajes */
-    margin-bottom: 1rem;
-}
 
-.alert-dinamico {
-    display: inline-block; /* puedes dejarlo */
-    text-align: center;
-    padding: 8px 12px;
-    border-radius: 6px;
-    /* margin: 10px auto; */ /* eliminar */
-    max-width: fit-content;
-    transition: opacity 0.4s, transform 0.4s;
-    opacity: 0;
-    font-weight: 600;
-    font-size: 0.95rem;
-    white-space: pre-line;
-}
+    #mensaje-dinamico-container { width:100%; display:flex; flex-direction:column; align-items:center; gap:0.5rem; margin-bottom:1rem; }
 
-.alert-dinamico.error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-.alert-dinamico.exito {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-.alert-dinamico.info {
-    background-color: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-}
     @media(max-width:991px) { .examen-content { flex-direction:column; } .image-description-block { flex:1 1 100%; } }
 </style>
 
@@ -70,78 +45,93 @@
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
-
     @if($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-        @foreach($errors->all() as $error)
-            <li>{{ $error }}</li>
-        @endforeach
-        </ul>
-    </div>
+        <div class="alert alert-danger">
+            <ul>
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+            </ul>
+        </div>
     @endif
-
     @if(session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
     <h4>Datos del paciente</h4>
-    <ul class="datos-paciente-flex">
-        <li><strong>Nombre:</strong> {{ $orden->paciente->nombre ?? $orden->nombres ?? 'N/A' }}</li>
-        <li><strong>Apellidos:</strong> {{ $orden->paciente->apellidos ?? $orden->apellidos ?? 'N/A' }}</li>
-        <li><strong>Identidad:</strong> {{ $orden->paciente->identidad ?? $orden->identidad ?? 'N/A' }}</li>
-        <li><strong>Género:</strong> {{ $orden->paciente->genero ?? $orden->genero ?? 'N/A' }}</li>
-    </ul>
+    <div class="patient-data-row">
+        <div class="patient-data-field">
+            <strong>Nombre:</strong>
+            <div class="underline-field-solid">{{ $orden->paciente->nombre ?? $orden->nombres ?? 'N/A' }}</div>
+        </div>
+        <div class="patient-data-field">
+            <strong>Apellidos:</strong>
+            <div class="underline-field-solid">{{ $orden->paciente->apellidos ?? $orden->apellidos ?? 'N/A' }}</div>
+        </div>
+        <div class="patient-data-field">
+            <strong>Identidad:</strong>
+            <div class="underline-field-solid">{{ $orden->paciente->identidad ?? $orden->identidad ?? 'N/A' }}</div>
+        </div>
+        <div class="patient-data-field">
+            <strong>Género:</strong>
+            <div class="underline-field-solid">{{ $orden->paciente->genero ?? $orden->genero ?? 'N/A' }}</div>
+        </div>
+    </div>
 
     <hr>
 
     <form action="{{ route('rayosx.storeAnalisis', $orden->id) }}" method="POST" enctype="multipart/form-data" id="form-analisis">
         @csrf
-        <div class="mb-3">
-            <label for="medico_analista_id" class="form-label"><strong>Médico analista:</strong></label>
-            <select name="medico_analista_id" id="medico_analista_id" class="form-select @error('medico_analista_id') is-invalid @enderror">
-                <option value="">Seleccionar Médico Analista (Radiológos)</option>
-                @foreach ($medicosRadiologos as $medico)
-                    <option value="{{ $medico->id }}" {{ (old('medico_analista_id', $orden->medico_analista_id ?? '') == $medico->id) ? 'selected' : '' }}>
-                        {{ $medico->nombre }} {{ $medico->apellidos }}
-                    </option>
-                @endforeach
-            </select>
-            @error('medico_analista_id')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+
+        <!-- Fila médico + fecha -->
+        <div class="form-row">
+            <div>
+                <label for="medico_analista_id" class="form-label"><strong>Médico analista:</strong></label>
+                <select name="medico_analista_id" id="medico_analista_id" class="form-select @error('medico_analista_id') is-invalid @enderror">
+                    <option value="">Seleccionar Médico Analista (Radiológos)</option>
+                    @foreach ($medicosRadiologos as $medico)
+                        <option value="{{ $medico->id }}" {{ (old('medico_analista_id', $orden->medico_analista_id ?? '') == $medico->id) ? 'selected' : '' }}>
+                            {{ $medico->nombre }} {{ $medico->apellidos }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('medico_analista_id')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            <div>
+                <label for="fecha" class="form-label"><strong>Fecha:</strong></label>
+                <div class="underline-field-solid">{{ $orden->fecha ?? 'N/A' }}</div>
+            </div>
         </div>
 
         <h4>Exámenes realizados</h4>
-@forelse ($orden->examenes as $examen)
-    @php
-        $bloquesImagenes = $examen->imagenes ?? collect();
-    @endphp
-    <div class="examen-card">
-        <div class="examen-nombre">
-            {{ $examenesNombres[$examen->examen_codigo] ?? $examen->examen_codigo }}
-            <button type="button" class="btn btn-sm btn-success" id="btn-agregar-{{ $examen->id }}" onclick="addImageBlock({{ $examen->id }})">
-                <i class="bi bi-plus-circle"></i> Agregar imagen
-            </button>
-        </div>
-        <div class="examen-content" id="examen-content-{{ $examen->id }}">
-            @foreach($bloquesImagenes as $i => $bloque)
-                <div class="image-description-block" data-block-index="{{ $i }}">
-                    <div class="preview-container text-center mb-2">
-                        <img src="{{ asset('storage/'.$bloque->ruta) }}" class="img-preview" alt="Imagen existente">
-                    </div>
-                    <div class="textarea-container mt-2">
-                        <label class="form-label mb-1">Descripción:</label>
-                        <textarea name="descripciones[{{ $examen->id }}][]" class="form-control descripcion-textarea" rows="3" maxlength="200">{{ $bloque->descripcion }}</textarea>
-                    </div>
+        @forelse ($orden->examenes as $examen)
+            @php $bloquesImagenes = $examen->imagenes ?? collect(); @endphp
+            <div class="examen-card">
+                <div class="examen-nombre">
+                    {{ $examenesNombres[$examen->examen_codigo] ?? $examen->examen_codigo }}
+                    <button type="button" class="btn btn-sm btn-success" id="btn-agregar-{{ $examen->id }}" onclick="addImageBlock({{ $examen->id }})">
+                        <i class="bi bi-plus-circle"></i> Agregar imagen
+                    </button>
                 </div>
-            @endforeach
-        </div>
-    </div>
-@empty
-    <p>No hay exámenes registrados para esta orden.</p>
-@endforelse
-
+                <div class="examen-content" id="examen-content-{{ $examen->id }}">
+                    @foreach($bloquesImagenes as $i => $bloque)
+                        <div class="image-description-block" data-block-index="{{ $i }}">
+                            <div class="preview-container text-center mb-2">
+                                <img src="{{ asset('storage/'.$bloque->ruta) }}" class="img-preview" alt="Imagen existente">
+                            </div>
+                            <div class="textarea-container mt-2">
+                                <label class="form-label mb-1">Descripción:</label>
+                                <textarea name="descripciones[{{ $examen->id }}][]" class="form-control descripcion-textarea" rows="3" maxlength="200">{{ $bloque->descripcion }}</textarea>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @empty
+            <p>No hay exámenes registrados para esta orden.</p>
+        @endforelse
 
         <div class="btn-group mt-4">
             <a href="{{ route('rayosx.index') }}" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-left-circle"></i> Regresar</a>
@@ -149,6 +139,7 @@
         </div>
     </form>
 </div>
+
 <script>
 function mostrarMensaje(mensaje, tipo='error') {
     const container = document.getElementById('mensaje-dinamico-container');
