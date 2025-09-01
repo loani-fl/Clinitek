@@ -133,6 +133,7 @@
                 <li><a class="dropdown-item" href="{{ route('consultas.index') }}">Registrar consulta</a></li>
                 <li><a class="dropdown-item" href="{{ route('pacientes.index') }}">Registrar paciente</a></li>
                 <li><a class="dropdown-item" href="{{ route('farmacias.index') }}">Registrar Farmacia</a></li>
+                <li><a class="dropdown-item" href="{{ route('rayosx.index') }}">Registrar rayos x</a></li>
             </ul>
             </ul>
         </div>

@@ -350,7 +350,7 @@ a.btn-primary:hover {
 }
 
 a.btn-primary {
-    width: 160px; /* tamaño fijo */
+    width: 220px; /* tamaño fijo */
 }
 
 /* Responsive */
@@ -462,7 +462,7 @@ a.btn-primary {
                 <div>
                     <label class="d-block">&nbsp;</label>
                     <a href="{{ route('pacientes.create', ['returnUrl' => route('rayosx.create')]) }}" class="btn btn-primary">
-                        <i class="bi bi-person-plus"></i> Registrar
+                        <i class="bi bi-person-plus"></i> Registrar paciente
                     </a>
                 </div>
             </div>
