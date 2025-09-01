@@ -185,7 +185,7 @@
     <!-- Datos del paciente -->
     <h4>Datos del paciente:</h4>
     <div class="patient-data-inline">
-        <div><span class="label">Nombre:</span> <span class="underline-field">{{ $orden->paciente->nombre ?? $orden->nombres ?? 'N/A' }}</span></div>
+        <div><span class="label">Nombres:</span> <span class="underline-field">{{ $orden->paciente->nombre ?? $orden->nombres ?? 'N/A' }}</span></div>
         <div><span class="label">Apellidos:</span> <span class="underline-field">{{ $orden->paciente->apellidos ?? $orden->apellidos ?? 'N/A' }}</span></div>
         <div><span class="label">Identidad:</span> <span class="underline-field">{{ $orden->paciente->identidad ?? $orden->identidad ?? 'N/A' }}</span></div>
         <div><span class="label">Género:</span> <span class="underline-field">{{ $orden->paciente->genero ?? $orden->genero ?? 'N/A' }}</span></div>
