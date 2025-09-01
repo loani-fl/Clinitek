@@ -396,7 +396,7 @@ a.btn-primary {
         <div class="col-md-3 text-center">
             <img src="{{ asset('images/logo2.jpg') }}" alt="Logo Clinitek" style="height: 60px; width: auto;">
             <div style="font-size: 1rem; font-weight: 700; color: #555;">
-                Laboratorio Clínico Honduras
+                Laboratorio Rayos X Honduras
             </div>
         </div>
         <div class="col-md-9 text-center" style="transform: translateX(30%);">
