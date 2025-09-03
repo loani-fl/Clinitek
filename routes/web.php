@@ -10,6 +10,7 @@ use App\Http\Controllers\ConsultaController;
 use App\Http\Controllers\ConsultahoraController;
 use App\Http\Controllers\DiagnosticoController;
 use App\Http\Controllers\ExamenController;
+use App\Http\Controllers\FacturaController;
 use App\Models\Puesto;
 use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\MedicamentoController;
@@ -83,6 +84,7 @@ Route::get('/recetas/{id}', [RecetaController::class, 'show'])->name('recetas.sh
 
 Route::get('/pacientes/{paciente}/recetas', [PacienteController::class, 'showRecetas'])->name('pacientes.recetas');
 Route::get('/consultas/{id}', [ConsultaController::class, 'show'])->name('consultas.show');
+Route::resource('consultas', ConsultaController::class);
 
 // Ruta para mostrar formulario con paciente y consulta
 Route::get('diagnosticos/create/{paciente}/{consulta}', [DiagnosticoController::class, 'create'])->name('diagnosticos.create');
@@ -150,7 +152,6 @@ Route::post('/pacientes/rayosx/store', [App\Http\Controllers\PacienteRayosXContr
 use App\Http\Controllers\PacienteRayosXController;
 
 Route::get('/pacientes/validar-identidad/{identidad}', [PacienteRayosXController::class, 'validarIdentidad'])->name('pacientes.validarIdentidad');
-// rutas/web.php (ejemplo)
 Route::get('pacientes/rayosx/create', [PacienteRayosXController::class, 'create'])->name('pacientes.rayosx.create');
 Route::post('pacientes/rayosx/store', [PacienteRayosXController::class, 'store'])->name('pacientes.rayosx.store');
 
@@ -214,3 +215,10 @@ Route::get('/rayosx/{id}', [OrdenRayosXController::class, 'show'])->name('rayosx
 Route::resource('farmacias', FarmaciaController::class);
 
 Route::post('/farmacias/foto-temporal', [FarmaciaController::class, 'fotoTemporal'])->name('farmacias.foto-temporal');
+
+//factura
+Route::post('facturas/consulta', [FacturaController::class, 'generarDesdeConsulta'])->name('facturas.consulta');
+Route::post('facturas/rayos-x', [FacturaController::class, 'generarDesdeRayosX'])->name('facturas.rayos-x');
+Route::get('/factura/{factura}', [FacturaController::class, 'show'])->name('factura.show');
+Route::post('/facturas/rayos-x', [FacturaController::class, 'rayosX'])->name('facturas.rayos-x');
+Route::get('/facturas/{id}', [FacturaController::class, 'show'])->name('facturas.show');

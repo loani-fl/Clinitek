@@ -23,11 +23,16 @@ class Medico extends Model
         'fecha_ingreso',
         'genero',
         'observaciones',
-        'direccion',    // agregado para que se guarde la dirección
+        'direccion',    
         'foto',
     ];
 
     protected $casts = [
         'estado' => 'boolean',
     ];
+
+    public function getNombreCompletoAttribute()
+{
+    return $this->nombre . ' ' . $this->apellido;
+}
 }
