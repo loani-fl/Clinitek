@@ -513,7 +513,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return false;
         }
         
-        // Confirmación antes de proceder al pago
+       /* // Confirmación antes de proceder al pago
         const nombrePaciente = pacienteSelect.options[pacienteSelect.selectedIndex].textContent;
         const nombreMedico = medicoSelect.options[medicoSelect.selectedIndex].textContent;
         const totalPagar = totalPagarInput.value;
@@ -530,6 +530,7 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             return false;
         }
+            */
     });
 
     // Inicializar si hay datos antiguos tras validación fallida

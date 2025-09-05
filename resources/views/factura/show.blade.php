@@ -8,7 +8,6 @@
         <div class="col-lg-8">
             <div class="card shadow-lg border-0">
                 <div class="card-body p-0">
-                    <!-- Header de la Factura -->
                     <div class="bg-primary text-white p-4">
                         <div class="row align-items-center">
                             <div class="col-md-6">
@@ -176,7 +175,6 @@
                         </div>
                     </div>
 
-                    <!-- Footer con Botones -->
                     <div class="bg-light p-4 border-top">
                         <div class="row">
                             <div class="col-md-6">
@@ -209,7 +207,6 @@
     </div>
 </div>
 
-<!-- Estilos adicionales para impresión -->
 <style>
 @media print {
     body * {

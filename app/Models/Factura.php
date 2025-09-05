@@ -33,7 +33,7 @@ class Factura extends Model
         'total' => 'decimal:2'
     ];
 
-    // AGREGAR ESTAS RELACIONES
+ 
     public function paciente()
     {
         return $this->belongsTo(Paciente::class);
@@ -49,12 +49,12 @@ class Factura extends Model
         parent::boot();
         
         static::creating(function ($factura) {
-            // Solo generar número de factura si no existe
+
             if (!$factura->numero_factura) {
                 $factura->numero_factura = 'FACT-' . str_pad(static::max('id') + 1, 6, '0', STR_PAD_LEFT);
             }
             
-            // Solo configurar fecha y hora si no existen
+
             if (!$factura->fecha || !$factura->hora) {
                 $honduras_time = Carbon::now('America/Tegucigalpa');
                 $factura->fecha = $factura->fecha ?? $honduras_time->format('Y-m-d');
@@ -63,9 +63,7 @@ class Factura extends Model
         });
     }
 
-    /**
-     * Generar factura desde consulta
-     */
+
     public static function crearDesdeConsulta($consulta, $paciente, $medico)
     {
         return static::create([
@@ -87,9 +85,7 @@ class Factura extends Model
         ]);
     }
 
-    /**
-     * Generar factura desde orden de rayos X
-     */
+
     public static function crearDesdeRayosX($orden, $paciente, $examenes_seleccionados)
     {
         $examenes_precios = static::getExamenesPrecios();
@@ -108,7 +104,6 @@ class Factura extends Model
 
         return static::create([
             'paciente_id' => $paciente->id,
-            // Para rayos X no siempre hay médico, así que dejamos medico_id como null
             'paciente_nombre' => $paciente->nombre_completo ?? ($paciente->nombre . ' ' . $paciente->apellido),
             'paciente_identidad' => $paciente->identidad,
             'tipo' => 'rayos_x',
@@ -118,7 +113,7 @@ class Factura extends Model
         ]);
     }
 
-    // ... resto de métodos igual
+
     public static function getPrecioEspecialidad($especialidad)
     {
         $precios = [
