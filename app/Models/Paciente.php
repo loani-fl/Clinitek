@@ -14,13 +14,13 @@ class Paciente extends Model
     protected $fillable = [
         'nombre',
         'apellidos',
-        'identidad',             // agregado
+        'identidad',
         'fecha_nacimiento',
         'telefono',
         'direccion',
         'correo',
         'tipo_sangre',
-        'genero',                // <--- agregado aquí
+        'genero',
         'padecimientos',
         'medicamentos',
         'historial_clinico',
@@ -31,31 +31,47 @@ class Paciente extends Model
     protected $casts = [
         'fecha_nacimiento' => 'date',
     ];
+
     public function diagnostico()
     {
         return $this->hasOne(Diagnostico::class);
     }
 
     public function consultas()
-{
-    return $this->hasMany(Consulta::class);
-}
+    {
+        return $this->hasMany(Consulta::class);
+    }
 
-public function recetas()
-{
-    return $this->hasManyThrough(Receta::class, Consulta::class);
-}
+    public function recetas()
+    {
+        return $this->hasManyThrough(Receta::class, Consulta::class);
+    }
 
-public function diagnosticos()
-{
-    return $this->hasMany(Diagnostico::class);
-}
+    public function diagnosticos()
+    {
+        return $this->hasMany(Diagnostico::class);
+    }
 
+    public function ordenesRayosX()
+    {
+        return $this->hasMany(RayosxOrder::class);
+    }
 
-public function ordenesRayosX()
-{
-    return $this->hasMany(RayosxOrder::class);
-}
+    // AGREGAR: Relación con facturas
+    public function facturas()
+    {
+        return $this->hasMany(Factura::class);
+    }
 
+    // CORREGIR: Usar 'apellidos' en lugar de 'apellido'
+    public function getNombreCompletoAttribute()
+    {
+        return $this->nombre . ' ' . $this->apellidos;
+    }
 
+    // AGREGAR: Accessor para compatibilidad con 'apellido' singular
+    public function getApellidoAttribute()
+    {
+        return $this->apellidos;
+    }
 }

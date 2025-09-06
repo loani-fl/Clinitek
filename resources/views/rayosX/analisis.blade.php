@@ -185,7 +185,7 @@
     <!-- Datos del paciente -->
     <h4>Datos del paciente:</h4>
     <div class="patient-data-inline">
-        <div><span class="label">Nombre:</span> <span class="underline-field">{{ $orden->paciente->nombre ?? $orden->nombres ?? 'N/A' }}</span></div>
+        <div><span class="label">Nombres:</span> <span class="underline-field">{{ $orden->paciente->nombre ?? $orden->nombres ?? 'N/A' }}</span></div>
         <div><span class="label">Apellidos:</span> <span class="underline-field">{{ $orden->paciente->apellidos ?? $orden->apellidos ?? 'N/A' }}</span></div>
         <div><span class="label">Identidad:</span> <span class="underline-field">{{ $orden->paciente->identidad ?? $orden->identidad ?? 'N/A' }}</span></div>
         <div><span class="label">Género:</span> <span class="underline-field">{{ $orden->paciente->genero ?? $orden->genero ?? 'N/A' }}</span></div>
@@ -259,15 +259,13 @@
 </div>
 
 <script>
+// Mostrar mensajes dinámicos con scroll a la página
 function mostrarMensaje(mensaje, tipo='error') {
     const container = document.getElementById('mensaje-dinamico-container');
-    container.innerHTML = ''; // Limpiar mensajes anteriores
-
+    container.innerHTML = '';
     const div = document.createElement('div');
     div.className = 'alert-dinamico ' + tipo;
     div.textContent = mensaje;
-
-    // Estilos centrados y animación
     div.style.display = 'inline-block';
     div.style.textAlign = 'center';
     div.style.padding = '8px 12px';
@@ -279,50 +277,71 @@ function mostrarMensaje(mensaje, tipo='error') {
     div.style.fontWeight = '600';
     div.style.fontSize = '0.95rem';
     div.style.whiteSpace = 'pre-line';
-
-    if(tipo === 'error'){
-        div.style.backgroundColor = '#f8d7da';
-        div.style.color = '#721c24';
-        div.style.border = '1px solid #f5c6cb';
-    } else if(tipo === 'exito'){
-        div.style.backgroundColor = '#d4edda';
-        div.style.color = '#155724';
-        div.style.border = '1px solid #c3e6cb';
-    } else if(tipo === 'info'){
-        div.style.backgroundColor = '#d1ecf1';
-        div.style.color = '#0c5460';
-        div.style.border = '1px solid #bee5eb';
+    if(tipo === 'error'){ 
+        div.style.backgroundColor = '#f8d7da'; 
+        div.style.color = '#721c24'; 
+        div.style.border = '1px solid #f5c6cb'; 
+    } else if(tipo === 'exito'){ 
+        div.style.backgroundColor = '#d4edda'; 
+        div.style.color = '#155724'; 
+        div.style.border = '1px solid #c3e6cb'; 
+    } else if(tipo === 'info'){ 
+        div.style.backgroundColor = '#d1ecf1'; 
+        div.style.color = '#0c5460'; 
+        div.style.border = '1px solid #bee5eb'; 
     }
-
     container.appendChild(div);
-    div.scrollIntoView({ behavior:'smooth', block:'center' });
+
+    // Scroll a toda la página donde se muestra el mensaje
+    const rect = div.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    window.scrollTo({ top: rect.top + scrollTop - 100, behavior: 'smooth' });
 
     setTimeout(() => { div.style.opacity = '1'; div.style.transform = 'translateY(0)'; }, 50);
-
-    setTimeout(() => {
-        div.style.opacity = '0';
-        setTimeout(() => { if(div.parentNode) container.removeChild(div); }, 400);
-    }, 4000);
+    setTimeout(() => { div.style.opacity = '0'; setTimeout(() => { if(div.parentNode) container.removeChild(div); }, 400); }, 4000);
 }
 
+// Previsualizar imagen con mensaje de error dentro del bloque
 function previewImage(event, examenIdIndex) {
     const input = event.target;
     const preview = document.getElementById('preview_'+examenIdIndex);
+    const bloque = input.closest('.image-description-block');
+
+    // Eliminar mensaje de error previo
+    let msgError = bloque.querySelector('.mensaje-error-imagen');
+    if(msgError) msgError.remove();
+
     if(input.files && input.files[0]){
         const file = input.files[0];
         const ext = file.name.split('.').pop().toLowerCase();
         if(!['jpg','jpeg','png'].includes(ext)){
-            mostrarMensaje('Solo se permiten imágenes JPG, JPEG o PNG.', 'error');
+            // Crear mensaje dentro del bloque
+            msgError = document.createElement('div');
+            msgError.className = 'mensaje-error-imagen';
+            msgError.textContent = 'Solo se permiten imágenes JPG, JPEG o PNG.';
+            msgError.style.color = 'red';
+            msgError.style.fontSize = '0.85rem';
+            msgError.style.marginBottom = '5px';
+            bloque.insertBefore(msgError, bloque.firstChild);
+
             input.value = '';
-            preview.src='#'; preview.style.display='none';
+            preview.src='#';
+            preview.style.display='none';
             return;
         }
         const reader = new FileReader();
-        reader.onload = function(e){ preview.src=e.target.result; preview.style.display='block'; }
+        reader.onload = function(e){ 
+            preview.src=e.target.result; 
+            preview.style.display='block'; 
+        }
         reader.readAsDataURL(file);
-    } else { preview.src='#'; preview.style.display='none'; }
+    } else { 
+        preview.src='#'; 
+        preview.style.display='none'; 
+    }
 }
 
+// Agregar bloque de imagen con X
 function addImageBlock(examenId){
     const container = document.getElementById('examen-content-'+examenId);
     if(!container) return;
@@ -337,6 +356,23 @@ function addImageBlock(examenId){
     const blockDiv = document.createElement('div'); 
     blockDiv.className='image-description-block'; 
     blockDiv.setAttribute('data-block-index', index);
+    blockDiv.style.position='relative';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type='button';
+    removeBtn.className='remove-block';
+    removeBtn.style.position='absolute';
+    removeBtn.style.top='5px';
+    removeBtn.style.right='5px';
+    removeBtn.style.color = 'red';
+    removeBtn.style.fontWeight = '700';
+    removeBtn.style.fontSize = '1.2rem';
+    removeBtn.style.background = 'transparent';
+    removeBtn.style.border = 'none';
+    removeBtn.style.cursor = 'pointer';
+    removeBtn.innerHTML='X';
+    removeBtn.onclick = function(){ removeBlock(removeBtn); };
+    blockDiv.appendChild(removeBtn);
 
     const previewDiv=document.createElement('div'); 
     previewDiv.className='preview-container text-center mb-2';
@@ -377,66 +413,87 @@ function addImageBlock(examenId){
         document.getElementById('btn-agregar-'+examenId).disabled=true;
 }
 
+// Eliminar bloque y actualizar límite
+function removeBlock(button){
+    const block = button.closest('.image-description-block');
+    if(block){
+        const examenContent = block.closest('.examen-content');
+        block.remove();
+        const addBtn = document.getElementById('btn-agregar-'+examenContent.id.replace('examen-content-',''));
+        if(addBtn && examenContent.querySelectorAll('.image-description-block').length < 3){
+            addBtn.disabled = false;
+        }
+    }
+}
+
+// Inicializar bloques automáticamente al cargar la página
 document.addEventListener('DOMContentLoaded', function(){
     const examenes=@json($orden->examenes->pluck('id'));
     examenes.forEach(examenId=>{
         const container=document.getElementById('examen-content-'+examenId);
         if(container){
             const bloquesExistentes = container.querySelectorAll('.image-description-block');
-            if(bloquesExistentes.length===0){ 
-                addImageBlock(examenId); 
+            if(bloquesExistentes.length === 0){
+                addImageBlock(examenId);
             }
-            if(bloquesExistentes.length >= 3){ 
-                document.getElementById('btn-agregar-'+examenId).disabled=true; 
+            if(container.querySelectorAll('.image-description-block').length >= 3){
+                document.getElementById('btn-agregar-'+examenId).disabled=true;
             }
         }
     });
 });
 
+// Validaciones al enviar formulario (manteniendo mensajes globales)
 document.getElementById('form-analisis').addEventListener('submit', function(event){
     const medicoAnalista = this.querySelector('#medico_analista_id');
-    const examenesCards = this.querySelectorAll('.examen-card');
-
-    if(!medicoAnalista.value && examenesCards.length === 0){
-        mostrarMensaje('El médico analista es obligatorio y todas las imágenes y descripciones son obligatorias.', 'error');
+    if(!medicoAnalista.value){ 
+        mostrarMensaje('El médico analista es obligatorio.', 'error'); 
+        medicoAnalista.focus();
         event.preventDefault();
         return;
     }
 
-    let errores=false;
+    const examenesCards = this.querySelectorAll('.examen-card');
 
-    // Validar médico
-    if(!medicoAnalista.value){ mostrarMensaje('El médico analista es obligatorio.', 'error'); errores=true; }
-
-    // Validar bloques de imágenes y descripciones
-    examenesCards.forEach(card=>{
+    for(let i=0; i<examenesCards.length; i++){
+        const card = examenesCards[i];
+        const nombreExamen = card.querySelector('.examen-nombre').childNodes[0].textContent.trim();
         const bloques = card.querySelectorAll('.image-description-block');
-        bloques.forEach((bloque,j)=>{
+
+        if(bloques.length === 0){
+            mostrarMensaje(`Debes agregar al menos un bloque para el examen "${nombreExamen}".`, 'error');
+            event.preventDefault();
+            return;
+        }
+
+        for(let j=0; j<bloques.length; j++){
+            const bloque = bloques[j];
             const fileInput = bloque.querySelector('input[type="file"]');
             const textarea = bloque.querySelector('textarea');
-            const nombreExamen = card.querySelector('.examen-nombre').childNodes[0].textContent.trim();
 
-            // Validar imagen: si está vacía, no dejar enviar
             if(!fileInput || fileInput.files.length===0){
-                mostrarMensaje(`El bloque ${j+1} del examen "${nombreExamen}" debe tener una imagen.`, 'error');
-                errores=true;
-            } else {
-                const ext = fileInput.files[0].name.split('.').pop().toLowerCase();
-                if(!['jpg','jpeg','png'].includes(ext)){
-                    mostrarMensaje(`Solo se permiten imágenes JPG, JPEG o PNG en "${nombreExamen}" bloque ${j+1}.`, 'error');
-                    errores=true;
-                }
+                mostrarMensaje(`Falta imagen en el bloque ${j+1} del examen "${nombreExamen}".`, 'error'); 
+                if(fileInput) fileInput.focus();
+                event.preventDefault();
+                return;
             }
 
-            // Validar descripción
+            const ext = fileInput.files[0].name.split('.').pop().toLowerCase();
+            if(!['jpg','jpeg','png'].includes(ext)){
+                // Mensaje dentro del bloque ya se maneja en previewImage
+                fileInput.focus();
+                event.preventDefault();
+                return;
+            }
+
             if(!textarea.value.trim()){
-                mostrarMensaje(`La descripción del bloque ${j+1} del examen "${nombreExamen}" es obligatoria.`, 'error');
-                errores=true;
+                mostrarMensaje(`Falta descripción en el bloque ${j+1} del examen "${nombreExamen}".`, 'error'); 
+                textarea.focus();
+                event.preventDefault();
+                return;
             }
-        });
-    });
-
-    if(errores) event.preventDefault();
+        }
+    }
 });
 </script>
 

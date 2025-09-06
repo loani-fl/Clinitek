@@ -124,7 +124,7 @@
                 <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Registro de consulta médica</h5>
             </div>
 
-            <form action="{{ route('consultas.store') }}" method="POST" novalidate>
+            <form action="{{ route('facturas.consulta') }}" method="POST">
                 @csrf
 
                 <div class="row g-3 px-2 mt-3">
@@ -258,29 +258,32 @@
                 @enderror
             </div>
 
-
+            
             <div id="contenedor_total_pagar" style="display:none;">
-    <div class="col-md-2">
-        <label for="total_pagar">Total a pagar <span id="total_asterisco" class="text-danger">*</span></label>
-        <div class="input-group input-group-sm">
-            <span class="input-group-text">L.</span>
-            <input 
-                type="number" 
-                step="0.01" 
-                min="0" 
-                id="total_pagar" 
-                name="total_pagar" 
-                class="form-control @error('total_pagar') is-invalid @enderror" 
-                value="{{ old('total_pagar') }}" 
-                readonly
-                required
-            >
-        </div>
-        @error('total_pagar')
-            <div class="invalid-feedback d-block">{{ $message }}</div>
-        @enderror
-    </div>
-</div>
+                <div class="col-md-2">
+                    <label for="total_pagar">Total a pagar <span id="total_asterisco" class="text-danger">*</span></label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text">L.</span>
+                        <input 
+                            type="number" 
+                            step="0.01" 
+                            min="0" 
+                            id="total_pagar" 
+                            name="total_pagar" 
+                            class="form-control @error('total_pagar') is-invalid @enderror" 
+                            value="{{ old('total_pagar') }}" 
+                            readonly
+                            required
+                        >
+                    </div>
+                    @error('total_pagar')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+                
+                <input type="hidden" name="paciente_id" id="hidden_paciente_id" value="">
+                <input type="hidden" name="medico_id" id="hidden_medico_id" value="">
+            </div>
 
 
 
@@ -329,6 +332,15 @@ document.addEventListener('DOMContentLoaded', function () {
         "Radiología": 700.00
     };
 
+    // Función para actualizar los campos hidden
+    function actualizarCamposHidden() {
+        const pacienteId = pacienteSelect.value;
+        const medicoId = medicoSelect.value;
+        
+        document.getElementById('hidden_paciente_id').value = pacienteId;
+        document.getElementById('hidden_medico_id').value = medicoId;
+    }
+
     function autocompletarPaciente() {
         const opt = pacienteSelect.options[pacienteSelect.selectedIndex];
         if (!opt) return;
@@ -339,6 +351,9 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('correo').textContent = opt.getAttribute('data-correo') || '';
         document.getElementById('direccion').value = opt.getAttribute('data-direccion') || '';
         generoInput.textContent = opt.getAttribute('data-genero') || '';
+        
+        // Actualizar campos hidden
+        actualizarCamposHidden();
     }
 
     function hora12a24(hora12) {
@@ -421,6 +436,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Event Listeners
     medicoSelect.addEventListener('change', function () {
         const selected = this.options[this.selectedIndex];
         const especialidad = selected.getAttribute('data-especialidad') || '';
@@ -428,10 +444,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         actualizarTotalPagar();
         cargarHorasDisponibles();
+        
+        // Actualizar campos hidden
+        actualizarCamposHidden();
     });
 
     fechaConsultaInput.addEventListener('change', cargarHorasDisponibles);
-    pacienteSelect.addEventListener('change', autocompletarPaciente);
+    
+    pacienteSelect.addEventListener('change', function() {
+        autocompletarPaciente();
+    });
 
     btnLimpiar.addEventListener('click', function (e) {
         e.preventDefault();
@@ -453,6 +475,10 @@ document.addEventListener('DOMContentLoaded', function () {
         totalPagarInput.value = '';
         contenedorTotalPagar.style.display = 'none';
 
+        // Limpiar campos hidden
+        document.getElementById('hidden_paciente_id').value = '';
+        document.getElementById('hidden_medico_id').value = '';
+
         form.querySelectorAll('.is-invalid, .is-valid').forEach(el => {
             el.classList.remove('is-invalid', 'is-valid');
         });
@@ -464,14 +490,60 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Validación antes del submit
+    form.addEventListener('submit', function(e) {
+        const pacienteId = document.getElementById('hidden_paciente_id').value;
+        const medicoId = document.getElementById('hidden_medico_id').value;
+        
+        if (!pacienteId || !medicoId) {
+            e.preventDefault();
+            alert('Por favor selecciona un paciente y un médico antes de continuar.');
+            return false;
+        }
+        
+        // Validación adicional de campos requeridos
+        const motivo = document.querySelector('[name="motivo"]').value.trim();
+        const sintomas = document.querySelector('[name="sintomas"]').value.trim();
+        const fecha = fechaConsultaInput.value;
+        const hora = horaSelect.value;
+        
+        if (!motivo || !sintomas || !fecha || !hora) {
+            e.preventDefault();
+            alert('Por favor completa todos los campos requeridos.');
+            return false;
+        }
+        
+       /* // Confirmación antes de proceder al pago
+        const nombrePaciente = pacienteSelect.options[pacienteSelect.selectedIndex].textContent;
+        const nombreMedico = medicoSelect.options[medicoSelect.selectedIndex].textContent;
+        const totalPagar = totalPagarInput.value;
+        
+        const mensaje = `¿Confirmar consulta médica?\n\n` +
+                       `Paciente: ${nombrePaciente}\n` +
+                       `Médico: ${nombreMedico}\n` +
+                       `Fecha: ${fecha}\n` +
+                       `Hora: ${hora}\n` +
+                       `Total a pagar: L. ${totalPagar}\n\n` +
+                       `Se generará la factura automáticamente.`;
+        
+        if (!confirm(mensaje)) {
+            e.preventDefault();
+            return false;
+        }
+            */
+    });
+
     // Inicializar si hay datos antiguos tras validación fallida
-    if (pacienteSelect.value) autocompletarPaciente();
+    if (pacienteSelect.value) {
+        autocompletarPaciente();
+    }
 
     if (medicoSelect.value) {
         const opt = medicoSelect.options[medicoSelect.selectedIndex];
         const especialidad = opt.getAttribute('data-especialidad') || '';
         especialidadInput.textContent = especialidad;
         actualizarTotalPagar();
+        actualizarCamposHidden();
     }
 
     if (medicoSelect.value && fechaConsultaInput.value) {

@@ -3,7 +3,6 @@
 @section('content')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <style>
-
 body {
     background-color: #e8f4fc;
     margin: 0;
@@ -75,47 +74,25 @@ h2 {
     margin-bottom: 2rem;
 }
 
-.patient-data-row-wrapper {
-    display: flex;
-    overflow-x: auto;       /* permite scroll horizontal si no cabe */
-    gap: 2rem;
-    padding-bottom: 0.5rem; /* espacio para la línea de scroll */
-}
-
 .patient-data-row {
     display: flex;
-    gap: 2rem;
-    flex: 0 0 auto;        /* cada fila no se encoge */
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .patient-data-field {
     display: flex;
     align-items: center;
-    gap: 0.5rem;         
-    flex: 0 0 250px;       /* ancho fijo de cada campo */
+    gap: 0.5rem;
+    min-width: 200px;
+    flex: 1;
 }
 
 .patient-data-field strong {
-    font-weight: 700;    
-    color: #000;         
-    font-size: 1.2rem;   
-    min-width: 80px;      /* ancho mínimo para etiquetas */
+    min-width: 120px;
+    font-weight: 600;
+    color: #003366;
 }
-
-.underline-field-solid {
-    border-bottom: 1px solid #333;
-    min-height: 1.8rem;
-    padding-left: 4px;
-    padding-right: 4px;
-    user-select: none;
-    font-size: 1.2rem;   
-    font-weight: 700;    
-    color: #000;         
-}
-#datosPaciente {
-    margin-bottom: 2.5rem; /* más espacio debajo de los datos del paciente */
-}
-
 
 .underline-field {
     border-bottom: 1px dashed #333;
@@ -299,7 +276,6 @@ a.btn-primary:hover {
     line-height: 1.5rem;
 }
 
-
 .examenes-grid {
     display: flex;
     flex-direction: column;
@@ -328,18 +304,19 @@ a.btn-primary:hover {
     font-size: 1rem;
 }
 
-
-
+/* Top controls - filtro, fecha, botón */
 .top-controls {
     display: flex;
     flex-wrap: nowrap;
-    gap:3rem;
-    justify-content: flex-start; /* alineado a la izquierda */
-    align-items:baseline;
-    margin-bottom: 3rem;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
 }
 
-
+.top-controls > div {
+    flex: 0 0 auto;
+}
 
 #buscarPaciente {
     width: 300px; /* más grande */
@@ -350,7 +327,7 @@ a.btn-primary:hover {
 }
 
 a.btn-primary {
-    width: 160px; /* tamaño fijo */
+    width: 220px; /* tamaño fijo */
 }
 
 /* Responsive */
@@ -363,24 +340,6 @@ a.btn-primary {
         width: 90%;
     }
 }
-
-/* Contenedor del mensaje debajo del input de paciente */
-#mensajeFiltro {
-    min-height: 1.5rem; /* reserva espacio aunque no haya mensaje */
-    color: #000;
-    font-weight: 600;
-    margin-top: 0.3rem;
-}
-.titulo-rayosx {
-    font-size: 1.6rem;      /* más grande que 1.2rem */
-    font-weight: 700;       /* negrita más fuerte */
-    color: #003366;         /* azul oscuro */
-    line-height: 1.3;
-    text-align: center;     /* centrado */
-    margin-bottom: 2rem;    /* espacio debajo */
-}
-
-
 
 
 
@@ -396,14 +355,13 @@ a.btn-primary {
         <div class="col-md-3 text-center">
             <img src="{{ asset('images/logo2.jpg') }}" alt="Logo Clinitek" style="height: 60px; width: auto;">
             <div style="font-size: 1rem; font-weight: 700; color: #555;">
-                Laboratorio Clínico Honduras
+                Laboratorio Rayos X Honduras
             </div>
         </div>
         <div class="col-md-9 text-center" style="transform: translateX(30%);">
-            <h4 class="titulo-rayosx mb-0">
-    ORDEN PARA RAYOS X
-</h4>
-
+            <h4 class="mb-0" style="font-size: 1.2rem; font-weight: 600; color: #333; line-height: 1.3;">
+                CREAR ORDEN DE RAYOS X
+            </h4>
         </div>
     </div>
 
@@ -425,7 +383,7 @@ a.btn-primary {
         </div>
         @endif
 
-        <form action="{{ route('rayosx.store') }}" method="POST" id="formOrden" novalidate>
+        <form action="{{ route('facturas.rayos-x') }}" method="POST" id="formOrden" novalidate>
             @csrf
 
             {{-- FILTRO PACIENTE, BOTÓN REGISTRAR, FECHA en misma fila --}}
@@ -442,9 +400,6 @@ a.btn-primary {
                             </li>
                         @endforeach
                     </ul>
-                    <!-- Mensaje paciente no encontrado -->
-   <div id="mensajeFiltro" class="fw-bold mt-1" style="display:none; color: #000;"></div>
-
                 </div>
 
                 <!-- Fecha -->
@@ -462,7 +417,7 @@ a.btn-primary {
                 <div>
                     <label class="d-block">&nbsp;</label>
                     <a href="{{ route('pacientes.create', ['returnUrl' => route('rayosx.create')]) }}" class="btn btn-primary">
-                        <i class="bi bi-person-plus"></i> Registrar
+                        <i class="bi bi-person-plus"></i> Registrar paciente
                     </a>
                 </div>
             </div>
@@ -470,6 +425,8 @@ a.btn-primary {
                 
 {{-- DATOS DEL PACIENTE CON ESTILO SUBRAYADO --}}
 <div id="datosPaciente" style="display: {{ old('paciente_id') ? 'block' : 'none' }}; margin-bottom: 1.5rem;">
+
+    <!-- Primera fila: Nombres y Apellidos -->
     <div class="patient-data-row">
         <div class="patient-data-field">
             <strong>Nombres:</strong>
@@ -479,6 +436,10 @@ a.btn-primary {
             <strong>Apellidos:</strong>
             <div id="dp-apellidos" class="underline-field-solid">{{ old('apellidos') }}</div>
         </div>
+    </div>
+
+    <!-- Segunda fila: Identidad y Género -->
+    <div class="patient-data-row">
         <div class="patient-data-field">
             <strong>Identidad:</strong>
             <div id="dp-identidad" class="underline-field-solid">{{ old('identidad') }}</div>
@@ -488,9 +449,8 @@ a.btn-primary {
             <div id="dp-genero" class="underline-field-solid">{{ old('genero') }}</div>
         </div>
     </div>
+
 </div>
-
-
 
 
 {{-- SECCIONES Y EXÁMENES EN GRID DE 3 COLUMNAS --}}
@@ -529,7 +489,7 @@ a.btn-primary {
             {{-- BOTONES GUARDAR, LIMPIAR, VOLVER --}}
             <div class="d-flex justify-content-center gap-3">
                 <button type="submit" class="btn btn-primary px-4 py-2">
-                    <i class="bi bi-save"></i> Guardar e imprimir
+                    <i class="bi bi-save"></i> Guardar y pagar
                 </button>
                 <button type="button" id="btnLimpiar" class="btn btn-warning px-4 py-2">
                     <i class="bi bi-x-circle"></i> Limpiar
@@ -648,17 +608,6 @@ document.addEventListener('DOMContentLoaded', function() {
         dpGenero.textContent = '';
         document.getElementById('datosPaciente').style.display = 'none';
         clearMensajes();
-
-         // Mostrar u ocultar mensaje de paciente no encontrado
-    const mensajeFiltro = document.getElementById('mensajeFiltro');
-    if (filtro !== '' && visibleCount === 0) {
-        mensajeFiltro.style.display = 'block';
-        mensajeFiltro.textContent = `No se encontraron pacientes para "${filtro}".`;
-    } else {
-        mensajeFiltro.style.display = 'none';
-    }
-
-        
     });
 
     lista.querySelectorAll('.paciente-item').forEach(item => {
