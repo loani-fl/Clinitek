@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+ use Illuminate\Support\Str; // asegurarte de tener esto al inicio del archivo
 use Illuminate\Http\Request;
 use App\Models\Paciente;
 use App\Models\Consulta;
@@ -108,11 +108,15 @@ class ExamenController extends Controller
         }
 
         foreach ($examenesSeleccionados as $nombreExamen) {
-            Examen::create([
-                'paciente_id' => $pacienteId,
-                'consulta_id' => $diagnostico->consulta_id,
-                'nombre' => $nombreExamen,
-            ]);
+          
+
+Examen::create([
+    'paciente_id' => $pacienteId,
+    'consulta_id' => $diagnostico->consulta_id,
+    'nombre' => $nombreExamen,
+    'codigo' => Str::uuid(), // genera un código único tipo UUID
+]);
+
         }
 
         return redirect()->route('consultas.show', $diagnostico->consulta_id)

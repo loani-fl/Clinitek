@@ -151,6 +151,9 @@
     .examenes-grid label {
         font-size: 0.85rem;
         line-height: 1rem;
+
+         font-weight: 700;       /* Más negrita */
+    color: #007BFF; 
     }
  .d-flex.justify-content-center.gap-3.mt-4 {
         margin-top: 2rem !important; /* para separarlos bien de las secciones */
