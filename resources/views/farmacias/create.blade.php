@@ -165,11 +165,11 @@
                 </div>
 
                 <!-- Ciudad -->
-                    <!-- Ciudad -->
+                    <!-- Municipio -->
                     <div class="col-md-4">
-                        <label for="ciudad" class="form-label">Ciudad:</label>
+                        <label for="ciudad" class="form-label">Municipio:</label>
                         <select name="ciudad" id="ciudad" class="form-select @error('ciudad') is-invalid @enderror">
-                            <option value="">Seleccione una ciudad</option>
+                            <option value="">Seleccione un municipio</option>
                             @if(old('departamento'))
                                 @foreach($ciudadesPorDepartamento[old('departamento')] as $ciudad)
                                     <option value="{{ $ciudad }}" {{ old('ciudad') == $ciudad ? 'selected' : '' }}>
@@ -319,7 +319,7 @@
         document.getElementById('departamento').addEventListener('change', function(){
             const depto = this.value;
             const ciudadSelect = document.getElementById('ciudad');
-            ciudadSelect.innerHTML = '<option value="">Seleccione una ciudad</option>';
+            ciudadSelect.innerHTML = '<option value="">Seleccione un municipio</option>';
             if(ciudadesPorDepartamento[depto]){
                 ciudadesPorDepartamento[depto].forEach(function(ciudad){
                     const option = document.createElement('option');
