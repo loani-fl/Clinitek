@@ -342,7 +342,7 @@ class OrdenRayosXController extends Controller
             $factura = \App\Models\Factura::crearDesdeRayosX($orden, $paciente, $examenesSeleccionados);
     
             // NOTA: Cambiado 'facturas.show' por 'factura.show' para mantener consistencia
-            return redirect()->route('factura.show', $factura->id)
+            return redirect()->route('facturas.show', $factura->id)
                 ->with('success', 'Orden de rayos X y factura creadas correctamente.');
                 
         } catch (\Exception $e) {

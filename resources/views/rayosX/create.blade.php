@@ -383,7 +383,7 @@ a.btn-primary {
         </div>
         @endif
 
-        <form action="{{ route('facturas.rayos-x') }}" method="POST" id="formOrden" novalidate>
+        <form action="{{ route('rayosx.store') }}" method="POST" id="formOrden" novalidate>
             @csrf
 
             {{-- FILTRO PACIENTE, BOTÓN REGISTRAR, FECHA en misma fila --}}
