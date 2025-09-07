@@ -261,68 +261,95 @@ class OrdenRayosXController extends Controller
         ]);
     }
     public function store(Request $request)
-{
-    $request->validate([
-        'paciente_id' => ['required', 'exists:pacientes,id'],
-        'fecha' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:2025-10-31'],
-        'examenes' => ['required', 'array', 'min:1', 'max:10'],
-        'examenes.*' => ['string'],
-        'imagenes.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-        'imagenes.*.*' => 'nullable|mimes:jpg,jpeg,png|max:5120',
-    ], [
-        'paciente_id.required' => 'Debe seleccionar un paciente.',
-        'paciente_id.exists' => 'El paciente seleccionado no existe.',
-        'fecha.required' => 'La fecha es obligatoria.',
-        'fecha.after_or_equal' => 'La fecha no puede ser anterior a hoy.',
-        'fecha.before_or_equal' => 'La fecha no puede ser posterior al 31 de octubre de 2025.',
-        'examenes.required' => 'Debe seleccionar al menos un examen.',
-        'examenes.array' => 'Los exámenes deben enviarse en formato de arreglo.',
-        'examenes.min' => 'Debe seleccionar al menos un examen.',
-        'examenes.max' => 'No puede seleccionar más de 10 exámenes.',
-        'imagenes.*.image' => 'Cada archivo debe ser una imagen.',
-        'imagenes.*.mimes' => 'Solo se permiten imágenes jpg, jpeg o png.',
-        'imagenes.*.max' => 'Cada imagen no debe superar los 2MB.',
-    ]);
-
-    $orden = new RayosxOrder();
-    $orden->paciente_id = $request->paciente_id;
-    $orden->fecha = $request->fecha;
-
-    // Calcular total de precios de exámenes
-    $examenesSeleccionados = $request->examenes;
-    $totalPrecio = \App\Models\Examen::whereIn('codigo', $examenesSeleccionados)->sum('precio');
-    $orden->total_precio = $totalPrecio;
-    $orden->save();
-
-    // Guardar relación de exámenes
-    foreach ($examenesSeleccionados as $codigoExamen) {
-        $examenRegistro = $orden->examenes()->create([
-            'examen_codigo' => $codigoExamen,
+    {
+        $request->validate([
+            'paciente_id' => ['required', 'exists:pacientes,id'],
+            'fecha' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:2025-10-31'],
+            'examenes' => ['required', 'array', 'min:1', 'max:10'],
+            'examenes.*' => ['string'],
+            'imagenes.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'imagenes.*.*' => 'nullable|mimes:jpg,jpeg,png|max:5120',
+        ], [
+            'paciente_id.required' => 'Debe seleccionar un paciente.',
+            'paciente_id.exists' => 'El paciente seleccionado no existe.',
+            'fecha.required' => 'La fecha es obligatoria.',
+            'fecha.after_or_equal' => 'La fecha no puede ser anterior a hoy.',
+            'fecha.before_or_equal' => 'La fecha no puede ser posterior al 31 de octubre de 2025.',
+            'examenes.required' => 'Debe seleccionar al menos un examen.',
+            'examenes.array' => 'Los exámenes deben enviarse en formato de arreglo.',
+            'examenes.min' => 'Debe seleccionar al menos un examen.',
+            'examenes.max' => 'No puede seleccionar más de 10 exámenes.',
+            'imagenes.*.image' => 'Cada archivo debe ser una imagen.',
+            'imagenes.*.mimes' => 'Solo se permiten imágenes jpg, jpeg o png.',
+            'imagenes.*.max' => 'Cada imagen no debe superar los 2MB.',
         ]);
-
-        // Guardar imágenes asociadas a este examen, si se suben
-        if ($request->hasFile('imagenes')) {
-            foreach ($request->file('imagenes') as $file) {
-                $nombre = time() . '_' . $file->getClientOriginalName();
-                $file->storeAs('public/rayosx_examenes', $nombre);
-
-                \App\Models\RayosxOrderExamenImagen::create([
-                    'rayosx_order_examen_id' => $examenRegistro->id,
-                    'ruta' => 'rayosx_examenes/' . $nombre,
-                    'descripcion' => null,
-                ]);
+    
+        try {
+            // PASO 1: Crear la orden
+            $orden = new RayosxOrder();
+            $orden->paciente_id = $request->paciente_id;
+            $orden->fecha = $request->fecha;
+            $orden->estado = 'pendiente';
+    
+            // Calcular total de precios de exámenes usando el modelo Factura
+            $examenesSeleccionados = $request->examenes;
+            $preciosExamenes = \App\Models\Factura::getExamenesPrecios();
+            $totalPrecio = 0;
+            
+            foreach ($examenesSeleccionados as $codigoExamen) {
+                if (isset($preciosExamenes[$codigoExamen])) {
+                    $totalPrecio += $preciosExamenes[$codigoExamen]['precio'];
+                }
             }
+            
+            $orden->total_precio = $totalPrecio;
+            $orden->save();
+    
+            // PASO 2: Guardar relación de exámenes
+            foreach ($examenesSeleccionados as $codigoExamen) {
+                $examenRegistro = $orden->examenes()->create([
+                    'examen_codigo' => $codigoExamen,
+                ]);
+    
+                // Guardar imágenes asociadas a este examen, si se suben
+                if ($request->hasFile('imagenes')) {
+                    foreach ($request->file('imagenes') as $file) {
+                        $nombre = time() . '_' . $file->getClientOriginalName();
+                        $file->storeAs('public/rayosx_examenes', $nombre);
+    
+                        \App\Models\RayosxOrderExamenImagen::create([
+                            'rayosx_order_examen_id' => $examenRegistro->id,
+                            'ruta' => 'rayosx_examenes/' . $nombre,
+                            'descripcion' => null,
+                        ]);
+                    }
+                }
+            }
+    
+            // PASO 3: Crear el pago asociado
+            $pago = \App\Models\Pago::create([
+                'paciente_id' => $request->paciente_id,
+                'metodo_pago' => 'pendiente',
+                'fecha' => now()->format('Y-m-d'),
+                'origen' => 'rayos_x',
+                'referencia_id' => $orden->id,
+                'servicio' => 'Rayos X',
+                'monto' => $totalPrecio,
+            ]);
+    
+            // PASO 4: Crear factura usando la orden guardada
+            $paciente = \App\Models\Paciente::find($orden->paciente_id);
+            $factura = \App\Models\Factura::crearDesdeRayosX($orden, $paciente, $examenesSeleccionados);
+    
+            // NOTA: Cambiado 'facturas.show' por 'factura.show' para mantener consistencia
+            return redirect()->route('factura.show', $factura->id)
+                ->with('success', 'Orden de rayos X y factura creadas correctamente.');
+                
+        } catch (\Exception $e) {
+            return back()->withInput()
+                        ->withErrors(['error' => 'Error al crear la orden: ' . $e->getMessage()]);
         }
     }
-
-
-$paciente = \App\Models\Paciente::find($orden->paciente_id);
-$factura = \App\Models\Factura::crearDesdeRayosX($orden, $paciente, $examenesSeleccionados);
-
-return redirect()->route('facturas.show', $factura->id)
-    ->with('success', 'Orden de rayos X y factura creadas correctamente.');
-  
-}
     
     // Mostrar detalles de una orden
     public function show($id)
