@@ -8,33 +8,54 @@ use Illuminate\Http\Request;
 class PuestoController extends Controller
 {
     // Mostrar la lista de puestos
- public function index(Request $request)
+public function index(Request $request)
 {
-    $query = $request->input('search', '');
+    try {
+        $query = $request->input('search', '');
+        $perPage = 3;
 
-    $puestos = Puesto::query()
-        ->when($query, function ($q) use ($query) {
-            $q->where('codigo', 'like', "%{$query}%")
-              ->orWhere('nombre', 'like', "%{$query}%");
-        })
-        ->orderBy('id')
-        ->paginate(2);
+        $puestosQuery = Puesto::query();
 
-    // Si es AJAX devuelve vista parcial
-    if ($request->ajax()) {
-        $view = view('puestos.partials.tabla', compact('puestos'))->render();
+        if ($query) {
+            $puestosQuery->where(function ($q) use ($query) {
+                $q->where('codigo', 'like', "%{$query}%")
+                  ->orWhere('nombre', 'like', "%{$query}%");
+            });
+        }
 
-        // Envía también la paginación y total para JS
-        return response()->json([
-            'html' => $view,
-            'pagination' => (string) $puestos->links('pagination::bootstrap-4'),
-            'total' => $puestos->count(),
-            'all' => $puestos->total(),
-        ]);
+        if ($query) {
+            // Si hay búsqueda, traemos todos los resultados filtrados
+            $puestos = $puestosQuery->get();
+            $isSearch = true;
+            $startIndex = 0; // numeración desde 0
+        } else {
+            // Si no hay búsqueda, usamos paginación
+            $puestos = $puestosQuery->paginate($perPage)->withQueryString();
+            $isSearch = false;
+            $startIndex = ($puestos->currentPage() - 1) * $puestos->perPage();
+        }
+
+        // AJAX
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('puestos.partials.tabla', compact('puestos', 'startIndex', 'isSearch'))->render(),
+                'pagination' => $isSearch ? '' : $puestos->links('pagination::bootstrap-5')->render(),
+                
+                'total' => $puestos->count(),
+                'all' => Puesto::count(),
+            ]);
+        }
+
+        return view('puestos.index', compact('puestos', 'startIndex', 'isSearch'));
+    } catch (\Exception $e) {
+        if ($request->ajax()) {
+            return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
+        }
+        abort(500, $e->getMessage());
     }
-
-    return view('puestos.index', compact('puestos'));
 }
+
+
 
 
     // Mostrar formulario de creación

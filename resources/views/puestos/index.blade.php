@@ -172,7 +172,12 @@
 
         <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
 
+       <div id="paginacion-container" class="pagination-container">
+    @if(!$isSearch)
         {{ $puestos->onEachSide(1)->links('pagination::bootstrap-5') }}
+    @endif
+</div>
+
     </div>
 </div>
 
@@ -198,29 +203,41 @@ $(document).ready(function () {
             data: { page, search: query },
             success: function(data) {
                 $('#tabla-container').html(data.html);
-                $('#paginacion-container').html(data.pagination ?? '');
+                $('#paginacion-container').html(data.pagination);
                 actualizarMensaje(data.total, data.all, query);
             },
-            error: function() {
-                $('#mensajeResultados').html('Error al cargar los datos.');
+            error: function(xhr) {
+                let msg = 'Error al cargar los datos.';
+                if(xhr.responseJSON && xhr.responseJSON.message) {
+                    msg += ' ' + xhr.responseJSON.message;
+                }
+                $('#mensajeResultados').html(msg);
             }
         });
     }
 
+    // Carga inicial sin filtro
     cargarDatos();
 
+    // Filtrar al escribir
     $('#filtroBusqueda').on('keyup', function () {
         let query = $(this).val();
         cargarDatos(1, query);
     });
 
+    // Paginación con delegación, para capturar clicks en links creados dinámicamente
     $(document).on('click', '.pagination a', function(e) {
         e.preventDefault();
         let url = $(this).attr('href');
-        let page = url.split('page=')[1];
+        let params = new URLSearchParams(url.split('?')[1]);
+        let page = params.get('page') || 1;
         let query = $('#filtroBusqueda').val();
         cargarDatos(page, query);
-        window.history.pushState("", "", url.split('?')[0] + '?page=' + page + (query ? "&search=" + encodeURIComponent(query) : ""));
+
+        // Actualizar URL sin recargar
+        let newUrl = url.split('?')[0] + '?page=' + page;
+        if (query) newUrl += '&search=' + encodeURIComponent(query);
+        window.history.pushState("", "", newUrl);
     });
 });
 </script>
