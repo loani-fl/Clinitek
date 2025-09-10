@@ -230,25 +230,40 @@
                                             <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                                 Más
                                             </button>
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <a class="dropdown-item"
-                                                       href="{{ route('diagnosticos.show', ['diagnostico' => $consulta->diagnostico->id, 'origen' => 'consultas.index']) }}">
-                                                        <i class="bi bi-journal-medical"></i> Ver Diagnóstico
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="{{ route('recetas.show', $consulta->id) }}">
-                                                        <i class="bi bi-capsule"></i> Ver Recetas
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="{{ route('examenes.show', $consulta->diagnostico->id) }}">
-                                                        <i class="bi bi-file-earmark-medical"></i> Ver Exámenes
-                                                    </a>
-                                                </li>
+                                         <div class="dropdown-menu">
 
-                                            </ul>
+    {{-- Diagnóstico --}}
+    @if ($consulta->diagnostico)
+        <a href="{{ route('diagnosticos.edit', $consulta->diagnostico->id) }}" class="dropdown-item">
+            <i class="bi bi-journal-text"></i> Ver Diagnóstico
+        </a>
+    @else
+        <a href="{{ route('diagnosticos.create', [$consulta->paciente->id, $consulta->id]) }}" class="dropdown-item text-primary">
+            <i class="bi bi-journal-plus"></i> Crear Diagnóstico
+        </a>
+    @endif
+{{-- Receta --}}
+<a href="{{ $consulta->recetas->count() > 0 ? route('recetas.show', $consulta->id) : '#' }}"
+   class="dropdown-item {{ $consulta->recetas->count() > 0 ? 'text-primary' : 'text-muted disabled' }}"
+   onclick="{{ $consulta->recetas->count() === 0 ? 'return false;' : '' }}">
+   <i class="bi bi-journal-medical"></i>
+   {{ $consulta->recetas->count() > 0 ? 'Ver Receta' : 'Paciente sin receta' }}
+</a>
+
+
+{{-- Exámenes --}}
+<a href="{{ ($consulta->examens->count() > 0 && $consulta->diagnostico) ? route('examenes.show', $consulta->id) : '#' }}"
+   class="dropdown-item {{ ($consulta->examens->count() > 0 && $consulta->diagnostico) ? 'text-primary' : 'text-muted disabled' }}"
+   onclick="{{ ($consulta->examens->count() === 0 || !$consulta->diagnostico) ? 'return false;' : '' }}">
+   <i class="bi bi-journal-check"></i>
+   {{ ($consulta->examens->count() > 0 && $consulta->diagnostico) ? 'Ver Exámenes' : 'Paciente sin examen' }}
+</a>
+
+
+
+
+</div>
+
                                         </div>
                                     @endif
 

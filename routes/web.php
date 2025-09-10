@@ -222,3 +222,34 @@ Route::post('facturas/rayos-x', [FacturaController::class, 'generarDesdeRayosX']
 Route::get('/factura/{factura}', [FacturaController::class, 'show'])->name('factura.show');
 Route::post('/facturas/rayos-x', [FacturaController::class, 'rayosX'])->name('facturas.rayos-x');
 Route::get('/facturas/{id}', [FacturaController::class, 'show'])->name('facturas.show');
+
+
+
+//para mensajes de aviso 
+// Cuando no haya receta
+// Mostrar receta de una consulta
+
+// Mostrar receta según la consulta
+Route::get('/recetas/{consulta}', [RecetaController::class, 'show'])
+    ->name('recetas.show');
+
+// Cuando no haya receta
+Route::get('/recetas/no-disponible/{consulta}', function ($consultaId) {
+    $consulta = App\Models\Consulta::findOrFail($consultaId);
+    return view('recetas.no-disponible', compact('consulta'));
+})->name('recetas.no-disponible');
+
+
+// ----------------------
+// Exámenes
+// ----------------------
+
+// Mostrar examen según la consulta
+Route::get('/examenes/{consulta}', [ExamenController::class, 'show'])
+    ->name('examenes.show');
+
+// Cuando no haya examen
+Route::get('/examenes/no-disponible/{consulta}', function ($consultaId) {
+    $consulta = App\Models\Consulta::findOrFail($consultaId);
+    return view('examenes.no-disponible', compact('consulta'));
+})->name('examenes.no-disponible');

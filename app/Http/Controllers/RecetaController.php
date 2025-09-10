@@ -74,11 +74,15 @@ class RecetaController extends Controller
             ->with('success', 'Receta creada correctamente.');
     }
 
-    public function show($id)
-    {
-        $receta = Receta::with('consulta.paciente', 'consulta.medico', 'medicamentos')
-            ->findOrFail($id);
+ public function show($consultaId)
+{
+    $receta = Receta::with('consulta.paciente', 'consulta.medico', 'medicamentos')
+        ->where('consulta_id', $consultaId)
+        ->firstOrFail();
 
-        return view('recetas.show', compact('receta'));
-    }
+    return view('recetas.show', compact('receta'));
+}
+
+
+    
 }
