@@ -190,15 +190,17 @@
       @error('fecha_nacimiento') <div class="text-danger small">{{ $message }}</div> @enderror
     </div>
     <div class="col-4th">
-      @php
-      $hoy = now();
-      $minIngreso = $hoy->copy()->subMonth()->format('Y-m-d');
-      $maxIngreso = $hoy->copy()->addMonth()->format('Y-m-d');
-      @endphp
-      <label for="fecha_ingreso" class="form-label">Fecha Ingreso <span class="text-danger">*</span></label>
-      <input type="date" name="fecha_ingreso" id="fecha_ingreso" class="form-control"
-        value="{{ old('fecha_ingreso') }}" min="{{ $minIngreso }}" max="{{ $maxIngreso }}" required>
-      @error('fecha_ingreso') <div class="text-danger small">{{ $message }}</div> @enderror
+          
+  @php
+    $hoy = \Carbon\Carbon::today()->format('Y-m-d'); // Hoy
+    $maxFecha = \Carbon\Carbon::create(now()->year + 1, 1, 30)->format('Y-m-d'); // 30 enero próximo año
+@endphp
+
+<label for="fecha_ingreso" class="form-label">Fecha Ingreso <span class="text-danger">*</span></label>
+<input type="date" name="fecha_ingreso" id="fecha_ingreso" class="form-control"
+       value="{{ old('fecha_ingreso') }}"
+       min="{{ $hoy }}" max="{{ $maxFecha }}" required>
+@error('fecha_ingreso') <div class="text-danger small">{{ $message }}</div> @enderror
     </div>
     <div class="col-4th">
       <label for="estado_civil" class="form-label">Estado Civil</label>
@@ -351,38 +353,40 @@
     salarioInput.value = sueldo ? parseFloat(sueldo).toFixed(2) : '';
   }
 
-  // --- Evento para botón limpiar ---
-  document.getElementById('btnLimpiar').addEventListener('click', function () {
-    const form = this.closest('form');
-    form.reset();
+ document.getElementById('btnLimpiar').addEventListener('click', function () {
+  const form = this.closest('form');
+  form.reset();
 
-    // Limpiar localStorage
-    document.querySelectorAll('input, select, textarea').forEach(el => {
-      localStorage.removeItem('empleado_' + el.name);
-    });
+  // Limpiar localStorage
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    localStorage.removeItem('empleado_' + el.name);
 
-    // Limpiar salario manualmente
-    const salarioInput = document.getElementById('salario');
-    if (salarioInput) salarioInput.value = '';
-
-    // Quitar clases de validación
-    form.querySelectorAll('.is-invalid, .is-valid').forEach(el => {
-      el.classList.remove('is-invalid', 'is-valid');
-    });
-
-    // Eliminar mensajes de error
-    form.querySelectorAll('.text-danger').forEach(el => {
-      el.innerHTML = '';
-    });
-
-    // Resetear selects si reset no funciona bien
-    form.querySelectorAll('select').forEach(select => {
-      select.selectedIndex = 0;
-    });
-
-    // Actualizar salario (queda vacío)
-    actualizarSalario();
+    // Borrar valores manualmente
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+      el.value = '';
+    }
+    if (el.tagName === 'SELECT') {
+      el.selectedIndex = 0;
+    }
   });
+
+  // Quitar clases de validación
+  form.querySelectorAll('.is-invalid, .is-valid').forEach(el => {
+    el.classList.remove('is-invalid', 'is-valid');
+  });
+
+  // Eliminar mensajes de error
+  form.querySelectorAll('.text-danger').forEach(el => {
+    el.innerHTML = '';
+  });
+
+  // Resetear salario (queda vacío)
+  const salarioInput = document.getElementById('salario');
+  if (salarioInput) salarioInput.value = '';
+
+  actualizarSalario();
+});
+
 
   // --- Actualizar salario al cambiar el puesto ---
   const puestoSelect = document.getElementById('puesto_id');

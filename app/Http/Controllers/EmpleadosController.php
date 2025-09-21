@@ -12,11 +12,21 @@ use Illuminate\Support\Facades\Storage;
 
 class EmpleadosController extends Controller
 {
-    public function create()
-    {
-        $puestos = Puesto::all();
-        return view('empleado.create', compact('puestos'));
+   public function create()
+{
+    $hoy = now()->toDateString(); // hoy en formato YYYY-MM-DD
+    $maxIngreso = now()->copy()->month(1)->day(30)->toDateString(); // 30 de enero del año actual
+
+    // Si hoy es después del 30 de enero, sumar un año
+    if (now()->greaterThan(Carbon::createFromDate(now()->year, 1, 30))) {
+        $maxIngreso = now()->copy()->addYear()->month(1)->day(30)->toDateString();
     }
+
+    $puestos = Puesto::all();
+
+    return view('empleado.create', compact('puestos', 'hoy', 'maxIngreso'));
+}
+
 
     public function store(Request $request)
     {
@@ -30,37 +40,69 @@ class EmpleadosController extends Controller
         $rules = [
             'nombres' => ['required', 'string', 'max:50', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'],
             'apellidos' => ['required', 'string', 'max:50', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'],
-            'identidad' => [
-                'required', 'digits:13', 'unique:listaempleados,identidad',
-                function ($attribute, $value, $fail) use ($departamentosValidos) {
-                    $codigoDepartamento = substr($value, 0, 2);
-                    if (!in_array($codigoDepartamento, $departamentosValidos)) {
-                        return $fail('El código del departamento en la identidad no es válido.');
-                    }
-                    $anioNacimiento = substr($value, 4, 4);
-                    $anioActual = date('Y');
-                    if ($anioNacimiento < 1900 || $anioNacimiento > $anioActual) {
-                        return $fail('El año de nacimiento en la identidad no es válido.');
-                    }
-                    $edad = $anioActual - $anioNacimiento;
-                    if ($edad < 18 || $edad > 65) {
-                        return $fail("La edad calculada a partir de la identidad no es válida (debe ser entre 18 y 65 años; edad actual: $edad).");
-                    }
-                }
-            ],
+           'identidad' => [
+        'required',
+        'digits:13',
+        'unique:listaempleados,identidad',
+        function ($attribute, $value, $fail) {
+            $departamentosMunicipios = [
+                '01' => 8, '02' => 10, '03' => 21, '04' => 23, '05' => 12,
+                '06' => 16, '07' => 19, '08' => 28, '09' => 9, '10' => 17,
+                '11' => 4, '12' => 19, '13' => 28, '14' => 16, '15' => 23,
+                '16' => 28, '17' => 9, '18' => 11,
+            ];
+
+            // Validar departamento
+            $codigoDepartamento = substr($value, 0, 2);
+            if (!array_key_exists($codigoDepartamento, $departamentosMunicipios)) {
+                return $fail('El código del departamento en la identidad no es válido.');
+            }
+
+            // Validar municipio
+            $codigoMunicipio = (int) substr($value, 2, 2);
+            $maxMunicipios = $departamentosMunicipios[$codigoDepartamento];
+            if ($codigoMunicipio < 1 || $codigoMunicipio > $maxMunicipios) {
+                return $fail('El código de municipio en la identidad no es válido.');
+            }
+
+            // Validar año
+            $anioNacimiento = substr($value, 4, 4);
+            $anioActual = date('Y');
+            if ($anioNacimiento < 1900 || $anioNacimiento > $anioActual) {
+                return $fail('El año de nacimiento en la identidad no es válido.');
+            }
+
+            // Validar edad
+            $edad = $anioActual - $anioNacimiento;
+            if ($edad < 18 || $edad > 65) {
+                return $fail("La edad calculada a partir de la identidad no es válida (debe estar entre 18 y 65 años; edad actual: $edad).");
+            }
+        }
+    ],
+
+
             'telefono' => ['required', 'digits:8', 'regex:/^[2389][0-9]{7}$/', 'unique:listaempleados,telefono'],
             'correo' => ['required', 'string', 'max:30', 'email', 'unique:listaempleados,correo'],
-            'fecha_ingreso' => [
-                'required', 'date',
-                function ($attribute, $value, $fail) use ($anio) {
-                    $fecha = Carbon::parse($value);
-                    $min = Carbon::createFromDate($anio, 5, 1);
-                    $max = Carbon::createFromDate($anio, 8, 31);
-                    if ($fecha->lt($min) || $fecha->gt($max)) {
-                        $fail("La fecha de ingreso debe estar entre mayo y agosto de $anio.");
-                    }
-                },
-            ],
+       'fecha_ingreso' => [
+    'required',
+    'date',
+    function ($attribute, $value, $fail) {
+        $fecha = Carbon::parse($value);
+        $anio = now()->year;
+
+        // Min: hoy
+        $min = now()->startOfDay();
+
+        // Max: 30 de enero del próximo año
+        $max = Carbon::createFromDate($anio + 1, 1, 30)->endOfDay();
+
+        if ($fecha->lt($min) || $fecha->gt($max)) {
+            $fail("La fecha de ingreso debe estar entre hoy (" . $min->toDateString() . ") y el 30 de enero de " . ($anio + 1) . ".");
+        }
+    },
+],
+
+
             'fecha_nacimiento' => [
                 'required', 'date',
                 function ($attribute, $value, $fail) use ($hace18, $hace65) {
@@ -195,18 +237,47 @@ class EmpleadosController extends Controller
     $rules = [
         'nombres' => ['required', 'string', 'max:50', 'regex:/^[\pL\s]+$/u'],
         'apellidos' => ['required', 'string', 'max:50', 'regex:/^[\pL\s]+$/u'],
-        'identidad' => [
+    'identidad' => [
     'required',
     'digits:13',
     'unique:listaempleados,identidad,' . $empleado->id,
-    function ($attribute, $value, $fail) use ($departamentosValidos) {
+    function ($attribute, $value, $fail) {
+        // Mapa de departamentos con su número máximo de municipios
+        $departamentosMunicipios = [
+            '01' => 8,
+            '02' => 10,
+            '03' => 21,
+            '04' => 23,
+            '05' => 12,
+            '06' => 16,
+            '07' => 19,
+            '08' => 28,
+            '09' => 9,
+            '10' => 17,
+            '11' => 4,
+            '12' => 19,
+            '13' => 28,
+            '14' => 16,
+            '15' => 23,
+            '16' => 28,
+            '17' => 9,
+            '18' => 11,
+        ];
+
         // Validar departamento (primeros 2 dígitos)
         $codigoDepartamento = substr($value, 0, 2);
-        if (!in_array($codigoDepartamento, $departamentosValidos)) {
+        if (!array_key_exists($codigoDepartamento, $departamentosMunicipios)) {
             return $fail('El código del departamento en la identidad no es válido.');
         }
 
-        // Validar año de nacimiento (posiciones 4 a 7)
+        // Validar municipio (dígitos 3 y 4)
+        $codigoMunicipio = (int) substr($value, 2, 2);
+        $maxMunicipios = $departamentosMunicipios[$codigoDepartamento];
+        if ($codigoMunicipio < 1 || $codigoMunicipio > $maxMunicipios) {
+            return $fail('El código de municipio en la identidad no es válido.');
+        }
+
+        // Validar año de nacimiento (posiciones 5 a 8)
         $anioNacimiento = substr($value, 4, 4);
         $anioActual = date('Y');
         if ($anioNacimiento < 1900 || $anioNacimiento > $anioActual) {
@@ -220,6 +291,7 @@ class EmpleadosController extends Controller
         }
     }
 ],
+
 
         'telefono' => [
             'required',
