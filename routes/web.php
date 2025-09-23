@@ -253,3 +253,12 @@ Route::get('/examenes/no-disponible/{consulta}', function ($consultaId) {
     $consulta = App\Models\Consulta::findOrFail($consultaId);
     return view('examenes.no-disponible', compact('consulta'));
 })->name('examenes.no-disponible');
+
+
+//EMERGENCIAS
+use App\Http\Controllers\EmergenciaController;
+
+Route::get('/emergencias', [EmergenciaController::class, 'index'])->name('emergencias.index');
+Route::get('/emergencias/create', [EmergenciaController::class, 'create'])->name('emergencias.create');
+Route::post('/emergencias/store', [EmergenciaController::class, 'store'])->name('emergencias.store');
+Route::get('/emergencias/{id}', [EmergenciaController::class, 'show'])->name('emergencias.show');
