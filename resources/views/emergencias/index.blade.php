@@ -126,6 +126,9 @@
     max-width: 450px !important;
 }
 
+
+
+
 </style>
 
 <div class="content-wrapper">
