@@ -191,54 +191,58 @@ if($diast < 40 || $diast > 130) $fail('La presión diastólica debe estar entre 
     return redirect()->route('emergencias.index')
                      ->with('success', 'Emergencia registrada correctamente.');
 }
-
 public function index(Request $request)
 {
     try {
         $query = $request->input('search', '');
-
-        // Ordenar por fecha y hora separadas
-        $emergenciasQuery = Emergencia::orderBy('fecha', 'desc')
-                                       ->orderBy('hora', 'desc');
-
-        // Filtrar por nombre de paciente (ajusta el campo correcto, antes era 'nombre')
-        if ($query) {
-            $emergenciasQuery->where('nombres', 'like', "%$query%")
-                             ->orWhere('apellidos', 'like', "%$query%");
-        }
-
-        // Filtros de fecha
         $fechaInicio = $request->input('fecha_desde');
         $fechaFin = $request->input('fecha_hasta');
+        $documentado = $request->input('documentado'); // <-- NUEVO
+        $perPage = 3;
 
-        if ($fechaInicio) {
-            $emergenciasQuery->where('fecha', '>=', $fechaInicio);
+        $emergenciasQuery = Emergencia::orderBy('fecha', 'desc')->orderBy('hora', 'desc');
+
+        // Filtrar por nombres/apellidos
+        if ($query) {
+            $emergenciasQuery->where(function($q) use ($query) {
+                $q->where('nombres', 'like', "%$query%")
+                  ->orWhere('apellidos', 'like', "%$query%");
+            });
         }
-        if ($fechaFin) {
-            $emergenciasQuery->where('fecha', '<=', $fechaFin);
+
+        // Filtrar por fechas
+        if ($fechaInicio) $emergenciasQuery->where('fecha', '>=', $fechaInicio);
+        if ($fechaFin) $emergenciasQuery->where('fecha', '<=', $fechaFin);
+
+        // Filtrar por documentación
+        if ($documentado !== null && $documentado !== '') {
+            $emergenciasQuery->where('documentado', $documentado);
         }
+
+        // Determinar si hay algún filtro activo
+        $isSearch = $query || $fechaInicio || $fechaFin || $documentado !== null && $documentado !== '' ? true : false;
 
         // Obtener resultados
-        if ($query) {
+        if ($isSearch) {
             $emergencias = $emergenciasQuery->get();
-            $isSearch = true;
         } else {
-            $emergencias = $emergenciasQuery->paginate(4);
-            $isSearch = false;
+            $emergencias = $emergenciasQuery->paginate($perPage);
         }
 
-        $all = Emergencia::count();
+        $totalFiltrado = $emergenciasQuery->count();
 
+        // Respuesta AJAX
         if ($request->ajax()) {
             return response()->json([
                 'html' => view('emergencias.tabla', compact('emergencias', 'isSearch'))->render(),
                 'pagination' => $isSearch ? '' : $emergencias->links('pagination::bootstrap-5')->render(),
-                'total' => $emergencias->count(),
-                'all' => $all,
+                'totalFiltrado' => $totalFiltrado,
+                'all' => $totalFiltrado,
             ]);
         }
 
-        return view('emergencias.index', compact('emergencias', 'isSearch', 'all'));
+        return view('emergencias.index', compact('emergencias', 'isSearch', 'totalFiltrado'));
+
     } catch (\Exception $e) {
         if ($request->ajax()) {
             return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
