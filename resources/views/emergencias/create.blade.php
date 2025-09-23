@@ -1,4 +1,4 @@
-@extends('layouts.app')
+quiero que los signos vitales tengan mensajes emergentes asi como los demas campos @extends('layouts.app')
 
 @section('content')
 <style>
@@ -23,15 +23,42 @@
     .card-header h2 { font-size:2rem; font-weight:bold; color:#000; margin:0; }
     label { font-size:0.85rem; font-weight:600; color:#003366; }
     input, select, textarea { font-size:0.85rem !important; }
-    .row > div { margin-bottom:1rem; }
-    .col-4th { flex:0 0 25%; max-width:25%; padding:0 0.5rem; }
-    .col-half { flex:0 0 50%; max-width:50%; padding:0 0.5rem; }
+    .row { display: flex; flex-wrap: wrap; margin-left: -0.5rem; margin-right: -0.5rem; }
+    .row > div { padding-left: 0.5rem; padding-right: 0.5rem; margin-bottom: 1rem; }
+    .col-4th { flex: 0 0 25%; max-width: 25%; }
+    .col-half { flex: 0 0 50%; max-width: 50%; }
+    .align-items-end { align-items: flex-end; }
     .btn { font-size:0.9rem; }
     .custom-radio { display:flex; align-items:center; gap:0.5rem; font-size:1rem; font-weight:600; color:#003366; cursor:pointer; }
     .custom-radio input[type="radio"] { appearance:none; -webkit-appearance:none; width:18px; height:18px; border:2px solid #003366; border-radius:4px; position: relative; cursor:pointer; }
     .custom-radio input[type="radio"]:checked::after { content:"✖"; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:14px; color:#003366; }
     .radio-group { display:flex; gap:2rem; margin-bottom:1.5rem; }
     .text-danger { font-size:0.75rem; margin-top:0.25rem; display:block; }
+    /* Campos indocumentado alineados */
+    #indocFields { display: none; }
+    #indocFields .col-4th { flex: 0 0 33.33%; max-width: 33.33%; }
+
+
+    /* Campos indocumentado alineados */
+#indocFields { display: none; }
+
+/* Foto más grande y ocupa más espacio */
+#indocFields .col-4th:first-child { flex: 0 0 50%; max-width: 50%; }
+
+/* Fecha y hora más pequeños */
+#indocFields .col-4th:nth-child(2),
+#indocFields .col-4th:nth-child(3) { 
+    flex: 0 0 25%; 
+    max-width: 25%; 
+}
+
+#indocFields label { 
+    font-size: 0.75rem; /* Más pequeño para fecha y hora */
+}
+
+#indocFields .col-4th:first-child label { 
+    font-size: 0.85rem; /* Mantener un poco más grande para foto */
+}
 </style>
 
 <div class="content-wrapper">
@@ -56,8 +83,8 @@
                 </label>
             </div>
 
+            <!-- Campos Documentado -->
             <div id="docFields">
-                <!-- Campos de Documentado -->
                 <div class="row mb-3">
                     <div class="col-4th">
                         <label for="nombres">Nombres:</label>
@@ -94,18 +121,36 @@
                         @error('telefono') <span class="text-danger">{{ $message }}</span> @enderror
                     </div>
                     <div class="col-4th">
-                        <label>Fecha y Hora:</label>
-                        <input type="text" name="fecha_hora" class="form-control @error('fecha_hora') is-invalid @enderror" value="{{ now()->format('Y-m-d H:i') }}" readonly>
-                        @error('fecha_hora') <span class="text-danger">{{ $message }}</span> @enderror
+                        <label>Fecha:</label>
+                        <input type="text" name="fecha" class="form-control" 
+                               value="{{ isset($emergencia) ? \Carbon\Carbon::parse($emergencia->fecha)->format('d/m/Y') : now()->format('d/m/Y') }}" 
+                               readonly>
+                    </div>
+                    <div class="col-4th">
+                        <label>Hora:</label>
+                        <input type="text" name="hora" class="form-control" 
+                               value="{{ isset($emergencia) ? \Carbon\Carbon::parse($emergencia->hora)->format('h:i A') : now()->format('h:i A') }}" 
+                               readonly>
                     </div>
                 </div>
             </div>
 
-            <div class="row mb-3" id="indocFields" style="display:none;">
-                <div class="col-half">
-                    <label>Foto del paciente:</label>
-                    <input type="file" name="foto" accept=".jpg,.jpeg,.png" class="form-control @error('foto') is-invalid @enderror" capture="camera">
-                    @error('foto') <span class="text-danger">{{ $message }}</span> @enderror
+            <!-- Campos Indocumentado -->
+            <div class="row mb-3" id="indocFields">
+               <div class="col-4th">
+    <label>Foto del paciente (jpg, jpeg, png):</label>
+    <input type="file" name="foto" accept=".jpg,.jpeg,.png" 
+           class="form-control @error('foto') is-invalid @enderror" capture="camera">
+    @error('foto') <span class="text-danger">{{ $message }}</span> @enderror
+</div>
+
+                <div class="col-4th">
+                    <label>Fecha:</label>
+                    <input type="text" name="fecha_indoc" class="form-control" value="{{ now()->format('d/m/Y') }}" readonly>
+                </div>
+                <div class="col-4th">
+                    <label>Hora:</label>
+                    <input type="text" name="hora_indoc" class="form-control" value="{{ now()->format('h:i A') }}" readonly>
                 </div>
             </div>
 
@@ -142,11 +187,11 @@
                </div>
             </div>
 
-          <div class="d-flex justify-content-center gap-3 mt-4 w-100">
-            <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Guardar</button>
-            <button type="button" class="btn btn-warning" id="btnLimpiar"><i class="bi bi-trash"></i> Limpiar</button>
-            <a href="{{ route('emergencias.index') }}" class="btn btn-success"><i class="bi bi-arrow-left"></i> Volver</a>
-          </div>
+            <div class="d-flex justify-content-center gap-3 mt-4 w-100">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Guardar</button>
+                <button type="button" class="btn btn-warning" id="btnLimpiar"><i class="bi bi-trash"></i> Limpiar</button>
+                <a href="{{ route('emergencias.index') }}" class="btn btn-success"><i class="bi bi-arrow-left"></i> Volver</a>
+            </div>
         </form>
     </div>
 </div>
@@ -154,8 +199,8 @@
 <script>
 function toggleDocs() {
     let doc = document.querySelector('input[name="documentado"][value="1"]').checked;
-    document.getElementById("docFields").style.display = doc ? "block" : "none";
-    document.getElementById("indocFields").style.display = doc ? "none" : "block";
+    document.getElementById("docFields").style.display = doc ? "flex" : "none";
+    document.getElementById("indocFields").style.display = doc ? "none" : "flex";
 }
 
 // Ejecutar al cargar para respetar old()
@@ -165,19 +210,28 @@ window.addEventListener('DOMContentLoaded', () => toggleDocs());
 document.getElementById('btnLimpiar').addEventListener('click', function(){
     const form = document.getElementById('emergenciaForm');
     const seleccionado = document.querySelector('input[name="documentado"]:checked').value;
-    form.reset();
-    // Restaurar radio
-    document.querySelector(`input[name="documentado"][value="${seleccionado}"]`).checked = true;
 
-    // Limpiar manualmente campos específicos
-    document.getElementById('identidad').value = '';
-    document.getElementById('edad').value = '';
-    
+    // Solo limpiar los campos de entrada del formulario (inputs y textarea), sin tocar fecha/hora de indoc
+    form.querySelectorAll('input, textarea, select').forEach(input => {
+        const name = input.name;
+        // Si es fecha o hora de indocumentado, no limpiar
+        if(name === 'fecha_indoc' || name === 'hora_indoc') return;
+        // Para otros campos de texto/numero/select/textarea
+        if(input.type === 'file') input.value = '';
+        else if(input.type !== 'radio' && input.type !== 'checkbox') input.value = '';
+        else if(input.tagName.toLowerCase() === 'select') input.selectedIndex = 0;
+    });
+
+    // Limpiar errores y clases de validación
     form.querySelectorAll('.text-danger').forEach(e => e.innerHTML = '');
     form.querySelectorAll('.is-invalid, .is-valid').forEach(e => e.classList.remove('is-invalid','is-valid'));
-    
+
+    // Restaurar radio seleccionado
+    document.querySelector(`input[name="documentado"][value="${seleccionado}"]`).checked = true;
+
     toggleDocs();
 });
+
 
 // Validaciones en tiempo real
 document.getElementById('nombres').addEventListener('keypress', e => {

@@ -83,7 +83,9 @@ public function store(Request $request)
         ] : 'nullable',
 
         // Foto
-        'foto' => !$documentado ? 'nullable|image|mimes:jpg,jpeg,png|max:2048' : 'nullable',
+       // 'foto' => !$documentado ? 'nullable|image|mimes:jpg,jpeg,png|max:2048' : 'nullable',
+       'foto' => !$documentado ? 'required|image|mimes:jpg,jpeg,png|max:2048' : 'nullable',
+
 
         // Motivo y dirección
         'motivo' => ['required','string','min:5','max:60','regex:/^[A-Za-z0-9.,\s]+$/'],
@@ -164,6 +166,11 @@ if($diast < 40 || $diast > 130) $fail('La presión diastólica debe estar entre 
     $emergencia->fc = $request->fc;
     $emergencia->temp = $request->temp;
     $emergencia->fecha_hora = $request->fecha_hora;
+
+    // ✅ Guardar fecha y hora separadas
+    $emergencia->fecha = now()->toDateString();  // YYYY-MM-DD
+    $emergencia->hora = now()->format('H:i');    // HH:MM en 24h
+
 
     if ($documentado) {
         $emergencia->nombres = $request->nombres;
