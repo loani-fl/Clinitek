@@ -26,7 +26,8 @@ return new class extends Migration {
             $table->string('foto')->nullable();
 
             // Datos de la emergencia
-            $table->dateTime('fecha_hora');
+               $table->date('fecha');       // Solo guarda día, mes y año (YYYY-MM-DD)
+               $table->time('hora');        // Guarda hora y minutos (HH:MM:SS)
             //$table->enum('evento', ['trauma', 'medico', 'obstetrico', 'pediatrico', 'otro']);
             //$table->string('lugar')->nullable();
             $table->text('motivo')->nullable();

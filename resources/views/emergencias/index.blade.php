@@ -134,7 +134,7 @@
                 <i class="bi bi-house-door"></i> Inicio
             </a>
 
-            <h2>Emergencias</h2>
+            <h2>Lista de emergencias</h2>
 
             <a href="{{ route('emergencias.create') }}" class="btn btn-primary ms-3">
                 <i class="bi bi-plus-circle"></i> Registrar Emergencia

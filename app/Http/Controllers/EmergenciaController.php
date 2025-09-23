@@ -83,7 +83,9 @@ public function store(Request $request)
         ] : 'nullable',
 
         // Foto
-        'foto' => !$documentado ? 'nullable|image|mimes:jpg,jpeg,png|max:2048' : 'nullable',
+       // 'foto' => !$documentado ? 'nullable|image|mimes:jpg,jpeg,png|max:2048' : 'nullable',
+       'foto' => !$documentado ? 'required|image|mimes:jpg,jpeg,png|max:2048' : 'nullable',
+
 
         // Motivo y dirección
         'motivo' => ['required','string','min:5','max:60','regex:/^[A-Za-z0-9.,\s]+$/'],
@@ -123,7 +125,7 @@ if($diast < 40 || $diast > 130) $fail('La presión diastólica debe estar entre 
             }
         ],
 
-        'fecha_hora' => 'required|date',
+        //'fecha_hora' => 'required|date',
     ];
 
     $messages = [
@@ -163,7 +165,12 @@ if($diast < 40 || $diast > 130) $fail('La presión diastólica debe estar entre 
     $emergencia->pa = $request->pa;
     $emergencia->fc = $request->fc;
     $emergencia->temp = $request->temp;
-    $emergencia->fecha_hora = $request->fecha_hora;
+    //$emergencia->fecha_hora = $request->fecha_hora;
+
+    // ✅ Guardar fecha y hora separadas
+    $emergencia->fecha = now()->toDateString();  // YYYY-MM-DD
+    $emergencia->hora = now()->format('H:i');    // HH:MM en 24h
+
 
     if ($documentado) {
         $emergencia->nombres = $request->nombres;
@@ -185,17 +192,19 @@ if($diast < 40 || $diast > 130) $fail('La presión diastólica debe estar entre 
                      ->with('success', 'Emergencia registrada correctamente.');
 }
 
-
-  public function index(Request $request)
+public function index(Request $request)
 {
     try {
         $query = $request->input('search', '');
 
-        $emergenciasQuery = Emergencia::orderBy('fecha_hora', 'desc');
+        // Ordenar por fecha y hora separadas
+        $emergenciasQuery = Emergencia::orderBy('fecha', 'desc')
+                                       ->orderBy('hora', 'desc');
 
-        // Filtrar por nombre de paciente
+        // Filtrar por nombre de paciente (ajusta el campo correcto, antes era 'nombre')
         if ($query) {
-            $emergenciasQuery->where('nombre', 'like', "%$query%");
+            $emergenciasQuery->where('nombres', 'like', "%$query%")
+                             ->orWhere('apellidos', 'like', "%$query%");
         }
 
         // Filtros de fecha
@@ -203,10 +212,10 @@ if($diast < 40 || $diast > 130) $fail('La presión diastólica debe estar entre 
         $fechaFin = $request->input('fecha_hasta');
 
         if ($fechaInicio) {
-            $emergenciasQuery->where('fecha_hora', '>=', $fechaInicio);
+            $emergenciasQuery->where('fecha', '>=', $fechaInicio);
         }
         if ($fechaFin) {
-            $emergenciasQuery->where('fecha_hora', '<=', $fechaFin);
+            $emergenciasQuery->where('fecha', '<=', $fechaFin);
         }
 
         // Obtener resultados
@@ -237,6 +246,5 @@ if($diast < 40 || $diast > 130) $fail('La presión diastólica debe estar entre 
         abort(500, $e->getMessage());
     }
 }
-
 
 }
