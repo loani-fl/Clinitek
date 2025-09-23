@@ -42,7 +42,6 @@
         overflow: hidden;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         position: relative;
-        border-radius: 10px;
         z-index: 1;
         max-width: 1000px;
         width: 100%;
@@ -52,8 +51,6 @@
         border-bottom: 3px solid #007BFF;
         padding-bottom: 0.5rem;
         margin-bottom: 1rem;
-        text-align: center;
-        position: relative;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -63,7 +60,6 @@
         font-weight: bold;
         color: #003366;
         margin: 0 auto;
-        flex-grow: 1;
         text-align: center;
     }
     .btn-inicio {
@@ -125,6 +121,11 @@
         color: #555;
         min-height: 1.2em;
     }
+
+    #filtroBusqueda.filtro-input {
+    max-width: 450px !important;
+}
+
 </style>
 
 <div class="content-wrapper">
@@ -158,6 +159,15 @@
                 <input type="date" id="fechaHasta" class="form-control filtro-input">
             </div>
 
+            <div>
+                <label class="filtro-label" for="filtroDocumentado">Documentación</label>
+                <select id="filtroDocumentado" class="form-select filtro-input">
+                    <option value="">Todos</option>
+                    <option value="1">Documentados</option>
+                    <option value="0">Indocumentados</option>
+                </select>
+            </div>
+
             <div style="align-self: flex-end;">
                 <button id="btnRecargar" class="btn btn-secondary">
                     <i class="bi bi-arrow-clockwise"></i>
@@ -182,24 +192,36 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function () {
-    function actualizarMensaje(total, all, query) {
-        if (!query) $('#mensajeResultados').html('');
-        else if (total === 0) $('#mensajeResultados').html(`No se encontraron resultados para "<strong>${query}</strong>".`);
-        else $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
+
+    function actualizarMensaje(total, all, query, fechaDesde, fechaHasta, documentado) {
+        if (!query && !fechaDesde && !fechaHasta && !documentado) {
+            $('#mensajeResultados').html('');
+        } else if (total === 0) {
+            $('#mensajeResultados').html(`No se encontraron resultados.`);
+        } else {
+            $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
+        }
     }
 
     function cargarDatos(page = 1, query = '') {
         const fechaDesde = $('#fechaDesde').val();
         const fechaHasta = $('#fechaHasta').val();
+        const documentado = $('#filtroDocumentado').val();
 
         $.ajax({
             url: "{{ route('emergencias.index') }}",
             type: 'GET',
-            data: { page, search: query, fecha_desde: fechaDesde, fecha_hasta: fechaHasta },
+            data: { 
+                page, 
+                search: query, 
+                fecha_desde: fechaDesde, 
+                fecha_hasta: fechaHasta,
+                documentado: documentado
+            },
             success: function(data) {
                 $('#tabla-container').html(data.html);
                 $('#paginacion-container').html(data.pagination);
-                actualizarMensaje(data.total, data.all, query);
+                actualizarMensaje(data.totalFiltrado ?? data.total, data.all, query, fechaDesde, fechaHasta, documentado);
             },
             error: function(xhr) {
                 let msg = 'Error al cargar los datos.';
@@ -212,15 +234,17 @@ $(document).ready(function () {
     // Carga inicial
     cargarDatos(1, $('#filtroBusqueda').val());
 
-    // Eventos de filtro
+    // Filtros de búsqueda, fechas y documentación
     $('#filtroBusqueda').on('keyup', function () { cargarDatos(1, $(this).val()); });
     $('#fechaDesde, #fechaHasta').on('change', function () { cargarDatos(1, $('#filtroBusqueda').val()); });
+    $('#filtroDocumentado').on('change', function () { cargarDatos(1, $('#filtroBusqueda').val()); });
 
     // Botón recargar
     $('#btnRecargar').on('click', function () {
         $('#filtroBusqueda').val('');
         $('#fechaDesde').val('');
         $('#fechaHasta').val('');
+        $('#filtroDocumentado').val('');
         cargarDatos(1, '');
     });
 
@@ -233,12 +257,16 @@ $(document).ready(function () {
         const query = $('#filtroBusqueda').val();
         const fechaDesde = $('#fechaDesde').val();
         const fechaHasta = $('#fechaHasta').val();
+        const documentado = $('#filtroDocumentado').val();
+
         cargarDatos(page, query);
 
+        // Actualizar URL sin recargar
         let newUrl = url.split('?')[0] + '?page=' + page;
         if(query) newUrl += '&search=' + encodeURIComponent(query);
         if(fechaDesde) newUrl += '&fecha_desde=' + encodeURIComponent(fechaDesde);
         if(fechaHasta) newUrl += '&fecha_hasta=' + encodeURIComponent(fechaHasta);
+        if(documentado) newUrl += '&documentado=' + encodeURIComponent(documentado);
         window.history.pushState("", "", newUrl);
     });
 });
