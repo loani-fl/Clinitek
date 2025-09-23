@@ -136,11 +136,16 @@
                 <p class="feature-desc">Laboratorio clínico con tecnología avanzada para diagnósticos rápidos y confiables.</p>
             </article>
 
-            <article class="feature-card">
-                <i class="bi bi-hospital feature-icon" title="Área de Emergencia"></i>
-                <h3 class="feature-title">Emergencia</h3>
-                <p class="feature-desc">Atención inmediata y profesional las 24 horas para situaciones críticas y urgentes.</p>
-            </article>
+           <a href="{{ route('emergencias.index') }}" style="text-decoration: none; color: inherit;">
+    <article class="feature-card">
+        <i class="bi bi-hospital feature-icon" title="Área de Emergencia"></i>
+        <h3 class="feature-title">Emergencia</h3>
+        <p class="feature-desc">
+            Atención inmediata y profesional las 24 horas para situaciones críticas y urgentes.
+        </p>
+    </article>
+</a>
+
 
          <a href="{{ route('rayosx.index') }}" style="text-decoration: none; color: inherit;">
     <article class="feature-card" role="button" aria-label="Abrir formulario de Orden de Rayos X">
