@@ -52,24 +52,121 @@ class FarmaciaController extends Controller
     public function create()
     {
         $ciudadesPorDepartamento = [
-            "Atlántida" => ["La Ceiba", "Tela", "Jutiapa"],
-            "Choluteca" => ["Choluteca", "El Triunfo", "San Marcos de Colón"],
-            "Colón" => ["Trujillo", "Tocoa", "Sabá"],
-            "Comayagua" => ["Comayagua", "Siguatepeque", "La Libertad"],
-            "Copán" => ["Santa Rosa de Copán", "La Entrada"],
-            "Cortés" => ["San Pedro Sula", "Puerto Cortés", "La Lima", "Choloma", "Villanueva"],
-            "El Paraíso" => ["Yuscarán", "Danlí", "El Paraiso"],
-            "Francisco Morazán" => ["Tegucigalpa", "Valle de Ángeles", "Santa Lucía"],
-            "Gracias a Dios" => ["Puerto Lempira"],
-            "Intibucá" => ["La Esperanza", "Intibucá"],
-            "Islas de la Bahía" => ["Roatán", "Utila", "Guanaja"],
-            "La Paz" => ["La Paz", "Marcala"],
-            "Lempira" => ["Gracias", "Erandique"],
-            "Ocotepeque" => ["Nueva Ocotepeque"],
-            "Olancho" => ["Juticalpa", "Catacamas"],
-            "Santa Bárbara" => ["Santa Bárbara", "Trinidad", "Gualala"],
-            "Valle" => ["Nacaome", "San Lorenzo"],
-            "Yoro" => ["Yoro", "El Progreso", "Olanchito"]
+            "Atlántida" => [
+                "La Ceiba", "El Porvenir", "Tela", "Jutiapa",
+                "La Masica", "San Francisco", "Arizona", "Esparta"
+            ],
+            "Choluteca" => [
+                "Choluteca", "Apacilagua", "Concepción de María", "Duyure",
+                "El Corpus", "El Triunfo", "Marcovia", "Morolica",
+                "Namasigüe", "Orocuina", "Pespire", "San Antonio de Flores",
+                "San Isidro", "San José", "San Marcos de Colón", "Santa Ana de Yusguare"
+            ],
+            "Colón" => [
+                "Trujillo", "Balfate", "Iriona", "Limón",
+                "Sabá", "Santa Fe", "Santa Rosa de Aguán", "Sonaguera",
+                "Tocoa", "Bonito Oriental"
+            ],
+            "Comayagua" => [
+                "Comayagua", "Ajuterique", "El Rosario", "Esquías",
+                "Humuya", "La Libertad", "Lamaní", "La Trinidad",
+                "Lejamaní", "Meámbar", "Minas de Oro", "Ojos de Agua",
+                "San Jerónimo", "San José de Comayagua", "San José del Potrero",
+                "San Luis"
+            ],
+            "Copán" => [
+                "Santa Rosa de Copán", "Cabañas", "Concepción", "Copán Ruinas",
+                "Corquín", "Cucuyagua", "Dolores", "Dulce Nombre",
+                "El Paraíso", "Florida", "La Jigua", "La Unión",
+                "Nueva Arcadia", "San Agustín", "San Antonio", "San Jerónimo",
+                "San José", "San Juan de Opoa", "San Nicolás", "San Pedro",
+                "Santa Rita", "Trinidad", "Veracruz"
+            ],
+            "Cortés" => [
+                "San Pedro Sula", "Choloma", "Omoa", "Pimienta",
+                "Potrerillos", "Puerto Cortés", "San Antonio de Cortés",
+                "San Francisco de Yojoa", "San Manuel", "Santa Cruz de Yojoa",
+                "Villanueva", "La Lima"
+            ],
+            "El Paraíso" => [
+                "Yuscarán", "Alauca", "Danlí", "El Paraíso",
+                "Güinope", "Jacaleapa", "Liure", "Morocelí",
+                "Oropolí", "Potrerillos", "San Antonio de Flores",
+                "San Lucas", "San Matías", "Soledad", "Teupasenti",
+                "Texiguat", "Trojes", "Vado Ancho", "Yauyupe"
+            ],
+            "Francisco Morazán" => [
+                "Tegucigalpa (Distrito Central)", "Alubarén", "Cedros",
+                "Curarén", "El Porvenir", "Guaimaca", "La Libertad",
+                "La Venta", "Lepaterique", "Maraita", "Marale",
+                "Nueva Armenia", "Ojojona", "Orica", "Reitoca",
+                "Sabanagrande", "San Antonio de Oriente", "San Buenaventura",
+                "San Ignacio", "San Juan de Flores (Cantarranas)",
+                "San Miguelito", "Santa Ana", "Santa Lucía",
+                "Talanga", "Tatumbla", "Valle de Ángeles", "Villa de San Francisco",
+                "Vallecillo"
+            ],
+            "Gracias a Dios" => [
+                "Puerto Lempira", "Brus Laguna", "Ahuas", "Juan Francisco Bulnes",
+                "Villeda Morales", "Wampusirpe"
+            ],
+            "Intibucá" => [
+                "La Esperanza", "Camasca", "Colomoncagua", "Concepción",
+                "Dolores", "Intibucá", "Jesús de Otoro", "Magdalena",
+                "Masaguara", "San Antonio", "San Isidro", "San Juan de Flores",
+                "San Marcos de la Sierra", "San Miguel Guancapla", "Santa Lucía",
+                "Yamaranguila", "San Francisco Opalaca"
+            ],
+            "Islas de la Bahía" => [
+                "Roatán", "Guanaja", "José Santos Guardiola", "Utila"
+            ],
+            "La Paz" => [
+                "La Paz", "Aguanqueterique", "Cabañas", "Cane",
+                "Chinacla", "Guajiquiro", "Lauterique", "Marcala",
+                "Mercedes de Oriente", "Opatoro", "San Antonio del Norte",
+                "San José", "San Juan", "San Pedro de Tutule",
+                "Santa Ana", "Santa Elena", "Santa María", "Santiago de Puringla",
+                "Yarula"
+            ],
+            "Lempira" => [
+                "Gracias", "Belén", "Candelaria", "Cololaca", "Erandique",
+                "Gualcince", "Guarita", "La Campa", "La Iguala", "La Unión",
+                "La Virtud", "Las Flores", "Lepaera", "Mapulaca", "Piraera",
+                "San Andrés", "San Francisco", "San Juan Guarita",
+                "San Manuel Colohete", "San Rafael", "San Sebastián",
+                "Santa Cruz", "Talgua", "Tambla", "Tomalá",
+                "Valladolid", "Virginia", "San Marcos de Caiquín"
+            ],
+            "Ocotepeque" => [
+                "Nueva Ocotepeque", "Belén Gualcho", "Concepción", "Dolores Merendón",
+                "Fraternidad", "La Encarnación", "La Labor", "Lucerna",
+                "Mercedes", "San Fernando", "San Francisco del Valle",
+                "San Jorge", "San Marcos", "Santa Fe", "Sensenti", "Sinuapa"
+            ],
+            "Olancho" => [
+                "Juticalpa", "Campamento", "Catacamas", "Concordia",
+                "Dulce Nombre de Culmí", "El Rosario", "Esquipulas del Norte", "Gualaco",
+                "Guarizama", "Guata", "Guayape", "Jano", "La Unión", "Mangulile",
+                "Manto", "Salamá", "San Esteban", "San Francisco de Becerra",
+                "San Francisco de la Paz", "Santa María del Real", "Silca", "Yocón"
+            ],
+            "Santa Bárbara" => [
+                "Santa Bárbara", "Arada", "Atima", "Azacualpa", "Ceguaca",
+                "Colinas", "Concepción del Norte", "Concepción del Sur",
+                "Chinda", "El Níspero", "Gualala", "Ilama", "Macuelizo",
+                "Naranjito", "Nueva Celilac", "Petoa", "Protección", "Quimistán",
+                "San Francisco de Ojuera", "San Luis", "San Marcos", "San Nicolás",
+                "San Pedro Zacapa", "Santa Rita", "San Vicente Centenario",
+                "Trinidad", "Las Vegas", "Nueva Frontera"
+            ],
+            "Valle" => [
+                "Nacaome", "Alianza", "Amapala", "Aramecina", "Caridad",
+                "Goascorán", "Langue", "San Francisco de Coray", "San Lorenzo"
+            ],
+            "Yoro" => [
+                "Yoro", "Arenal", "El Negrito", "El Progreso", "Olanchito",
+                "Santa Rita", "Sulaco", "Victoria", "Yorito", "Jocon", "Morazán"
+            ]
         ];
         return view('farmacias.create', compact('ciudadesPorDepartamento'));
     }
@@ -236,24 +333,121 @@ class FarmaciaController extends Controller
             'Santa Bárbara', 'Valle', 'Yoro'
         ];
         $ciudad = [
-            'Atlántida' => ['La Ceiba', 'Tela', 'Jutiapa'],
-            'Choluteca' => ['Choluteca', 'San Marcos de Colón'],
-            'Colón' => ['Trujillo', 'Tocoa'],
-            'Comayagua' => ['Comayagua', 'Siguatepeque'],
-            'Copán' => ['Santa Rosa de Copán', 'La Entrada'],
-            'Cortés' => ['San Pedro Sula', 'Puerto Cortés', 'La Lima'],
-            'El Paraíso' => ['Yuscarán', 'Danlí', 'El Paraiso'],
-            'Francisco Morazán' => ['Tegucigalpa', 'Valle de Ángeles', 'Santa Lucía'],
-            'Gracias a Dios' => ['Puerto Lempira'],
-            'Intibucá' => ['La Esperanza', 'Intibucá'],
-            'Islas de la Bahía' => ['Roatán', 'Utila'],
-            'La Paz' => ['La Paz', 'Marcala'],
-            'Lempira' => ['Gracias', 'La Campa'],
-            'Ocotepeque' => ['Ocotepeque', 'San Marcos'],
-            'Olancho' => ['Juticalpa', 'Catacamas'],
-            'Santa Bárbara' => ['Santa Bárbara', 'Trinidad'],
-            'Valle' => ['Nacaome', 'San Lorenzo'],
-            'Yoro' => ['Yoro', 'El Progreso']
+            "Atlántida" => [
+                "La Ceiba", "El Porvenir", "Tela", "Jutiapa",
+                "La Masica", "San Francisco", "Arizona", "Esparta"
+            ],
+            "Choluteca" => [
+                "Choluteca", "Apacilagua", "Concepción de María", "Duyure",
+                "El Corpus", "El Triunfo", "Marcovia", "Morolica",
+                "Namasigüe", "Orocuina", "Pespire", "San Antonio de Flores",
+                "San Isidro", "San José", "San Marcos de Colón", "Santa Ana de Yusguare"
+            ],
+            "Colón" => [
+                "Trujillo", "Balfate", "Iriona", "Limón",
+                "Sabá", "Santa Fe", "Santa Rosa de Aguán", "Sonaguera",
+                "Tocoa", "Bonito Oriental"
+            ],
+            "Comayagua" => [
+                "Comayagua", "Ajuterique", "El Rosario", "Esquías",
+                "Humuya", "La Libertad", "Lamaní", "La Trinidad",
+                "Lejamaní", "Meámbar", "Minas de Oro", "Ojos de Agua",
+                "San Jerónimo", "San José de Comayagua", "San José del Potrero",
+                "San Luis"
+            ],
+            "Copán" => [
+                "Santa Rosa de Copán", "Cabañas", "Concepción", "Copán Ruinas",
+                "Corquín", "Cucuyagua", "Dolores", "Dulce Nombre",
+                "El Paraíso", "Florida", "La Jigua", "La Unión",
+                "Nueva Arcadia", "San Agustín", "San Antonio", "San Jerónimo",
+                "San José", "San Juan de Opoa", "San Nicolás", "San Pedro",
+                "Santa Rita", "Trinidad", "Veracruz"
+            ],
+            "Cortés" => [
+                "San Pedro Sula", "Choloma", "Omoa", "Pimienta",
+                "Potrerillos", "Puerto Cortés", "San Antonio de Cortés",
+                "San Francisco de Yojoa", "San Manuel", "Santa Cruz de Yojoa",
+                "Villanueva", "La Lima"
+            ],
+            "El Paraíso" => [
+                "Yuscarán", "Alauca", "Danlí", "El Paraíso",
+                "Güinope", "Jacaleapa", "Liure", "Morocelí",
+                "Oropolí", "Potrerillos", "San Antonio de Flores",
+                "San Lucas", "San Matías", "Soledad", "Teupasenti",
+                "Texiguat", "Trojes", "Vado Ancho", "Yauyupe"
+            ],
+            "Francisco Morazán" => [
+                "Tegucigalpa (Distrito Central)", "Alubarén", "Cedros",
+                "Curarén", "El Porvenir", "Guaimaca", "La Libertad",
+                "La Venta", "Lepaterique", "Maraita", "Marale",
+                "Nueva Armenia", "Ojojona", "Orica", "Reitoca",
+                "Sabanagrande", "San Antonio de Oriente", "San Buenaventura",
+                "San Ignacio", "San Juan de Flores (Cantarranas)",
+                "San Miguelito", "Santa Ana", "Santa Lucía",
+                "Talanga", "Tatumbla", "Valle de Ángeles", "Villa de San Francisco",
+                "Vallecillo"
+            ],
+            "Gracias a Dios" => [
+                "Puerto Lempira", "Brus Laguna", "Ahuas", "Juan Francisco Bulnes",
+                "Villeda Morales", "Wampusirpe"
+            ],
+            "Intibucá" => [
+                "La Esperanza", "Camasca", "Colomoncagua", "Concepción",
+                "Dolores", "Intibucá", "Jesús de Otoro", "Magdalena",
+                "Masaguara", "San Antonio", "San Isidro", "San Juan de Flores",
+                "San Marcos de la Sierra", "San Miguel Guancapla", "Santa Lucía",
+                "Yamaranguila", "San Francisco Opalaca"
+            ],
+            "Islas de la Bahía" => [
+                "Roatán", "Guanaja", "José Santos Guardiola", "Utila"
+            ],
+            "La Paz" => [
+                "La Paz", "Aguanqueterique", "Cabañas", "Cane",
+                "Chinacla", "Guajiquiro", "Lauterique", "Marcala",
+                "Mercedes de Oriente", "Opatoro", "San Antonio del Norte",
+                "San José", "San Juan", "San Pedro de Tutule",
+                "Santa Ana", "Santa Elena", "Santa María", "Santiago de Puringla",
+                "Yarula"
+            ],
+            "Lempira" => [
+                "Gracias", "Belén", "Candelaria", "Cololaca", "Erandique",
+                "Gualcince", "Guarita", "La Campa", "La Iguala", "La Unión",
+                "La Virtud", "Las Flores", "Lepaera", "Mapulaca", "Piraera",
+                "San Andrés", "San Francisco", "San Juan Guarita",
+                "San Manuel Colohete", "San Rafael", "San Sebastián",
+                "Santa Cruz", "Talgua", "Tambla", "Tomalá",
+                "Valladolid", "Virginia", "San Marcos de Caiquín"
+            ],
+            "Ocotepeque" => [
+                "Nueva Ocotepeque", "Belén Gualcho", "Concepción", "Dolores Merendón",
+                "Fraternidad", "La Encarnación", "La Labor", "Lucerna",
+                "Mercedes", "San Fernando", "San Francisco del Valle",
+                "San Jorge", "San Marcos", "Santa Fe", "Sensenti", "Sinuapa"
+            ],
+            "Olancho" => [
+                "Juticalpa", "Campamento", "Catacamas", "Concordia",
+                "Dulce Nombre de Culmí", "El Rosario", "Esquipulas del Norte", "Gualaco",
+                "Guarizama", "Guata", "Guayape", "Jano", "La Unión", "Mangulile",
+                "Manto", "Salamá", "San Esteban", "San Francisco de Becerra",
+                "San Francisco de la Paz", "Santa María del Real", "Silca", "Yocón"
+            ],
+            "Santa Bárbara" => [
+                "Santa Bárbara", "Arada", "Atima", "Azacualpa", "Ceguaca",
+                "Colinas", "Concepción del Norte", "Concepción del Sur",
+                "Chinda", "El Níspero", "Gualala", "Ilama", "Macuelizo",
+                "Naranjito", "Nueva Celilac", "Petoa", "Protección", "Quimistán",
+                "San Francisco de Ojuera", "San Luis", "San Marcos", "San Nicolás",
+                "San Pedro Zacapa", "Santa Rita", "San Vicente Centenario",
+                "Trinidad", "Las Vegas", "Nueva Frontera"
+            ],
+            "Valle" => [
+                "Nacaome", "Alianza", "Amapala", "Aramecina", "Caridad",
+                "Goascorán", "Langue", "San Francisco de Coray", "San Lorenzo"
+            ],
+            "Yoro" => [
+                "Yoro", "Arenal", "El Negrito", "El Progreso", "Olanchito",
+                "Santa Rita", "Sulaco", "Victoria", "Yorito", "Jocon", "Morazán"
+            ]
         ];
 
         return view('farmacias.edit', compact('farmacia', 'departamento', 'ciudad'));

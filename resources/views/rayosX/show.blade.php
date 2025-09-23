@@ -18,6 +18,7 @@
         border-radius: 1.5rem;
         padding: 2rem 2.5rem;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        position: relative;
     }
 
     .section-title {
@@ -27,6 +28,37 @@
         border-bottom: 3px solid #007BFF;
         padding-bottom: 0.3rem;
         margin-bottom: 1rem;
+    }
+
+    /* Header con botón */
+    .header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .header-flex h2 {
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #003366;
+        border-bottom: 3px solid #007BFF;
+        padding-bottom: 0.3rem;
+    }
+
+    /* Estilo del botón imprimir */
+    .btn-imprimir {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #000;
+        font-weight: 600;
+    }
+    
+    .btn-imprimir:hover {
+        background-color: #ffb700;
+        border-color: #ffb700;
+        color: #000;
     }
 
     h4 {
@@ -188,10 +220,228 @@
     font-size: 0.9rem;
 }
 
+    /* Estilos para impresión - Adaptados para análisis de rayos X */
+    @media print {
+        /* Ocultar elementos innecesarios */
+        .btn-imprimir,
+        .mt-4.text-center,
+        .modal,
+        .modal-nav {
+            display: none !important;
+        }
+        
+        /* Configuración básica */
+        @page {
+            margin: 2cm;
+            size: A4;
+        }
+        
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            font-family: Arial, sans-serif !important;
+            font-size: 11pt !important;
+            line-height: 1.4 !important;
+            color: #000 !important;
+            background: white !important;
+        }
+        
+        .custom-card {
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            background: white !important;
+        }
+        
+        /* Header elegante */
+        .header-flex {
+            background: #003366 !important;
+            color: white !important;
+            padding: 20px !important;
+            text-align: center !important;
+            margin-bottom: 25px !important;
+            border-radius: 8px !important;
+            -webkit-print-color-adjust: exact;
+            justify-content: center !important;
+        }
+        
+        .header-flex h2, .section-title {
+            font-size: 22pt !important;
+            font-weight: bold !important;
+            margin: 0 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            color: white !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+        
+        /* Información de la clínica en el header */
+        .header-flex::before {
+            content: "CLINITEK - ANÁLISIS DE RAYOS X";
+            display: block;
+            font-size: 10pt;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+        
+        /* Títulos de sección mejorados */
+        h4 {
+            background: #f0f8ff !important;
+            color: #003366 !important;
+            padding: 12px 15px !important;
+            margin: 20px 0 15px 0 !important;
+            border-left: 4px solid #003366 !important;
+            font-size: 14pt !important;
+            font-weight: bold !important;
+            text-transform: uppercase !important;
+            -webkit-print-color-adjust: exact;
+            page-break-after: avoid;
+        }
+        
+        /* Datos del paciente */
+        .datos-paciente-flex {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px !important;
+            margin-bottom: 20px !important;
+            padding: 0 !important;
+        }
+        
+        .datos-paciente-flex li {
+            background: #f8f9fa !important;
+            padding: 10px !important;
+            border-radius: 4px !important;
+            border-left: 2px solid #003366 !important;
+            font-size: 10pt !important;
+            border-bottom: none !important;
+            -webkit-print-color-adjust: exact;
+            display: block !important;
+        }
+        
+        .datos-paciente-flex li strong {
+            color: #003366 !important;
+            font-weight: bold !important;
+            font-size: 9pt !important;
+            text-transform: uppercase !important;
+            display: block !important;
+            margin-bottom: 3px !important;
+            width: auto !important;
+        }
+        
+        /* Información del médico analista */
+        h4 + p {
+            background: #f8f9fa !important;
+            padding: 10px 15px !important;
+            border-radius: 4px !important;
+            border-left: 2px solid #003366 !important;
+            font-size: 11pt !important;
+            font-weight: bold !important;
+            -webkit-print-color-adjust: exact;
+        }
+        
+        /* Tarjetas de exámenes */
+        .examen-card {
+            background: white !important;
+            border: 1px solid #dee2e6 !important;
+            border-radius: 8px !important;
+            padding: 20px !important;
+            margin-bottom: 25px !important;
+            border-bottom: 3px solid #007BFF !important;
+            -webkit-print-color-adjust: exact;
+            page-break-inside: avoid;
+        }
+        
+        .examen-nombre {
+            background: #007BFF !important;
+            color: white !important;
+            padding: 10px 15px !important;
+            margin: -20px -20px 15px -20px !important;
+            border-radius: 8px 8px 0 0 !important;
+            font-size: 14pt !important;
+            text-align: center !important;
+            -webkit-print-color-adjust: exact;
+        }
+        
+        /* Galería de imágenes para impresión */
+        .img-gallery {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 15px !important;
+            margin-top: 15px !important;
+        }
+        
+        .img-card {
+            background: white !important;
+            border: 1px solid #dee2e6 !important;
+            border-radius: 6px !important;
+            padding: 10px !important;
+            page-break-inside: avoid;
+            transform: none !important;
+            transition: none !important;
+            cursor: default !important;
+            flex: none !important;
+            max-width: none !important;
+        }
+        
+        .img-preview {
+            width: 100% !important;
+            height: auto !important;
+            max-height: 200px !important;
+            object-fit: contain !important;
+            border: 1px solid #dee2e6 !important;
+            border-radius: 4px !important;
+        }
+        
+        .img-description {
+            font-size: 9pt !important;
+            color: #555 !important;
+            margin-top: 8px !important;
+            text-align: center !important;
+            line-height: 1.2 !important;
+        }
+        
+        /* Texto informativo si no hay imágenes */
+        .examen-card p {
+            font-size: 10pt !important;
+            color: #666 !important;
+            font-style: italic !important;
+            text-align: center !important;
+            margin: 10px 0 !important;
+        }
+        
+        /* Primera sección */
+        h4:first-of-type {
+            margin-top: 5px !important;
+        }
+        
+        /* Footer */
+        .custom-card::after {
+            content: "Análisis generado por Sistema Clinitek";
+            display: block;
+            margin-top: 25px;
+            padding-top: 10px;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            font-size: 8pt;
+            color: #6c757d;
+            font-style: italic;
+        }
+    }
+
 </style>
 
 <div class="custom-card">
-    <h2 class="section-title">Ver análisis de Rayos X</h2>
+    <!-- Header con título y botón -->
+    <div class="header-flex">
+        <h2>Ver análisis de Rayos X</h2>
+        <!-- Botón Imprimir Reporte -->
+        <button onclick="window.print()" class="btn btn-imprimir btn-sm d-inline-flex align-items-center gap-2 shadow-sm">
+            <i class="fas fa-print"></i> Imprimir Reporte
+        </button>
+    </div>
 
     {{-- Datos del paciente --}}
     <h4>Datos del paciente</h4>

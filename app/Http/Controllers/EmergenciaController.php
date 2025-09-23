@@ -9,7 +9,7 @@ use Illuminate\Validation\Rule;
 
 class EmergenciaController extends Controller
 {
-   
+
 
     public function create()
     {
@@ -250,5 +250,12 @@ public function index(Request $request)
         abort(500, $e->getMessage());
     }
 }
+    public function show($id)
+    {
+        // Buscar el registro de emergencia por ID o lanzar un 404 si no existe
+        $emergencia = Emergencia::findOrFail($id);
 
+        // Pasar el objeto a la vista show
+        return view('emergencias.show', compact('emergencia'));
+    }
 }

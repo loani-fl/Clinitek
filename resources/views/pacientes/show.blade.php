@@ -56,6 +56,273 @@
             border-bottom: 3px solid #0d6efd;
             padding-bottom: 0.25rem;
         }
+
+        /* Estilo del botón imprimir */
+        .btn-imprimir {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #000;
+            font-weight: 600;
+        }
+        
+        .btn-imprimir:hover {
+            background-color: #ffb700;
+            border-color: #ffb700;
+            color: #000;
+        }
+
+        /* Header con botón */
+        .card-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            border-bottom: 4px solid #0d6efd;
+            padding: 0.75rem 1.5rem;
+        }
+
+        .card-header-flex h5 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin: 0;
+            color: #212529;
+        }
+
+        /* Estilos para impresión - Adaptados para expediente médico */
+        @media print {
+            /* Ocultar elementos innecesarios */
+            .dropdown,
+            .btn-imprimir,
+            .text-center.pt-4,
+            .table .btn {
+                display: none !important;
+            }
+            
+            /* Configuración básica */
+            @page {
+                margin: 2cm;
+                size: A4;
+            }
+            
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+                font-family: Arial, sans-serif !important;
+                font-size: 11pt !important;
+                line-height: 1.4 !important;
+                color: #000 !important;
+                background: white !important;
+            }
+            
+            .container {
+                margin: 0 !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+            
+            .custom-card {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+                background: white !important;
+            }
+            
+            /* Header elegante */
+            .card-header, .card-header-flex {
+                background: #0d6efd !important;
+                color: white !important;
+                padding: 20px !important;
+                text-align: center !important;
+                margin-bottom: 25px !important;
+                border-radius: 8px !important;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .card-header h5, .card-header-flex h5 {
+                font-size: 22pt !important;
+                font-weight: bold !important;
+                margin: 0 !important;
+                text-transform: uppercase !important;
+                letter-spacing: 1px !important;
+                color: white !important;
+            }
+            
+            /* Información de la clínica en el header */
+            .card-header::before, .card-header-flex::before {
+                content: "CLINITEK - EXPEDIENTE MÉDICO";
+                display: block;
+                font-size: 10pt;
+                margin-bottom: 5px;
+                opacity: 0.9;
+            }
+            
+            .card-body {
+                padding: 0 !important;
+            }
+            
+            /* Títulos de sección mejorados */
+            .section-title {
+                background: #f0f8ff !important;
+                color: #0d6efd !important;
+                padding: 12px 15px !important;
+                margin: 20px 0 15px 0 !important;
+                border-left: 4px solid #0d6efd !important;
+                font-size: 14pt !important;
+                font-weight: bold !important;
+                text-transform: uppercase !important;
+                -webkit-print-color-adjust: exact;
+                page-break-after: avoid;
+            }
+            
+            /* Datos personales en grid */
+            .row.gy-3 {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px !important;
+                margin-bottom: 20px !important;
+            }
+            
+            .row.gy-3 > div {
+                background: #f8f9fa !important;
+                padding: 10px !important;
+                border-radius: 4px !important;
+                border-left: 2px solid #0d6efd !important;
+                font-size: 10pt !important;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .row.gy-3 > div strong {
+                color: #0d6efd !important;
+                font-weight: bold !important;
+                font-size: 9pt !important;
+                text-transform: uppercase !important;
+                display: block !important;
+                margin-bottom: 3px !important;
+            }
+            
+            /* Contenedores de información médica */
+            .detalle-paciente {
+                display: grid !important;
+                grid-template-columns: 1fr !important;
+                gap: 15px !important;
+                margin-bottom: 25px !important;
+            }
+            
+            .detalle-paciente > div {
+                background: white !important;
+                border: 1px solid #dee2e6 !important;
+                border-radius: 6px !important;
+                padding: 15px !important;
+                border-left: 3px solid #0d6efd !important;
+                -webkit-print-color-adjust: exact;
+                page-break-inside: avoid;
+            }
+            
+            .detalle-paciente > div strong {
+                color: #0d6efd !important;
+                font-weight: bold !important;
+                font-size: 11pt !important;
+                text-transform: uppercase !important;
+                display: block !important;
+                margin-bottom: 8px !important;
+            }
+            
+            .detalle-paciente p {
+                font-size: 10pt !important;
+                line-height: 1.3 !important;
+                margin: 0 !important;
+            }
+            
+            /* Badges mejorados */
+            .badge {
+                padding: 4px 8px !important;
+                border-radius: 12px !important;
+                font-size: 9pt !important;
+                font-weight: bold !important;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .bg-primary {
+                background: #0d6efd !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .bg-warning {
+                background: #ffc107 !important;
+                color: #000 !important;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .bg-info {
+                background: #0dcaf0 !important;
+                color: #000 !important;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            /* Tabla de consultas */
+            .table-responsive {
+                margin-top: 15px !important;
+            }
+            
+            .table {
+                font-size: 9pt !important;
+                width: 100% !important;
+                border-collapse: collapse !important;
+            }
+            
+            .table th, .table td {
+                border: 1px solid #dee2e6 !important;
+                padding: 8px !important;
+                text-align: center !important;
+            }
+            
+            .table-primary th {
+                background: #b6d7ff !important;
+                color: #000 !important;
+                font-weight: bold !important;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            /* Ocultar botones de la tabla */
+            .table .btn, .table .bi {
+                display: none !important;
+            }
+            
+            /* Mostrar solo texto en las celdas de opciones */
+            .table td:last-child::after {
+                content: "Ver en sistema";
+                font-size: 8pt;
+                color: #6c757d;
+                font-style: italic;
+            }
+            
+            /* Logo de fondo muy sutil */
+            .custom-card::before {
+                opacity: 0.02 !important;
+            }
+            
+            /* Primera sección */
+            .section-title:first-of-type {
+                margin-top: 5px !important;
+            }
+            
+            /* Footer simple */
+            .card-body::after {
+                content: "Expediente generado por Sistema Clinitek";
+                display: block;
+                margin-top: 25px;
+                padding-top: 10px;
+                border-top: 1px solid #dee2e6;
+                text-align: center;
+                font-size: 8pt;
+                color: #6c757d;
+                font-style: italic;
+            }
+        }
     </style>
 
     {{-- Menú desplegable estilo Bootstrap --}}
@@ -73,10 +340,14 @@
     <!-- Contenedor principal -->
     <div class="container mt-5 pt-3" style="max-width: 1000px;">
         <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100 mt-4">
-            <div class="card-header py-2 px-3" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-                <h5 class="mb-0 fw-bold text-dark text-center" style="font-size: 2.25rem;">Expediente médico</h5>
+            <!-- Header con título y botón -->
+            <div class="card-header-flex">
+                <h5>Expediente médico</h5>
+                <!-- Botón Imprimir Reporte -->
+                <button onclick="window.print()" class="btn btn-imprimir btn-sm d-inline-flex align-items-center gap-2 shadow-sm">
+                    <i class="fas fa-print"></i> Imprimir Reporte
+                </button>
             </div>
-
 
             <div class="card-body px-4 py-3">
 
@@ -128,13 +399,7 @@
                         <strong>Historial Quirúrgico:</strong><br>
                         <p class="text-break" style="white-space: pre-line;">{!! nl2br(e($paciente->historial_quirurgico ?? 'No especificado')) !!}</p>
                     </div>
-
-
                 </div>
-
-
-
-
 
             </div>
 
@@ -159,7 +424,6 @@
                                 <td>{{ \Carbon\Carbon::parse($consulta->fecha)->format('d/m/Y') }}</td>
                                 <td>{{ $consulta->medico->nombre ?? 'Sin asignar' }}</td>
                                 <td>
-                                    <!-- Ver Diagnóstico -->
                                     <!-- Ver Diagnóstico -->
                                     <a href="{{ $consulta->diagnostico ? route('diagnosticos.show', ['diagnostico' => $consulta->diagnostico->id, 'origen' => 'pacientes.show', 'paciente_id' => $paciente->id]) : '#' }}"
                                        class="btn btn-sm btn-outline-primary shadow-sm"
