@@ -135,7 +135,6 @@
                                 </div>
                             </div>
 
-                            {{-- Motivo y Dirección en la misma fila para ahorrar espacio --}}
                             <div class="col-md-6 info-block">
                                 <span class="info-label">Motivo de la Emergencia:</span>
                                 <div class="info-value" style="white-space: pre-line;">{{ $emergencia->motivo ?: 'Sin motivo registrado.' }}</div>
@@ -168,12 +167,20 @@
                     </div>
                 </div>
 
+                @php
+$paciente = \App\Models\Paciente::where('identidad', $emergencia->identidad)->first();
+@endphp
+
+
+
+                <!-- Botones de acción -->
                 <div class="text-center pt-3">
                     <a href="{{ route('emergencias.index') }}"
                        class="btn btn-success btn-sm px-4 shadow-sm"
                        style="font-size: 0.95rem;">
                         ← Regresar
                     </a>
+
                     <button type="button"
                             class="btn btn-primary btn-sm px-4 shadow-sm"
                             style="font-size: 0.95rem;"
@@ -181,11 +188,22 @@
                             data-bs-target="#historialModal">
                         Ver Historial
                     </button>
+
+                    <a href="{{ route('hospitalizacion.create', ['emergencia_id' => $emergencia->id]) }}"
+                        class="btn btn-warning btn-sm px-4 shadow-sm"
+                        style="font-size: 0.95rem;">
+                            Transferir a Hospitalización
+                    </a>
+
+
+
+
+
+
                 </div>
             </div>
         </div>
     </div>
-
 
     <!-- Modal Historial -->
     <div class="modal fade" id="historialModal" tabindex="-1" aria-labelledby="historialModalLabel" aria-hidden="true">
@@ -242,6 +260,7 @@
             </div>
         </div>
     </div>
+
     @if($mostrarFoto)
         <!-- Modal para ampliar imagen -->
         <div class="modal fade" id="fotoModal" tabindex="-1" aria-hidden="true">
@@ -252,13 +271,10 @@
                              alt="Foto del paciente"
                              style="max-width:550px; max-height:550px; object-fit:contain; cursor:pointer;"
                              id="imagenGrande">
-
                     </div>
                 </div>
             </div>
         </div>
-
-
 
         <script>
             document.addEventListener('DOMContentLoaded', () => {

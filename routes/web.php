@@ -262,3 +262,15 @@ Route::get('/emergencias', [EmergenciaController::class, 'index'])->name('emerge
 Route::get('/emergencias/create', [EmergenciaController::class, 'create'])->name('emergencias.create');
 Route::post('/emergencias/store', [EmergenciaController::class, 'store'])->name('emergencias.store');
 Route::get('/emergencias/{id}', [EmergenciaController::class, 'show'])->name('emergencias.show');
+
+
+//Hospitalizacion 
+use App\Http\Controllers\HospitalizacionController;
+Route::get('/hospitalizacion/transferir/{emergencia_id}', [HospitalizacionController::class, 'create'])
+     ->name('hospitalizacion.create');
+
+Route::post('/hospitalizacion/store', [HospitalizacionController::class, 'store'])
+     ->name('hospitalizacion.store');
+     
+ Route::get('/hospitalizaciones', [HospitalizacionController::class, 'index'])->name('hospitalizacion.index');
+
