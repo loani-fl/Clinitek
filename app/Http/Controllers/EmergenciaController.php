@@ -34,7 +34,7 @@ public function store(Request $request)
 'identidad' => $documentado ? [
     'required',
     'digits:13',
-    'unique:emergencias,identidad',
+
     function ($attribute, $value, $fail) use ($anioActual, &$request) {
         $departamentosMunicipios = [
             '01' => 8, '02' => 10, '03' => 21, '04' => 23, '05' => 12,
@@ -79,7 +79,7 @@ public function store(Request $request)
 
         // Teléfono avanzado
         'telefono' => $documentado ? [
-            'required', 'digits:8', 'regex:/^[2389][0-9]{7}$/', 'unique:emergencias,telefono'
+            'required', 'digits:8', 'regex:/^[2389][0-9]{7}$/',
         ] : 'nullable',
 
         // Foto
