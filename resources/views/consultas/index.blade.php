@@ -234,7 +234,7 @@
 
     {{-- Diagnóstico --}}
     @if ($consulta->diagnostico)
-        <a href="{{ route('diagnosticos.edit', $consulta->diagnostico->id) }}" class="dropdown-item">
+        <a href="{{ route('diagnosticos.show', $consulta->diagnostico->id) }}" class="dropdown-item">
             <i class="bi bi-journal-text"></i> Ver Diagnóstico
         </a>
     @else

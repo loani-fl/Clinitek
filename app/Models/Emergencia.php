@@ -32,5 +32,13 @@ class Emergencia extends Model
     protected $casts = [
         'documentado' => 'boolean', // <-- hace que documentado sea booleano
     ];
+
+    
+    public function paciente()
+    {
+        return $this->belongsTo(Paciente::class, 'paciente_id');
+    }
+    
+
 }
 
