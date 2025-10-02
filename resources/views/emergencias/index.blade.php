@@ -11,7 +11,7 @@
         overflow-x: hidden;
     }
     .content-wrapper {
-        margin-top: 50px;
+        margin-top: 8px;
         margin-left: auto;
         margin-right: auto;
         padding: 1rem;

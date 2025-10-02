@@ -1,267 +1,463 @@
-quiero que los signos vitales tengan mensajes emergentes asi como los demas campos @extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
+
 <style>
-    body { background-color: #e8f4fc; margin: 0; padding: 0; }
-    .content-wrapper { margin-top: 60px; max-width: 900px; margin-left:auto; margin-right:auto; padding:1rem; position: relative; }
-    .custom-card::before {
-        content: "";
-        position: absolute;
-        top: 50%; left: 50%;
-        width: 800px; height: 800px;
-        background-image: url('{{ asset("images/logo2.jpg") }}');
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        opacity: 0.15;
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-        z-index: 0;
-    }
-    .custom-card { background-color:#fff; border-radius:1.5rem; padding:2rem; overflow:hidden; position: relative; z-index:1; }
-    .card-header { background-color: transparent; border-bottom: 3px solid #007BFF; text-align:center; margin-bottom:1rem; padding:0.5rem 0; }
-    .card-header h2 { font-size:2rem; font-weight:bold; color:#000; margin:0; }
-    label { font-size:0.85rem; font-weight:600; color:#003366; }
-    input, select, textarea { font-size:0.85rem !important; }
-    .row { display: flex; flex-wrap: wrap; margin-left: -0.5rem; margin-right: -0.5rem; }
-    .row > div { padding-left: 0.5rem; padding-right: 0.5rem; margin-bottom: 1rem; }
-    .col-4th { flex: 0 0 25%; max-width: 25%; }
-    .col-half { flex: 0 0 50%; max-width: 50%; }
-    .align-items-end { align-items: flex-end; }
-    .btn { font-size:0.9rem; }
-    .custom-radio { display:flex; align-items:center; gap:0.5rem; font-size:1rem; font-weight:600; color:#003366; cursor:pointer; }
-    .custom-radio input[type="radio"] { appearance:none; -webkit-appearance:none; width:18px; height:18px; border:2px solid #003366; border-radius:4px; position: relative; cursor:pointer; }
-    .custom-radio input[type="radio"]:checked::after { content:"✖"; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:14px; color:#003366; }
-    .radio-group { display:flex; gap:2rem; margin-bottom:1.5rem; }
-    .text-danger { font-size:0.75rem; margin-top:0.25rem; display:block; }
-    /* Campos indocumentado alineados */
-    #indocFields { display: none; }
-    #indocFields .col-4th { flex: 0 0 33.33%; max-width: 33.33%; }
-
-
-    /* Campos indocumentado alineados */
-#indocFields { display: none; }
-
-/* Foto más grande y ocupa más espacio */
-#indocFields .col-4th:first-child { flex: 0 0 50%; max-width: 50%; }
-
-/* Fecha y hora más pequeños */
-#indocFields .col-4th:nth-child(2),
-#indocFields .col-4th:nth-child(3) { 
-    flex: 0 0 25%; 
-    max-width: 25%; 
+.custom-card {
+    max-width: 1000px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid #91cfff;
+    border-radius: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    margin: 2rem auto;
+    padding: 2rem;
+    box-shadow: 0 0 15px rgba(0,123,255,0.25);
+    z-index: 1;
+    min-height: 600px;
 }
 
-#indocFields label { 
-    font-size: 0.75rem; /* Más pequeño para fecha y hora */
+.custom-card::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 800px;
+    height: 800px;
+    background-image: url('/images/logo2.jpg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.15;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 0;
 }
 
-#indocFields .col-4th:first-child label { 
-    font-size: 0.85rem; /* Mantener un poco más grande para foto */
+input.is-invalid, textarea.is-invalid, select.is-invalid {
+    border-color: red;
+}
+
+.invalid-feedback {
+    display: block;
+}
+
+.alert-custom {
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.lista-resultados {
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ced4da;
+    border-top: none;
+    border-radius: 0 0 0.375rem 0.375rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-height: 280px;
+    overflow-y: auto;
+    width: 100%;
+    margin-top: 0;
+}
+
+.resultado-item {
+    padding: 0.875rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f3f5;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.resultado-item:hover {
+    background: linear-gradient(to right, #e3f2fd, #f8f9fa);
+    border-left: 3px solid #007BFF;
+    padding-left: calc(1rem - 3px);
+}
+
+.resultado-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 0.375rem 0.375rem;
+}
+
+.resultado-info {
+    flex-grow: 1;
+}
+
+.resultado-nombre {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+}
+
+.resultado-identidad {
+    font-size: 0.875rem;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.resultado-icono {
+    color: #007BFF;
+    font-size: 1.25rem;
+}
+
+.no-resultados {
+    padding: 1.5rem;
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.form-control-lg {
+    height: calc(3rem + 2px);
+    font-size: 1rem;
+    border: 2px solid #ced4da;
+    transition: all 0.3s ease;
+}
+
+.form-control-lg:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+}
+
+.form-control:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
 }
 </style>
 
-<div class="content-wrapper">
-    <div class="card custom-card">
-        <div class="card-header">
-            <h2>Registro de Emergencias</h2>
+<div class="custom-card">
+    <div class="mb-4 text-center" style="border-bottom: 3px solid #007BFF;">
+        <h2 class="fw-bold text-black mb-0">Registro de Emergencia</h2>
+    </div>
+
+    @php
+        $docFieldsVisible = old('documentado', 1) == 1;
+    @endphp
+
+    <form id="formEmergencia" action="{{ route('emergencias.store') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+
+        {{-- Radio Documentado / Indocumentado --}}
+        <div class="mb-4 d-flex gap-3">
+            <label>
+                <input type="radio" name="documentado" value="1" {{ $docFieldsVisible ? 'checked' : '' }} onclick="toggleDocs()"> Documentado
+            </label>
+            <label>
+                <input type="radio" name="documentado" value="0" {{ !$docFieldsVisible ? 'checked' : '' }} onclick="toggleDocs()"> Indocumentado
+            </label>
         </div>
 
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-
-        <form action="{{ route('emergencias.store') }}" method="POST" enctype="multipart/form-data" id="emergenciaForm">
-            @csrf
-
-            <div class="radio-group">
-                <label class="custom-radio">
-                    <input type="radio" name="documentado" value="1" {{ old('documentado', '1') == '1' ? 'checked' : '' }} onclick="toggleDocs()"><span>Documentado</span>
-                </label>
-                <label class="custom-radio">
-                    <input type="radio" name="documentado" value="0" {{ old('documentado') == '0' ? 'checked' : '' }} onclick="toggleDocs()"><span>Indocumentado</span>
-                </label>
-            </div>
-
-            <!-- Campos Documentado -->
-            <div id="docFields">
-                <div class="row mb-3">
-                    <div class="col-4th">
-                        <label for="nombres">Nombres:</label>
-                        <input type="text" id="nombres" name="nombres" class="form-control @error('nombres') is-invalid @enderror" maxlength="40" value="{{ old('nombres') }}">
-                        @error('nombres') <span class="text-danger">{{ $message }}</span> @enderror
+        {{-- Campos Documentado --}}
+        <div class="docFields" style="display: {{ $docFieldsVisible ? 'block' : 'none' }};">
+            
+            <h5 class="mb-3 text-dark fw-bold">
+                <i class="fas fa-user-circle"></i> Datos básicos y contacto
+            </h5>
+            
+            {{-- Buscador de pacientes en una sola fila --}}
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label style="font-weight: 700; font-size: 0.95rem;">
+                        <i class="fas fa-search"></i> BUSCAR PACIENTE
+                    </label>
+                    <div style="position: relative;">
+                        <input 
+                            type="text" 
+                            id="buscarIdentidad" 
+                            class="form-control" 
+                            placeholder="Buscar por identidad..."
+                            maxlength="13"
+                            autocomplete="off"
+                            style="padding-right: 40px; height: 38px; font-size: 0.9rem;">
+                        <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+                        <div id="listaResultados" class="lista-resultados" style="display: none;"></div>
                     </div>
-                    <div class="col-4th">
-                        <label for="apellidos">Apellidos:</label>
-                        <input type="text" id="apellidos" name="apellidos" class="form-control @error('apellidos') is-invalid @enderror" maxlength="40" value="{{ old('apellidos') }}">
-                        @error('apellidos') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="col-4th">
-                        <label for="identidad">Número de identidad:</label>
-                        <input type="text" id="identidad" name="identidad" class="form-control @error('identidad') is-invalid @enderror" maxlength="13" value="{{ old('identidad') }}">
-                        @error('identidad') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="col-4th">
-                        <label>Edad:</label>
-                        <input type="number" id="edad" name="edad" class="form-control @error('edad') is-invalid @enderror" readonly value="{{ old('edad') }}">
-                        @error('edad') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="col-4th">
-                        <label>Sexo:</label>
-                        <select name="sexo" class="form-control @error('sexo') is-invalid @enderror">
-                            <option value="">-- Selecciona --</option>
-                            <option value="M" {{ old('sexo')=='M' ? 'selected':'' }}>Masculino</option>
-                            <option value="F" {{ old('sexo')=='F' ? 'selected':'' }}>Femenino</option>
-                        </select>
-                        @error('sexo') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="col-4th">
-                        <label>Teléfono:</label>
-                        <input type="text" id="telefono" name="telefono" class="form-control @error('telefono') is-invalid @enderror" maxlength="8" value="{{ old('telefono') }}">
-                        @error('telefono') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="col-4th">
-                        <label>Fecha:</label>
-                        <input type="text" name="fecha" class="form-control" 
-                               value="{{ isset($emergencia) ? \Carbon\Carbon::parse($emergencia->fecha)->format('d/m/Y') : now()->format('d/m/Y') }}" 
-                               readonly>
-                    </div>
-                    <div class="col-4th">
-                        <label>Hora:</label>
-                        <input type="text" name="hora" class="form-control" 
-                               value="{{ isset($emergencia) ? \Carbon\Carbon::parse($emergencia->hora)->format('h:i A') : now()->format('h:i A') }}" 
-                               readonly>
-                    </div>
+                    <div id="mensajeBusqueda"></div>
                 </div>
             </div>
 
-            <!-- Campos Indocumentado -->
-            <div class="row mb-3" id="indocFields">
-               <div class="col-4th">
-    <label>Foto del paciente (jpg, jpeg, png):</label>
-    <input type="file" name="foto" accept=".jpg,.jpeg,.png" 
-           class="form-control @error('foto') is-invalid @enderror" capture="camera">
-    @error('foto') <span class="text-danger">{{ $message }}</span> @enderror
-</div>
-
-                <div class="col-4th">
-                    <label>Fecha:</label>
-                    <input type="text" name="fecha_indoc" class="form-control" value="{{ now()->format('d/m/Y') }}" readonly>
-                </div>
-                <div class="col-4th">
-                    <label>Hora:</label>
-                    <input type="text" name="hora_indoc" class="form-control" value="{{ now()->format('h:i A') }}" readonly>
-                </div>
-            </div>
-
-            <!-- Otros campos -->
             <div class="row mb-3">
-                <div class="col-half">
-                    <label>Motivo de la emergencia:</label>
-                    <textarea name="motivo" id="motivo" class="form-control @error('motivo') is-invalid @enderror" maxlength="60">{{ old('motivo') }}</textarea>
-                    @error('motivo') <span class="text-danger">{{ $message }}</span> @enderror
+                @foreach([
+                    ['label'=>'Nombre(s)','name'=>'nombres','type'=>'text','size'=>'50'],
+                    ['label'=>'Apellidos','name'=>'apellidos','type'=>'text','size'=>'50'],
+                    ['label'=>'Identidad','name'=>'identidad','type'=>'text','size'=>'13','placeholder'=>'Ej: 0703200201564'],
+                    ['label'=>'Fecha de Nacimiento','name'=>'fecha_nacimiento','type'=>'date']
+                ] as $field)
+                <div class="col-md-3">
+                    <label>{{ $field['label'] }}: <span class="text-danger">*</span></label>
+                    <input 
+                        type="{{ $field['type'] }}" 
+                        name="{{ $field['name'] }}" 
+                        id="{{ $field['name'] }}"
+                        maxlength="{{ $field['size'] ?? '' }}" 
+                        placeholder="{{ $field['placeholder'] ?? '' }}"
+                        class="form-control @error($field['name']) is-invalid @enderror" 
+                        value="{{ old($field['name']) }}">
+                    @error($field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
-                <div class="col-half">
-                    <label>Dirección:</label>
-                    <textarea name="direccion" id="direccion" class="form-control @error('direccion') is-invalid @enderror" maxlength="70">{{ old('direccion') }}</textarea>
-                    @error('direccion') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
+                @endforeach
             </div>
 
-            <h4 class="mt-4">Signos Vitales</h4>
             <div class="row mb-3">
-               <div class="col-4th">
-                    <label for="pa">Presión Arterial:</label>
-                    <input type="text" id="pa" name="pa" class="form-control @error('pa') is-invalid @enderror" placeholder="Ej: 120/80 mmHg" maxlength="7" value="{{ old('pa') }}">
-                    @error('pa') <span class="text-danger">{{ $message }}</span> @enderror
-               </div>
-               <div class="col-4th">
-                    <label for="fc">Frecuencia Cardíaca:</label>
-                    <input type="number" id="fc" name="fc" class="form-control @error('fc') is-invalid @enderror" value="{{ old('fc') }}" min="30" max="200" placeholder="30-200" oninput="if(this.value.length>3)this.value=this.value.slice(0,3)">
-                    @error('fc') <span class="text-danger">{{ $message }}</span> @enderror
-               </div>
-               <div class="col-4th">
-                    <label for="temp">Temperatura (°C):</label>
-                    <input type="number" step="0.1" id="temp" name="temp" class="form-control @error('temp') is-invalid @enderror" value="{{ old('temp') }}" min="30" max="45" placeholder="30-45" oninput="if(this.value>45)this.value=45; if(this.value<30)this.value=30;">
-                    @error('temp') <span class="text-danger">{{ $message }}</span> @enderror
-               </div>
-            </div>
+                <div class="col-md-3">
+                    <label>Teléfono: <span class="text-danger">*</span></label>
+                    <input type="text" name="telefono" id="telefono" maxlength="8" class="form-control @error('telefono') is-invalid @enderror" value="{{ old('telefono') }}">
+                    @error('telefono') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
 
-            <div class="d-flex justify-content-center gap-3 mt-4 w-100">
-                <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Guardar</button>
-                <button type="button" class="btn btn-warning" id="btnLimpiar"><i class="bi bi-trash"></i> Limpiar</button>
-                <a href="{{ route('emergencias.index') }}" class="btn btn-success"><i class="bi bi-arrow-left"></i> Volver</a>
+                <div class="col-md-3">
+                    <label>Tipo de Sangre (opcional):</label>
+                    <select name="tipo_sangre" id="tipo_sangre" class="form-select @error('tipo_sangre') is-invalid @enderror">
+                        <option value="">Seleccione...</option>
+                        @foreach(['A+','A-','B+','B-','AB+','AB-','O+','O-'] as $tipo)
+                            <option value="{{ $tipo }}" {{ old('tipo_sangre')==$tipo?'selected':'' }}>{{ $tipo }}</option>
+                        @endforeach
+                    </select>
+                    @error('tipo_sangre') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="col-md-3">
+                    <label>Género: <span class="text-danger">*</span></label>
+                    <select name="genero" id="genero" class="form-select @error('genero') is-invalid @enderror">
+                        <option value="">Seleccione...</option>
+                        <option value="Femenino" {{ old('genero')=='Femenino'?'selected':'' }}>Femenino</option>
+                        <option value="Masculino" {{ old('genero')=='Masculino'?'selected':'' }}>Masculino</option>
+                        <option value="Otro" {{ old('genero')=='Otro'?'selected':'' }}>Otro</option>
+                    </select>
+                    @error('genero') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="col-md-3">
+                    <label>Dirección: <span class="text-danger">*</span></label>
+                    <textarea name="direccion" id="direccion" rows="2" maxlength="300" class="form-control @error('direccion') is-invalid @enderror">{{ old('direccion') }}</textarea>
+                    @error('direccion') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
             </div>
-        </form>
-    </div>
+        </div>
+
+        {{-- Campos Indocumentado --}}
+        <div class="indocFields" style="display: {{ !$docFieldsVisible ? 'block' : 'none' }};">
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label>Foto del paciente:</label>
+                    <input type="file" name="foto" class="form-control @error('foto') is-invalid @enderror">
+                    @error('foto') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+            </div>
+        </div>
+
+        {{-- Motivo de la emergencia --}}
+        <h5 class="mt-4 mb-3 text-dark fw-bold">Motivo de la emergencia</h5>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <textarea name="motivo" rows="2" maxlength="300" class="form-control @error('motivo') is-invalid @enderror">{{ old('motivo') }}</textarea>
+                @error('motivo') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+        </div>
+
+        {{-- Signos vitales --}}
+        <h5 class="mt-4 mb-3 text-dark fw-bold">Signos Vitales</h5>
+        <div class="row mb-3">
+            @foreach([
+                ['label'=>'Presión Arterial','name'=>'pa','type'=>'text','placeholder'=>'Ej: 120/80'],
+                ['label'=>'Frecuencia Cardíaca','name'=>'fc','type'=>'number'],
+                ['label'=>'Temperatura (°C)','name'=>'temp','type'=>'number','step'=>'0.1']
+            ] as $vital)
+            <div class="col-md-4">
+                <label>{{ $vital['label'] }}:</label>
+                <input 
+                    type="{{ $vital['type'] }}" 
+                    name="{{ $vital['name'] }}" 
+                    placeholder="{{ $vital['placeholder'] ?? '' }}"
+                    step="{{ $vital['step'] ?? '' }}"
+                    class="form-control @error($vital['name']) is-invalid @enderror" 
+                    value="{{ old($vital['name']) }}">
+                @error($vital['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+            @endforeach
+        </div>
+
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="submit" class="btn btn-primary">Registrar</button>
+            <button type="button" id="btnLimpiar" class="btn btn-warning">Limpiar</button>
+            <a href="{{ route('emergencias.index') }}" class="btn btn-success">Regresar</a>
+        </div>
+    </form>
 </div>
 
 <script>
-function toggleDocs() {
+function toggleDocs(){
     let doc = document.querySelector('input[name="documentado"][value="1"]').checked;
-    document.getElementById("docFields").style.display = doc ? "flex" : "none";
-    document.getElementById("indocFields").style.display = doc ? "none" : "flex";
+    document.querySelectorAll('.docFields').forEach(el => el.style.display = doc ? 'block' : 'none');
+    document.querySelectorAll('.indocFields').forEach(el => el.style.display = doc ? 'none' : 'block');
 }
 
-// Ejecutar al cargar para respetar old()
-window.addEventListener('DOMContentLoaded', () => toggleDocs());
-
-// Botón Limpiar sin cambiar radio
-document.getElementById('btnLimpiar').addEventListener('click', function(){
-    const form = document.getElementById('emergenciaForm');
-    const seleccionado = document.querySelector('input[name="documentado"]:checked').value;
-
-    // Solo limpiar los campos de entrada del formulario (inputs y textarea), sin tocar fecha/hora de indoc
-    form.querySelectorAll('input, textarea, select').forEach(input => {
-        const name = input.name;
-        // Si es fecha o hora de indocumentado, no limpiar
-        if(name === 'fecha_indoc' || name === 'hora_indoc') return;
-        // Para otros campos de texto/numero/select/textarea
-        if(input.type === 'file') input.value = '';
-        else if(input.type !== 'radio' && input.type !== 'checkbox') input.value = '';
-        else if(input.tagName.toLowerCase() === 'select') input.selectedIndex = 0;
+// Limpiar formulario
+document.getElementById('btnLimpiar').addEventListener('click', () => {
+    const form = document.getElementById('formEmergencia');
+    form.querySelectorAll('input, textarea, select').forEach(el => {
+        if(el.type === 'radio') return;
+        if(el.tagName.toLowerCase() === 'select') el.selectedIndex = 0;
+        else el.value = '';
     });
-
-    // Limpiar errores y clases de validación
-    form.querySelectorAll('.text-danger').forEach(e => e.innerHTML = '');
-    form.querySelectorAll('.is-invalid, .is-valid').forEach(e => e.classList.remove('is-invalid','is-valid'));
-
-    // Restaurar radio seleccionado
-    document.querySelector(`input[name="documentado"][value="${seleccionado}"]`).checked = true;
-
-    toggleDocs();
+    document.getElementById('mensajeBusqueda').innerHTML = '';
 });
 
+// Variable para controlar el timeout del debounce
+let timeoutBusqueda = null;
 
-// Validaciones en tiempo real
-document.getElementById('nombres').addEventListener('keypress', e => {
-    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]$/.test(e.key)) e.preventDefault();
-});
-document.getElementById('apellidos').addEventListener('keypress', e => {
-    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]$/.test(e.key)) e.preventDefault();
-});
-document.getElementById('telefono').addEventListener('keypress', e => {
-    if (!/^\d$/.test(e.key)) e.preventDefault();
+// Buscar paciente automáticamente mientras escribe
+document.getElementById('buscarIdentidad').addEventListener('input', function() {
+    const identidad = this.value.trim();
+    const listaDiv = document.getElementById('listaResultados');
+    const mensajeDiv = document.getElementById('mensajeBusqueda');
+    
+    // Limpiar timeout anterior
+    clearTimeout(timeoutBusqueda);
+    
+    // Si está vacío, ocultar lista y limpiar campos
+    if (!identidad) {
+        listaDiv.style.display = 'none';
+        listaDiv.innerHTML = '';
+        mensajeDiv.innerHTML = '';
+        limpiarCamposPaciente();
+        return;
+    }
+    
+    // Esperar 300ms después de que el usuario deje de escribir
+    timeoutBusqueda = setTimeout(() => {
+        buscarPacientes(identidad);
+    }, 300);
 });
 
-// Identidad solo números y cálculo de edad
-const identidad = document.getElementById('identidad');
-identidad.addEventListener('input', e => {
-    identidad.value = identidad.value.replace(/\D/g, '');
-    if (identidad.value.length >= 8) {
-        const year = parseInt(identidad.value.substring(4,8));
-        const edad = new Date().getFullYear() - year;
-        document.getElementById('edad').value = (edad >= 0 && edad <= 95) ? edad : '';
-    } else {
-        document.getElementById('edad').value = '';
+function buscarPacientes(identidad) {
+    const listaDiv = document.getElementById('listaResultados');
+    const mensajeDiv = document.getElementById('mensajeBusqueda');
+    
+    const url = `{{ route('pacientes.buscar') }}?identidad=${encodeURIComponent(identidad)}`;
+    
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success && data.pacientes && data.pacientes.length > 0) {
+                // Mostrar lista de resultados con mejor diseño
+                let html = '';
+                data.pacientes.forEach(paciente => {
+                    html += `
+                        <div class="resultado-item" onclick="seleccionarPaciente(${paciente.id})">
+                            <div class="resultado-info">
+                                <div class="resultado-nombre">${paciente.nombre} ${paciente.apellidos}</div>
+                                <div class="resultado-identidad">
+                                    <i class="fas fa-id-card"></i>
+                                    <span>${paciente.identidad}</span>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right resultado-icono"></i>
+                        </div>
+                    `;
+                });
+                listaDiv.innerHTML = html;
+                listaDiv.style.display = 'block';
+                mensajeDiv.innerHTML = '';
+            } else {
+                // No hay resultados
+                listaDiv.innerHTML = '<div class="no-resultados"><i class="fas fa-user-slash"></i><br>No se encontraron pacientes</div>';
+                listaDiv.style.display = 'block';
+                mensajeDiv.innerHTML = '';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            listaDiv.style.display = 'none';
+            mensajeDiv.innerHTML = '<div class="alert alert-danger alert-custom mt-2">Error al buscar pacientes</div>';
+        });
+}
+
+function seleccionarPaciente(pacienteId) {
+    const url = `{{ url('pacientes/datos') }}/${pacienteId}`;
+    
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Llenar campos con datos del paciente
+                document.getElementById('nombres').value = data.paciente.nombres || '';
+                document.getElementById('apellidos').value = data.paciente.apellidos || '';
+                document.getElementById('identidad').value = data.paciente.identidad || '';
+                document.getElementById('fecha_nacimiento').value = data.paciente.fecha_nacimiento || '';
+                document.getElementById('telefono').value = data.paciente.telefono || '';
+                document.getElementById('genero').value = data.paciente.genero || '';
+                document.getElementById('direccion').value = data.paciente.direccion || '';
+                
+                if (data.paciente.tipo_sangre) {
+                    document.getElementById('tipo_sangre').value = data.paciente.tipo_sangre;
+                }
+                
+                // Actualizar campo de búsqueda
+                document.getElementById('buscarIdentidad').value = data.paciente.identidad;
+                
+                // Ocultar lista
+                document.getElementById('listaResultados').style.display = 'none';
+                document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-success alert-custom mt-2"><i class="fas fa-check-circle"></i> Datos cargados correctamente</div>';
+                
+                // Ocultar mensaje después de 2 segundos
+                setTimeout(() => {
+                    document.getElementById('mensajeBusqueda').innerHTML = '';
+                }, 2000);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-danger alert-custom mt-2">Error al cargar datos del paciente</div>';
+        });
+}
+
+// Cerrar lista al hacer clic fuera
+document.addEventListener('click', function(e) {
+    const buscarInput = document.getElementById('buscarIdentidad');
+    const listaDiv = document.getElementById('listaResultados');
+    
+    if (e.target !== buscarInput && !listaDiv.contains(e.target)) {
+        listaDiv.style.display = 'none';
     }
 });
 
-document.getElementById('motivo').addEventListener('keypress', e => {
-    if (!/^[\p{L}\d\s\.,]$/u.test(e.key)) e.preventDefault();
-});
-document.getElementById('direccion').addEventListener('keypress', e => {
-    if (!/^[\p{L}\d\s\.,#\/\-\(\)]$/u.test(e.key)) e.preventDefault();
-});
+function limpiarCamposPaciente() {
+    document.getElementById('nombres').value = '';
+    document.getElementById('apellidos').value = '';
+    document.getElementById('identidad').value = '';
+    document.getElementById('fecha_nacimiento').value = '';
+    document.getElementById('telefono').value = '';
+    document.getElementById('tipo_sangre').selectedIndex = 0;
+    document.getElementById('genero').selectedIndex = 0;
+    document.getElementById('direccion').value = '';
+}
 </script>
+
 @endsection

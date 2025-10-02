@@ -44,6 +44,11 @@ Route::resource('medicos', MedicoController::class)->except(['destroy']);
 Route::patch('/medicos/{medico}/estado', [MedicoController::class, 'toggleEstado'])->name('medicos.toggleEstado');
 Route::get('/medicos/buscar', [MedicoController::class, 'buscar'])->name('medicos.buscar');
 
+//BUSCAR EN EMERGENCIAS 
+Route::get('/pacientes/buscar', [PacienteController::class, 'buscarPaciente'])->name('pacientes.buscar');
+// Ruta para obtener datos completos del paciente
+Route::get('/pacientes/datos/{id}', [PacienteController::class, 'obtenerDatosPacienteCompleto'])->name('pacientes.datosCompleto');
+
 // Solo deja esta línea para los puestos
 Route::resource('puestos', PuestoController::class);
 Route::get('/puestos/create', [PuestoController::class, 'create'])->name('puestos.create');
@@ -257,7 +262,7 @@ Route::get('/examenes/no-disponible/{consulta}', function ($consultaId) {
 
 //EMERGENCIAS
 use App\Http\Controllers\EmergenciaController;
-
+Route::resource('emergencias', EmergenciasController::class);
 Route::get('/emergencias', [EmergenciaController::class, 'index'])->name('emergencias.index');
 Route::get('/emergencias/create', [EmergenciaController::class, 'create'])->name('emergencias.create');
 Route::post('/emergencias/store', [EmergenciaController::class, 'store'])->name('emergencias.store');
@@ -274,3 +279,4 @@ Route::post('/hospitalizacion/store', [HospitalizacionController::class, 'store'
      
  Route::get('/hospitalizaciones', [HospitalizacionController::class, 'index'])->name('hospitalizacion.index');
 
+// EMERGENCIAS 

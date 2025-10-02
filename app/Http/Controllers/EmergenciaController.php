@@ -3,235 +3,47 @@
 namespace App\Http\Controllers;
 
 use App\Models\Emergencia;
+use App\Models\Paciente;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-
+use Carbon\Carbon;
 
 class EmergenciaController extends Controller
 {
-
-
     public function create()
     {
         return view('emergencias.create');
     }
 
-
-public function store(Request $request)
-{
-    $documentado = $request->documentado === '1';
-    $anioActual = now()->year;
-
-    $rules = [
-        'documentado' => 'required|boolean',
-
-        // Nombres y apellidos solo letras, máximo 40
-        'nombres' => $documentado ? ['required','string','max:40','regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'] : 'nullable',
-        'apellidos' => $documentado ? ['required','string','max:40','regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'] : 'nullable',
-
-        // Identidad avanzada
-       // Identidad avanzada
-'identidad' => $documentado ? [
-    'required',
-    'digits:13',
-
-    function ($attribute, $value, $fail) use ($anioActual, &$request) {
-        $departamentosMunicipios = [
-            '01' => 8, '02' => 10, '03' => 21, '04' => 23, '05' => 12,
-            '06' => 16, '07' => 19, '08' => 28, '09' => 9, '10' => 17,
-            '11' => 4, '12' => 19, '13' => 28, '14' => 16, '15' => 23,
-            '16' => 28, '17' => 9, '18' => 11,
-        ];
-
-        $codigoDepartamento = substr($value, 0, 2);
-        if (!array_key_exists($codigoDepartamento, $departamentosMunicipios)) {
-            return $fail('El código del departamento en la identidad no es válido.');
-        }
-
-        $codigoMunicipio = (int) substr($value, 2, 2);
-        $maxMunicipios = $departamentosMunicipios[$codigoDepartamento];
-        if ($codigoMunicipio < 1 || $codigoMunicipio > $maxMunicipios) {
-            return $fail('El código de municipio en la identidad no es válido.');
-        }
-
-        $anioNacimiento = (int) substr($value, 4, 4);
-        if ($anioNacimiento < 1900 || $anioNacimiento > $anioActual) {
-            return $fail('El año de nacimiento en la identidad no es válido.');
-        }
-
-        $edad = $anioActual - $anioNacimiento;
-
-        // Permitir recién nacidos hasta 95 años
-        if ($edad < 0 || $edad > 95) {
-            return $fail("La edad calculada a partir de la identidad no es válida (0-95 años; actual: $edad).");
-        }
-
-        $request->merge(['edad' => $edad]);
-    }
-] : 'nullable',
-
-// Edad calculada
-'edad' => $documentado ? 'required|integer|min:0|max:95' : 'nullable',
-
-
-        // Sexo
-        'sexo' => $documentado ? ['required', Rule::in(['M','F'])] : 'nullable',
-
-        // Teléfono avanzado
-        'telefono' => $documentado ? [
-            'required', 'digits:8', 'regex:/^[2389][0-9]{7}$/',
-        ] : 'nullable',
-
-        // Foto
-       // 'foto' => !$documentado ? 'nullable|image|mimes:jpg,jpeg,png|max:2048' : 'nullable',
-       'foto' => !$documentado ? 'required|image|mimes:jpg,jpeg,png|max:2048' : 'nullable',
-
-
-        // Motivo y dirección
-        'motivo' => ['required','string','min:5','max:60','regex:/^[A-Za-z0-9.,\s]+$/'],
-        'direccion' => ['required','string','min:5','max:70','regex:/^[A-Za-z0-9.,\s]+$/'],
-
-        // Signos vitales con validaciones estrictas
-        'pa' => [
-            'nullable',
-            function($attribute, $value, $fail) {
-                if (!preg_match('/^\d{2,3}\/\d{2,3}$/', $value)) {
-                    return $fail('El formato de la presión arterial debe ser XX/XX o XXX/XX.');
-                }
-                [$sist, $diast] = explode('/', $value);
-                $sist = (int)$sist;
-                $diast = (int)$diast;
-                if($sist < 80 || $sist > 200) $fail('La presión sistólica debe estar entre 80 y 200 mmHg.');
-if($diast < 40 || $diast > 130) $fail('La presión diastólica debe estar entre 40 y 130 mmHg.');
-
-            }
-        ],
-        'fc' => [
-            'nullable',
-            'integer',
-            function($attribute, $value, $fail) {
-                if($value < 30 || $value > 200) {
-                    $fail('La frecuencia cardíaca debe estar entre 30 y 200 lpm.');
-                }
-            }
-        ],
-        'temp' => [
-            'nullable',
-            'numeric',
-            function($attribute, $value, $fail) {
-                if($value < 30 || $value > 45) {
-                    $fail('La temperatura debe estar entre 30°C y 45°C.');
-                }
-            }
-        ],
-
-        //'fecha_hora' => 'required|date',
-    ];
-
-    $messages = [
-        'required' => ':attribute es obligatorio.',
-        'digits' => ':attribute debe tener exactamente :digits dígitos.',
-        'regex' => ':attribute contiene caracteres inválidos.',
-        'min' => ':attribute debe tener al menos :min caracteres.',
-        'max' => ':attribute no puede tener más de :max caracteres.',
-        'numeric' => ':attribute debe ser un número válido.',
-        'image' => ':attribute debe ser una imagen válida.',
-        'unique' => ':attribute ya está registrado.',
-    ];
-
-    $attributes = [
-        'nombres' => 'Nombres',
-        'apellidos' => 'Apellidos',
-        'identidad' => 'Identidad',
-        'edad' => 'Edad',
-        'sexo' => 'Sexo',
-        'telefono' => 'Teléfono',
-        'motivo' => 'Motivo',
-        'direccion' => 'Dirección',
-        'foto' => 'Foto del paciente',
-        'pa' => 'Presión arterial',
-        'fc' => 'Frecuencia cardíaca',
-        'temp' => 'Temperatura',
-        'fecha_hora' => 'Fecha y hora',
-    ];
-
-    $request->validate($rules, $messages, $attributes);
-
-    // Guardar datos
-    $emergencia = new Emergencia();
-    $emergencia->documentado = $documentado;
-    $emergencia->motivo = $request->motivo;
-    $emergencia->direccion = $request->direccion;
-    $emergencia->pa = $request->pa;
-    $emergencia->fc = $request->fc;
-    $emergencia->temp = $request->temp;
-    //$emergencia->fecha_hora = $request->fecha_hora;
-
-    // ✅ Guardar fecha y hora separadas
-    $emergencia->fecha = now()->toDateString();  // YYYY-MM-DD
-    $emergencia->hora = now()->format('H:i');    // HH:MM en 24h
-
-
-    if ($documentado) {
-        $emergencia->nombres = $request->nombres;
-        $emergencia->apellidos = $request->apellidos;
-        $emergencia->identidad = $request->identidad;
-        $emergencia->edad = $request->edad;
-        $emergencia->sexo = $request->sexo;
-        $emergencia->telefono = $request->telefono;
-    } else {
-        $emergencia->codigo_temporal = 'TEMP-' . time();
-        if ($request->hasFile('foto')) {
-            $emergencia->foto = $request->file('foto')->store('emergencias', 'public');
-        }
-    }
-
-    $emergencia->save();
-
-    return redirect()->route('emergencias.index')
-                     ->with('success', 'Emergencia registrada correctamente.');
-}
-public function index(Request $request)
-{
-    try {
+    public function index(Request $request)
+    {
         $query = $request->input('search', '');
         $fechaInicio = $request->input('fecha_desde');
         $fechaFin = $request->input('fecha_hasta');
-        $documentado = $request->input('documentado'); // <-- NUEVO
+        $documentado = $request->input('documentado');
         $perPage = 3;
 
-        $emergenciasQuery = Emergencia::orderBy('fecha', 'desc')->orderBy('hora', 'desc');
+        $emergenciasQuery = Emergencia::with('paciente')
+            ->orderBy('fecha', 'desc')
+            ->orderBy('hora', 'desc');
 
-        // Filtrar por nombres/apellidos
         if ($query) {
-            $emergenciasQuery->where(function($q) use ($query) {
-                $q->where('nombres', 'like', "%$query%")
+            $emergenciasQuery->whereHas('paciente', function($q) use ($query) {
+                $q->where('nombre', 'like', "%$query%")
                   ->orWhere('apellidos', 'like', "%$query%");
             });
         }
 
-        // Filtrar por fechas
         if ($fechaInicio) $emergenciasQuery->where('fecha', '>=', $fechaInicio);
         if ($fechaFin) $emergenciasQuery->where('fecha', '<=', $fechaFin);
 
-        // Filtrar por documentación
         if ($documentado !== null && $documentado !== '') {
             $emergenciasQuery->where('documentado', $documentado);
         }
 
-        // Determinar si hay algún filtro activo
-        $isSearch = $query || $fechaInicio || $fechaFin || $documentado !== null && $documentado !== '' ? true : false;
-
-        // Obtener resultados
-        if ($isSearch) {
-            $emergencias = $emergenciasQuery->get();
-        } else {
-            $emergencias = $emergenciasQuery->paginate($perPage);
-        }
-
+        $isSearch = ($query || $fechaInicio || $fechaFin || ($documentado !== null && $documentado !== ''));
+        $emergencias = $isSearch ? $emergenciasQuery->get() : $emergenciasQuery->paginate($perPage);
         $totalFiltrado = $emergenciasQuery->count();
 
-        // Respuesta AJAX
         if ($request->ajax()) {
             return response()->json([
                 'html' => view('emergencias.tabla', compact('emergencias', 'isSearch'))->render(),
@@ -242,20 +54,141 @@ public function index(Request $request)
         }
 
         return view('emergencias.index', compact('emergencias', 'isSearch', 'totalFiltrado'));
-
-    } catch (\Exception $e) {
-        if ($request->ajax()) {
-            return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
-        }
-        abort(500, $e->getMessage());
     }
-}
+
+    public function store(Request $request)
+    {
+        $anioActual = date('Y');
+
+        // Función para validar año en la identidad
+        $validarAnioIdentidad = function($identidad) use ($anioActual) {
+            $anio = intval(substr($identidad, 4, 4));
+            return $anio >= 1930 && $anio <= $anioActual;
+        };
+
+        // PRIMERO: Validar campos comunes (motivo y signos vitales)
+        $request->validate([
+            'motivo' => ['required', 'string', 'max:300'],
+            'pa' => ['required', 'string', 'max:7'],
+            'fc' => ['required', 'integer', 'min:1', 'max:300'],
+            'temp' => ['required', 'numeric', 'between:30,45'],
+        ], [
+            'motivo.required' => 'El motivo de la emergencia es obligatorio.',
+            'motivo.max' => 'El motivo no puede superar los 300 caracteres.',
+            'pa.required' => 'La presión arterial es obligatoria.',
+            'pa.max' => 'La presión arterial no puede superar los 7 caracteres.',
+            'fc.required' => 'La frecuencia cardíaca es obligatoria.',
+            'fc.integer' => 'La frecuencia cardíaca debe ser un número válido.',
+            'fc.min' => 'La frecuencia cardíaca debe ser mayor a 0.',
+            'fc.max' => 'La frecuencia cardíaca no puede superar 300.',
+            'temp.required' => 'La temperatura es obligatoria.',
+            'temp.numeric' => 'La temperatura debe ser un número válido.',
+            'temp.between' => 'La temperatura debe estar entre 30 y 45°C.',
+        ]);
+
+        $dataEmergencia = [];
+
+        // SEGUNDO: Validaciones específicas según tipo de paciente
+        if ($request->input('documentado') == 1) {
+            // Validaciones para paciente documentado
+            $request->validate([
+                'nombres' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
+                'apellidos' => ['required', 'regex:/^[\pL\s]+$/u', 'max:50'],
+                'identidad' => ['required', 'digits:13'],
+                'fecha_nacimiento' => ['required', 'date', 'after_or_equal:' . Carbon::now()->subYears(60)->format('Y-m-d')],
+                'telefono' => ['required', 'digits:8', 'regex:/^[2389][0-9]{7}$/'],
+                'direccion' => ['required', 'string', 'max:300'],
+                'tipo_sangre' => ['nullable', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
+                'genero' => ['required', 'in:Femenino,Masculino,Otro'],
+            ], [
+                'nombres.required' => 'El nombre es obligatorio.',
+                'nombres.regex' => 'El nombre solo puede contener letras y espacios.',
+                'nombres.max' => 'El nombre no puede superar los 50 caracteres.',
+                'apellidos.required' => 'Los apellidos son obligatorios.',
+                'apellidos.regex' => 'Los apellidos solo pueden contener letras y espacios.',
+                'apellidos.max' => 'Los apellidos no pueden superar los 50 caracteres.',
+                'identidad.required' => 'La identidad es obligatoria.',
+                'identidad.digits' => 'La identidad debe tener exactamente 13 dígitos.',
+                'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
+                'fecha_nacimiento.date' => 'Debe ser una fecha válida.',
+                'fecha_nacimiento.after_or_equal' => 'El paciente no puede tener más de 60 años.',
+                'telefono.required' => 'El teléfono es obligatorio.',
+                'telefono.digits' => 'El teléfono debe tener exactamente 8 dígitos.',
+                'telefono.regex' => 'El teléfono debe iniciar con 2, 3, 8 o 9.',
+                'direccion.required' => 'La dirección es obligatoria.',
+                'direccion.max' => 'La dirección no puede superar los 300 caracteres.',
+                'tipo_sangre.in' => 'El tipo de sangre debe ser válido.',
+                'genero.required' => 'El género es obligatorio.',
+                'genero.in' => 'El género debe ser Femenino, Masculino u Otro.',
+            ]);
+
+            if (!$validarAnioIdentidad($request->identidad)) {
+                return redirect()->back()
+                    ->withErrors(['identidad' => "El año en la identidad debe estar entre 1930 y $anioActual."])
+                    ->withInput();
+            }
+
+            // Buscar si el paciente ya existe
+            $paciente = Paciente::where('identidad', $request->identidad)->first();
+
+            if (!$paciente) {
+                // Si no existe, crear nuevo paciente
+                $paciente = Paciente::create([
+                    'nombre' => $request->nombres,
+                    'apellidos' => $request->apellidos,
+                    'identidad' => $request->identidad,
+                    'fecha_nacimiento' => $request->fecha_nacimiento,
+                    'telefono' => $request->telefono,
+                    'tipo_sangre' => $request->tipo_sangre,
+                    'genero' => $request->genero,
+                    'direccion' => $request->direccion,
+                    'correo' => 'emergencia@temp.com', // Valor temporal
+                    'padecimientos' => 'N/A',
+                    'medicamentos' => 'N/A',
+                    'historial_clinico' => 'N/A',
+                    'alergias' => 'N/A',
+                ]);
+            }
+
+            $dataEmergencia['paciente_id'] = $paciente->id;
+            
+        } else {
+            // Validaciones para paciente indocumentado
+            $dataEmergencia['paciente_id'] = null;
+
+            $request->validate([
+                'foto' => ['required', 'file', 'mimes:jpeg,jpg,png', 'max:2048'],
+            ], [
+                'foto.required' => 'La foto es obligatoria para pacientes indocumentados.',
+                'foto.file' => 'El archivo debe ser una imagen válida.',
+                'foto.mimes' => 'La foto debe ser un archivo de tipo: png, jpg o jpeg.',
+                'foto.max' => 'La foto no puede superar los 2MB.',
+            ]);
+
+            if ($request->hasFile('foto')) {
+                $rutaFoto = $request->file('foto')->store('fotos_emergencias', 'public');
+                $dataEmergencia['foto'] = $rutaFoto;
+            }
+        }
+
+        // Preparar datos de la emergencia
+        $dataEmergencia['documentado'] = $request->documentado;
+        $dataEmergencia['motivo'] = $request->motivo;
+        $dataEmergencia['pa'] = $request->pa;
+        $dataEmergencia['fc'] = $request->fc;
+        $dataEmergencia['temp'] = $request->temp;
+        $dataEmergencia['fecha'] = $request->fecha ?: now()->format('Y-m-d');
+        $dataEmergencia['hora'] = $request->hora ?: now()->format('H:i:s');
+
+        // Crear el registro de emergencia
+        Emergencia::create($dataEmergencia);
+
+        return redirect()->route('emergencias.index')->with('success', 'Emergencia registrada correctamente.');
+    }
+
     public function show($id)
     {
-        // Buscar el registro de emergencia por ID o lanzar un 404 si no existe
         $emergencia = Emergencia::findOrFail($id);
-
-        // Pasar el objeto a la vista show
         return view('emergencias.show', compact('emergencia'));
     }
 }

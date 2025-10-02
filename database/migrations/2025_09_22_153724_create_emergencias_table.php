@@ -10,48 +10,27 @@ return new class extends Migration {
         Schema::create('emergencias', function (Blueprint $table) {
             $table->id();
 
-            // Documentación
-            //$table->boolean('documentado')->default(true);
-             $table->boolean('documentado')->default(true);
-            $table->string('nombres')->nullable();
-             $table->string('apellidos')->nullable();
-            $table->string('identidad')->nullable();
-            $table->integer('edad')->nullable();
-            $table->enum('sexo', ['M','F'])->nullable();
-            $table->string('direccion')->nullable();
-            $table->string('telefono')->nullable();
+            // Relación con paciente si está documentado
+            $table->foreignId('paciente_id')->nullable()
+                  ->constrained('pacientes')
+                  ->onDelete('set null');
 
-            // Indocumentado
-            $table->string('codigo_temporal')->nullable();
+            // Lógica documentado / indocumentado
+            $table->boolean('documentado')->default(true);
+
+            // Solo si es indocumentado
             $table->string('foto')->nullable();
+            $table->string('direccion')->nullable();
 
             // Datos de la emergencia
-               $table->date('fecha');       // Solo guarda día, mes y año (YYYY-MM-DD)
-               $table->time('hora');        // Guarda hora y minutos (HH:MM:SS)
-            //$table->enum('evento', ['trauma', 'medico', 'obstetrico', 'pediatrico', 'otro']);
-            //$table->string('lugar')->nullable();
+            $table->date('fecha');       // YYYY-MM-DD
+            $table->time('hora');        // HH:MM:SS
             $table->text('motivo')->nullable();
 
             // Signos vitales
-            $table->string('pa')->nullable(); // ejemplo: 120/80
-            $table->integer('fc')->nullable();
-            //$table->integer('fr')->nullable();
-            $table->decimal('temp', 4,1)->nullable();
-            //$table->integer('sat')->nullable();
-
-            // Estado al ingreso
-           // $table->enum('conciencia', ['consciente','inconsciente'])->nullable();
-            //$table->enum('triage', ['rojo','amarillo','verde'])->nullable();
-
-            // Atención inmediata → booleanos
-           // $table->boolean('oxigeno')->default(false);
-            //$table->boolean('canalizacion')->default(false);
-            //$table->boolean('hemorragia')->default(false);
-            //$table->boolean('reanimacion')->default(false);
-            //$table->text('medicamentos')->nullable();
-
-            // Responsable
-            //$table->string('responsable')->nullable();
+            $table->string('pa')->nullable(); // presión arterial: 120/80
+            $table->integer('fc')->nullable(); // frecuencia cardíaca
+            $table->decimal('temp', 4,1)->nullable(); // temperatura
 
             $table->timestamps();
         });
@@ -62,4 +41,3 @@ return new class extends Migration {
         Schema::dropIfExists('emergencias');
     }
 };
-

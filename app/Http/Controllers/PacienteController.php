@@ -376,6 +376,70 @@ public function obtenerDatosPaciente($id)
 }
 
 
-
+public function buscarPaciente(Request $request)
+{
+    try {
+        $identidad = $request->get('identidad');
+        
+        if (empty($identidad)) {
+            return response()->json([
+                'success' => false,
+                'pacientes' => [],
+                'message' => 'Debe proporcionar un número de identidad'
+            ]);
+        }
+        
+        // Busca TODOS los pacientes que coincidan (máximo 10)
+        $pacientes = Paciente::where('identidad', 'LIKE', '%' . $identidad . '%')
+                             ->limit(10)
+                             ->get(['id', 'nombre', 'apellidos', 'identidad']);
+        
+        if ($pacientes->count() > 0) {
+            return response()->json([
+                'success' => true,
+                'pacientes' => $pacientes
+            ]);
+        }
+        
+        return response()->json([
+            'success' => false,
+            'pacientes' => [],
+            'message' => 'No se encontraron pacientes'
+        ]);
+        
+    } catch (\Exception $e) {
+        \Log::error('Error al buscar paciente: ' . $e->getMessage());
+        
+        return response()->json([
+            'success' => false,
+            'pacientes' => [],
+            'message' => 'Error en el servidor: ' . $e->getMessage()
+        ], 500);
+    }
+}public function obtenerDatosPacienteCompleto($id)
+{
+    try {
+        $paciente = Paciente::findOrFail($id);
+        
+        return response()->json([
+            'success' => true,
+            'paciente' => [
+                'nombres' => $paciente->nombre,
+                'apellidos' => $paciente->apellidos,
+                'identidad' => $paciente->identidad,
+                'fecha_nacimiento' => $paciente->fecha_nacimiento,
+                'telefono' => $paciente->telefono,
+                'tipo_sangre' => $paciente->tipo_sangre ?? '',
+                'genero' => $paciente->genero,
+                'direccion' => $paciente->direccion,
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Paciente no encontrado'
+        ], 404);
+    }
+}
 
 }

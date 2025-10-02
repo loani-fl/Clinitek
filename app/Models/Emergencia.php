@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,33 +10,19 @@ class Emergencia extends Model
     use HasFactory;
 
     protected $fillable = [
-        'documentado',
-        'nombres',
-        'apellidos',
-        'identidad',
-        'edad',
-        'sexo',
-        'direccion',
-        'telefono',
-        'codigo_temporal',
-        'foto',
-        'fecha_hora',
-        'motivo',
-        'pa',
-        'fc',
-        'temp',
+        'documentado', 'paciente_id', 'foto', 'direccion',
+        'fecha', 'hora', 'motivo', 'pa', 'fc', 'temp'
     ];
 
     protected $casts = [
-        'documentado' => 'boolean', // <-- hace que documentado sea booleano
+        'documentado' => 'boolean',
     ];
 
-    
+    // Relación con Paciente
     public function paciente()
     {
-        return $this->belongsTo(Paciente::class, 'paciente_id');
+        return $this->belongsTo(Paciente::class);
     }
-    
-
 }
+
 
