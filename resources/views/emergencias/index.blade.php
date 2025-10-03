@@ -4,6 +4,17 @@
 
 @section('content')
 <style>
+    /* Primera fila del encabezado más alta */
+    .table thead tr:first-child {
+        height: 40px;
+    }
+
+    /* Opcional: ajustar padding de las celdas del encabezado */
+    .table thead tr:first-child th {
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
+    }
+
     body {
         background-color: #e8f4fc;
         margin: 0;
@@ -104,31 +115,114 @@
         vertical-align: middle;
         border: 1px solid #dee2e6;
     }
+    /* Primera columna: ID o número de fila */
     table th:nth-child(1), table td:nth-child(1) {
         width: 40px;
         text-align: center;
     }
-    .pagination-container {
-        font-size: 0.9rem;
-        margin-top: 1rem;
-        display: flex;
-        justify-content: center;
+
+    /* Nombre del paciente: un poco más ancho */
+    table th:nth-child(2), table td:nth-child(2) {
+        width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
+
+    /* Apellidos: más pequeño para que quepa en una línea */
+    table th:nth-child(3), table td:nth-child(3) {
+        width: 100px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Tipo de sangre: columna más pequeña */
+    table th:nth-child(4), table td:nth-child(4) {
+        width: 30px;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Género: también pequeño */
+    table th:nth-child(5), table td:nth-child(5) {
+        width: 60px;
+        text-align: center;
+    }
+
+    /* Hora: ajustable */
+    table th:nth-child(6), table td:nth-child(6) {
+        width: 80px;
+        text-align: center;
+    }
+
+    /* Acciones: botón pequeño */
+    table th:nth-child(7), table td:nth-child(7) {
+        width: 80px;
+        text-align: center;
+    }
+
     #mensajeResultados {
         text-align: center;
         margin-top: 0.5rem;
         font-weight: 500;
         color: #555;
-        min-height: 1.2em;
+        min-height: 2.5em;
     }
 
     #filtroBusqueda.filtro-input {
-    max-width: 450px !important;
-}
+        max-width: 450px !important;
+    }
 
-
-
-
+    /* Estilos de paginación personalizada */
+    .custom-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.3rem;
+    }
+    
+    .custom-pagination .page-item {
+        list-style: none;
+    }
+    
+    .custom-pagination .page-link {
+        display: inline-block;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        color: #007BFF;
+        background-color: #fff;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .custom-pagination .page-link:hover:not(.disabled) {
+        background-color: #007BFF;
+        color: #fff;
+        border-color: #007BFF;
+    }
+    
+    .custom-pagination .page-item.active .page-link {
+        background-color: #007BFF;
+        color: #fff;
+        border-color: #007BFF;
+        font-weight: 600;
+        cursor: default;
+    }
+    
+    .custom-pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+        cursor: not-allowed;
+        opacity: 0.6;
+        pointer-events: none;
+    }
 </style>
 
 <div class="content-wrapper">
@@ -149,7 +243,7 @@
         <div class="d-flex filter-container">
             <div>
                 <label class="filtro-label" for="filtroBusqueda">Paciente</label>
-                <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar paciente..." autocomplete="off">
+                <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar paciente" autocomplete="off">
             </div>
 
             <div>
@@ -186,8 +280,13 @@
         <div id="mensajeResultados"></div>
 
         {{-- Paginación --}}
-        <div id="paginacion-container" class="pagination-container mt-3">
-            {{ $emergencias->onEachSide(1)->links('pagination::bootstrap-5') }}
+        <div id="paginacion-container" class="mt-3">
+            @include('emergencias.custom-pagination', [
+                'currentPage' => $emergencias->currentPage(),
+                'lastPage' => $emergencias->lastPage(),
+                'hasMorePages' => $emergencias->hasMorePages(),
+                'onFirstPage' => $emergencias->onFirstPage(),
+            ])
         </div>
     </div>
 </div>
@@ -196,14 +295,24 @@
 <script>
 $(document).ready(function () {
 
-    function actualizarMensaje(total, all, query, fechaDesde, fechaHasta, documentado) {
+    function actualizarMensaje(total, all, query, fechaDesde, fechaHasta, documentado, from, to) {
+        let mensajeHTML = '';
+        
+        // Mensaje de resultados filtrados
         if (!query && !fechaDesde && !fechaHasta && !documentado) {
-            $('#mensajeResultados').html('');
+            mensajeHTML = '';
         } else if (total === 0) {
-            $('#mensajeResultados').html(`No se encontraron resultados.`);
+            mensajeHTML = `No se encontraron resultados.`;
         } else {
-            $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
+            mensajeHTML = `<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong><br>`;
         }
+        
+        // Información de paginación (siempre se muestra si hay resultados)
+        if (total > 0) {
+            mensajeHTML += `<small class="text-muted">Mostrando del <strong>${from}</strong> al <strong>${to}</strong> de <strong>${total}</strong> resultado${total > 1 ? 's' : ''}</small>`;
+        }
+        
+        $('#mensajeResultados').html(mensajeHTML);
     }
 
     function cargarDatos(page = 1, query = '') {
@@ -224,7 +333,14 @@ $(document).ready(function () {
             success: function(data) {
                 $('#tabla-container').html(data.html);
                 $('#paginacion-container').html(data.pagination);
-                actualizarMensaje(data.totalFiltrado ?? data.total, data.all, query, fechaDesde, fechaHasta, documentado);
+                
+                // Calcular from y to para la paginación
+                const total = data.totalFiltrado ?? data.total;
+                const perPage = 3; // Debe coincidir con $perPage del controlador
+                const from = total > 0 ? ((page - 1) * perPage) + 1 : 0;
+                const to = Math.min(page * perPage, total);
+                
+                actualizarMensaje(total, data.all, query, fechaDesde, fechaHasta, documentado, from, to);
             },
             error: function(xhr) {
                 let msg = 'Error al cargar los datos.';
@@ -251,26 +367,20 @@ $(document).ready(function () {
         cargarDatos(1, '');
     });
 
-    // Paginación dinámica
-    $(document).on('click', '.pagination a', function(e) {
+    // Paginación dinámica - Actualizado para custom-pagination
+    $(document).on('click', '.custom-pagination a', function(e) {
         e.preventDefault();
         const url = $(this).attr('href');
         const params = new URLSearchParams(url.split('?')[1]);
         const page = params.get('page') || 1;
         const query = $('#filtroBusqueda').val();
-        const fechaDesde = $('#fechaDesde').val();
-        const fechaHasta = $('#fechaHasta').val();
-        const documentado = $('#filtroDocumentado').val();
 
         cargarDatos(page, query);
 
-        // Actualizar URL sin recargar
-        let newUrl = url.split('?')[0] + '?page=' + page;
-        if(query) newUrl += '&search=' + encodeURIComponent(query);
-        if(fechaDesde) newUrl += '&fecha_desde=' + encodeURIComponent(fechaDesde);
-        if(fechaHasta) newUrl += '&fecha_hasta=' + encodeURIComponent(fechaHasta);
-        if(documentado) newUrl += '&documentado=' + encodeURIComponent(documentado);
-        window.history.pushState("", "", newUrl);
+        // Scroll suave hacia arriba (opcional)
+        $('html, body').animate({
+            scrollTop: $('.custom-card').offset().top - 20
+        }, 300);
     });
 });
 </script>

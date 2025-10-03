@@ -1,8 +1,9 @@
 <div class="table-responsive">
     <table class="table table-striped table-bordered">
-        <thead class="table-primary">
+       <thead>
             <tr>
-                <th>Nombre</th>
+                <th>#</th>
+                <th>Nombres</th>
                 <th>Apellidos</th>
                 <th>Tipo de sangre</th>
                 <th>Género</th>
@@ -11,8 +12,9 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($emergencias as $emergencia)
+            @forelse($emergencias as $index => $emergencia)
             <tr>
+                <td>{{ $emergencias->firstItem() + $index }}</td>
                 <td>{{ $emergencia->documentado && $emergencia->paciente ? $emergencia->paciente->nombre : 'Sin documento' }}</td>
                 <td>{{ $emergencia->documentado && $emergencia->paciente ? $emergencia->paciente->apellidos : 'Sin documento' }}</td>
                 <td>{{ $emergencia->documentado && $emergencia->paciente ? $emergencia->paciente->tipo_sangre : '-' }}</td>
@@ -28,7 +30,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="6" class="text-center">No se encontraron emergencias.</td>
+                <td colspan="7" class="text-center">No se encontraron emergencias.</td>
             </tr>
             @endforelse
         </tbody>

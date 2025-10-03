@@ -14,47 +14,69 @@ class EmergenciaController extends Controller
         return view('emergencias.create');
     }
 
-    public function index(Request $request)
-    {
-        $query = $request->input('search', '');
-        $fechaInicio = $request->input('fecha_desde');
-        $fechaFin = $request->input('fecha_hasta');
-        $documentado = $request->input('documentado');
-        $perPage = 3;
+  public function index(Request $request)
+{
+    $query = $request->input('search', '');
+    $fechaInicio = $request->input('fecha_desde');
+    $fechaFin = $request->input('fecha_hasta');
+    $documentado = $request->input('documentado');
+    $perPage = 3; // Mantén tu valor original
 
-        $emergenciasQuery = Emergencia::with('paciente')
-            ->orderBy('fecha', 'desc')
-            ->orderBy('hora', 'desc');
+    $totalEmergencias = Emergencia::count();
 
-        if ($query) {
-            $emergenciasQuery->whereHas('paciente', function($q) use ($query) {
-                $q->where('nombre', 'like', "%$query%")
-                  ->orWhere('apellidos', 'like', "%$query%");
-            });
-        }
+    $emergenciasQuery = Emergencia::with('paciente')
+        ->orderBy('fecha', 'desc')
+        ->orderBy('hora', 'desc');
 
-        if ($fechaInicio) $emergenciasQuery->where('fecha', '>=', $fechaInicio);
-        if ($fechaFin) $emergenciasQuery->where('fecha', '<=', $fechaFin);
-
-        if ($documentado !== null && $documentado !== '') {
-            $emergenciasQuery->where('documentado', $documentado);
-        }
-
-        $isSearch = ($query || $fechaInicio || $fechaFin || ($documentado !== null && $documentado !== ''));
-        $emergencias = $isSearch ? $emergenciasQuery->get() : $emergenciasQuery->paginate($perPage);
-        $totalFiltrado = $emergenciasQuery->count();
-
-        if ($request->ajax()) {
-            return response()->json([
-                'html' => view('emergencias.tabla', compact('emergencias', 'isSearch'))->render(),
-                'pagination' => $isSearch ? '' : $emergencias->links('pagination::bootstrap-5')->render(),
-                'totalFiltrado' => $totalFiltrado,
-                'all' => $totalFiltrado,
-            ]);
-        }
-
-        return view('emergencias.index', compact('emergencias', 'isSearch', 'totalFiltrado'));
+    if ($query) {
+        $emergenciasQuery->whereHas('paciente', function($q) use ($query) {
+            $q->where('nombre', 'like', "%$query%")
+              ->orWhere('apellidos', 'like', "%$query%");
+        });
     }
+
+    if ($fechaInicio) $emergenciasQuery->where('fecha', '>=', $fechaInicio);
+    if ($fechaFin) $emergenciasQuery->where('fecha', '<=', $fechaFin);
+
+    if ($documentado !== null && $documentado !== '') {
+        $emergenciasQuery->where('documentado', $documentado);
+    }
+
+    $isSearch = ($query || $fechaInicio || $fechaFin || ($documentado !== null && $documentado !== ''));
+    
+    $totalFiltrado = $emergenciasQuery->count();
+    $emergencias = $emergenciasQuery->paginate($perPage);
+    
+    $emergencias->appends([
+        'search' => $query,
+        'fecha_desde' => $fechaInicio,
+        'fecha_hasta' => $fechaFin,
+        'documentado' => $documentado
+    ]);
+
+    if ($request->ajax()) {
+        // Crear paginación personalizada que siempre se muestra
+        $currentPage = $emergencias->currentPage();
+        $lastPage = max($emergencias->lastPage(), 1); // Mínimo 1 página
+        
+        $customPagination = view('emergencias.custom-pagination', [
+            'currentPage' => $currentPage,
+            'lastPage' => $lastPage,
+            'hasMorePages' => $emergencias->hasMorePages(),
+            'onFirstPage' => $emergencias->onFirstPage(),
+        ])->render();
+        
+        return response()->json([
+            'html' => view('emergencias.tabla', compact('emergencias', 'isSearch'))->render(),
+            'pagination' => $customPagination,
+            'total' => $totalFiltrado,
+            'totalFiltrado' => $totalFiltrado,
+            'all' => $totalEmergencias,
+        ]);
+    }
+
+    return view('emergencias.index', compact('emergencias', 'isSearch'));
+}
 
     public function store(Request $request)
     {
