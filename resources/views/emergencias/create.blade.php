@@ -1,4 +1,4 @@
-@extends('layouts.app')
+dame la vista completa @extends('layouts.app')
 
 @section('content')
 
@@ -14,7 +14,7 @@
     padding: 2rem;
     box-shadow: 0 0 15px rgba(0,123,255,0.25);
     z-index: 1;
-    min-height: 600px;
+    min-height: 650px;
 }
 
 .custom-card::before {
@@ -140,6 +140,8 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
 
     @php
         $docFieldsVisible = old('documentado', 1) == 1;
+        $fechaActual = old('fecha', date('Y-m-d'));
+        $horaActual = old('hora', date('H:i:s'));
     @endphp
 
     <form id="formEmergencia" action="{{ route('emergencias.store') }}" method="POST" enctype="multipart/form-data">
@@ -162,7 +164,7 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
                 <i class="fas fa-user-circle"></i> Datos básicos y contacto
             </h5>
             
-            {{-- Buscador de pacientes en una sola fila --}}
+            {{-- Buscador de pacientes --}}
             <div class="row mb-4">
                 <div class="col-md-6">
                     <label style="font-weight: 700; font-size: 0.95rem;">
@@ -243,48 +245,75 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
             </div>
         </div>
 
-        {{-- Campos Indocumentado --}}
-        <div class="indocFields" style="display: {{ !$docFieldsVisible ? 'block' : 'none' }};">
-            <div class="row mb-3">
-                <div class="col-md-3">
-                    <label>Foto del paciente:</label>
-                    <input type="file" name="foto" class="form-control @error('foto') is-invalid @enderror">
-                    @error('foto') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                </div>
-            </div>
+{{-- Campos Indocumentado con Foto, Fecha, Hora y Edad en la misma fila --}}
+<div class="indocFields" style="display: {{ !$docFieldsVisible ? 'block' : 'none' }};">
+    <div class="row mb-3 align-items-end"> {{-- align-items-end alinea los labels abajo --}}
+        <div class="col-md-6">
+            <label>Foto del paciente:</label>
+            <input type="file" name="foto" class="form-control @error('foto') is-invalid @enderror">
+            @error('foto') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Fecha:</label>
+            <input type="date" name="fecha" id="fecha" class="form-control" value="{{ $fechaActual }}">
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Hora:</label>
+            <input type="time" name="hora" id="hora" class="form-control" value="{{ $horaActual }}">
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Edad <span class="text-danger">*</span></label>
+            <input type="number" name="edad" id="edad" min="0" max="105"
+                class="form-control @error('edad') is-invalid @enderror"
+                value="{{ old('edad') }}">
+            @error('edad') 
+                <div class="invalid-feedback">{{ $message }}</div> 
+            @enderror
+        </div>
+    </div>
+</div>
+
+
+
 
         {{-- Motivo de la emergencia --}}
         <h5 class="mt-4 mb-3 text-dark fw-bold">Motivo de la emergencia</h5>
         <div class="row mb-3">
-            <div class="col-md-6">
+            <div class="col-md-7">
                 <textarea name="motivo" rows="2" maxlength="300" class="form-control @error('motivo') is-invalid @enderror">{{ old('motivo') }}</textarea>
                 @error('motivo') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
 
-        {{-- Signos vitales --}}
-        <h5 class="mt-4 mb-3 text-dark fw-bold">Signos Vitales</h5>
-        <div class="row mb-3">
-            @foreach([
-                ['label'=>'Presión Arterial','name'=>'pa','type'=>'text','placeholder'=>'Ej: 120/80'],
-                ['label'=>'Frecuencia Cardíaca','name'=>'fc','type'=>'number'],
-                ['label'=>'Temperatura (°C)','name'=>'temp','type'=>'number','step'=>'0.1']
-            ] as $vital)
-            <div class="col-md-4">
-                <label>{{ $vital['label'] }}:</label>
-                <input 
-                    type="{{ $vital['type'] }}" 
-                    name="{{ $vital['name'] }}" 
-                    placeholder="{{ $vital['placeholder'] ?? '' }}"
-                    step="{{ $vital['step'] ?? '' }}"
-                    class="form-control @error($vital['name']) is-invalid @enderror" 
-                    value="{{ old($vital['name']) }}">
-                @error($vital['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-            @endforeach
-        </div>
-
+   {{-- Signos vitales --}}
+<h5 class="mt-4 mb-3 text-dark fw-bold">Signos Vitales</h5>
+<div class="row mb-3">
+    @foreach([
+        ['label'=>'Presión Arterial','name'=>'pa','type'=>'text','placeholder'=>'Ej: 120/80',
+         'note'=>'<strong>Ingrese presión arterial sistólica / diastólica</strong> (Ej: 120/80). Permite valores normales y elevados según emergencia)'],
+        ['label'=>'Frecuencia Cardíaca','name'=>'fc','type'=>'number',
+         'note'=>'<strong>Ingrese frecuencia cardíaca en reposo o emergencia</strong> (Ej: 60–100 lpm normales, cualquier valor en urgencia permitido)'],
+        ['label'=>'Temperatura (°C)','name'=>'temp','type'=>'number','step'=>'0.1',
+         'note'=>'<strong>Ingrese temperatura corporal</strong> (normal: 36–37.5 °C, cualquier valor permitido en emergencia)']
+    ] as $vital)
+    <div class="col-md-4">
+        <label>{{ $vital['label'] }}:</label>
+        <input 
+            type="{{ $vital['type'] }}" 
+            name="{{ $vital['name'] }}" 
+            placeholder="{{ $vital['placeholder'] ?? '' }}"
+            class="form-control @error($vital['name']) is-invalid @enderror" 
+            value="{{ old($vital['name']) }}"
+            @if(isset($vital['step'])) step="{{ $vital['step'] }}" @endif
+            maxlength="{{ $vital['name']=='pa'?7:'' }}">
+        @if(isset($vital['note'])) <small class="text-muted">{!! $vital['note'] !!}</small> @endif
+        @error($vital['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+    @endforeach
+</div>
         <div class="d-flex justify-content-center gap-3 mt-4">
             <button type="submit" class="btn btn-primary">Registrar</button>
             <button type="button" id="btnLimpiar" class="btn btn-warning">Limpiar</button>
@@ -300,30 +329,54 @@ function toggleDocs(){
     document.querySelectorAll('.indocFields').forEach(el => el.style.display = doc ? 'none' : 'block');
 }
 
-// Limpiar formulario
+// Limpiar formulario completo incluyendo validaciones y mensajes
 document.getElementById('btnLimpiar').addEventListener('click', () => {
     const form = document.getElementById('formEmergencia');
-    form.querySelectorAll('input, textarea, select').forEach(el => {
-        if(el.type === 'radio') return;
-        if(el.tagName.toLowerCase() === 'select') el.selectedIndex = 0;
-        else el.value = '';
-    });
+
+    // Resetea todos los campos
+    form.reset();
+
+    // Quita clases de error
+    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+    // Oculta mensajes de error
+    form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
+    // Limpiar buscador
+    document.getElementById('buscarIdentidad').value = '';
+    document.getElementById('listaResultados').style.display = 'none';
+    document.getElementById('listaResultados').innerHTML = '';
     document.getElementById('mensajeBusqueda').innerHTML = '';
+
+    // Limpiar campos de paciente
+    limpiarCamposPaciente();
+
+    // Mantener visibilidad de campos según radio
+    toggleDocs();
 });
 
-// Variable para controlar el timeout del debounce
+// Función para limpiar campos de paciente
+function limpiarCamposPaciente() {
+    const campos = ['nombres','apellidos','identidad','fecha_nacimiento','telefono','tipo_sangre','genero','direccion'];
+    campos.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) {
+            if(el.tagName.toLowerCase() === 'select') el.selectedIndex = 0;
+            else el.value = '';
+        }
+    });
+}
+
+// Variables para búsqueda de pacientes
 let timeoutBusqueda = null;
 
-// Buscar paciente automáticamente mientras escribe
 document.getElementById('buscarIdentidad').addEventListener('input', function() {
     const identidad = this.value.trim();
     const listaDiv = document.getElementById('listaResultados');
     const mensajeDiv = document.getElementById('mensajeBusqueda');
-    
-    // Limpiar timeout anterior
+
     clearTimeout(timeoutBusqueda);
-    
-    // Si está vacío, ocultar lista y limpiar campos
+
     if (!identidad) {
         listaDiv.style.display = 'none';
         listaDiv.innerHTML = '';
@@ -331,8 +384,7 @@ document.getElementById('buscarIdentidad').addEventListener('input', function() 
         limpiarCamposPaciente();
         return;
     }
-    
-    // Esperar 300ms después de que el usuario deje de escribir
+
     timeoutBusqueda = setTimeout(() => {
         buscarPacientes(identidad);
     }, 300);
@@ -341,9 +393,9 @@ document.getElementById('buscarIdentidad').addEventListener('input', function() 
 function buscarPacientes(identidad) {
     const listaDiv = document.getElementById('listaResultados');
     const mensajeDiv = document.getElementById('mensajeBusqueda');
-    
+
     const url = `{{ route('pacientes.buscar') }}?identidad=${encodeURIComponent(identidad)}`;
-    
+
     fetch(url, {
         method: 'GET',
         headers: {
@@ -352,112 +404,107 @@ function buscarPacientes(identidad) {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
         }
     })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success && data.pacientes && data.pacientes.length > 0) {
-                // Mostrar lista de resultados con mejor diseño
-                let html = '';
-                data.pacientes.forEach(paciente => {
-                    html += `
-                        <div class="resultado-item" onclick="seleccionarPaciente(${paciente.id})">
-                            <div class="resultado-info">
-                                <div class="resultado-nombre">${paciente.nombre} ${paciente.apellidos}</div>
-                                <div class="resultado-identidad">
-                                    <i class="fas fa-id-card"></i>
-                                    <span>${paciente.identidad}</span>
-                                </div>
-                            </div>
-                            <i class="fas fa-chevron-right resultado-icono"></i>
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.pacientes.length > 0) {
+            let html = '';
+            data.pacientes.forEach(p => {
+                html += `
+                    <div class="resultado-item" onclick="seleccionarPaciente(${p.id})">
+                        <div class="resultado-info">
+                            <div class="resultado-nombre">${p.nombre} ${p.apellidos}</div>
+                            <div class="resultado-identidad"><i class="fas fa-id-card"></i> ${p.identidad}</div>
                         </div>
-                    `;
-                });
-                listaDiv.innerHTML = html;
-                listaDiv.style.display = 'block';
-                mensajeDiv.innerHTML = '';
-            } else {
-                // No hay resultados
-                listaDiv.innerHTML = '<div class="no-resultados"><i class="fas fa-user-slash"></i><br>No se encontraron pacientes</div>';
-                listaDiv.style.display = 'block';
-                mensajeDiv.innerHTML = '';
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            listaDiv.style.display = 'none';
-            mensajeDiv.innerHTML = '<div class="alert alert-danger alert-custom mt-2">Error al buscar pacientes</div>';
-        });
-}
-
-function seleccionarPaciente(pacienteId) {
-    const url = `{{ url('pacientes/datos') }}/${pacienteId}`;
-    
-    fetch(url, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
+                        <i class="fas fa-chevron-right resultado-icono"></i>
+                    </div>`;
+            });
+            listaDiv.innerHTML = html;
+            listaDiv.style.display = 'block';
+            mensajeDiv.innerHTML = '';
+        } else {
+            listaDiv.innerHTML = '<div class="no-resultados"><i class="fas fa-user-slash"></i><br>No se encontraron pacientes</div>';
+            listaDiv.style.display = 'block';
         }
     })
-        .then(response => response.json())
+    .catch(() => {
+        listaDiv.style.display = 'none';
+        mensajeDiv.innerHTML = '<div class="alert alert-danger alert-custom mt-2">Error al buscar pacientes</div>';
+    });
+}
+
+function seleccionarPaciente(id) {
+    fetch(`{{ url('pacientes/datos') }}/${id}`)
+        .then(res => res.json())
         .then(data => {
-            if (data.success) {
-                // Llenar campos con datos del paciente
+            if(data.success) {
                 document.getElementById('nombres').value = data.paciente.nombres || '';
                 document.getElementById('apellidos').value = data.paciente.apellidos || '';
                 document.getElementById('identidad').value = data.paciente.identidad || '';
                 document.getElementById('fecha_nacimiento').value = data.paciente.fecha_nacimiento || '';
                 document.getElementById('telefono').value = data.paciente.telefono || '';
-                document.getElementById('genero').value = data.paciente.genero || '';
                 document.getElementById('direccion').value = data.paciente.direccion || '';
-                
-                if (data.paciente.tipo_sangre) {
-                    document.getElementById('tipo_sangre').value = data.paciente.tipo_sangre;
-                }
-                
-                // Actualizar campo de búsqueda
+                document.getElementById('genero').value = data.paciente.genero || '';
+                if(data.paciente.tipo_sangre) document.getElementById('tipo_sangre').value = data.paciente.tipo_sangre;
+
                 document.getElementById('buscarIdentidad').value = data.paciente.identidad;
-                
-                // Ocultar lista
                 document.getElementById('listaResultados').style.display = 'none';
                 document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-success alert-custom mt-2"><i class="fas fa-check-circle"></i> Datos cargados correctamente</div>';
-                
-                // Ocultar mensaje después de 2 segundos
-                setTimeout(() => {
-                    document.getElementById('mensajeBusqueda').innerHTML = '';
-                }, 2000);
+
+                setTimeout(() => { document.getElementById('mensajeBusqueda').innerHTML = ''; }, 2000);
             }
         })
-        .catch(error => {
-            console.error('Error:', error);
+        .catch(() => {
             document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-danger alert-custom mt-2">Error al cargar datos del paciente</div>';
         });
 }
 
-// Cerrar lista al hacer clic fuera
 document.addEventListener('click', function(e) {
     const buscarInput = document.getElementById('buscarIdentidad');
     const listaDiv = document.getElementById('listaResultados');
-    
-    if (e.target !== buscarInput && !listaDiv.contains(e.target)) {
+    if(e.target !== buscarInput && !listaDiv.contains(e.target)) {
         listaDiv.style.display = 'none';
     }
 });
 
-function limpiarCamposPaciente() {
-    document.getElementById('nombres').value = '';
-    document.getElementById('apellidos').value = '';
-    document.getElementById('identidad').value = '';
-    document.getElementById('fecha_nacimiento').value = '';
-    document.getElementById('telefono').value = '';
-    document.getElementById('tipo_sangre').selectedIndex = 0;
-    document.getElementById('genero').selectedIndex = 0;
-    document.getElementById('direccion').value = '';
-}
+document.addEventListener('DOMContentLoaded', toggleDocs);
+
+// Permitir solo letras y espacios en nombres y apellidos
+['nombres','apellidos'].forEach(id => {
+    document.getElementById(id).addEventListener('keypress', function(e){
+        const char = String.fromCharCode(e.which);
+        if(!/[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/.test(char)) e.preventDefault();
+    });
+});
+
+// Permitir solo números en teléfono e identidad
+['telefono','identidad','fc'].forEach(id => {
+    document.getElementById(id).addEventListener('keypress', function(e){
+        const char = String.fromCharCode(e.which);
+        if(!/[0-9]/.test(char)) e.preventDefault();
+    });
+});
+
+// Permitir números y '/' en presión arterial
+document.getElementById('pa').addEventListener('keypress', function(e){
+    const char = String.fromCharCode(e.which);
+    if(!/[0-9\/]/.test(char)) e.preventDefault();
+});
+// Presión arterial: agregar '/' automáticamente
+document.getElementById('pa').addEventListener('input', function(e){
+    let val = this.value.replace(/[^0-9]/g,''); // solo números
+    if(val.length > 3){
+        this.value = val.slice(0,3) + '/' + val.slice(3,5);
+    } else {
+        this.value = val;
+    }
+});
+
+// Permitir cualquier número en FC y temperatura, sin bloquear (emergencia)
+['fc','temp'].forEach(id => {
+    document.getElementById(id).addEventListener('input', function(){
+        this.value = this.value.replace(/[^0-9.]/g,'');
+    });
+});
 </script>
 
 @endsection
