@@ -4,7 +4,7 @@
 
 <style>
 .custom-card {
-    max-width: 1000px;
+    max-width: 1200px;
     background-color: rgba(255, 255, 255, 0.95);
     border: 1px solid #91cfff;
     border-radius: 0.5rem;
@@ -142,6 +142,51 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
 .row.mb-3 .col-md-3 {
     min-width: 0;
 }
+
+/* Radios Documentado / Indocumentado */
+.mb-4.d-flex.gap-3 label {
+    font-size: 1.3rem;  /* más grande */
+    font-weight: 800;   /* negrita más marcada */
+}
+
+/* Título Datos básicos y contacto */
+.docFields h5.mb-3.text-dark.fw-bold {
+    font-size: 1.4rem;  /* más grande */
+    font-weight: 700;
+}
+
+/* Etiquetas de los campos (Nombre, Apellidos, Identidad...) */
+.docFields label {
+    font-size: 1.1rem;  /* más grande */
+    font-weight: 700;
+}
+
+/* Títulos Motivo de la emergencia y Signos Vitales */
+h5.mt-4.mb-3.text-dark.fw-bold {
+    font-size: 1.35rem;  /* más grande */
+    font-weight: 700;
+}
+
+/* Inputs, selects y textareas */
+.docFields input.form-control,
+.docFields select.form-select,
+.docFields textarea.form-control {
+    font-size: 1.05rem;  /* texto más grande dentro de los campos */
+}
+
+/* Opcional: el buscador de pacientes */
+#buscarIdentidad {
+    font-size: 1rem;  /* más grande */
+    height: 42px;     /* un poco más alto */
+}
+
+/* Mensajes de alerta y resultados */
+.alert-custom,
+.lista-resultados .resultado-item,
+.lista-resultados .no-resultados {
+    font-size: 1rem;  /* más grande y legible */
+}
+
 </style>
 
 <div class="custom-card">
@@ -174,28 +219,29 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
             <h5 class="mb-3 text-dark fw-bold">
                 <i class="fas fa-user-circle"></i> Datos básicos y contacto
             </h5>
-            
             {{-- Buscador de pacientes --}}
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <label style="font-weight: 700; font-size: 0.95rem;">
-                        <i class="fas fa-search"></i> BUSCAR PACIENTE
-                    </label>
-                    <div style="position: relative;">
-                        <input 
-                            type="text" 
-                            id="buscarIdentidad" 
-                            class="form-control" 
-                            placeholder="Buscar por identidad..."
-                            maxlength="13"
-                            autocomplete="off"
-                            style="padding-right: 40px; height: 38px; font-size: 0.9rem;">
-                        <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
-                        <div id="listaResultados" class="lista-resultados" style="display: none;"></div>
-                    </div>
-                    <div id="mensajeBusqueda"></div>
-                </div>
-            </div>
+<div class="d-flex align-items-center mb-4" style="gap: 1.25rem;"> <!-- separación ajustada -->
+    <!-- Título -->
+    <label class="fw-bold mb-0" style="white-space: nowrap; font-size: 0.95rem;">
+        <i class="fas fa-search"></i> BUSCAR PACIENTE
+    </label>
+
+    <!-- Input de búsqueda -->
+    <div style="position: relative; flex-grow: 1; max-width: 250px;"> <!-- filtro menos largo -->
+        <input 
+            type="text" 
+            id="buscarIdentidad" 
+            class="form-control" 
+            placeholder="Buscar por identidad..."
+            maxlength="13"
+            autocomplete="off"
+            style="padding-right: 40px; height: 38px; font-size: 0.9rem;">
+        <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+        <div id="listaResultados" class="lista-resultados" style="display: none;"></div>
+    </div>
+</div>
+<div id="mensajeBusqueda" class="mt-1"></div>
+
 
             <div class="row mb-3">
                 <div class="col-md-3">
