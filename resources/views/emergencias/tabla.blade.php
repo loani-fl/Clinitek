@@ -15,8 +15,8 @@
             @forelse($emergencias as $index => $emergencia)
             <tr>
                 <td>{{ $emergencias->firstItem() + $index }}</td>
-                <td>{{ $emergencia->documentado && $emergencia->paciente ? $emergencia->paciente->nombre : 'Sin documento' }}</td>
-                <td>{{ $emergencia->documentado && $emergencia->paciente ? $emergencia->paciente->apellidos : 'Sin documento' }}</td>
+                <td>{{ $emergencia->documentado && $emergencia->paciente ? $emergencia->paciente->nombre : 'indocumentado' }}</td>
+                <td>{{ $emergencia->documentado && $emergencia->paciente ? $emergencia->paciente->apellidos : '-' }}</td>
                 <td>{{ $emergencia->documentado && $emergencia->paciente ? $emergencia->paciente->tipo_sangre : '-' }}</td>
                 <td>{{ $emergencia->documentado && $emergencia->paciente ? $emergencia->paciente->genero : '-' }}</td>
                 <td>{{ \Carbon\Carbon::parse($emergencia->hora)->format('H:i') }}</td>
