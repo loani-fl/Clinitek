@@ -79,20 +79,28 @@ class EmergenciaController extends Controller
     }
 
     return view('emergencias.index', compact('emergencias', 'isSearch'));
-}
-public function store(Request $request)
+}public function store(Request $request)
 {
     $anioActual = date('Y');
 
     // Función para validar año de identidad
     $validarAnioIdentidad = fn($identidad) => intval(substr($identidad, 4, 4)) >= 1930 && intval(substr($identidad, 4, 4)) <= $anioActual;
 
+    // CONVERTIR FECHA ANTES DE VALIDAR
+    if($request->filled('fecha_nacimiento') && $request->documentado == 1) {
+        $fechaPartes = explode('/', $request->fecha_nacimiento);
+        if(count($fechaPartes) == 3) {
+            $fechaConvertida = $fechaPartes[2] . '-' . $fechaPartes[1] . '-' . $fechaPartes[0];
+            $request->merge(['fecha_nacimiento' => $fechaConvertida]);
+        }
+    }
+
     // Reglas base
     $rules = [
         'documentado' => 'required|boolean',
         'motivo' => 'required|string|max:300',
-        'pa' => 'required|string|max:7',
-        'fc' => 'required|integer|min:1|max:300',
+        'pa' => ['required', 'string', 'regex:/^\d{2,3}\/\d{2,3}$/'],
+        'fc' => 'required|integer|min:20|max:250',
         'temp' => 'required|numeric|between:30,45',
     ];
 
@@ -110,17 +118,48 @@ public function store(Request $request)
             'genero' => 'required|in:Femenino,Masculino,Otro',
         ]);
     } else {
-        // Campos indocumentado
+        // Campos indocumentado - SIN edad
         $rules = array_merge($rules, [
             'foto' => 'required|file|mimes:jpeg,jpg,png|max:2048',
         ]);
     }
 
+    // Validación adicional de presión arterial
+    if ($request->filled('pa')) {
+        $partes = explode('/', $request->pa);
+        if (count($partes) === 2) {
+            $sistolica = (int)$partes[0];
+            $diastolica = (int)$partes[1];
+            
+            if ($sistolica < 40 || $sistolica > 250) {
+                return redirect()->back()
+                    ->withErrors(['pa' => 'La presión sistólica debe estar entre 40 y 250 mmHg.'])
+                    ->withInput();
+            }
+            
+            if ($diastolica < 20 || $diastolica > 150) {
+                return redirect()->back()
+                    ->withErrors(['pa' => 'La presión diastólica debe estar entre 20 y 150 mmHg.'])
+                    ->withInput();
+            }
+            
+            if ($sistolica <= $diastolica) {
+                return redirect()->back()
+                    ->withErrors(['pa' => 'La presión sistólica debe ser mayor que la diastólica.'])
+                    ->withInput();
+            }
+        }
+    }
+
     $request->validate($rules, [
         'motivo.required' => 'El motivo de la emergencia es obligatorio.',
         'pa.required' => 'La presión arterial es obligatoria.',
+        'pa.regex' => 'La presión arterial debe tener el formato: 120/80',
         'fc.required' => 'La frecuencia cardíaca es obligatoria.',
+        'fc.min' => 'La frecuencia cardíaca debe ser al menos 20 lpm.',
+        'fc.max' => 'La frecuencia cardíaca no puede superar 250 lpm.',
         'temp.required' => 'La temperatura es obligatoria.',
+        'temp.between' => 'La temperatura debe estar entre 30 y 45°C.',
         'nombres.required' => 'El nombre es obligatorio.',
         'apellidos.required' => 'Los apellidos son obligatorios.',
         'identidad.required' => 'La identidad es obligatoria.',
@@ -128,23 +167,11 @@ public function store(Request $request)
         'edad.required' => 'La edad es obligatoria.',
         'edad.max' => 'La edad no puede ser mayor a 105 años.',
         'telefono.required' => 'El teléfono es obligatorio.',
+        'telefono.regex' => 'El número de teléfono debe comenzar con 2, 3, 8 o 9.',
         'direccion.required' => 'La dirección es obligatoria.',
         'genero.required' => 'El género es obligatorio.',
         'foto.required' => 'La foto es obligatoria para pacientes indocumentados.',
     ]);
-
-    // Validar coherencia entre edad y fecha de nacimiento
-    if ($request->documentado && $request->filled('fecha_nacimiento')) {
-        $fechaNacimiento = new \DateTime($request->fecha_nacimiento);
-        $hoy = new \DateTime();
-        $edadCalculada = $hoy->diff($fechaNacimiento)->y;
-
-        if ($edadCalculada != $request->edad) {
-            return redirect()->back()
-                ->withErrors(['edad' => "La edad ingresada ($request->edad) no coincide con la fecha de nacimiento. Edad real: $edadCalculada"])
-                ->withInput();
-        }
-    }
 
     // Validación manual de identidad
     if ($request->documentado && !$validarAnioIdentidad($request->identidad)) {
@@ -153,7 +180,7 @@ public function store(Request $request)
             ->withInput();
     }
 
-    // Guardar datos de emergencia
+    // Resto del código igual...
     $dataEmergencia = [
         'documentado' => $request->documentado,
         'motivo' => $request->motivo,
@@ -197,8 +224,6 @@ public function store(Request $request)
 
     return redirect()->route('emergencias.index')->with('success', 'Emergencia registrada correctamente.');
 }
-
-
 
     public function show($id)
     {

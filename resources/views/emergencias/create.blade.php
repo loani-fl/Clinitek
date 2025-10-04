@@ -1,4 +1,4 @@
-dame la vista completa @extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
 
@@ -131,6 +131,17 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
     border-color: #007BFF;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
 }
+
+#fecha_nacimiento {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+
+.row.mb-3 .col-md-3 {
+    min-width: 0;
+}
 </style>
 
 <div class="custom-card">
@@ -187,28 +198,71 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
             </div>
 
             <div class="row mb-3">
-                @foreach([
-                    ['label'=>'Nombre(s)','name'=>'nombres','type'=>'text','size'=>'50'],
-                    ['label'=>'Apellidos','name'=>'apellidos','type'=>'text','size'=>'50'],
-                    ['label'=>'Identidad','name'=>'identidad','type'=>'text','size'=>'13','placeholder'=>'Ej: 0703200201564'],
-                    ['label'=>'Fecha de Nacimiento','name'=>'fecha_nacimiento','type'=>'date']
-                ] as $field)
                 <div class="col-md-3">
-                    <label>{{ $field['label'] }}: <span class="text-danger">*</span></label>
+                    <label>Nombre(s): <span class="text-danger">*</span></label>
                     <input 
-                        type="{{ $field['type'] }}" 
-                        name="{{ $field['name'] }}" 
-                        id="{{ $field['name'] }}"
-                        maxlength="{{ $field['size'] ?? '' }}" 
-                        placeholder="{{ $field['placeholder'] ?? '' }}"
-                        class="form-control @error($field['name']) is-invalid @enderror" 
-                        value="{{ old($field['name']) }}">
-                    @error($field['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        type="text" 
+                        name="nombres" 
+                        id="nombres"
+                        maxlength="50"
+                        class="form-control @error('nombres') is-invalid @enderror" 
+                        value="{{ old('nombres') }}">
+                    @error('nombres') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
-                @endforeach
+
+                <div class="col-md-3">
+                    <label>Apellidos: <span class="text-danger">*</span></label>
+                    <input 
+                        type="text" 
+                        name="apellidos" 
+                        id="apellidos"
+                        maxlength="50"
+                        class="form-control @error('apellidos') is-invalid @enderror" 
+                        value="{{ old('apellidos') }}">
+                    @error('apellidos') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="col-md-3">
+                    <label>Identidad: <span class="text-danger">*</span></label>
+                    <input 
+                        type="text" 
+                        name="identidad" 
+                        id="identidad"
+                        maxlength="13"
+                        placeholder="Ej: 0703200201564"
+                        class="form-control @error('identidad') is-invalid @enderror" 
+                        value="{{ old('identidad') }}">
+                    @error('identidad') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="col-md-3">
+                    <label>Fecha de Nacimiento: <span class="text-danger">*</span></label>
+                    <input 
+                        type="text" 
+                        name="fecha_nacimiento" 
+                        id="fecha_nacimiento"
+                        maxlength="10" 
+                        placeholder="dd/mm/aaaa"
+                        class="form-control @error('fecha_nacimiento') is-invalid @enderror" 
+                        value="{{ old('fecha_nacimiento') }}">
+                    @error('fecha_nacimiento') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
             </div>
 
             <div class="row mb-3">
+                <div class="col-md-3">
+                    <label>Edad: <span class="text-danger">*</span></label>
+                    <input 
+                        type="number" 
+                        name="edad" 
+                        id="edadDocumentado" 
+                        min="0" 
+                        max="105"
+                        class="form-control @error('edad') is-invalid @enderror"
+                        value="{{ old('edad') }}">
+                    @error('edad') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
                 <div class="col-md-3">
                     <label>Teléfono: <span class="text-danger">*</span></label>
                     <input type="text" name="telefono" id="telefono" maxlength="8" class="form-control @error('telefono') is-invalid @enderror" value="{{ old('telefono') }}">
@@ -236,8 +290,10 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
                     </select>
                     @error('genero') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
+            </div>
 
-                <div class="col-md-3">
+            <div class="row mb-3">
+                <div class="col-md-12">
                     <label>Dirección: <span class="text-danger">*</span></label>
                     <textarea name="direccion" id="direccion" rows="2" maxlength="300" class="form-control @error('direccion') is-invalid @enderror">{{ old('direccion') }}</textarea>
                     @error('direccion') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -245,75 +301,81 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
             </div>
         </div>
 
-{{-- Campos Indocumentado con Foto, Fecha, Hora y Edad en la misma fila --}}
-<div class="indocFields" style="display: {{ !$docFieldsVisible ? 'block' : 'none' }};">
-    <div class="row mb-3 align-items-end"> {{-- align-items-end alinea los labels abajo --}}
-        <div class="col-md-6">
-            <label>Foto del paciente:</label>
-            <input type="file" name="foto" class="form-control @error('foto') is-invalid @enderror">
-            @error('foto') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        {{-- Campos Indocumentado --}}
+        <div class="indocFields" style="display: {{ !$docFieldsVisible ? 'block' : 'none' }};">
+            <div class="row mb-3 align-items-end">
+                <div class="col-md-6">
+                    <label>Foto del paciente: <span class="text-danger">*</span></label>
+                    <input type="file" name="foto" id="foto" class="form-control @error('foto') is-invalid @enderror">
+                    @error('foto') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Fecha:</label>
+                    <input type="date" name="fecha" id="fecha" class="form-control" value="{{ $fechaActual }}">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Hora:</label>
+                    <input type="time" name="hora" id="hora" class="form-control" value="{{ $horaActual }}">
+                </div>
+            </div>
         </div>
-
-        <div class="col-md-2">
-            <label class="form-label">Fecha:</label>
-            <input type="date" name="fecha" id="fecha" class="form-control" value="{{ $fechaActual }}">
-        </div>
-
-        <div class="col-md-2">
-            <label class="form-label">Hora:</label>
-            <input type="time" name="hora" id="hora" class="form-control" value="{{ $horaActual }}">
-        </div>
-
-        <div class="col-md-2">
-            <label class="form-label">Edad <span class="text-danger">*</span></label>
-            <input type="number" name="edad" id="edad" min="0" max="105"
-                class="form-control @error('edad') is-invalid @enderror"
-                value="{{ old('edad') }}">
-            @error('edad') 
-                <div class="invalid-feedback">{{ $message }}</div> 
-            @enderror
-        </div>
-    </div>
-</div>
-
-
-
 
         {{-- Motivo de la emergencia --}}
         <h5 class="mt-4 mb-3 text-dark fw-bold">Motivo de la emergencia</h5>
         <div class="row mb-3">
-            <div class="col-md-7">
-                <textarea name="motivo" rows="2" maxlength="300" class="form-control @error('motivo') is-invalid @enderror">{{ old('motivo') }}</textarea>
+            <div class="col-md-12">
+                <textarea name="motivo" id="motivo" rows="2" maxlength="300" placeholder="Describa el motivo de la emergencia..." class="form-control @error('motivo') is-invalid @enderror">{{ old('motivo') }}</textarea>
                 @error('motivo') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
 
-   {{-- Signos vitales --}}
-<h5 class="mt-4 mb-3 text-dark fw-bold">Signos Vitales</h5>
-<div class="row mb-3">
-    @foreach([
-        ['label'=>'Presión Arterial','name'=>'pa','type'=>'text','placeholder'=>'Ej: 120/80',
-         'note'=>'<strong>Ingrese presión arterial sistólica / diastólica</strong> (Ej: 120/80). Permite valores normales y elevados según emergencia)'],
-        ['label'=>'Frecuencia Cardíaca','name'=>'fc','type'=>'number',
-         'note'=>'<strong>Ingrese frecuencia cardíaca en reposo o emergencia</strong> (Ej: 60–100 lpm normales, cualquier valor en urgencia permitido)'],
-        ['label'=>'Temperatura (°C)','name'=>'temp','type'=>'number','step'=>'0.1',
-         'note'=>'<strong>Ingrese temperatura corporal</strong> (normal: 36–37.5 °C, cualquier valor permitido en emergencia)']
-    ] as $vital)
-    <div class="col-md-4">
-        <label>{{ $vital['label'] }}:</label>
-        <input 
-            type="{{ $vital['type'] }}" 
-            name="{{ $vital['name'] }}" 
-            placeholder="{{ $vital['placeholder'] ?? '' }}"
-            class="form-control @error($vital['name']) is-invalid @enderror" 
-            value="{{ old($vital['name']) }}"
-            @if(isset($vital['step'])) step="{{ $vital['step'] }}" @endif
-            maxlength="{{ $vital['name']=='pa'?7:'' }}">
-        @if(isset($vital['note'])) <small class="text-muted">{!! $vital['note'] !!}</small> @endif
-        @error($vital['name']) <div class="invalid-feedback">{{ $message }}</div> @enderror
-    </div>
-    @endforeach
-</div>
+        {{-- Signos vitales --}}
+        <h5 class="mt-4 mb-3 text-dark fw-bold">Signos Vitales</h5>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label>Presión Arterial: <span class="text-danger">*</span></label>
+                <input 
+                    type="text" 
+                    name="pa" 
+                    id="pa"
+                    placeholder="Ej: 120/80"
+                    class="form-control @error('pa') is-invalid @enderror" 
+                    value="{{ old('pa') }}"
+                    maxlength="7">
+                <small class="text-muted">Rango: 40-250 / 20-150 mmHg</small>
+                @error('pa') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="col-md-4">
+                <label>Frecuencia Cardíaca (lpm): <span class="text-danger">*</span></label>
+                <input 
+                    type="number" 
+                    name="fc" 
+                    id="fc"
+                    placeholder="Ej: 75"
+                    class="form-control @error('fc') is-invalid @enderror" 
+                    value="{{ old('fc') }}">
+                <small class="text-muted">Rango: 20-250 lpm</small>
+                @error('fc') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="col-md-4">
+                <label>Temperatura (°C): <span class="text-danger">*</span></label>
+                <input 
+                    type="number" 
+                    name="temp" 
+                    id="temp"
+                    placeholder="Ej: 36.5"
+                    class="form-control @error('temp') is-invalid @enderror" 
+                    value="{{ old('temp') }}"
+                    step="0.1">
+                <small class="text-muted">Rango: 30-45 °C</small>
+                @error('temp') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+        </div>
+
         <div class="d-flex justify-content-center gap-3 mt-4">
             <button type="submit" class="btn btn-primary">Registrar</button>
             <button type="button" id="btnLimpiar" class="btn btn-warning">Limpiar</button>
@@ -323,51 +385,225 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
 </div>
 
 <script>
+// ========== TOGGLE DOCUMENTADO/INDOCUMENTADO ==========
 function toggleDocs(){
     let doc = document.querySelector('input[name="documentado"][value="1"]').checked;
-    document.querySelectorAll('.docFields').forEach(el => el.style.display = doc ? 'block' : 'none');
-    document.querySelectorAll('.indocFields').forEach(el => el.style.display = doc ? 'none' : 'block');
+
+    // Campos documentado
+    document.querySelectorAll('.docFields').forEach(el => {
+        el.style.display = doc ? 'block' : 'none';
+        el.querySelectorAll('input, select, textarea').forEach(input => input.disabled = !doc);
+    });
+
+    // Campos indocumentado
+    document.querySelectorAll('.indocFields').forEach(el => {
+        el.style.display = doc ? 'none' : 'block';
+        el.querySelectorAll('input, select, textarea').forEach(input => input.disabled = doc);
+        if(doc) resetIndocFields(el);
+    });
 }
 
-// Limpiar formulario completo incluyendo validaciones y mensajes
+function resetIndocFields(container) {
+    container.querySelectorAll('input, select, textarea').forEach(input => {
+        if(input.name === 'fecha' || input.name === 'hora') return;
+        if(input.type === 'file') {
+            input.value = '';
+        } else if(input.tagName.toLowerCase() === 'select') {
+            input.selectedIndex = 0;
+        } else {
+            input.value = '';
+        }
+    });
+}
+
+// ========== VALIDACIONES DE SIGNOS VITALES ==========
+
+// Validación y formato automático de Presión Arterial
+document.getElementById('pa').addEventListener('input', function(e) {
+    let valor = this.value.replace(/[^0-9]/g, '');
+    
+    if (valor.length > 6) {
+        valor = valor.substring(0, 6);
+    }
+    
+    if (valor.length > 3) {
+        this.value = valor.substring(0, 3) + '/' + valor.substring(3);
+    } else {
+        this.value = valor;
+    }
+    
+    validarPresionArterial(this.value);
+});
+
+function validarPresionArterial(valor) {
+    const paInput = document.getElementById('pa');
+    let feedback = paInput.parentElement.querySelector('.invalid-feedback:not(.d-block)');
+    
+    if (!valor) return true;
+    
+    const partes = valor.split('/');
+    if (partes.length === 2 && partes[0] && partes[1]) {
+        const sistolica = parseInt(partes[0]);
+        const diastolica = parseInt(partes[1]);
+        
+        let errorMsg = '';
+        
+        if (sistolica < 40 || sistolica > 250) {
+            errorMsg = 'Presión sistólica fuera de rango (40-250 mmHg)';
+        } else if (diastolica < 20 || diastolica > 150) {
+            errorMsg = 'Presión diastólica fuera de rango (20-150 mmHg)';
+        } else if (sistolica <= diastolica) {
+            errorMsg = 'La presión sistólica debe ser mayor que la diastólica';
+        }
+        
+        if (errorMsg) {
+            paInput.classList.add('is-invalid');
+            if (!feedback) {
+                feedback = document.createElement('div');
+                feedback.className = 'invalid-feedback';
+                paInput.parentElement.appendChild(feedback);
+            }
+            feedback.textContent = errorMsg;
+            return false;
+        } else {
+            paInput.classList.remove('is-invalid');
+            if (feedback && !feedback.classList.contains('d-block')) {
+                feedback.remove();
+            }
+            return true;
+        }
+    }
+    
+    return true;
+}
+
+// Validación de Frecuencia Cardíaca
+document.getElementById('fc').addEventListener('input', function(e) {
+    let valor = this.value.replace(/[^0-9]/g, '');
+    
+    if (valor.length > 3) {
+        valor = valor.substring(0, 3);
+    }
+    
+    this.value = valor;
+    if(valor) validarFrecuenciaCardiaca(parseInt(valor));
+});
+
+function validarFrecuenciaCardiaca(valor) {
+    const fcInput = document.getElementById('fc');
+    let feedback = fcInput.parentElement.querySelector('.invalid-feedback:not(.d-block)');
+    
+    if (!valor) return true;
+    
+    if (valor < 20 || valor > 250) {
+        fcInput.classList.add('is-invalid');
+        if (!feedback) {
+            feedback = document.createElement('div');
+            feedback.className = 'invalid-feedback';
+            fcInput.parentElement.appendChild(feedback);
+        }
+        feedback.textContent = 'Frecuencia cardíaca fuera de rango (20-250 lpm)';
+        return false;
+    }
+    
+    fcInput.classList.remove('is-invalid');
+    if (feedback && !feedback.classList.contains('d-block')) {
+        feedback.remove();
+    }
+    return true;
+}
+
+// Validación de Temperatura
+document.getElementById('temp').addEventListener('input', function(e) {
+    let valor = this.value;
+    
+    valor = valor.replace(/[^0-9.]/g, '');
+    
+    const partes = valor.split('.');
+    if (partes.length > 2) {
+        valor = partes[0] + '.' + partes.slice(1).join('');
+    }
+    
+    if (partes.length === 2 && partes[1].length > 1) {
+        valor = partes[0] + '.' + partes[1].substring(0, 1);
+    }
+    
+    if (parseFloat(valor) > 45) {
+        valor = '45';
+    }
+    
+    this.value = valor;
+    if(valor) validarTemperatura(parseFloat(valor));
+});
+
+function validarTemperatura(valor) {
+    const tempInput = document.getElementById('temp');
+    let feedback = tempInput.parentElement.querySelector('.invalid-feedback:not(.d-block)');
+    
+    if (!valor) return true;
+    
+    if (valor < 30 || valor > 45) {
+        tempInput.classList.add('is-invalid');
+        if (!feedback) {
+            feedback = document.createElement('div');
+            feedback.className = 'invalid-feedback';
+            tempInput.parentElement.appendChild(feedback);
+        }
+        feedback.textContent = 'Temperatura fuera de rango (30-45°C)';
+        return false;
+    }
+    
+    tempInput.classList.remove('is-invalid');
+    if (feedback && !feedback.classList.contains('d-block')) {
+        feedback.remove();
+    }
+    return true;
+}
+
+// ========== LIMPIAR FORMULARIO COMPLETO ==========
 document.getElementById('btnLimpiar').addEventListener('click', () => {
     const form = document.getElementById('formEmergencia');
-
-    // Resetea todos los campos
+    
+    // Resetear formulario
     form.reset();
-
-    // Quita clases de error
+    
+    // Remover todas las clases de error
     form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-
-    // Oculta mensajes de error
+    
+    // Remover todos los mensajes de error (tanto dinámicos como de Laravel)
     form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
-
-    // Limpiar buscador
+    
+    // Limpiar búsqueda de pacientes
     document.getElementById('buscarIdentidad').value = '';
     document.getElementById('listaResultados').style.display = 'none';
     document.getElementById('listaResultados').innerHTML = '';
     document.getElementById('mensajeBusqueda').innerHTML = '';
-
-    // Limpiar campos de paciente
+    
+    // Limpiar y desbloquear campos de paciente
     limpiarCamposPaciente();
-
-    // Mantener visibilidad de campos según radio
+    
+    // Restaurar estado inicial
+    document.querySelector('input[name="documentado"][value="1"]').checked = true;
     toggleDocs();
 });
 
-// Función para limpiar campos de paciente
+// ========== BÚSQUEDA DE PACIENTES ==========
 function limpiarCamposPaciente() {
-    const campos = ['nombres','apellidos','identidad','fecha_nacimiento','telefono','tipo_sangre','genero','direccion'];
+    const campos = ['nombres','apellidos','identidad','fecha_nacimiento','edadDocumentado','telefono','tipo_sangre','genero','direccion'];
     campos.forEach(id => {
         const el = document.getElementById(id);
         if(el) {
             if(el.tagName.toLowerCase() === 'select') el.selectedIndex = 0;
             else el.value = '';
+            
+            el.removeAttribute('readonly');
+            el.style.backgroundColor = '';
+            el.style.cursor = '';
+            el.style.userSelect = '';
         }
     });
 }
 
-// Variables para búsqueda de pacientes
 let timeoutBusqueda = null;
 
 document.getElementById('buscarIdentidad').addEventListener('input', function() {
@@ -440,11 +676,33 @@ function seleccionarPaciente(id) {
                 document.getElementById('nombres').value = data.paciente.nombres || '';
                 document.getElementById('apellidos').value = data.paciente.apellidos || '';
                 document.getElementById('identidad').value = data.paciente.identidad || '';
-                document.getElementById('fecha_nacimiento').value = data.paciente.fecha_nacimiento || '';
+                
+                let fechaNacimiento = data.paciente.fecha_nacimiento || '';
+                if(fechaNacimiento) {
+                    fechaNacimiento = fechaNacimiento.split('T')[0].split(' ')[0];
+                    if(fechaNacimiento.includes('-')) {
+                        const partes = fechaNacimiento.split('-');
+                        fechaNacimiento = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                    }
+                }
+                document.getElementById('fecha_nacimiento').value = fechaNacimiento;
+                
+                if(data.paciente.edad) document.getElementById('edadDocumentado').value = data.paciente.edad;
                 document.getElementById('telefono').value = data.paciente.telefono || '';
                 document.getElementById('direccion').value = data.paciente.direccion || '';
                 document.getElementById('genero').value = data.paciente.genero || '';
                 if(data.paciente.tipo_sangre) document.getElementById('tipo_sangre').value = data.paciente.tipo_sangre;
+
+                const camposBloquear = ['nombres', 'apellidos', 'identidad', 'fecha_nacimiento',  'telefono', 'direccion', 'genero', 'tipo_sangre'];
+                camposBloquear.forEach(campo => {
+                    const elemento = document.getElementById(campo);
+                    if(elemento) {
+                        elemento.setAttribute('readonly', true);
+                        elemento.style.backgroundColor = '#e9ecef';
+                        elemento.style.cursor = 'not-allowed';
+                        elemento.style.userSelect = 'none';
+                    }
+                });
 
                 document.getElementById('buscarIdentidad').value = data.paciente.identidad;
                 document.getElementById('listaResultados').style.display = 'none';
@@ -454,7 +712,7 @@ function seleccionarPaciente(id) {
             }
         })
         .catch(() => {
-            document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-danger alert-custom mt-2">Error al cargar datos del paciente</div>';
+                            document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-danger alert-custom mt-2">Error al cargar datos del paciente</div>';
         });
 }
 
@@ -466,7 +724,7 @@ document.addEventListener('click', function(e) {
     }
 });
 
-document.addEventListener('DOMContentLoaded', toggleDocs);
+// ========== VALIDACIONES DE FORMATO ==========
 
 // Permitir solo letras y espacios en nombres y apellidos
 ['nombres','apellidos'].forEach(id => {
@@ -477,34 +735,29 @@ document.addEventListener('DOMContentLoaded', toggleDocs);
 });
 
 // Permitir solo números en teléfono e identidad
-['telefono','identidad','fc'].forEach(id => {
+['telefono','identidad'].forEach(id => {
     document.getElementById(id).addEventListener('keypress', function(e){
         const char = String.fromCharCode(e.which);
         if(!/[0-9]/.test(char)) e.preventDefault();
     });
 });
 
-// Permitir números y '/' en presión arterial
-document.getElementById('pa').addEventListener('keypress', function(e){
-    const char = String.fromCharCode(e.which);
-    if(!/[0-9\/]/.test(char)) e.preventDefault();
-});
-// Presión arterial: agregar '/' automáticamente
-document.getElementById('pa').addEventListener('input', function(e){
-    let val = this.value.replace(/[^0-9]/g,''); // solo números
-    if(val.length > 3){
-        this.value = val.slice(0,3) + '/' + val.slice(3,5);
-    } else {
-        this.value = val;
+// Formatear fecha de nacimiento automáticamente (DD/MM/AAAA)
+document.getElementById('fecha_nacimiento').addEventListener('input', function(e) {
+    let valor = this.value.replace(/\D/g, '');
+    
+    if (valor.length >= 2) {
+        valor = valor.substring(0, 2) + '/' + valor.substring(2);
     }
+    if (valor.length >= 5) {
+        valor = valor.substring(0, 5) + '/' + valor.substring(5, 9);
+    }
+    
+    this.value = valor;
 });
 
-// Permitir cualquier número en FC y temperatura, sin bloquear (emergencia)
-['fc','temp'].forEach(id => {
-    document.getElementById(id).addEventListener('input', function(){
-        this.value = this.value.replace(/[^0-9.]/g,'');
-    });
-});
+// Inicializar al cargar la página
+document.addEventListener('DOMContentLoaded', toggleDocs);
 </script>
 
 @endsection
