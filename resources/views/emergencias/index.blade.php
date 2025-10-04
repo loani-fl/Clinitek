@@ -221,8 +221,10 @@
         border-color: #dee2e6;
         cursor: not-allowed;
         opacity: 0.6;
+        
         pointer-events: none;
     }
+    
 </style>
 
 <div class="content-wrapper">
@@ -275,19 +277,17 @@
         {{-- Contenedor de tabla --}}
         <div id="tabla-container" class="table-responsive">
             @include('emergencias.tabla', ['emergencias' => $emergencias, 'isSearch' => $isSearch])
+            
         </div>
 
         <div id="mensajeResultados"></div>
 
-        {{-- Paginación --}}
-        <div id="paginacion-container" class="mt-3">
-            @include('emergencias.custom-pagination', [
-                'currentPage' => $emergencias->currentPage(),
-                'lastPage' => $emergencias->lastPage(),
-                'hasMorePages' => $emergencias->hasMorePages(),
-                'onFirstPage' => $emergencias->onFirstPage(),
-            ])
-        </div>
+      {{-- Paginación --}}
+<div id="paginacion-container" class="mt-3">
+    @if(!($isSearch ?? false))
+        {{ $emergencias->onEachSide(1)->links('pagination::bootstrap-5') }}
+    @endif
+</div>
     </div>
 </div>
 
@@ -308,9 +308,9 @@ $(document).ready(function () {
         }
         
         // Información de paginación (siempre se muestra si hay resultados)
-        if (total > 0) {
-            mensajeHTML += `<small class="text-muted">Mostrando del <strong>${from}</strong> al <strong>${to}</strong> de <strong>${total}</strong> resultado${total > 1 ? 's' : ''}</small>`;
-        }
+       // if (total > 0) {
+           // mensajeHTML += `<small class="text-muted">Mostrando del <strong>${from}</strong> al <strong>${to}</strong> de <strong>${total}</strong> resultado${total > 1 ? 's' : ''}</small>`;
+        //}
         
         $('#mensajeResultados').html(mensajeHTML);
     }

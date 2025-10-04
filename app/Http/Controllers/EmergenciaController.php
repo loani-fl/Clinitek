@@ -64,6 +64,9 @@ class EmergenciaController extends Controller
             'lastPage' => $lastPage,
             'hasMorePages' => $emergencias->hasMorePages(),
             'onFirstPage' => $emergencias->onFirstPage(),
+            'from' => $emergencias->firstItem() ?? 0,  // ← AGREGAR ESTO
+                'to' => $emergencias->lastItem() ?? 0,      // ← AGREGAR ESTO
+                'total' => $emergencias->total(), 
         ])->render();
         
         return response()->json([
