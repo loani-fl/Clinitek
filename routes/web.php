@@ -262,7 +262,8 @@ Route::get('/examenes/no-disponible/{consulta}', function ($consultaId) {
 
 //EMERGENCIAS
 use App\Http\Controllers\EmergenciaController;
-Route::resource('emergencias', EmergenciasController::class);
+//aqui modifique solo esta 
+Route::resource('emergencias', EmergenciaController::class);
 Route::get('/emergencias', [EmergenciaController::class, 'index'])->name('emergencias.index');
 Route::get('/emergencias/create', [EmergenciaController::class, 'create'])->name('emergencias.create');
 Route::post('/emergencias/store', [EmergenciaController::class, 'store'])->name('emergencias.store');
