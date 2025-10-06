@@ -27,6 +27,9 @@ return new class extends Migration {
             $table->time('hora');        // HH:MM:SS
             $table->text('motivo')->nullable();
 
+            // Edad tomada en la emergencia
+            $table->integer('edad')->nullable();
+
             // Signos vitales
             $table->string('pa')->nullable(); // presión arterial: 120/80
             $table->integer('fc')->nullable(); // frecuencia cardíaca
