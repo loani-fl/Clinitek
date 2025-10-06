@@ -190,6 +190,42 @@
                     </div>
                 </div>
 
+            {{-- Botones --}}
+            <div class="text-center pt-3">
+                <a href="{{ route('emergencias.index') }}" class="btn btn-success btn-sm px-4 shadow-sm">← Regresar</a>
+                <button type="button" class="btn btn-primary btn-sm px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#historialModal">Ver Historial</button>
+                <a href="{{ route('hospitalizaciones.create', ['emergencia_id' => $emergencia->id]) }}"
+                class="btn btn-warning btn-sm px-4 shadow-sm">
+                Transferir a Hospitalización
+                </a>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Historial --}}
+<div class="modal fade" id="historialModal" tabindex="-1" aria-labelledby="historialModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="historialModalLabel">Historial de Emergencias</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @php
+                    $historial = $paciente
+                        ? $paciente->emergencias()->where('id', '!=', $emergencia->id)->orderBy('fecha', 'desc')->get()
+                        : collect();
+                @endphp
+
+                @if($historial->isEmpty())
+                    <p class="text-center mb-0">Este paciente no tiene historial de emergencias previas.</p>
+                @else
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead class="table-light">
                 {{-- Botones --}}
                 <div class="text-center pt-3">
                     <a href="{{ route('emergencias.index') }}" class="btn btn-success btn-sm px-4 shadow-sm">← Regresar</a>
