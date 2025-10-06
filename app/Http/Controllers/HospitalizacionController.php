@@ -3,80 +3,110 @@
 namespace App\Http\Controllers;
 
 use App\Models\Emergencia;
-use App\Models\Paciente;
 use App\Models\Hospitalizacion;
+use App\Models\Medico;
+use App\Models\Paciente;
 use Illuminate\Http\Request;
 
 class HospitalizacionController extends Controller
 {
-    public function create($emergencia_id)
+    // Mostrar formulario de creación
+    public function create($emergencia_id = null)
     {
-        // Obtiene la emergencia
-        $emergencia = Emergencia::findOrFail($emergencia_id);
+        $emergencia = $emergencia_id ? Emergencia::findOrFail($emergencia_id) : null;
+        $paciente = $emergencia->paciente ?? null;
+        $medicos = Medico::all();
 
-        // Redirige al formulario con los datos de la emergencia
-        return view('Hospitalizacion.transferirHospitalizacion', compact('emergencia'));
-
+        return view('Hospitalizacion.create', compact('emergencia', 'paciente', 'medicos'));
     }
 
+    // Guardar hospitalización y redirigir a impresión
     public function store(Request $request)
+    {
+        // Validaciones
+        $request->validate([
+            'acompanante' => ['nullable','string','max:100','regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/u'],
+            'fecha_ingreso' => 'required|date',
+            'motivo' => ['required','string','max:150','regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,;:()\-]+$/u'],
+            'hospital' => 'required|string|max:150',
+            'medico_id' => 'required|exists:medicos,id',
+            'clinica' => ['required','string','max:100','regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,-]+$/u'],
+            'emergencia_id' => 'required|exists:emergencias,id',
+        ], [
+            'acompanante.max' => 'El campo Acompañante no puede tener más de 100 caracteres.',
+            'acompanante.regex' => 'El campo Acompañante solo puede contener letras, números y espacios.',
+            'fecha_ingreso.required' => 'Debes seleccionar la fecha y hora de ingreso.',
+            'fecha_ingreso.date' => 'La fecha de ingreso debe ser válida.',
+            'motivo.required' => 'El campo Motivo de hospitalización es obligatorio.',
+            'motivo.max' => 'El Motivo de hospitalización no puede exceder los 150 caracteres.',
+            'motivo.regex' => 'El Motivo de hospitalización solo puede contener letras, números, espacios y algunos signos (.,;:()-).',
+            'hospital.required' => 'Debes seleccionar un hospital de destino.',
+            'hospital.max' => 'El nombre del hospital no puede exceder los 150 caracteres.',
+            'medico_id.required' => 'Debes seleccionar el médico que remite.',
+            'medico_id.exists' => 'El médico seleccionado no existe en la base de datos.',
+            'clinica.required' => 'Debes ingresar el nombre de la clínica.',
+            'clinica.max' => 'El nombre de la clínica no puede exceder los 100 caracteres.',
+            'clinica.regex' => 'El nombre de la clínica solo puede contener letras, números, espacios y algunos signos (.,-).',
+            'emergencia_id.required' => 'Debe seleccionarse la emergencia asociada.',
+            'emergencia_id.exists' => 'La emergencia seleccionada no existe.',
+        ]);
+
+        // Crear o usar paciente existente
+        $paciente = Paciente::firstOrCreate(
+            ['identidad' => $request->identidad ?? '0000000000000'],
+            [
+                'nombre' => $request->nombres ?? 'Desconocido',
+                'apellidos' => $request->apellidos ?? 'Desconocido',
+                'telefono' => $request->telefono ?? '00000000',
+                'fecha_nacimiento' => $request->fecha_nacimiento ?? now(),
+                'direccion' => $request->direccion ?? 'Desconocida',
+                'genero' => $request->sexo ?? 'Desconocido',
+                'padecimientos' => $request->padecimientos ?? 'Ninguno',
+                'medicamentos' => $request->medicamentos ?? 'Ninguno',
+                'historial_clinico' => $request->historial_clinico ?? 'Ninguno',
+                'alergias' => $request->alergias ?? 'Ninguno',
+                'historial_quirurgico' => $request->historial_quirurgico ?? 'Ninguno',
+            ]
+        );
+
+        // Registrar hospitalización
+        $hospitalizacion = Hospitalizacion::create([
+            'paciente_id' => $paciente->id,
+            'emergencia_id' => $request->emergencia_id,
+            'acompanante' => $request->acompanante,
+            'fecha_ingreso' => $request->fecha_ingreso,
+            'motivo' => $request->motivo,
+            'hospital' => $request->hospital,
+            'medico_id' => $request->medico_id,
+            'clinica' => $request->clinica,
+        ]);
+
+        // Cargar relaciones para impresión
+        $hospitalizacion->load('paciente', 'medico', 'emergencia');
+
+        // Redirigir a la vista de impresión
+        return redirect()->route('hospitalizaciones.imprimir', $hospitalizacion->id);
+    }
+
+    // Mostrar hospitalización para impresión
+   public function imprimir(Hospitalizacion $hospitalizacion)
 {
-    $request->validate([
-        'acompanante' => [
-            'required',
-            'string',
-            'max:100',
-            'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/u'
-        ],
-        'fecha_ingreso' => 'required|date',
-        'motivo' => [
-            'required',
-            'string',
-            'max:150',
-            'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,;:()\-]+$/u'
-        ],
-    ], [
-        'acompanante.required' => 'El campo acompañante es obligatorio.',
-        'acompanante.max' => 'El campo Acompañante no puede tener más de 100 caracteres.',
-        'acompanante.regex' => 'El campo acompañante solo puede contener letras, números y espacios.',
-        'fecha_ingreso.required' => 'Debes seleccionar la fecha y hora de ingreso.',
-        'fecha_ingreso.date' => 'La fecha de ingreso debe ser válida.',
-        'motivo.required' => 'El campo motivo de hospitalización es obligatorio.',
-        'motivo.max' => 'El Motivo de hospitalización no puede exceder los 150 caracteres.',
-        'motivo.regex' => 'El Motivo de hospitalización solo puede contener letras, números, espacios y algunos signos (.,;:()-).',
-    ]);
+    // Cargar relaciones básicas
+    $hospitalizacion->load('paciente', 'medico', 'emergencia');
 
-    // Crear o actualizar paciente
-    $paciente = Paciente::updateOrCreate(
-        ['identidad' => $request->identidad],
-        [
-            'nombre' => $request->nombres,
-            'apellidos' => $request->apellidos,
-            'telefono' => $request->telefono,
-            'fecha_nacimiento' => $request->fecha_nacimiento ?? now(),
-            'direccion' => $request->direccion ?? 'Desconocida',
-            'genero' => $request->sexo ?? 'No especificado',
-            'padecimientos' => $request->padecimientos ?? 'Ninguno'
-        ]
-    );
+    // Si la hospitalización no tiene emergencia asociada, tomar la última del paciente
+    if (!$hospitalizacion->emergencia && $hospitalizacion->paciente) {
+        $hospitalizacion->emergencia = $hospitalizacion->paciente->emergencias()->latest()->first();
+    }
 
-    // Crear hospitalización
-    Hospitalizacion::create([
-        'paciente_id' => $paciente->id,
-        'fecha_ingreso' => $request->fecha_ingreso,
-        'motivo' => $request->motivo,
-        'acompanante' => $request->acompanante,
-    ]);
-
-    return redirect()->route('emergencias.show', $request->emergencia_id)
-                     ->with('success', 'Paciente transferido a hospitalización correctamente.');
+    return view('Hospitalizacion.imprimir', compact('hospitalizacion'));
 }
 
-public function index() {
-    $hospitalizaciones = Hospitalizacion::all();
-    return view('hospitalizacion.index', compact('hospitalizaciones'));
-}
-
-
-    
+    // Mostrar hospitalización específica
+    public function show($id)
+    {
+        $hospitalizacion = Hospitalizacion::findOrFail($id);
+        $hospitalizacion->load('paciente', 'medico', 'emergencia');
+        return view('Hospitalizacion.show', compact('hospitalizacion'));
+    }
 }

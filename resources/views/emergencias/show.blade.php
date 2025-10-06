@@ -187,7 +187,12 @@
             <div class="text-center pt-3">
                 <a href="{{ route('emergencias.index') }}" class="btn btn-success btn-sm px-4 shadow-sm">← Regresar</a>
                 <button type="button" class="btn btn-primary btn-sm px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#historialModal">Ver Historial</button>
-                <a href="{{ route('hospitalizacion.create', ['emergencia_id' => $emergencia->id]) }}" class="btn btn-warning btn-sm px-4 shadow-sm">Transferir a Hospitalización</a>
+                <a href="{{ route('hospitalizaciones.create', ['emergencia_id' => $emergencia->id]) }}"
+                class="btn btn-warning btn-sm px-4 shadow-sm">
+                Transferir a Hospitalización
+                </a>
+
+
             </div>
         </div>
     </div>
