@@ -120,8 +120,14 @@ class EmergenciaController extends Controller
     } else {
         // Campos indocumentado - SIN edad
         $rules = array_merge($rules, [
-            'foto' => 'required|file|mimes:jpeg,jpg,png|max:2048',
-        ]);
+    'foto' => [
+        'required',
+        'file',
+        'mimetypes:image/jpeg,image/png',
+        'mimes:jpg,jpeg,png',
+        'max:2048', // 2 MB máximo
+    ],
+]);
     }
 
     // Validación adicional de presión arterial
@@ -171,6 +177,10 @@ class EmergenciaController extends Controller
         'direccion.required' => 'La dirección es obligatoria.',
         'genero.required' => 'El género es obligatorio.',
         'foto.required' => 'La foto es obligatoria para pacientes indocumentados.',
+        'foto.mimes' => 'La foto debe ser un archivo con formato JPG, JPEG o PNG.',
+'foto.mimetypes' => 'El archivo debe ser una imagen válida (JPG, JPEG o PNG).',
+'foto.max' => 'La foto no debe superar los 2 MB.',
+
     ]);
 
     // Validación manual de identidad

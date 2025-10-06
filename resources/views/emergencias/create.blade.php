@@ -347,35 +347,64 @@ h5.mt-4.mb-3.text-dark.fw-bold {
             </div>
         </div>
 
-        {{-- Campos Indocumentado --}}
-        <div class="indocFields" style="display: {{ !$docFieldsVisible ? 'block' : 'none' }};">
-            <div class="row mb-3 align-items-end">
-                <div class="col-md-6">
-                    <label>Foto del paciente: <span class="text-danger">*</span></label>
-                    <input type="file" name="foto" id="foto" class="form-control @error('foto') is-invalid @enderror">
-                    @error('foto') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                </div>
+     {{-- Campos Indocumentado --}}
+<div class="indocFields" style="display: {{ !$docFieldsVisible ? 'block' : 'none' }};">
+    <div class="row mb-3 align-items-end">
+        <div class="col-md-6">
+            <label>Foto del paciente: <span class="text-danger">*</span></label>
+            <input type="file" name="foto" id="foto" class="form-control @error('foto') is-invalid @enderror">
+            
+            @error('foto') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        </div>
+    </div>
 
-                <div class="col-md-3">
-                    <label class="form-label">Fecha:</label>
-                    <input type="date" name="fecha" id="fecha" class="form-control" value="{{ $fechaActual }}">
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Hora:</label>
-                    <input type="time" name="hora" id="hora" class="form-control" value="{{ $horaActual }}">
-                </div>
-            </div>
+    {{-- Motivo de la emergencia (Indocumentado) --}}
+    <h5 class="mt-4 mb-3 text-dark fw-bold">Motivo de la emergencia</h5>
+    <div class="row mb-3 align-items-end">
+        <div class="col-md-6">
+            <textarea name="motivo" id="motivoIndoc" rows="2" maxlength="300"
+                placeholder="Describa el motivo de la emergencia..."
+                class="form-control @error('motivo') is-invalid @enderror">{{ old('motivo') }}</textarea>
+            @error('motivo') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
 
-        {{-- Motivo de la emergencia --}}
-        <h5 class="mt-4 mb-3 text-dark fw-bold">Motivo de la emergencia</h5>
-        <div class="row mb-3">
-            <div class="col-md-12">
-                <textarea name="motivo" id="motivo" rows="2" maxlength="300" placeholder="Describa el motivo de la emergencia..." class="form-control @error('motivo') is-invalid @enderror">{{ old('motivo') }}</textarea>
-                @error('motivo') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
+        <div class="col-md-3">
+            <label class="form-label">Fecha:</label>
+            <input type="date" name="fecha" id="fechaIndoc" class="form-control" value="{{ $fechaActual }}">
         </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Hora:</label>
+            <input type="time" name="hora" id="horaIndoc" class="form-control" value="{{ $horaActual }}">
+        </div>
+    </div>
+</div>
+
+{{-- Motivo de la emergencia (Documentado) --}}
+<div class="docFields" style="display: {{ $docFieldsVisible ? 'block' : 'none' }};">
+    <h5 class="mt-4 mb-3 text-dark fw-bold">Motivo de la emergencia</h5>
+    <div class="row mb-3 align-items-end">
+        <div class="col-md-6">
+            <textarea name="motivo" id="motivoDoc" rows="2" maxlength="300"
+                placeholder="Describa el motivo de la emergencia..."
+                class="form-control @error('motivo') is-invalid @enderror">{{ old('motivo') }}</textarea>
+            @error('motivo') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Fecha:</label>
+            <input type="date" name="fecha" id="fechaDoc" class="form-control" value="{{ $fechaActual }}">
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Hora:</label>
+            <input type="time" name="hora" id="horaDoc" class="form-control" value="{{ $horaActual }}">
+        </div>
+
+       
+    </div>
+</div>
+
 
         {{-- Signos vitales --}}
         <h5 class="mt-4 mb-3 text-dark fw-bold">Signos Vitales</h5>
@@ -562,49 +591,50 @@ function validarFrecuenciaCardiaca(valor) {
 // Validación de Temperatura
 document.getElementById('temp').addEventListener('input', function(e) {
     let valor = this.value;
-    
+
+    // Permitir solo números y punto decimal
     valor = valor.replace(/[^0-9.]/g, '');
-    
+
     const partes = valor.split('.');
     if (partes.length > 2) {
         valor = partes[0] + '.' + partes.slice(1).join('');
     }
-    
+
     if (partes.length === 2 && partes[1].length > 1) {
         valor = partes[0] + '.' + partes[1].substring(0, 1);
     }
-    
-    if (parseFloat(valor) > 45) {
-        valor = '45';
-    }
-    
+
     this.value = valor;
-    if(valor) validarTemperatura(parseFloat(valor));
+
+    // Validar y mostrar error si está fuera de rango
+    if (valor) validarTemperatura(parseFloat(valor));
 });
 
 function validarTemperatura(valor) {
     const tempInput = document.getElementById('temp');
-    let feedback = tempInput.parentElement.querySelector('.invalid-feedback:not(.d-block)');
-    
-    if (!valor) return true;
-    
-    if (valor < 30 || valor > 45) {
+    let feedback = tempInput.parentElement.querySelector('.invalid-feedback');
+
+    // Crear el div de error si no existe
+    if (!feedback) {
+        feedback = document.createElement('div');
+        feedback.className = 'invalid-feedback';
+        tempInput.parentElement.appendChild(feedback);
+    }
+
+    // Mostrar mensaje si fuera de rango
+    if (isNaN(valor) || valor < 30 || valor > 45) {
         tempInput.classList.add('is-invalid');
-        if (!feedback) {
-            feedback = document.createElement('div');
-            feedback.className = 'invalid-feedback';
-            tempInput.parentElement.appendChild(feedback);
-        }
-        feedback.textContent = 'Temperatura fuera de rango (30-45°C)';
+        feedback.textContent = 'La temperatura debe estar entre 30°C y 45°C';
+        feedback.style.display = 'block';
         return false;
+    } else {
+        tempInput.classList.remove('is-invalid');
+        feedback.textContent = '';
+        feedback.style.display = 'none';
+        return true;
     }
-    
-    tempInput.classList.remove('is-invalid');
-    if (feedback && !feedback.classList.contains('d-block')) {
-        feedback.remove();
-    }
-    return true;
 }
+
 
 // ========== LIMPIAR FORMULARIO COMPLETO ==========
 document.getElementById('btnLimpiar').addEventListener('click', () => {
@@ -804,6 +834,83 @@ document.getElementById('fecha_nacimiento').addEventListener('input', function(e
 
 // Inicializar al cargar la página
 document.addEventListener('DOMContentLoaded', toggleDocs);
+
+document.addEventListener('DOMContentLoaded', function() {
+    const fotoInput = document.getElementById('foto');
+    const errorDiv = document.createElement('div');
+    errorDiv.classList.add('invalid-feedback');
+    fotoInput.parentNode.appendChild(errorDiv);
+
+    fotoInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (!file) return; // si no selecciona nada
+
+        const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        const maxSize = 2 * 1024 * 1024; // 2 MB
+
+        // Limpiar error previo
+        fotoInput.classList.remove('is-invalid');
+        errorDiv.textContent = '';
+
+        if (!validTypes.includes(file.type)) {
+            fotoInput.classList.add('is-invalid');
+            errorDiv.textContent = 'Solo se permiten imágenes JPG, JPEG o PNG.';
+            this.value = ''; // limpia el input
+            return;
+        }
+
+        if (file.size > maxSize) {
+            fotoInput.classList.add('is-invalid');
+            errorDiv.textContent = 'La imagen no debe superar los 2 MB.';
+            this.value = '';
+            return;
+        }
+    });
+});
+
+// ========== GUARDAR Y RESTAURAR ESTADO DOCUMENTADO / INDOCUMENTADO ==========
+document.addEventListener('DOMContentLoaded', function () {
+    // Restaurar la selección desde localStorage (si existe)
+    const savedState = localStorage.getItem('tipoPaciente');
+    if (savedState === '1' || savedState === '0') {
+        const radio = document.querySelector(`input[name="documentado"][value="${savedState}"]`);
+        if (radio) {
+            radio.checked = true;
+            toggleDocs(); // aplica los cambios visuales
+        }
+    }
+
+    // Guardar automáticamente cuando el usuario cambia la opción
+    document.querySelectorAll('input[name="documentado"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            localStorage.setItem('tipoPaciente', this.value);
+        });
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    const tempInput = document.getElementById("temp");
+
+    tempInput.addEventListener("input", function() {
+        const value = parseFloat(this.value);
+        const feedback = this.parentElement.querySelector(".invalid-feedback");
+
+        // Si el valor no está entre 30 y 45
+        if (isNaN(value) || value < 30 || value > 45) {
+            this.classList.add("is-invalid");
+            if (feedback) {
+                feedback.textContent = "La temperatura debe estar entre 30 y 45 °C.";
+                feedback.style.display = "block";
+            }
+        } else {
+            this.classList.remove("is-invalid");
+            if (feedback) {
+                feedback.style.display = "none";
+            }
+        }
+    });
+});
+
 </script>
 
 @endsection
