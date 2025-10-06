@@ -74,4 +74,9 @@ class Paciente extends Model
     {
         return $this->apellidos;
     }
+    public function emergencias()
+{
+    return $this->hasMany(Emergencia::class, 'paciente_id');
+}
+
 }
