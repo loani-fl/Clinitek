@@ -159,42 +159,38 @@
 
     /* Descripción de la imagen */
     .img-description {
-    font-size: 0.8rem;
-    color: #555;
-    margin-top: 0.3rem;
-    text-align: center;
-    white-space: normal;   /* permite saltos de línea */
-    overflow-wrap: break-word; /* rompe palabras largas si es necesario */
-}
-
+        font-size: 0.8rem;
+        color: #555;
+        margin-top: 0.3rem;
+        text-align: center;
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
 
     /* Descripción del examen */
     .examen-card p {
-    max-height: none;      /* sin límite de altura */
-    overflow: visible;     /* nada de scroll */
-    line-height: 1.4rem;   /* un poco más de espacio entre líneas */
-}
+        max-height: none;
+        overflow: visible;
+        line-height: 1.4rem;
+    }
 
+    /* Modal navegación */
+    .modal-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 2rem;
+        color: #ff8c00;
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+        cursor: pointer;
+        z-index: 1055;
+        user-select: none;
+        transition: color 0.2s ease;
+    }
 
-
-   /* Modal navegación */
-.modal-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 2rem;
-    color: #ff8c00; /* color naranja brillante */
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.7); /* sombra para resaltar */
-    cursor: pointer;
-    z-index: 1055;
-    user-select: none;
-    transition: color 0.2s ease;
-}
-
-.modal-nav:hover {
-    color: #ffa500; 
-}
-
+    .modal-nav:hover {
+        color: #ffa500; 
+    }
 
     .modal-prev {
         left: 10px;
@@ -211,28 +207,57 @@
     }
 
     /* Descripción dentro del modal */
-[id^="modal-desc-"] {
-    max-height: none;           /* sin límite de altura */
-    overflow-y: auto;           /* scroll vertical si fuera muy largo */
-    white-space: normal;        /* texto normal */
-    overflow-wrap: break-word;  /* evita que palabras largas rompan el diseño */
-    line-height: 1.4rem;
-    font-size: 0.9rem;
-}
+    [id^="modal-desc-"] {
+        max-height: none;
+        overflow-y: auto;
+        white-space: normal;
+        overflow-wrap: break-word;
+        line-height: 1.4rem;
+        font-size: 0.9rem;
+    }
 
-    /* Estilos para impresión - Adaptados para análisis de rayos X */
+    /* ========================================
+       ESTILOS DE IMPRESIÓN - MISMO ESTILO QUE CONSULTA
+       ======================================== */
     @media print {
         /* Ocultar elementos innecesarios */
         .btn-imprimir,
         .mt-4.text-center,
         .modal,
-        .modal-nav {
+        .modal-backdrop,
+        .modal-nav,
+        button,
+        a.btn {
             display: none !important;
         }
         
-        /* Configuración básica */
+        /* Ocultar el Clinitek grande del centro de la página */
+        .custom-card::before {
+            display: none !important;
+            content: none !important;
+        }
+        
+        /* Mostrar header de impresión */
+        .print-header {
+            display: block !important;
+        }
+        
+        /* Estilo para el texto Clinitek */
+        .print-header .clinitek-text {
+            color: #6c757d !important;
+            font-size: 22pt !important;
+            font-weight: 800 !important;
+            font-family: 'Impact', 'Arial Black', sans-serif !important;
+            letter-spacing: 1px !important;
+            text-transform: uppercase !important;
+            display: inline-block !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        
+        /* Configuración de página */
         @page {
-            margin: 2cm;
+            margin: 1.2cm 0.5cm 1.5cm 0.5cm;
             size: A4;
         }
         
@@ -240,144 +265,159 @@
             margin: 0 !important;
             padding: 0 !important;
             font-family: Arial, sans-serif !important;
-            font-size: 11pt !important;
-            line-height: 1.4 !important;
+            font-size: 10pt !important;
+            line-height: 1.3 !important;
             color: #000 !important;
             background: white !important;
         }
         
         .custom-card {
+            width: 100% !important;
             max-width: 100% !important;
             margin: 0 !important;
-            padding: 0 !important;
+            padding: 0 10px !important;
             box-shadow: none !important;
-            border-radius: 0 !important;
+            border: none !important;
             background: white !important;
+            border-radius: 0 !important;
         }
         
-        /* Header elegante */
+        /* Header con título */
         .header-flex {
-            background: #003366 !important;
-            color: white !important;
-            padding: 20px !important;
+            background: white !important;
+            color: #0d6efd !important;
+            padding: 10px 0 !important;
+            margin-bottom: 12px !important;
             text-align: center !important;
-            margin-bottom: 25px !important;
-            border-radius: 8px !important;
+            border-bottom: 3px solid #0d6efd !important;
             -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            display: block !important;
             justify-content: center !important;
         }
         
-        .header-flex h2, .section-title {
-            font-size: 22pt !important;
+        .header-flex h2 {
+            font-size: 16pt !important;
             font-weight: bold !important;
             margin: 0 !important;
+            color: #000 !important;
             text-transform: uppercase !important;
             letter-spacing: 1px !important;
-            color: white !important;
             border: none !important;
             padding: 0 !important;
         }
         
-        /* Información de la clínica en el header */
-        .header-flex::before {
-            content: "CLINITEK - ANÁLISIS DE RAYOS X";
-            display: block;
-            font-size: 10pt;
-            margin-bottom: 5px;
-            opacity: 0.9;
-        }
-        
-        /* Títulos de sección mejorados */
+        /* Títulos de sección principales con línea azul */
         h4 {
-            background: #f0f8ff !important;
-            color: #003366 !important;
-            padding: 12px 15px !important;
-            margin: 20px 0 15px 0 !important;
-            border-left: 4px solid #003366 !important;
-            font-size: 14pt !important;
+            color: #0d6efd !important;
+            font-size: 11pt !important;
             font-weight: bold !important;
             text-transform: uppercase !important;
+            border-bottom: 2px solid #0d6efd !important;
+            padding-bottom: 3px !important;
+            margin-top: 12px !important;
+            margin-bottom: 8px !important;
+            background: none !important;
+            border-left: none !important;
             -webkit-print-color-adjust: exact;
-            page-break-after: avoid;
+            print-color-adjust: exact;
         }
         
-        /* Datos del paciente */
+        h4:first-of-type {
+            margin-top: 0 !important;
+        }
+        
+        /* Datos del paciente en grid 2 columnas */
         .datos-paciente-flex {
             display: grid !important;
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 12px !important;
-            margin-bottom: 20px !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px 15px !important;
+            background: none !important;
+            border: none !important;
             padding: 0 !important;
+            margin-bottom: 10px !important;
         }
         
         .datos-paciente-flex li {
-            background: #f8f9fa !important;
-            padding: 10px !important;
-            border-radius: 4px !important;
-            border-left: 2px solid #003366 !important;
-            font-size: 10pt !important;
-            border-bottom: none !important;
-            -webkit-print-color-adjust: exact;
+            padding: 0 !important;
+            font-size: 9pt !important;
+            line-height: 1.3 !important;
+            margin: 0 !important;
+            border: none !important;
+            background: none !important;
             display: block !important;
+            border-bottom: none !important;
         }
         
+        /* Labels */
         .datos-paciente-flex li strong {
-            color: #003366 !important;
+            color: #0d6efd !important;
             font-weight: bold !important;
-            font-size: 9pt !important;
+            font-size: 8pt !important;
             text-transform: uppercase !important;
-            display: block !important;
-            margin-bottom: 3px !important;
+            display: inline !important;
             width: auto !important;
         }
         
-        /* Información del médico analista */
+        .datos-paciente-flex li strong::after {
+            content: ": ";
+        }
+        
+        /* Médico analista - mismo formato */
         h4 + p {
-            background: #f8f9fa !important;
-            padding: 10px 15px !important;
-            border-radius: 4px !important;
-            border-left: 2px solid #003366 !important;
-            font-size: 11pt !important;
+            font-size: 9pt !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+            background: none !important;
+            border: none !important;
+            font-weight: normal !important;
+        }
+        
+        h4 + p::before {
+            content: "MÉDICO: ";
+            color: #0d6efd !important;
             font-weight: bold !important;
-            -webkit-print-color-adjust: exact;
+            font-size: 8pt !important;
+            text-transform: uppercase !important;
         }
         
         /* Tarjetas de exámenes */
         .examen-card {
-            background: white !important;
-            border: 1px solid #dee2e6 !important;
-            border-radius: 8px !important;
-            padding: 20px !important;
-            margin-bottom: 25px !important;
-            border-bottom: 3px solid #007BFF !important;
-            -webkit-print-color-adjust: exact;
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
+            margin-bottom: 15px !important;
+            border-bottom: none !important;
             page-break-inside: avoid;
         }
         
         .examen-nombre {
-            background: #007BFF !important;
-            color: white !important;
-            padding: 10px 15px !important;
-            margin: -20px -20px 15px -20px !important;
-            border-radius: 8px 8px 0 0 !important;
-            font-size: 14pt !important;
-            text-align: center !important;
-            -webkit-print-color-adjust: exact;
+            background: none !important;
+            color: #0d6efd !important;
+            padding: 0 !important;
+            margin: 0 0 8px 0 !important;
+            font-size: 10pt !important;
+            font-weight: bold !important;
+            text-align: left !important;
+            text-transform: uppercase !important;
+            border-bottom: 1px solid #0d6efd !important;
+            padding-bottom: 3px !important;
         }
         
-        /* Galería de imágenes para impresión */
+        /* Galería de imágenes - 2 columnas como consulta */
         .img-gallery {
             display: grid !important;
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 15px !important;
-            margin-top: 15px !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px !important;
+            margin-top: 8px !important;
+            margin-bottom: 10px !important;
         }
         
         .img-card {
-            background: white !important;
-            border: 1px solid #dee2e6 !important;
-            border-radius: 6px !important;
-            padding: 10px !important;
+            background: none !important;
+            border: 1px solid #ddd !important;
+            border-radius: 0 !important;
+            padding: 5px !important;
             page-break-inside: avoid;
             transform: none !important;
             transition: none !important;
@@ -389,49 +429,45 @@
         .img-preview {
             width: 100% !important;
             height: auto !important;
-            max-height: 200px !important;
+            max-height: 150px !important;
             object-fit: contain !important;
-            border: 1px solid #dee2e6 !important;
-            border-radius: 4px !important;
+            border: none !important;
+            border-radius: 0 !important;
         }
         
         .img-description {
-            font-size: 9pt !important;
+            font-size: 7pt !important;
             color: #555 !important;
-            margin-top: 8px !important;
+            margin-top: 3px !important;
             text-align: center !important;
             line-height: 1.2 !important;
         }
         
-        /* Texto informativo si no hay imágenes */
-        .examen-card p {
-            font-size: 10pt !important;
+        /* Texto cuando no hay imágenes */
+        .examen-card > p {
+            font-size: 9pt !important;
             color: #666 !important;
             font-style: italic !important;
-            text-align: center !important;
-            margin: 10px 0 !important;
-        }
-        
-        /* Primera sección */
-        h4:first-of-type {
-            margin-top: 5px !important;
+            margin: 5px 0 !important;
+            padding: 0 !important;
+            background: none !important;
         }
         
         /* Footer */
         .custom-card::after {
-            content: "Análisis generado por Sistema Clinitek";
-            display: block;
-            margin-top: 25px;
-            padding-top: 10px;
-            border-top: 1px solid #dee2e6;
-            text-align: center;
-            font-size: 8pt;
-            color: #6c757d;
-            font-style: italic;
+            content: "Sistema Clinitek";
+            display: block !important;
+            text-align: center !important;
+            font-size: 7pt !important;
+            color: #999 !important;
+            border-top: 1px solid #ddd !important;
+            padding-top: 6px !important;
+            margin-top: 12px !important;
         }
     }
-
 </style>
+
+
 
 <div class="custom-card">
     <!-- Header con título y botón -->
@@ -446,10 +482,10 @@
     {{-- Datos del paciente --}}
     <h4>Datos del paciente</h4>
     <ul class="datos-paciente-flex">
-        <li><strong>Nombre:</strong> {{ $orden->paciente->nombre ?? $orden->nombres ?? 'N/A' }}</li>
-        <li><strong>Apellidos:</strong> {{ $orden->paciente->apellidos ?? $orden->apellidos ?? 'N/A' }}</li>
-        <li><strong>Identidad:</strong> {{ $orden->paciente->identidad ?? $orden->identidad ?? 'N/A' }}</li>
-        <li><strong>Género:</strong> {{ $orden->paciente->genero ?? $orden->genero ?? 'N/A' }}</li>
+        <li><strong>Nombre</strong> {{ $orden->paciente->nombre ?? $orden->nombres ?? 'N/A' }}</li>
+        <li><strong>Apellidos</strong> {{ $orden->paciente->apellidos ?? $orden->apellidos ?? 'N/A' }}</li>
+        <li><strong>Identidad</strong> {{ $orden->paciente->identidad ?? $orden->identidad ?? 'N/A' }}</li>
+        <li><strong>Género</strong> {{ $orden->paciente->genero ?? $orden->genero ?? 'N/A' }}</li>
     </ul>
 
     {{-- Médico Analista --}}
@@ -499,18 +535,15 @@
             <p>Sin imágenes registradas</p>
         @endif
     </div>
-@empty
-    <p>No hay exámenes registrados para esta orden.</p>
-@endforelse
+    @empty
+        <p>No hay exámenes registrados para esta orden.</p>
+    @endforelse
 
-
-<div class="mt-4 text-center">
-    <a href="{{ route('rayosx.index') }}" class="btn btn-success">
-        <i class="bi bi-arrow-left-circle"></i> Regresar
-    </a>
-</div>
-
-
+    <div class="mt-4 text-center">
+        <a href="{{ route('rayosx.index') }}" class="btn btn-success">
+            <i class="bi bi-arrow-left-circle"></i> Regresar
+        </a>
+    </div>
 </div>
 
 <script>

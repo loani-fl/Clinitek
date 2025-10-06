@@ -88,239 +88,230 @@
             color: #212529;
         }
 
-        /* Estilos para impresión - Adaptados para expediente médico */
+        /* Estilos para impresión - Ultra compacto estilo documento formal */
         @media print {
             /* Ocultar elementos innecesarios */
             .dropdown,
             .btn-imprimir,
             .text-center.pt-4,
-            .table .btn {
+            .table .btn,
+            .bi {
                 display: none !important;
             }
             
-            /* Configuración básica */
+            /* Configuración de página */
             @page {
-                margin: 2cm;
+                margin: 1.2cm;
                 size: A4;
             }
             
+            * {
+                margin: 0 !important;
+                padding: 0 !important;
+                box-sizing: border-box !important;
+            }
+            
             body {
-                margin: 0 !important;
-                padding: 0 !important;
                 font-family: Arial, sans-serif !important;
-                font-size: 11pt !important;
-                line-height: 1.4 !important;
+                font-size: 9pt !important;
+                line-height: 1.1 !important;
                 color: #000 !important;
-                background: white !important;
             }
             
-            .container {
-                margin: 0 !important;
-                padding: 0 !important;
+            .container, .custom-card {
+                width: 100% !important;
                 max-width: 100% !important;
-            }
-            
-            .custom-card {
-                max-width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
                 box-shadow: none !important;
                 border: none !important;
-                border-radius: 0 !important;
                 background: white !important;
             }
             
-            /* Header elegante */
+            /* Header compacto */
             .card-header, .card-header-flex {
                 background: #0d6efd !important;
                 color: white !important;
-                padding: 20px !important;
+                padding: 6px 10px !important;
+                margin-bottom: 6px !important;
                 text-align: center !important;
-                margin-bottom: 25px !important;
-                border-radius: 8px !important;
                 -webkit-print-color-adjust: exact;
             }
             
             .card-header h5, .card-header-flex h5 {
-                font-size: 22pt !important;
+                font-size: 12pt !important;
                 font-weight: bold !important;
-                margin: 0 !important;
                 text-transform: uppercase !important;
-                letter-spacing: 1px !important;
                 color: white !important;
+                letter-spacing: 0.5px !important;
             }
             
-            /* Información de la clínica en el header */
             .card-header::before, .card-header-flex::before {
-                content: "CLINITEK - EXPEDIENTE MÉDICO";
-                display: block;
-                font-size: 10pt;
-                margin-bottom: 5px;
-                opacity: 0.9;
+                content: "CLINITEK - SISTEMA MÉDICO | ";
+                font-size: 7pt !important;
             }
             
-            .card-body {
-                padding: 0 !important;
-            }
-            
-            /* Títulos de sección mejorados */
+            /* Secciones solo con línea azul */
             .section-title {
-                background: #f0f8ff !important;
                 color: #0d6efd !important;
-                padding: 12px 15px !important;
-                margin: 20px 0 15px 0 !important;
-                border-left: 4px solid #0d6efd !important;
-                font-size: 14pt !important;
+                font-size: 9pt !important;
                 font-weight: bold !important;
                 text-transform: uppercase !important;
+                border-top: 1.5px solid #0d6efd !important;
+                padding-top: 3px !important;
+                padding-bottom: 2px !important;
+                margin-top: 6px !important;
+                margin-bottom: 3px !important;
+                background: none !important;
+                border-left: none !important;
                 -webkit-print-color-adjust: exact;
-                page-break-after: avoid;
             }
             
-            /* Datos personales en grid */
+            /* Datos personales en tabla compacta 4 columnas */
             .row.gy-3 {
-                display: grid !important;
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 12px !important;
-                margin-bottom: 20px !important;
+                display: block !important;
+                width: 100% !important;
+                margin-bottom: 6px !important;
+            }
+            
+            .row.gy-3::after {
+                content: "";
+                display: table;
+                clear: both;
             }
             
             .row.gy-3 > div {
-                background: #f8f9fa !important;
-                padding: 10px !important;
-                border-radius: 4px !important;
-                border-left: 2px solid #0d6efd !important;
-                font-size: 10pt !important;
-                -webkit-print-color-adjust: exact;
+                display: inline-block !important;
+                width: 48% !important;
+                float: left !important;
+                padding: 2px 4px !important;
+                font-size: 8pt !important;
+                border-bottom: 1px solid #ddd !important;
+                background: none !important;
+                vertical-align: top !important;
+            }
+            
+            .row.gy-3 > div:nth-child(odd) {
+                margin-right: 2% !important;
             }
             
             .row.gy-3 > div strong {
                 color: #0d6efd !important;
                 font-weight: bold !important;
-                font-size: 9pt !important;
+                font-size: 7pt !important;
                 text-transform: uppercase !important;
-                display: block !important;
-                margin-bottom: 3px !important;
             }
             
-            /* Contenedores de información médica */
+            .row.gy-3 > div strong::after {
+                content: ": ";
+            }
+            
+            .row.gy-3 > div br {
+                display: none !important;
+            }
+            
+            /* Datos médicos compactos */
             .detalle-paciente {
-                display: grid !important;
-                grid-template-columns: 1fr !important;
-                gap: 15px !important;
-                margin-bottom: 25px !important;
+                display: block !important;
+                margin-bottom: 6px !important;
             }
             
             .detalle-paciente > div {
-                background: white !important;
-                border: 1px solid #dee2e6 !important;
-                border-radius: 6px !important;
-                padding: 15px !important;
-                border-left: 3px solid #0d6efd !important;
-                -webkit-print-color-adjust: exact;
-                page-break-inside: avoid;
+                padding: 2px 0 !important;
+                border-bottom: 1px solid #e0e0e0 !important;
+                background: none !important;
+            }
+            
+            .detalle-paciente > div:last-child {
+                border-bottom: none !important;
             }
             
             .detalle-paciente > div strong {
                 color: #0d6efd !important;
                 font-weight: bold !important;
-                font-size: 11pt !important;
+                font-size: 8pt !important;
                 text-transform: uppercase !important;
-                display: block !important;
-                margin-bottom: 8px !important;
+            }
+            
+            .detalle-paciente > div strong::after {
+                content: ": ";
+            }
+            
+            .detalle-paciente > div br:first-of-type {
+                display: none !important;
             }
             
             .detalle-paciente p {
-                font-size: 10pt !important;
-                line-height: 1.3 !important;
-                margin: 0 !important;
+                display: inline !important;
+                font-size: 8pt !important;
+                line-height: 1.15 !important;
             }
             
-            /* Badges mejorados */
+            /* Badges */
             .badge {
-                padding: 4px 8px !important;
-                border-radius: 12px !important;
-                font-size: 9pt !important;
-                font-weight: bold !important;
+                padding: 1px 4px !important;
+                font-size: 7pt !important;
+                border-radius: 2px !important;
                 -webkit-print-color-adjust: exact;
             }
             
             .bg-primary {
                 background: #0d6efd !important;
                 color: white !important;
-                -webkit-print-color-adjust: exact;
             }
             
             .bg-warning {
                 background: #ffc107 !important;
                 color: #000 !important;
-                -webkit-print-color-adjust: exact;
             }
             
             .bg-info {
                 background: #0dcaf0 !important;
                 color: #000 !important;
-                -webkit-print-color-adjust: exact;
             }
             
-            /* Tabla de consultas */
+            /* Tabla ultra compacta */
             .table-responsive {
-                margin-top: 15px !important;
+                margin-top: 3px !important;
             }
             
             .table {
-                font-size: 9pt !important;
                 width: 100% !important;
+                font-size: 7pt !important;
                 border-collapse: collapse !important;
             }
             
             .table th, .table td {
-                border: 1px solid #dee2e6 !important;
-                padding: 8px !important;
+                border: 1px solid #ddd !important;
+                padding: 2px 3px !important;
                 text-align: center !important;
             }
             
             .table-primary th {
-                background: #b6d7ff !important;
+                background: #cce5ff !important;
                 color: #000 !important;
                 font-weight: bold !important;
                 -webkit-print-color-adjust: exact;
             }
             
-            /* Ocultar botones de la tabla */
-            .table .btn, .table .bi {
+            .table td:last-child::after {
+                content: "Sistema";
+                font-size: 6pt !important;
+            }
+            
+            /* Eliminar logo */
+            .custom-card::before {
                 display: none !important;
             }
             
-            /* Mostrar solo texto en las celdas de opciones */
-            .table td:last-child::after {
-                content: "Ver en sistema";
-                font-size: 8pt;
-                color: #6c757d;
-                font-style: italic;
-            }
-            
-            /* Logo de fondo muy sutil */
-            .custom-card::before {
-                opacity: 0.02 !important;
-            }
-            
-            /* Primera sección */
-            .section-title:first-of-type {
-                margin-top: 5px !important;
-            }
-            
-            /* Footer simple */
+            /* Footer mínimo */
             .card-body::after {
-                content: "Expediente generado por Sistema Clinitek";
-                display: block;
-                margin-top: 25px;
-                padding-top: 10px;
-                border-top: 1px solid #dee2e6;
-                text-align: center;
-                font-size: 8pt;
-                color: #6c757d;
-                font-style: italic;
+                content: "Clinitek";
+                display: block !important;
+                text-align: center !important;
+                font-size: 6pt !important;
+                color: #999 !important;
+                border-top: 1px solid #e0e0e0 !important;
+                padding-top: 3px !important;
+                margin-top: 6px !important;
             }
         }
     </style>
