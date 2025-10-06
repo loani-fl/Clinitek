@@ -235,22 +235,9 @@ class EmergenciaController extends Controller
     return redirect()->route('emergencias.index')->with('success', 'Emergencia registrada correctamente.');
 }
 
-   public function show($id)
-{
-    // Buscar la emergencia por ID
-    $emergencia = \App\Models\Emergencia::findOrFail($id);
-
-    // Obtener el paciente relacionado con la emergencia
-    $paciente = $emergencia->paciente; // usa la relación belongsTo en el modelo
-
-    // Obtener el historial de emergencias del mismo paciente
-    $historial = \App\Models\Emergencia::where('paciente_id', $emergencia->paciente_id)
-        ->where('id', '!=', $emergencia->id)
-        ->orderBy('fecha', 'desc')
-        ->get();
-
-    // Pasar todos los datos a la vista
-    return view('emergencias.show', compact('emergencia', 'paciente', 'historial'));
-}
-
+    public function show($id)
+    {
+        $emergencia = Emergencia::findOrFail($id);
+        return view('emergencias.show', compact('emergencia'));
+    }
 }
