@@ -145,25 +145,25 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
 
 /* Radios Documentado / Indocumentado */
 .mb-4.d-flex.gap-3 label {
-    font-size: 1.3rem;  /* más grande */
-    font-weight: 800;   /* negrita más marcada */
+    font-size: 1.3rem;
+    font-weight: 800;
 }
 
 /* Título Datos básicos y contacto */
 .docFields h5.mb-3.text-dark.fw-bold {
-    font-size: 1.4rem;  /* más grande */
+    font-size: 1.4rem;
     font-weight: 700;
 }
 
-/* Etiquetas de los campos (Nombre, Apellidos, Identidad...) */
+/* Etiquetas de los campos */
 .docFields label {
-    font-size: 1.1rem;  /* más grande */
+    font-size: 1.1rem;
     font-weight: 700;
 }
 
 /* Títulos Motivo de la emergencia y Signos Vitales */
 h5.mt-4.mb-3.text-dark.fw-bold {
-    font-size: 1.35rem;  /* más grande */
+    font-size: 1.35rem;
     font-weight: 700;
 }
 
@@ -171,22 +171,19 @@ h5.mt-4.mb-3.text-dark.fw-bold {
 .docFields input.form-control,
 .docFields select.form-select,
 .docFields textarea.form-control {
-    font-size: 1.05rem;  /* texto más grande dentro de los campos */
+    font-size: 1.05rem;
 }
 
-/* Opcional: el buscador de pacientes */
 #buscarIdentidad {
-    font-size: 1rem;  /* más grande */
-    height: 42px;     /* un poco más alto */
+    font-size: 1rem;
+    height: 42px;
 }
 
-/* Mensajes de alerta y resultados */
 .alert-custom,
 .lista-resultados .resultado-item,
 .lista-resultados .no-resultados {
-    font-size: 1rem;  /* más grande y legible */
+    font-size: 1rem;
 }
-
 </style>
 
 <div class="custom-card">
@@ -219,29 +216,26 @@ h5.mt-4.mb-3.text-dark.fw-bold {
             <h5 class="mb-3 text-dark fw-bold">
                 <i class="fas fa-user-circle"></i> Datos básicos y contacto
             </h5>
+
             {{-- Buscador de pacientes --}}
-<div class="d-flex align-items-center mb-4" style="gap: 1.25rem;"> <!-- separación ajustada -->
-    <!-- Título -->
-    <label class="fw-bold mb-0" style="white-space: nowrap; font-size: 0.95rem;">
-        <i class="fas fa-search"></i> BUSCAR PACIENTE
-    </label>
-
-    <!-- Input de búsqueda -->
-    <div style="position: relative; flex-grow: 1; max-width: 250px;"> <!-- filtro menos largo -->
-        <input 
-            type="text" 
-            id="buscarIdentidad" 
-            class="form-control" 
-            placeholder="Buscar por identidad..."
-            maxlength="13"
-            autocomplete="off"
-            style="padding-right: 40px; height: 38px; font-size: 0.9rem;">
-        <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
-        <div id="listaResultados" class="lista-resultados" style="display: none;"></div>
-    </div>
-</div>
-<div id="mensajeBusqueda" class="mt-1"></div>
-
+            <div class="d-flex align-items-center mb-4" style="gap: 1.25rem;">
+                <label class="fw-bold mb-0" style="white-space: nowrap; font-size: 0.95rem;">
+                    <i class="fas fa-search"></i> BUSCAR PACIENTE
+                </label>
+                <div style="position: relative; flex-grow: 1; max-width: 250px;">
+                    <input 
+                        type="text" 
+                        id="buscarIdentidad" 
+                        class="form-control" 
+                        placeholder="Buscar por identidad..."
+                        maxlength="13"
+                        autocomplete="off"
+                        style="padding-right: 40px; height: 38px; font-size: 0.9rem;">
+                    <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+                    <div id="listaResultados" class="lista-resultados" style="display: none;"></div>
+                </div>
+            </div>
+            <div id="mensajeBusqueda" class="mt-1"></div>
 
             <div class="row mb-3">
                 <div class="col-md-3">
@@ -347,64 +341,60 @@ h5.mt-4.mb-3.text-dark.fw-bold {
             </div>
         </div>
 
-     {{-- Campos Indocumentado --}}
-<div class="indocFields" style="display: {{ !$docFieldsVisible ? 'block' : 'none' }};">
-    <div class="row mb-3 align-items-end">
-        <div class="col-md-6">
-            <label>Foto del paciente: <span class="text-danger">*</span></label>
-            <input type="file" name="foto" id="foto" class="form-control @error('foto') is-invalid @enderror">
-            
-            @error('foto') <div class="invalid-feedback">{{ $message }}</div> @enderror
-        </div>
-    </div>
+        {{-- Campos Indocumentado --}}
+        <div class="indocFields" style="display: {{ !$docFieldsVisible ? 'block' : 'none' }};">
+            <div class="row mb-3 align-items-end">
+                <div class="col-md-6">
+                    <label>Foto del paciente: <span class="text-danger">*</span></label>
+                    <input type="file" name="foto" id="foto" class="form-control @error('foto') is-invalid @enderror">
+                    @error('foto') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+            </div>
 
-    {{-- Motivo de la emergencia (Indocumentado) --}}
-    <h5 class="mt-4 mb-3 text-dark fw-bold">Motivo de la emergencia</h5>
-    <div class="row mb-3 align-items-end">
-        <div class="col-md-6">
-            <textarea name="motivo" id="motivoIndoc" rows="2" maxlength="300"
-                placeholder="Describa el motivo de la emergencia..."
-                class="form-control @error('motivo') is-invalid @enderror">{{ old('motivo') }}</textarea>
-            @error('motivo') <div class="invalid-feedback">{{ $message }}</div> @enderror
-        </div>
+            {{-- Motivo de la emergencia (Indocumentado) --}}
+            <h5 class="mt-4 mb-3 text-dark fw-bold">Motivo de la emergencia</h5>
+            <div class="row mb-3 align-items-end">
+                <div class="col-md-6">
+                    <textarea name="motivo" id="motivoIndoc" rows="2" maxlength="300"
+                        placeholder="Describa el motivo de la emergencia..."
+                        class="form-control @error('motivo') is-invalid @enderror">{{ old('motivo') }}</textarea>
+                    @error('motivo') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
 
-        <div class="col-md-3">
-            <label class="form-label">Fecha:</label>
-            <input type="date" name="fecha" id="fechaIndoc" class="form-control" value="{{ $fechaActual }}">
-        </div>
+                <div class="col-md-3">
+                    <label class="form-label">Fecha:</label>
+                    <input type="date" name="fecha" id="fechaIndoc" class="form-control" value="{{ $fechaActual }}">
+                </div>
 
-        <div class="col-md-3">
-            <label class="form-label">Hora:</label>
-            <input type="time" name="hora" id="horaIndoc" class="form-control" value="{{ $horaActual }}">
-        </div>
-    </div>
-</div>
-
-{{-- Motivo de la emergencia (Documentado) --}}
-<div class="docFields" style="display: {{ $docFieldsVisible ? 'block' : 'none' }};">
-    <h5 class="mt-4 mb-3 text-dark fw-bold">Motivo de la emergencia</h5>
-    <div class="row mb-3 align-items-end">
-        <div class="col-md-6">
-            <textarea name="motivo" id="motivoDoc" rows="2" maxlength="300"
-                placeholder="Describa el motivo de la emergencia..."
-                class="form-control @error('motivo') is-invalid @enderror">{{ old('motivo') }}</textarea>
-            @error('motivo') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <div class="col-md-3">
+                    <label class="form-label">Hora:</label>
+                    <input type="time" name="hora" id="horaIndoc" class="form-control" value="{{ $horaActual }}">
+                </div>
+            </div>
         </div>
 
-        <div class="col-md-2">
-            <label class="form-label">Fecha:</label>
-            <input type="date" name="fecha" id="fechaDoc" class="form-control" value="{{ $fechaActual }}">
+        {{-- Motivo de la emergencia (Documentado) --}}
+        <div class="docFields" style="display: {{ $docFieldsVisible ? 'block' : 'none' }};">
+            <h5 class="mt-4 mb-3 text-dark fw-bold">Motivo de la emergencia</h5>
+            <div class="row mb-3 align-items-end">
+                <div class="col-md-6">
+                    <textarea name="motivo" id="motivoDoc" rows="2" maxlength="300"
+                        placeholder="Describa el motivo de la emergencia..."
+                        class="form-control @error('motivo') is-invalid @enderror">{{ old('motivo') }}</textarea>
+                    @error('motivo') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Fecha:</label>
+                    <input type="date" name="fecha" id="fechaDoc" class="form-control" value="{{ $fechaActual }}">
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Hora:</label>
+                    <input type="time" name="hora" id="horaDoc" class="form-control" value="{{ $horaActual }}">
+                </div>
+            </div>
         </div>
-
-        <div class="col-md-2">
-            <label class="form-label">Hora:</label>
-            <input type="time" name="hora" id="horaDoc" class="form-control" value="{{ $horaActual }}">
-        </div>
-
-       
-    </div>
-</div>
-
 
         {{-- Signos vitales --}}
         <h5 class="mt-4 mb-3 text-dark fw-bold">Signos Vitales</h5>
@@ -464,13 +454,11 @@ h5.mt-4.mb-3.text-dark.fw-bold {
 function toggleDocs(){
     let doc = document.querySelector('input[name="documentado"][value="1"]').checked;
 
-    // Campos documentado
     document.querySelectorAll('.docFields').forEach(el => {
         el.style.display = doc ? 'block' : 'none';
         el.querySelectorAll('input, select, textarea').forEach(input => input.disabled = !doc);
     });
 
-    // Campos indocumentado
     document.querySelectorAll('.indocFields').forEach(el => {
         el.style.display = doc ? 'none' : 'block';
         el.querySelectorAll('input, select, textarea').forEach(input => input.disabled = doc);
@@ -495,18 +483,33 @@ function resetIndocFields(container) {
 
 // Validación y formato automático de Presión Arterial
 document.getElementById('pa').addEventListener('input', function(e) {
-    let valor = this.value.replace(/[^0-9]/g, '');
+    let valor = this.value.replace(/[^0-9]/g, ''); // Solo números
     
+    // Limitar longitud total
     if (valor.length > 6) {
         valor = valor.substring(0, 6);
     }
     
-    if (valor.length > 3) {
-        this.value = valor.substring(0, 3) + '/' + valor.substring(3);
-    } else {
-        this.value = valor;
+    // Insertar barra automáticamente después de 2 o 3 dígitos
+    if (valor.length >= 4) {
+        // Si hay 4 o más dígitos, insertar la barra
+        // Intentar primero con 3 dígitos antes de la barra
+        if (valor.length >= 4) {
+            let sistolica = valor.substring(0, 3);
+            let diastolica = valor.substring(3);
+            
+            // Verificar si la sistólica con 3 dígitos es válida (<=250)
+            if (parseInt(sistolica) > 250) {
+                // Si es mayor a 250, usar solo 2 dígitos
+                sistolica = valor.substring(0, 2);
+                diastolica = valor.substring(2);
+            }
+            
+            valor = sistolica + '/' + diastolica;
+        }
     }
     
+    this.value = valor;
     validarPresionArterial(this.value);
 });
 
@@ -590,38 +593,46 @@ function validarFrecuenciaCardiaca(valor) {
 
 // Validación de Temperatura
 document.getElementById('temp').addEventListener('input', function(e) {
-    let valor = this.value;
+    let valor = this.value.replace(/[^0-9.]/g, ''); // Solo números y punto
 
-    // Permitir solo números y punto decimal
-    valor = valor.replace(/[^0-9.]/g, '');
-
-    const partes = valor.split('.');
-    if (partes.length > 2) {
-        valor = partes[0] + '.' + partes.slice(1).join('');
-    }
-
-    if (partes.length === 2 && partes[1].length > 1) {
-        valor = partes[0] + '.' + partes[1].substring(0, 1);
+    // Si el usuario está escribiendo y NO hay punto
+    if (!valor.includes('.')) {
+        // Si tiene más de 2 dígitos, insertar punto automáticamente
+        if (valor.length > 2) {
+            valor = valor.substring(0, 2) + '.' + valor.substring(2, 3);
+        }
+    } else {
+        // Si ya hay punto, procesar las partes
+        const partes = valor.split('.');
+        
+        // Limitar parte entera a 2 dígitos
+        if (partes[0].length > 2) {
+            partes[0] = partes[0].substring(0, 2);
+        }
+        
+        // Limitar parte decimal a 1 dígito
+        if (partes[1] && partes[1].length > 1) {
+            partes[1] = partes[1].substring(0, 1);
+        }
+        
+        valor = partes[0] + '.' + (partes[1] || '');
     }
 
     this.value = valor;
 
-    // Validar y mostrar error si está fuera de rango
     if (valor) validarTemperatura(parseFloat(valor));
 });
 
 function validarTemperatura(valor) {
     const tempInput = document.getElementById('temp');
-    let feedback = tempInput.parentElement.querySelector('.invalid-feedback');
+    let feedback = tempInput.parentElement.querySelector('.invalid-feedback:not(.d-block)');
 
-    // Crear el div de error si no existe
     if (!feedback) {
         feedback = document.createElement('div');
         feedback.className = 'invalid-feedback';
         tempInput.parentElement.appendChild(feedback);
     }
 
-    // Mostrar mensaje si fuera de rango
     if (isNaN(valor) || valor < 30 || valor > 45) {
         tempInput.classList.add('is-invalid');
         feedback.textContent = 'La temperatura debe estar entre 30°C y 45°C';
@@ -635,30 +646,63 @@ function validarTemperatura(valor) {
     }
 }
 
+// Limitar edad a 3 dígitos y validar rango 0-105
+document.getElementById('edadDocumentado').addEventListener('input', function(e) {
+    let valor = this.value.replace(/\D/g, '');
+    
+    if (valor.length > 3) {
+        valor = valor.substring(0, 3);
+    }
+    
+    this.value = valor;
+    
+    if (valor) {
+        validarEdad(parseInt(valor));
+    } else {
+        this.classList.remove('is-invalid');
+        const feedback = this.parentElement.querySelector('.invalid-feedback:not(.d-block)');
+        if (feedback) feedback.remove();
+    }
+});
+
+function validarEdad(valor) {
+    const edadInput = document.getElementById('edadDocumentado');
+    let feedback = edadInput.parentElement.querySelector('.invalid-feedback:not(.d-block)');
+    
+    if (valor < 0 || valor > 105) {
+        edadInput.classList.add('is-invalid');
+        if (!feedback) {
+            feedback = document.createElement('div');
+            feedback.className = 'invalid-feedback';
+            edadInput.parentElement.appendChild(feedback);
+        }
+        feedback.textContent = 'La edad debe estar entre 0 y 105 años';
+        feedback.style.display = 'block';
+        return false;
+    } else {
+        edadInput.classList.remove('is-invalid');
+        if (feedback) {
+            feedback.remove();
+        }
+        return true;
+    }
+}
 
 // ========== LIMPIAR FORMULARIO COMPLETO ==========
 document.getElementById('btnLimpiar').addEventListener('click', () => {
     const form = document.getElementById('formEmergencia');
     
-    // Resetear formulario
     form.reset();
-    
-    // Remover todas las clases de error
     form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-    
-    // Remover todos los mensajes de error (tanto dinámicos como de Laravel)
     form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
     
-    // Limpiar búsqueda de pacientes
     document.getElementById('buscarIdentidad').value = '';
     document.getElementById('listaResultados').style.display = 'none';
     document.getElementById('listaResultados').innerHTML = '';
     document.getElementById('mensajeBusqueda').innerHTML = '';
     
-    // Limpiar y desbloquear campos de paciente
     limpiarCamposPaciente();
     
-    // Restaurar estado inicial
     document.querySelector('input[name="documentado"][value="1"]').checked = true;
     toggleDocs();
 });
@@ -769,7 +813,7 @@ function seleccionarPaciente(id) {
                 document.getElementById('genero').value = data.paciente.genero || '';
                 if(data.paciente.tipo_sangre) document.getElementById('tipo_sangre').value = data.paciente.tipo_sangre;
 
-                const camposBloquear = ['nombres', 'apellidos', 'identidad', 'fecha_nacimiento',  'telefono', 'direccion', 'genero', 'tipo_sangre'];
+                const camposBloquear = ['nombres', 'apellidos', 'identidad', 'fecha_nacimiento', 'telefono', 'direccion', 'genero', 'tipo_sangre'];
                 camposBloquear.forEach(campo => {
                     const elemento = document.getElementById(campo);
                     if(elemento) {
@@ -788,7 +832,7 @@ function seleccionarPaciente(id) {
             }
         })
         .catch(() => {
-                            document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-danger alert-custom mt-2">Error al cargar datos del paciente</div>';
+            document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-danger alert-custom mt-2">Error al cargar datos del paciente</div>';
         });
 }
 
@@ -843,19 +887,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     fotoInput.addEventListener('change', function() {
         const file = this.files[0];
-        if (!file) return; // si no selecciona nada
+        if (!file) return;
 
         const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-        const maxSize = 2 * 1024 * 1024; // 2 MB
+        const maxSize = 2 * 1024 * 1024;
 
-        // Limpiar error previo
         fotoInput.classList.remove('is-invalid');
         errorDiv.textContent = '';
 
         if (!validTypes.includes(file.type)) {
             fotoInput.classList.add('is-invalid');
             errorDiv.textContent = 'Solo se permiten imágenes JPG, JPEG o PNG.';
-            this.value = ''; // limpia el input
+            this.value = '';
             return;
         }
 
@@ -870,47 +913,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ========== GUARDAR Y RESTAURAR ESTADO DOCUMENTADO / INDOCUMENTADO ==========
 document.addEventListener('DOMContentLoaded', function () {
-    // Restaurar la selección desde localStorage (si existe)
     const savedState = localStorage.getItem('tipoPaciente');
     if (savedState === '1' || savedState === '0') {
         const radio = document.querySelector(`input[name="documentado"][value="${savedState}"]`);
         if (radio) {
             radio.checked = true;
-            toggleDocs(); // aplica los cambios visuales
+            toggleDocs();
         }
     }
 
-    // Guardar automáticamente cuando el usuario cambia la opción
     document.querySelectorAll('input[name="documentado"]').forEach(radio => {
         radio.addEventListener('change', function() {
             localStorage.setItem('tipoPaciente', this.value);
         });
     });
 });
-
-document.addEventListener("DOMContentLoaded", function() {
-    const tempInput = document.getElementById("temp");
-
-    tempInput.addEventListener("input", function() {
-        const value = parseFloat(this.value);
-        const feedback = this.parentElement.querySelector(".invalid-feedback");
-
-        // Si el valor no está entre 30 y 45
-        if (isNaN(value) || value < 30 || value > 45) {
-            this.classList.add("is-invalid");
-            if (feedback) {
-                feedback.textContent = "La temperatura debe estar entre 30 y 45 °C.";
-                feedback.style.display = "block";
-            }
-        } else {
-            this.classList.remove("is-invalid");
-            if (feedback) {
-                feedback.style.display = "none";
-            }
-        }
-    });
-});
-
 </script>
 
 @endsection
