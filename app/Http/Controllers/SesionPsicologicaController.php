@@ -12,12 +12,84 @@ class SesionPsicologicaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+   public function index(Request $request)
     {
-        $sesiones = SesionPsicologica::with(['paciente', 'medico'])
+        $query = $request->input('search', '');
+        $medico = $request->input('medico', '');
+        $fechaInicio = $request->input('fecha_desde');
+        $fechaFin = $request->input('fecha_hasta');
+        $tipoExamen = $request->input('tipo_examen');
+        $perPage = 10; // Ajusta según necesites
+
+        $totalSesiones = SesionPsicologica::count(); // ← CAMBIADO
+
+        $sesionesQuery = SesionPsicologica::with(['paciente', 'medico']) // ← CAMBIADO
             ->orderBy('fecha', 'desc')
-            ->paginate(10); // Paginación
-        return view('sesiones.index', compact('sesiones'));
+            ->orderBy('hora_inicio', 'desc');
+
+        // Filtro por paciente
+        if ($query) {
+            $sesionesQuery->whereHas('paciente', function($q) use ($query) {
+                $q->where('nombre', 'like', "%$query%")
+                  ->orWhere('apellidos', 'like', "%$query%");
+            });
+        }
+
+        // Filtro por médico
+        if ($medico) {
+            $sesionesQuery->whereHas('medico', function($q) use ($medico) {
+                $q->where('nombre', 'like', "%$medico%")
+                  ->orWhere('apellidos', 'like', "%$medico%");
+            });
+        }
+
+        // Filtros de fecha
+        if ($fechaInicio) $sesionesQuery->where('fecha', '>=', $fechaInicio);
+        if ($fechaFin) $sesionesQuery->where('fecha', '<=', $fechaFin);
+
+        // Filtro por tipo de examen
+        if ($tipoExamen) {
+            $sesionesQuery->where('tipo_examen', $tipoExamen);
+        }
+
+        $isSearch = ($query || $medico || $fechaInicio || $fechaFin || $tipoExamen);
+        
+        $totalFiltrado = $sesionesQuery->count();
+        $sesiones = $sesionesQuery->paginate($perPage);
+        
+        $sesiones->appends([
+            'search' => $query,
+            'medico' => $medico,
+            'fecha_desde' => $fechaInicio,
+            'fecha_hasta' => $fechaFin,
+            'tipo_examen' => $tipoExamen
+        ]);
+
+        if ($request->ajax()) {
+            // Crear paginación personalizada
+            $currentPage = $sesiones->currentPage();
+            $lastPage = max($sesiones->lastPage(), 1);
+            
+            $customPagination = view('sesiones.custom-pagination', [
+                'currentPage' => $currentPage,
+                'lastPage' => $lastPage,
+                'hasMorePages' => $sesiones->hasMorePages(),
+                'onFirstPage' => $sesiones->onFirstPage(),
+                'from' => $sesiones->firstItem() ?? 0,
+                'to' => $sesiones->lastItem() ?? 0,
+                'total' => $sesiones->total(), 
+            ])->render();
+            
+            return response()->json([
+                'html' => view('sesiones.tabla', compact('sesiones', 'isSearch'))->render(),
+                'pagination' => $customPagination,
+                'total' => $totalFiltrado,
+                'totalFiltrado' => $totalFiltrado,
+                'all' => $totalSesiones,
+            ]);
+        }
+
+        return view('sesiones.index', compact('sesiones', 'isSearch'));
     }
 
     /**
