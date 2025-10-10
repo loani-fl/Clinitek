@@ -140,13 +140,14 @@
             </article>
             </a>
 
+            <a href="{{ route('sesiones.create') }}" style="text-decoration: none; color: inherit;">
             <article class="feature-card">
-            <i class="bi bi-eyedropper feature-icon" title="Laboratorio"></i>
-                <h3 class="feature-title">Laboratorio</h3>
-                <p class="feature-desc">Laboratorio clínico con tecnología avanzada para diagnósticos rápidos y confiables.</p>
+            <i class="bi bi-eyedropper feature-icon" title="Psicologia"></i>
+                <h3 class="feature-title">Psicologia</h3>
+                <p class="feature-desc">Sesiones con expertos y examenes psicometricos para diagnósticos rápidos y confiables.</p>
             </article>
 
-    
+
 
 
          <a href="{{ route('rayosx.index') }}" style="text-decoration: none; color: inherit;">

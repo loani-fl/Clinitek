@@ -44,7 +44,7 @@ Route::resource('medicos', MedicoController::class)->except(['destroy']);
 Route::patch('/medicos/{medico}/estado', [MedicoController::class, 'toggleEstado'])->name('medicos.toggleEstado');
 Route::get('/medicos/buscar', [MedicoController::class, 'buscar'])->name('medicos.buscar');
 
-//BUSCAR EN EMERGENCIAS 
+//BUSCAR EN EMERGENCIAS
 Route::get('/pacientes/buscar', [PacienteController::class, 'buscarPaciente'])->name('pacientes.buscar');
 // Ruta para obtener datos completos del paciente
 Route::get('/pacientes/datos/{id}', [PacienteController::class, 'obtenerDatosPacienteCompleto'])->name('pacientes.datosCompleto');
@@ -230,7 +230,7 @@ Route::get('/facturas/{id}', [FacturaController::class, 'show'])->name('facturas
 
 
 
-//para mensajes de aviso 
+//para mensajes de aviso
 // Cuando no haya receta
 // Mostrar receta de una consulta
 
@@ -262,7 +262,7 @@ Route::get('/examenes/no-disponible/{consulta}', function ($consultaId) {
 
 //EMERGENCIAS
 use App\Http\Controllers\EmergenciaController;
-//aqui modifique solo esta 
+//aqui modifique solo esta
 Route::resource('emergencias', EmergenciaController::class);
 Route::get('/emergencias', [EmergenciaController::class, 'index'])->name('emergencias.index');
 Route::get('/emergencias/create', [EmergenciaController::class, 'create'])->name('emergencias.create');
@@ -284,4 +284,10 @@ Route::get('hospitalizaciones/create/{emergencia_id?}', [HospitalizacionControll
 
 
 
-// EMERGENCIAS 
+// EMERGENCIAS
+
+//rutas para psicologia
+use App\Http\Controllers\SesionPsicologicaController;
+
+// Rutas para sesiones psicológicas
+Route::resource('sesiones', SesionPsicologicaController::class);
