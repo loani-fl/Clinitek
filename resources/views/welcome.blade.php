@@ -115,6 +115,7 @@
                 <li><a class="dropdown-item" href="{{ route('puestos.index') }}">Registrar Puesto</a></li>
                 <li><a class="dropdown-item" href="{{ route('empleado.index') }}">Registrar Empleado</a></li>
                 <li><a class="dropdown-item" href="{{ route('pacientes.index') }}">Registrar Paciente</a></li>
+                <li><a class="dropdown-item" href="{{ route('inventario.index') }}">Inventario</a></li>
             </ul>
         </div>
     </header>

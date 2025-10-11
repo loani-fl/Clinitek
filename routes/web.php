@@ -291,3 +291,13 @@ use App\Http\Controllers\SesionPsicologicaController;
 
 // Rutas para sesiones psicológicas
 Route::resource('sesiones', SesionPsicologicaController::class);
+
+
+//Inventario
+use App\Http\Controllers\InventarioController;
+
+Route::get('/inventario/crear', [InventarioController::class, 'create'])->name('inventario.create');
+Route::post('/inventario', [InventarioController::class, 'store'])->name('inventario.store');
+Route::get('/inventario', [InventarioController::class, 'index'])->name('inventario.index');
+Route::get('/inventario/{inventario}', [InventarioController::class, 'show'])->name('inventario.show');
+Route::get('/inventario/{inventario}/edit', [InventarioController::class, 'edit'])->name('inventario.edit');

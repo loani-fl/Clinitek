@@ -16,7 +16,7 @@ body::before {
     left: 50%;
     width: 600px;
     height: 600px;
-    background-image: url('{{ asset("images/logo2.jpg") }}');
+    background-image: url('{{ asset("images/barra.png") }}');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
