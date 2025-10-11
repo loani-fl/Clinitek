@@ -16,7 +16,7 @@ body::before {
     left: 50%;
     width: 600px;
     height: 600px;
-    background-image: url('{{ asset("images/logo2.jpg") }}');
+    background-image: url('{{ asset("images/barra.png") }}');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -297,7 +297,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('hospitalizacionForm');
 
     btnLimpiar.addEventListener('click', function() {
-        form.querySelectorAll('input:not([readonly]), textarea').forEach(input => input.value = '');
+        form.querySelectorAll('input:not([readonly]):not([name="fecha_ingreso"]), textarea').forEach(input => input.value = '');
         form.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
         form.querySelectorAll('.text-danger').forEach(span => span.textContent = '');
     });
