@@ -2,13 +2,13 @@
     <thead>
         <tr>
             <th>#</th>
+            <th>Código</th>
             <th>Nombre</th>
             <th>Categoría</th>
             <th>Cantidad</th>
             <th>Unidad</th>
             <th>Fecha Ingreso</th>
             <th>Vencimiento</th>
-            <th>Precio (L.)</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -17,16 +17,20 @@
         <tr>
             {{-- Numeración correcta a través de la paginación --}}
             <td>{{ $inventarios->firstItem() + $loop->index }}</td>
+            <td>{{ $item->codigo }}</td>
             <td>{{ $item->nombre }}</td>
             <td>{{ $item->categoria }}</td>
             <td>{{ $item->cantidad }}</td>
             <td>{{ $item->unidad ?? '-' }}</td>
-            <td>{{ \Carbon\Carbon::parse($item->fecha_ingreso)->format('d/m/Y') }}</td>
+            <td>{{ $item->fecha_ingreso ? \Carbon\Carbon::parse($item->fecha_ingreso)->format('d/m/Y') : '—' }}</td>
             <td>{{ $item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('d/m/Y') : '—' }}</td>
-            <td>{{ $item->precio_unitario ? number_format($item->precio_unitario,2) : '—' }}</td>
-            <td>
-                <a href="{{ route('inventario.show', $item->id) }}" class="btn btn-info btn-sm text-white"><i class="bi bi-eye"></i></a>
-                <a href="{{ route('inventario.edit', $item->id) }}" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i></a>
+            <td class="d-flex justify-content-center gap-1">
+                <a href="{{ route('inventario.edit', $item->id) }}" class="btn btn-sm btn-warning">
+                    <i class="bi bi-pencil-square"></i>
+                </a>
+                <a href="{{ route('inventario.show', $item->id) }}" class="btn btn-sm btn-info text-white">
+                    <i class="bi bi-eye"></i>
+                </a>
             </td>
         </tr>
         @empty
