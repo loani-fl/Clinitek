@@ -79,4 +79,32 @@ class InventarioController extends Controller
         $inventario = Inventario::findOrFail($id);
         return view('inventario.edit', compact('inventario'));
     }
+    public function update(Request $request, $id)
+{
+    $request->validate([
+        'nombre' => 'required|string|max:255',
+        'categoria' => 'required|string|max:100',
+        'cantidad' => 'required|integer|min:0',
+        'precio_unitario' => 'required|numeric|min:0',
+        'descripcion' => 'required|string|max:200',
+        'observaciones' => 'required|string|max:200',
+        'fecha_ingreso' => 'required|date',
+        'fecha_vencimiento' => 'nullable|date|after_or_equal:fecha_ingreso',
+    ], [
+        'nombre.required' => 'El nombre del producto es obligatorio.',
+        'categoria.required' => 'Debe seleccionar una categoría.',
+        'cantidad.required' => 'Debe ingresar una cantidad.',
+        'precio_unitario.required' => 'Debe ingresar el precio.',
+        'descripcion.required' => 'La descripción es obligatoria.',
+        'observaciones.required' => 'Las observaciones son obligatorias.',
+        'fecha_ingreso.required' => 'Debe ingresar la fecha de ingreso.',
+        'fecha_vencimiento.after_or_equal' => 'La fecha de vencimiento no puede ser anterior a la fecha de ingreso.',
+    ]);
+
+    $inventario = Inventario::findOrFail($id);
+    $inventario->update($request->all());
+
+    return redirect()->route('inventario.index')
+        ->with('success', 'Producto actualizado correctamente en el inventario.');
+}
 }

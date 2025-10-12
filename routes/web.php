@@ -301,3 +301,5 @@ Route::post('/inventario', [InventarioController::class, 'store'])->name('invent
 Route::get('/inventario', [InventarioController::class, 'index'])->name('inventario.index');
 Route::get('/inventario/{inventario}', [InventarioController::class, 'show'])->name('inventario.show');
 Route::get('/inventario/{inventario}/edit', [InventarioController::class, 'edit'])->name('inventario.edit');
+Route::put('/inventario/{id}', [InventarioController::class, 'update'])->name('inventario.update');
+Route::get('/inventario/{id}', [InventarioController::class, 'show'])->name('inventario.show');
