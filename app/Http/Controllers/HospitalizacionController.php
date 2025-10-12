@@ -30,7 +30,6 @@ class HospitalizacionController extends Controller
             'motivo' => ['required','string','max:150','regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,;:()\-]+$/u'],
             'hospital' => 'required|string|max:150',
             'medico_id' => 'required|exists:medicos,id',
-            'clinica' => ['required','string','max:100','regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,-]+$/u'],
             'emergencia_id' => 'required|exists:emergencias,id',
         ], [
             'acompanante.max' => 'El campo Acompañante no puede tener más de 100 caracteres.',
@@ -44,9 +43,6 @@ class HospitalizacionController extends Controller
             'hospital.max' => 'El nombre del hospital no puede exceder los 150 caracteres.',
             'medico_id.required' => 'Debes seleccionar el médico que remite.',
             'medico_id.exists' => 'El médico seleccionado no existe en la base de datos.',
-            'clinica.required' => 'Debes ingresar el nombre de la clínica.',
-            'clinica.max' => 'El nombre de la clínica no puede exceder los 100 caracteres.',
-            'clinica.regex' => 'El nombre de la clínica solo puede contener letras, números, espacios y algunos signos (.,-).',
             'emergencia_id.required' => 'Debe seleccionarse la emergencia asociada.',
             'emergencia_id.exists' => 'La emergencia seleccionada no existe.',
         ]);
