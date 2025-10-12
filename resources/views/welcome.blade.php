@@ -418,7 +418,7 @@
 
     <!-- Hero Section -->
     <section class="hero-section">
-        <h2 class="hero-title">Bienvenido a CLINITEK</h2>
+        <h2 class="hero-title">Bienvenido a tu clinica de confianza</h2>
         <p class="hero-subtitle">Tu salud en manos expertas — atención integral para toda la familia</p>
     </section>
 
