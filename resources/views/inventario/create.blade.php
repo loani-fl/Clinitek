@@ -173,33 +173,47 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
         </div>
     </form>
 </div>
-
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const cantidad = document.getElementById('cantidad');
     cantidad.addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9]/g,'').slice(0,5);
+        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 5);
     });
 
     const precio = document.getElementById('precio_unitario');
     precio.addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9.]/g,'');
+        this.value = this.value.replace(/[^0-9.]/g, '');
         const parts = this.value.split('.');
-        if(parts[0].length>8) parts[0]=parts[0].slice(0,8);
+        if (parts[0].length > 8) parts[0] = parts[0].slice(0, 8);
         this.value = parts.join('.');
-        if((this.value.match(/\./g)||[]).length>1) this.value=this.value.slice(0,-1);
+        if ((this.value.match(/\./g) || []).length > 1) this.value = this.value.slice(0, -1);
     });
 
-    ['codigo','nombre','unidad','descripcion'].forEach(id=>{
-        const input=document.getElementById(id);
-        if(input){
-            input.addEventListener('input', function(){
-                this.value=this.value.replace(/[^A-Za-z0-9À-ÿ\s.,()-]/g,'').slice(0,this.getAttribute('maxlength'));
+    // Solo letras y espacios para nombre y unidad
+    const soloLetras = ['nombre', 'unidad'];
+    soloLetras.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', function() {
+                this.value = this.value
+                    .replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '') // solo letras y espacios
+                    .replace(/\s{2,}/g, ' ') // evita espacios dobles
+                    .trimStart(); // evita espacio inicial
             });
         }
     });
 
+    // Los demás (como descripción y código) mantienen su validación original
+    ['codigo', 'descripcion'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/[^A-Za-z0-9À-ÿ\s.,()-]/g, '').slice(0, this.getAttribute('maxlength'));
+            });
+        }
+    });
+
+    // Botón limpiar (no limpia fecha de ingreso)
     const form = document.querySelector('form');
     const btnLimpiar = document.getElementById('btnLimpiar');
     btnLimpiar.addEventListener('click', () => {
@@ -213,4 +227,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
+
 @endsection
