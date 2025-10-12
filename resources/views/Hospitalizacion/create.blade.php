@@ -274,9 +274,9 @@ input, select, textarea { font-size:0.85rem !important; }
                         </div>
                         <div class="col-half">
                             <label>Nombre de la clínica:</label>
-                            <input type="text" name="clinica" class="form-control" maxlength="100" value="{{ old('clinica') }}">
-                            @error('clinica')<span class="text-danger">{{ $message }}</span>@enderror
+                            <input type="text" name="clinica" class="form-control" value="Clinitek" readonly>
                         </div>
+
                     </div>
                 </div>
 
