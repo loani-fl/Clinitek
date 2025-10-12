@@ -2,33 +2,17 @@
 
 @section('content')
     <style>
-        html, body {
-            overflow-x: hidden;
-            margin: 0;
-            padding: 0;
-            max-width: 100%;
-        }
-
         .custom-card {
             max-width: 1000px;
-            width: 100%;
-            padding-left: 20px;
-            padding-right: 20px;
-            margin-left: auto;
-            margin-right: auto;
-            box-sizing: border-box;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 1px solid #91cfff;
+            border-radius: 0.5rem;
             position: relative;
-        }
-
-        input, select, textarea {
-            max-width: 100%;
-            box-sizing: border-box;
-        }
-
-        .invalid-feedback {
-            display: block;
-            font-size: 0.75rem;
-            color: #dc3545;
+            overflow: hidden;
+            margin: 2rem auto;
+            padding: 2rem;
+            box-shadow: 0 0 15px rgba(0,123,255,0.25);
+            z-index: 1;
         }
 
         .custom-card::before {
@@ -47,138 +31,183 @@
             pointer-events: none;
             z-index: 0;
         }
+
+        #previewContainer {
+            display: none;
+            margin-bottom: 0.5rem;
+            text-align: center; /* Centrar la imagen */
+        }
+
+        #previewImage {
+            max-width: 250px; /* Más pequeña */
+            max-height: 150px;
+            border-radius: 5px;
+            object-fit: cover;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+
     </style>
 
-    <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
-        <div class="card-header text-center py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
-            <h5 class="mb-0 fw-bold text-dark" style="font-size: 2.25rem;">Registro de Sesión Psicológica</h5>
+    <div class="custom-card">
+        <div class="mb-4 text-center" style="border-bottom: 3px solid #007BFF;">
+            <h2 class="fw-bold text-black mb-0">Registro de Sesión Psicológica</h2>
         </div>
 
-        <form action="{{ route('sesiones.store') }}" method="POST" enctype="multipart/form-data">
+        <form id="formSesion" action="{{ route('sesiones.store') }}" method="POST" enctype="multipart/form-data" novalidate>
             @csrf
-            <div class="row g-3 px-2 mt-3">
 
-                <!-- Información del Paciente -->
-                <h5 class="text-dark fw-bold mt-4 mb-3">Información del Paciente</h5>
+            {{-- Sección Paciente --}}
+            <div class="card mb-3 p-3 shadow-sm border">
+                <h5 class="fw-bold mb-3">Información del Paciente</h5>
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label for="paciente_id">Paciente <span class="text-danger">*</span></label>
-                        <select name="paciente_id" id="paciente_id" class="form-select form-select-sm @error('paciente_id') is-invalid @enderror" required>
+                        <label for="paciente_id" class="form-label">Paciente <span class="text-danger">*</span></label>
+                        <select name="paciente_id" id="paciente_id" class="form-select @error('paciente_id') is-invalid @enderror" required>
                             <option value="">-- Selecciona --</option>
                             @foreach($pacientes as $p)
-                                <option value="{{ $p->id }}"
-                                        data-nacimiento="{{ $p->fecha_nacimiento }}"
+                                <option value="{{ $p->id }}" {{ old('paciente_id') == $p->id ? 'selected' : '' }}
+                                data-nacimiento="{{ $p->fecha_nacimiento }}"
                                         data-genero="{{ $p->genero }}"
-                                        data-telefono="{{ $p->telefono }}"
-                                >
+                                        data-telefono="{{ $p->telefono }}">
                                     {{ $p->nombre }} {{ $p->apellidos }}
                                 </option>
                             @endforeach
                         </select>
                         @error('paciente_id')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-
                     <div class="col-md-2">
-                        <label class="form-label">Edad</label>
-                        <input type="text" id="edad" class="form-control form-control-sm bg-light" readonly>
+                        <label>Edad</label>
+                        <input type="text" id="edad" class="form-control bg-light" readonly>
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label">Género</label>
-                        <input type="text" id="genero" class="form-control form-control-sm bg-light" readonly>
+                        <label>Género</label>
+                        <input type="text" id="genero" class="form-control bg-light" readonly>
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label">Teléfono</label>
-                        <input type="text" id="telefono" class="form-control form-control-sm bg-light" readonly>
+                        <label>Teléfono</label>
+                        <input type="text" id="telefono" class="form-control bg-light" readonly>
                     </div>
                 </div>
+            </div>
 
-                <!-- Médico -->
-                <h5 class="text-dark fw-bold mt-4 mb-3">Médico que Atiende</h5>
+            {{-- Sección Médico y Fecha/Hora --}}
+            <div class="card mb-3 p-3 shadow-sm border">
+                <h5 class="fw-bold mb-3">Médico y Horario</h5>
                 <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="medico_id">Médico <span class="text-danger">*</span></label>
-                        <select name="medico_id" id="medico_id" class="form-select form-select-sm @error('medico_id') is-invalid @enderror" required>
+                    <div class="col-md-4">
+                        <label for="medico_id" class="form-label">Médico <span class="text-danger">*</span></label>
+                        <select name="medico_id" id="medico_id" class="form-select @error('medico_id') is-invalid @enderror" required>
                             <option value="">-- Selecciona --</option>
                             @foreach($medicos as $m)
-                                <option value="{{ $m->id }}">{{ $m->nombre }} {{ $m->apellidos }}</option>
+                                <option value="{{ $m->id }}" {{ old('medico_id') == $m->id ? 'selected' : '' }}>
+                                    {{ $m->nombre }} {{ $m->apellidos }}
+                                </option>
                             @endforeach
                         </select>
                         @error('medico_id')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                </div>
-
-                <!-- Detalles de la Sesión Psicológica -->
-                <h5 class="text-dark fw-bold mt-4 mb-3">Detalles de la Sesión</h5>
-                <div class="row g-3">
-                    <div class="col-md-2">
-                        <label for="fecha">Fecha <span class="text-danger">*</span></label>
-                        <input type="date" name="fecha" id="fecha" class="form-control form-control-sm @error('fecha') is-invalid @enderror" required value="{{ old('fecha', \Carbon\Carbon::now()->format('Y-m-d')) }}">
+                    <div class="col-md-3">
+                        <label for="fecha" class="form-label">Fecha <span class="text-danger">*</span></label>
+                        <input type="date" name="fecha" id="fecha" class="form-control @error('fecha') is-invalid @enderror"
+                               value="{{ old('fecha', \Carbon\Carbon::now()->format('Y-m-d')) }}" required>
                         @error('fecha')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-md-2">
-                        <label for="hora_inicio">Hora Inicio <span class="text-danger">*</span></label>
-                        <input type="time" name="hora_inicio" id="hora_inicio" class="form-control form-control-sm @error('hora_inicio') is-invalid @enderror" required value="{{ old('hora_inicio') }}">
+                        <label for="hora_inicio" class="form-label">Hora Inicio <span class="text-danger">*</span></label>
+                        <input type="time" name="hora_inicio" id="hora_inicio" class="form-control @error('hora_inicio') is-invalid @enderror"
+                               value="{{ old('hora_inicio') }}" required>
                         @error('hora_inicio')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-md-2">
-                        <label for="hora_fin">Hora Fin <span class="text-danger">*</span></label>
-                        <input type="time" name="hora_fin" id="hora_fin" class="form-control form-control-sm @error('hora_fin') is-invalid @enderror" required value="{{ old('hora_fin') }}">
+                        <label for="hora_fin" class="form-label">Hora Fin <span class="text-danger">*</span></label>
+                        <input type="time" name="hora_fin" id="hora_fin" class="form-control @error('hora_fin') is-invalid @enderror"
+                               value="{{ old('hora_fin') }}" required>
                         @error('hora_fin')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
+            </div>
 
-                <div class="row g-3 mt-3">
+            {{-- Sección Motivo y Examen --}}
+            <div class="card mb-3 p-3 shadow-sm border">
+                <h5 class="fw-bold mb-3">Motivo y Examen Psicométrico</h5>
+                <div class="row g-3">
                     <div class="col-md-6">
-                        <label for="motivo_consulta">Motivo de la consulta <span class="text-danger">*</span></label>
-                        <textarea name="motivo_consulta" id="motivo_consulta" rows="2" class="form-control form-control-sm @error('motivo_consulta') is-invalid @enderror" required>{{ old('motivo_consulta') }}</textarea>
+                        <label for="motivo_consulta" class="form-label">Motivo de la consulta <span class="text-danger">*</span></label>
+                        <textarea name="motivo_consulta" id="motivo_consulta" rows="2" class="form-control @error('motivo_consulta') is-invalid @enderror" required maxlength="250">{{ old('motivo_consulta') }}</textarea>
                         @error('motivo_consulta')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-
                     <div class="col-md-6">
-                        <label for="tipo_examen">Tipo de examen psicométrico <span class="text-danger">*</span></label>
-                        <input type="text" name="tipo_examen" id="tipo_examen" class="form-control form-control-sm @error('tipo_examen') is-invalid @enderror" required value="{{ old('tipo_examen') }}">
+                        <label for="tipo_examen" class="form-label">Tipo de examen psicométrico <span class="text-danger">*</span></label>
+                        <select name="tipo_examen" id="tipo_examen" class="form-select @error('tipo_examen') is-invalid @enderror" required>
+                            <option value="">-- Selecciona un examen --</option>
+                            @php
+                                $examenes = [
+                                    "Test de Inteligencia (WAIS)","Test de Raven","Test de Bender",
+                                    "Test de Machover (Figura Humana)","Test de la Casa-Árbol-Persona (HTP)",
+                                    "Test de Luscher (Colores)","Test de 16 Factores de Personalidad (16PF)",
+                                    "Inventario Multifásico de Personalidad de Minnesota (MMPI)","Inventario de Ansiedad de Beck (BAI)",
+                                    "Inventario de Depresión de Beck (BDI)","Escala de Autoestima de Rosenberg",
+                                    "Test de Apercepción Temática (TAT)","Test de la Figura Compleja de Rey",
+                                    "Test de Aptitudes Diferenciales (DAT)","Test de Dominós D48","Test Cleaver","Test DISC"
+                                ];
+                            @endphp
+                            @foreach($examenes as $examen)
+                                <option value="{{ $examen }}" {{ old('tipo_examen') == $examen ? 'selected' : '' }}>{{ $examen }}</option>
+                            @endforeach
+                        </select>
                         @error('tipo_examen')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                </div>
+            </div>
 
-                    <div class="col-md-6 mt-3">
-                        <label for="resultado">Resultado <span class="text-danger">*</span></label>
-                        <textarea name="resultado" id="resultado" rows="3" class="form-control form-control-sm @error('resultado') is-invalid @enderror" required>{{ old('resultado') }}</textarea>
+            {{-- Sección Resultado y Observaciones --}}
+            <div class="card mb-3 p-3 shadow-sm border">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="resultado" class="form-label">Resultado <span class="text-danger">*</span></label>
+                        <textarea name="resultado" id="resultado" rows="3" class="form-control @error('resultado') is-invalid @enderror" required maxlength="250">{{ old('resultado') }}</textarea>
                         @error('resultado')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-
-                    <div class="col-md-6 mt-3">
-                        <label for="observaciones">Observaciones</label>
-                        <textarea name="observaciones" id="observaciones" rows="3" class="form-control form-control-sm">{{ old('observaciones') }}</textarea>
-                    </div>
-
-                    <div class="col-md-6 mt-3">
-                        <label for="archivo_resultado">Archivo Resultado</label>
-                        <input type="file" name="archivo_resultado" id="archivo_resultado" class="form-control form-control-sm">
+                    <div class="col-md-6">
+                        <label for="observaciones" class="form-label">Observaciones</label>
+                        <textarea name="observaciones" id="observaciones" rows="3" class="form-control" maxlength="250">{{ old('observaciones') }}</textarea>
                     </div>
                 </div>
+            </div>
 
-                <!-- Botones -->
-                <div class="d-flex justify-content-center gap-3 mt-4 mb-4">
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Registrar sesión</button>
-                    <button type="reset" class="btn btn-warning"><i class="bi bi-trash"></i> Limpiar</button>
-                    <a href="{{ route('sesiones.index') }}" class="btn btn-success"><i class="bi bi-arrow-left"></i> Regresar</a>
+            {{-- Archivo --}}
+            <div class="mb-3">
+                <label for="archivo_resultado" class="form-label">Archivo Resultado</label>
+                <div id="previewContainer">
+                    <img id="previewImage" src="#" alt="Vista previa">
                 </div>
+                <input type="file" name="archivo_resultado" id="archivo_resultado" class="form-control @error('archivo_resultado') is-invalid @enderror"   accept="image/jpeg,image/png,image/jpg,application/pdf">
+                @error('archivo_resultado')
+                <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- Botones --}}
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <button type="submit" class="btn btn-primary">Registrar Sesión</button>
+                <button type="button" id="btnLimpiar" class="btn btn-warning">Limpiar</button>
+                <a href="{{ route('sesiones.index') }}" class="btn btn-success">Regresar</a>
             </div>
         </form>
     </div>
@@ -192,11 +221,11 @@
 
             pacienteSelect.addEventListener('change', function() {
                 const selected = pacienteSelect.selectedOptions[0];
-                if(selected.value) {
+                if(selected.value){
                     const nacimiento = new Date(selected.dataset.nacimiento);
                     const hoy = new Date();
                     let edad = hoy.getFullYear() - nacimiento.getFullYear();
-                    if(hoy.getMonth() < nacimiento.getMonth() || (hoy.getMonth() === nacimiento.getMonth() && hoy.getDate() < nacimiento.getDate())) {
+                    if(hoy.getMonth() < nacimiento.getMonth() || (hoy.getMonth() === nacimiento.getMonth() && hoy.getDate() < nacimiento.getDate())){
                         edad--;
                     }
                     edadInput.value = edad;
@@ -207,6 +236,44 @@
                     generoInput.value = '';
                     telefonoInput.value = '';
                 }
+            });
+
+            // Mantener valores antiguos si hay error
+            const oldPaciente = "{{ old('paciente_id') }}";
+            if(oldPaciente){
+                pacienteSelect.value = oldPaciente;
+                pacienteSelect.dispatchEvent(new Event('change'));
+            }
+
+            // Preview de imagen
+            const archivoInput = document.getElementById('archivo_resultado');
+            const previewContainer = document.getElementById('previewContainer');
+            const previewImage = document.getElementById('previewImage');
+
+            archivoInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if(file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewContainer.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    previewContainer.style.display = 'none';
+                    previewImage.src = '#';
+                }
+            });
+
+            // Botón Limpiar
+            document.getElementById('btnLimpiar').addEventListener('click', () => {
+                const form = document.getElementById('formSesion');
+                form.reset();
+                previewContainer.style.display = 'none';
+                previewImage.src = '#';
+                form.querySelectorAll('input, select, textarea').forEach(el => {
+                    el.classList.remove('is-invalid', 'is-valid');
+                });
             });
         });
     </script>

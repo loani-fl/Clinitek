@@ -464,7 +464,7 @@
                     </article>
                 </a>
 
-                <a href="{{ route('sesiones.create') }}" style="text-decoration: none; color: inherit;">
+                <a href="{{ route('sesiones.index') }}" style="text-decoration: none; color: inherit;">
                     <article class="service-card">
                         <div class="icon-circle">
                             <i class="bi bi-chat-heart-fill service-icon"></i>
