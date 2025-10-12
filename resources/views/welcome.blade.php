@@ -56,12 +56,13 @@
         }
 
         .logo-image {
-            height: 45px;
+            height: 65px; /* Antes 45px */
             width: auto;
-            max-width: 150px;
+            max-width: 200px; /* Antes 150px */
             object-fit: contain;
             display: block;
         }
+
 
         .logo-text h1 {
             color: white;
@@ -385,18 +386,15 @@
     <!-- Navbar superior -->
     <nav class="top-navbar">
         <div class="navbar-content">
-            <div class="logo-section">
-                <div class="logo-icon-container">
-                    <i class="bi bi-heart-pulse-fill" style="font-size: 2rem; color: #004aad;"></i>
-                </div>
-                <!-- Para usar tu logo Barra.png, reemplaza el div logo-icon-container por:
-                     <img src="RUTA_CORRECTA/Barra.png" alt="CLINITEK" class="logo-image" style="background: white; padding: 0.6rem; border-radius: 12px;">
-                -->
-                <div class="logo-text">
-                    <h1>CLINITEK</h1>
-                    <p>Sistema de Gestión Médica</p>
-                </div>
-            </div>
+        <div class="logo-section">
+    <img src="{{ asset('images/Barra.png') }}" alt="CLINITEK" class="logo-image">
+    <div class="logo-text">
+        <h1>CLINITEK</h1>
+        <p>Sistema de Gestión Médica</p>
+    </div>
+</div>
+
+
 
             <div class="dropdown">
                 <button class="registro-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
