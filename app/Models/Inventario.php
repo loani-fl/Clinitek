@@ -10,6 +10,7 @@ class Inventario extends Model
     use HasFactory;
 
     protected $fillable = [
+        'codigo',
         'nombre',
         'categoria',
         'descripcion',
@@ -18,7 +19,10 @@ class Inventario extends Model
         'fecha_ingreso',
         'fecha_vencimiento',
         'precio_unitario',
-        'proveedor',
-        'observaciones',
+    ];
+
+    protected $casts = [
+        'fecha_ingreso' => 'date',
+        'fecha_vencimiento' => 'date',
     ];
 }

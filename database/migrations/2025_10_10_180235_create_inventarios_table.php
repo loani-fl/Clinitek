@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('inventarios', function (Blueprint $table) {
             $table->id();
+            $table->string('codigo');
             $table->string('nombre');
             $table->string('categoria');
             $table->text('descripcion')->nullable();

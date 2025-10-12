@@ -129,7 +129,7 @@ tbody td .btn i {
 
         {{-- Filtro dinámico --}}
         <div class="d-flex filter-container mb-3" style="max-width:400px">
-            <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por nombre o categoría..." value="{{ request('search') }}">
+            <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por codigo, nombre o categoría..." value="{{ request('search') }}">
         </div>
 
         {{-- Tabla --}}
