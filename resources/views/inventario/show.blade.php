@@ -5,8 +5,8 @@
 @section('content')
 <style>
 .detail-card {
-    max-width: 98%;
-    width: 100%;
+    max-width: 1200px;
+    width: 95%;
     background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     border-radius: 15px;
     box-shadow: 0 10px 40px rgba(0, 123, 255, 0.15);
@@ -79,36 +79,23 @@
 }
 
 .content-section {
-    padding: 1.2rem;
+    padding: 1.5rem;
     flex: 1;
     display: flex;
+    flex-direction: column;
     gap: 1.5rem;
-    overflow: hidden;
-}
-
-.left-column {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.right-column {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    overflow-y: auto;
 }
 
 .info-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.8rem;
-    margin-bottom: auto;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
 }
 
 .info-item {
     background: white;
-    padding: 0.8rem;
+    padding: 1rem;
     border-radius: 10px;
     border-left: 4px solid #007BFF;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -121,19 +108,19 @@
 }
 
 .info-label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: #6c757d;
     text-transform: uppercase;
     letter-spacing: 0.3px;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.5rem;
     display: flex;
     align-items: center;
     gap: 0.4rem;
 }
 
 .info-value {
-    font-size: 0.95rem;
+    font-size: 1rem;
     color: #212529;
     font-weight: 500;
     line-height: 1.3;
@@ -141,37 +128,31 @@
 
 .description-section {
     background: white;
-    padding: 1rem;
+    padding: 1.2rem;
     border-radius: 10px;
     border: 2px dashed #91cfff;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    min-height: 150px;
 }
 
 .section-title {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 700;
     color: #007BFF;
     text-transform: uppercase;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    flex-shrink: 0;
 }
 
 .description-text {
     color: #495057;
-    line-height: 1.5;
-    font-size: 0.9rem;
+    line-height: 1.6;
+    font-size: 0.95rem;
     word-wrap: break-word;
     word-break: break-word;
     overflow-wrap: break-word;
     white-space: pre-wrap;
-    overflow-y: auto;
-    flex: 1;
 }
 
 .status-badge {
@@ -231,17 +212,13 @@
     font-size: 0.95rem;
 }
 
-@media print {
-    .action-buttons {
-        display: none;
+@media (max-width: 1200px) {
+    .info-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (max-width: 992px) {
-    .content-section {
-        flex-direction: column;
-    }
-    
+@media (max-width: 768px) {
     .info-grid {
         grid-template-columns: 1fr;
     }
@@ -253,10 +230,10 @@
     <div class="header-section">
         <div class="logo-container">
             <div class="logo-brand">
-                <img src="{{ asset('images/Barra.png') }}" alt="Logo CLINITEK" class="logo-img">
+               <!--  <img src="{{ asset('images/Barra.png') }}" alt="Logo CLINITEK" class="logo-img">-->
                 <div>
-                    <h1 class="clinic-name">CLINITEK</h1>
-                    <p class="document-title">Detalle de Inventario Médico</p>
+                    <h1 class="clinic-name">Detalle de Inventario Médico</h1>
+                   <!--  <p class="document-title">Detalle de Inventario Médico</p>-->
                 </div>
             </div>
             <div>
@@ -265,97 +242,71 @@
         </div>
     </div>
 
-    <!-- Contenido Principal en 2 Columnas -->
+    <!-- Contenido Principal -->
     <div class="content-section">
         
-        <!-- Columna Izquierda: Descripciones -->
-        <div class="left-column">
-            <!-- Descripción -->
-            <div class="description-section">
-                <div class="section-title">
-                    <i class="bi bi-file-text"></i> Descripción del Producto
+        <!-- Grid de Información (3 columnas, 2 filas) -->
+        <div class="info-grid">
+            <!-- Fila 1 -->
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="bi bi-box-seam icon-label"></i> Nombre del Producto
                 </div>
-                <div class="description-text">
-                    {{ $inventario->descripcion }}
+                <div class="info-value">{{ $inventario->nombre }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="bi bi-tag icon-label"></i> Categoría
+                </div>
+                <div class="info-value">{{ $inventario->categoria }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="bi bi-upc-scan icon-label"></i> Código
+                </div>
+                <div class="info-value">{{ $inventario->codigo }}</div>
+            </div>
+
+            <!-- Fila 2 -->
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="bi bi-123 icon-label"></i> Cantidad Disponible
+                </div>
+                <div class="info-value">
+                    {{ $inventario->cantidad }} 
+                    @if($inventario->unidad)
+                        <small class="text-muted">({{ $inventario->unidad }})</small>
+                    @endif
+                    
+                    @if($inventario->cantidad == 0)
+                        <span class="status-badge status-vencido ms-2">Agotado</span>
+                    @elseif($inventario->cantidad < 10)
+                        <span class="status-badge status-bajo ms-2">Stock Bajo</span>
+                    @else
+                        <span class="status-badge status-disponible ms-2">Disponible</span>
+                    @endif
                 </div>
             </div>
 
-            <!-- Observaciones -->
-            <div class="description-section">
-                <div class="section-title">
-                    <i class="bi bi-clipboard-check"></i> Observaciones
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="bi bi-cash-coin icon-label"></i> Precio Unitario
                 </div>
-                <div class="description-text">
-                    {{ $inventario->observaciones }}
-                </div>
-            </div>
-        </div>
-
-        <!-- Columna Derecha: Información en Grid 2x3 -->
-        <div class="right-column">
-            <div class="info-grid">
-                <!-- Fila 1 -->
-                <div class="info-item">
-                    <div class="info-label">
-                        <i class="bi bi-box-seam icon-label"></i> Nombre del Producto
-                    </div>
-                    <div class="info-value">{{ $inventario->nombre }}</div>
-                </div>
-
-                <div class="info-item">
-                    <div class="info-label">
-                        <i class="bi bi-tag icon-label"></i> Categoría
-                    </div>
-                    <div class="info-value">{{ $inventario->categoria }}</div>
-                </div>
-
-                <!-- Fila 2 -->
-                <div class="info-item">
-                    <div class="info-label">
-                        <i class="bi bi-123 icon-label"></i> Cantidad Disponible
-                    </div>
-                    <div class="info-value">
-                        {{ $inventario->cantidad }} 
-                        @if($inventario->unidad)
-                            <small class="text-muted">({{ $inventario->unidad }})</small>
-                        @endif
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <div class="info-label">
-                        <i class="bi bi-cash-coin icon-label"></i> Precio Unitario
-                    </div>
-                    <div class="info-value">L. {{ number_format($inventario->precio_unitario, 2) }}</div>
-                </div>
-
-                <!-- Fila 3 -->
-                <div class="info-item">
-                    <div class="info-label">
-                        <i class="bi bi-calendar-check icon-label"></i> Fecha de Ingreso
-                    </div>
-                    <div class="info-value">{{ \Carbon\Carbon::parse($inventario->fecha_ingreso)->format('d/m/Y') }}</div>
-                </div>
-
-                <div class="info-item">
-                    <div class="info-label">
-                        <i class="bi bi-activity icon-label"></i> Estado de Inventario
-                    </div>
-                    <div class="info-value">
-                        @if($inventario->cantidad == 0)
-                            <span class="status-badge status-vencido">Agotado</span>
-                        @elseif($inventario->cantidad < 10)
-                            <span class="status-badge status-bajo">Stock Bajo</span>
-                        @else
-                            <span class="status-badge status-disponible">Disponible</span>
-                        @endif
-                    </div>
-                </div>
+                <div class="info-value">L. {{ number_format($inventario->precio_unitario, 2) }}</div>
             </div>
 
-            <!-- Fecha de vencimiento si existe (debajo del grid) -->
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="bi bi-calendar-check icon-label"></i> Fecha de Ingreso
+                </div>
+                <div class="info-value">{{ \Carbon\Carbon::parse($inventario->fecha_ingreso)->format('d/m/Y') }}</div>
+            </div>
+
+            <!-- Fecha de vencimiento si existe -->
             @if($inventario->fecha_vencimiento)
-            <div class="info-item" style="margin-top: 0.8rem;">
+            <div class="info-item">
                 <div class="info-label">
                     <i class="bi bi-calendar-x icon-label"></i> Fecha de Vencimiento
                 </div>
@@ -379,6 +330,16 @@
             </div>
             @endif
         </div>
+
+        <!-- Descripción (ocupa todo el ancho) -->
+        <div class="description-section">
+            <div class="section-title">
+                <i class="bi bi-file-text"></i> Descripción del Producto
+            </div>
+            <div class="description-text">
+                {{ $inventario->descripcion }}
+            </div>
+        </div>
     </div>
 
     <!-- Botones de Acción -->
@@ -386,9 +347,6 @@
         <a href="{{ route('inventario.edit', $inventario->id) }}" class="btn btn-primary btn-modern">
             <i class="bi bi-pencil-square"></i> Editar
         </a>
-        <button onclick="window.print()" class="btn btn-info btn-modern">
-            <i class="bi bi-printer"></i> Imprimir
-        </button>
         <a href="{{ route('inventario.index') }}" class="btn btn-success btn-modern">
             <i class="bi bi-arrow-left-circle"></i> Regresar
         </a>

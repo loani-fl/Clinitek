@@ -418,7 +418,7 @@
 
     <!-- Hero Section -->
     <section class="hero-section">
-        <h2 class="hero-title">Bienvenido a CLINITEK</h2>
+        <h2 class="hero-title">Bienvenido a tu clinica de confianza</h2>
         <p class="hero-subtitle">Tu salud en manos expertas — atención integral para toda la familia</p>
     </section>
 
@@ -464,7 +464,7 @@
                     </article>
                 </a>
 
-                <a href="{{ route('sesiones.create') }}" style="text-decoration: none; color: inherit;">
+                <a href="{{ route('sesiones.index') }}" style="text-decoration: none; color: inherit;">
                     <article class="service-card">
                         <div class="icon-circle">
                             <i class="bi bi-chat-heart-fill service-icon"></i>

@@ -53,10 +53,10 @@ class SesionPsicologicaController extends Controller
         }
 
         $isSearch = ($query || $medico || $fechaInicio || $fechaFin || $tipoExamen);
-        
+
         $totalFiltrado = $sesionesQuery->count();
         $sesiones = $sesionesQuery->paginate($perPage);
-        
+
         $sesiones->appends([
             'search' => $query,
             'medico' => $medico,
@@ -69,7 +69,7 @@ class SesionPsicologicaController extends Controller
             // Crear paginación personalizada
             $currentPage = $sesiones->currentPage();
             $lastPage = max($sesiones->lastPage(), 1);
-            
+
             $customPagination = view('sesiones.custom-pagination', [
                 'currentPage' => $currentPage,
                 'lastPage' => $lastPage,
@@ -77,9 +77,9 @@ class SesionPsicologicaController extends Controller
                 'onFirstPage' => $sesiones->onFirstPage(),
                 'from' => $sesiones->firstItem() ?? 0,
                 'to' => $sesiones->lastItem() ?? 0,
-                'total' => $sesiones->total(), 
+                'total' => $sesiones->total(),
             ])->render();
-            
+
             return response()->json([
                 'html' => view('sesiones.tabla', compact('sesiones', 'isSearch'))->render(),
                 'pagination' => $customPagination,
@@ -110,16 +110,39 @@ class SesionPsicologicaController extends Controller
         $request->validate([
             'paciente_id' => 'required|exists:pacientes,id',
             'medico_id' => 'required|exists:medicos,id',
-
             'fecha' => 'required|date',
             'hora_inicio' => 'required',
             'hora_fin' => 'required|after:hora_inicio',
-            'motivo_consulta' => 'required|string',
-            'tipo_examen' => 'required|string|max:100',
-            'resultado' => 'required|string',
-            'observaciones' => 'nullable|string',
+            'motivo_consulta' => 'required|string|max:250',
+            'tipo_examen' => 'required|string',
+            'resultado' => 'required|string|max:300',
+            'observaciones' => 'nullable|string|max:250',
             'archivo_resultado' => 'nullable|file|max:5120|mimes:pdf,jpeg,jpg,png',
+        ], [
+            //paciente id
+            'paciente_id.required' => 'Debe seleccionar un paciente.',
+
+            //medico id
+            'medico_id.required' => 'Debe seleccionar un médico.',
+
+            //fecha
+            'fecha.required' => 'Debe indicar la fecha de la sesión.',
+            // hora inicio
+            'hora_inicio.required' => 'Debe indicar la hora de inicio.',
+
+            //hora final
+            'hora_fin.required' => 'Debe indicar la hora de finalización.',
+            //motivo
+            'motivo_consulta.required' => 'Debe ingresar el motivo de la consulta.',
+
+            //tipo de examen
+            'tipo_examen.required' => 'Debe seleccionar el tipo de examen psicométrico.',
+
+            //reusltado
+            'resultado.required' => 'Debe ingresar el resultado de la sesión.',
         ]);
+
+
 
         $rutaArchivo = null;
         if ($request->hasFile('archivo_resultado')) {
