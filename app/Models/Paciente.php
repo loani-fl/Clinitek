@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Paciente extends Model
 {
@@ -79,4 +80,9 @@ class Paciente extends Model
     return $this->hasMany(Emergencia::class, 'paciente_id');
 }
 
+// Accessor para calcular la edad automáticamente
+    public function getEdadAttribute()
+    {
+        return $this->fecha_nacimiento ? Carbon::parse($this->fecha_nacimiento)->age : null;
+    }
 }

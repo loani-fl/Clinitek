@@ -43,10 +43,10 @@ class EmergenciaController extends Controller
     }
 
     $isSearch = ($query || $fechaInicio || $fechaFin || ($documentado !== null && $documentado !== ''));
-    
+
     $totalFiltrado = $emergenciasQuery->count();
     $emergencias = $emergenciasQuery->paginate($perPage);
-    
+
     $emergencias->appends([
         'search' => $query,
         'fecha_desde' => $fechaInicio,
@@ -58,7 +58,7 @@ class EmergenciaController extends Controller
         // Crear paginación personalizada que siempre se muestra
         $currentPage = $emergencias->currentPage();
         $lastPage = max($emergencias->lastPage(), 1); // Mínimo 1 página
-        
+
         $customPagination = view('emergencias.custom-pagination', [
             'currentPage' => $currentPage,
             'lastPage' => $lastPage,
@@ -66,9 +66,9 @@ class EmergenciaController extends Controller
             'onFirstPage' => $emergencias->onFirstPage(),
             'from' => $emergencias->firstItem() ?? 0,  // ← AGREGAR ESTO
                 'to' => $emergencias->lastItem() ?? 0,      // ← AGREGAR ESTO
-                'total' => $emergencias->total(), 
+                'total' => $emergencias->total(),
         ])->render();
-        
+
         return response()->json([
             'html' => view('emergencias.tabla', compact('emergencias', 'isSearch'))->render(),
             'pagination' => $customPagination,
@@ -136,19 +136,19 @@ class EmergenciaController extends Controller
         if (count($partes) === 2) {
             $sistolica = (int)$partes[0];
             $diastolica = (int)$partes[1];
-            
+
             if ($sistolica < 40 || $sistolica > 250) {
                 return redirect()->back()
                     ->withErrors(['pa' => 'La presión sistólica debe estar entre 40 y 250 mmHg.'])
                     ->withInput();
             }
-            
+
             if ($diastolica < 20 || $diastolica > 150) {
                 return redirect()->back()
                     ->withErrors(['pa' => 'La presión diastólica debe estar entre 20 y 150 mmHg.'])
                     ->withInput();
             }
-            
+
             if ($sistolica <= $diastolica) {
                 return redirect()->back()
                     ->withErrors(['pa' => 'La presión sistólica debe ser mayor que la diastólica.'])
@@ -239,5 +239,19 @@ class EmergenciaController extends Controller
     {
         $emergencia = Emergencia::findOrFail($id);
         return view('emergencias.show', compact('emergencia'));
+    }
+
+    public function detalle($id)
+    {
+        $emergencia = \App\Models\Emergencia::findOrFail($id);
+
+        return response()->json([
+            'fecha' => $emergencia->fecha ? \Carbon\Carbon::parse($emergencia->fecha)->format('d/m/Y') : null,
+            'hora' => $emergencia->hora ? \Carbon\Carbon::parse($emergencia->hora)->format('h:i A') : null,
+            'motivo' => $emergencia->motivo,
+            'pa' => $emergencia->pa,
+            'fc' => $emergencia->fc,
+            'temp' => $emergencia->temp,
+        ]);
     }
 }
