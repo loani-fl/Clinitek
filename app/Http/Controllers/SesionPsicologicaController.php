@@ -97,8 +97,9 @@ class SesionPsicologicaController extends Controller
      */
     public function create()
     {
+
         $pacientes = Paciente::all();
-        $medicos = Medico::all();
+        $medicos = Medico::whereIn('especialidad', ['Psiquiatría', 'Psicología'])->get();
         return view('sesiones.create', compact('pacientes', 'medicos'));
     }
 

@@ -110,14 +110,24 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label for="fecha" class="form-label">Fecha <span class="text-danger">*</span></label>
-                        <input type="date" name="fecha" id="fecha" class="form-control @error('fecha') is-invalid @enderror"
-                               value="{{ old('fecha', \Carbon\Carbon::now()->format('Y-m-d')) }}" required>
+                        <input
+                            type="date"
+                            id="fecha"
+                            name="fecha"
+                            class="form-control @error('fecha') is-invalid @enderror"
+                            value="{{ old('fecha', \Carbon\Carbon::now()->format('Y-m-d')) }}"
+                            required
+                            min="2025-01-01"
+                            max="2025-12-31"
+                            onchange="checkYear(this)"
+                        >
                         @error('fecha')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
                     <div class="col-md-2">
                         <label for="hora_inicio" class="form-label">Hora Inicio <span class="text-danger">*</span></label>
                         <input type="time" name="hora_inicio" id="hora_inicio" class="form-control @error('hora_inicio') is-invalid @enderror"
@@ -143,11 +153,21 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="motivo_consulta" class="form-label">Motivo de la consulta <span class="text-danger">*</span></label>
-                        <textarea name="motivo_consulta" id="motivo_consulta" rows="2" class="form-control @error('motivo_consulta') is-invalid @enderror" required maxlength="250">{{ old('motivo_consulta') }}</textarea>
+                        <textarea
+                            name="motivo_consulta"
+                            id="motivo_consulta"
+                            rows="2"
+                            class="form-control @error('motivo_consulta') is-invalid @enderror"
+                            required
+                            maxlength="250"
+                            onkeydown="return allowOnly(event)"
+                            onpaste="return handlePaste(event)"
+                        >{{ old('motivo_consulta') }}</textarea>
                         @error('motivo_consulta')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
                     <div class="col-md-6">
                         <label for="tipo_examen" class="form-label">Tipo de examen psicométrico <span class="text-danger">*</span></label>
                         <select name="tipo_examen" id="tipo_examen" class="form-select @error('tipo_examen') is-invalid @enderror" required>
@@ -179,21 +199,38 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="resultado" class="form-label">Resultado <span class="text-danger">*</span></label>
-                        <textarea name="resultado" id="resultado" rows="3" class="form-control @error('resultado') is-invalid @enderror" required maxlength="250">{{ old('resultado') }}</textarea>
+                        <textarea
+                            name="resultado"
+                            id="resultado"
+                            rows="3"
+                            class="form-control @error('resultado') is-invalid @enderror"
+                            required
+                            maxlength="250"
+                            onkeydown="return allowOnly(event)"
+                            onpaste="return handlePaste(event)"
+                        >{{ old('resultado') }}</textarea>
                         @error('resultado')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-md-6">
-                        <label for="observaciones" class="form-label">Observaciones</label>
-                        <textarea name="observaciones" id="observaciones" rows="3" class="form-control" maxlength="250">{{ old('observaciones') }}</textarea>
+                        <label for="observaciones" class="form-label">Observaciones(Opcional)</label>
+                        <textarea
+                            name="observaciones"
+                            id="observaciones"
+                            rows="3"
+                            class="form-control"
+                            maxlength="250"
+                            onkeydown="return allowOnly(event)"
+                            onpaste="return handlePaste(event)"
+                        >{{ old('observaciones') }}</textarea>
                     </div>
                 </div>
             </div>
 
             {{-- Archivo --}}
             <div class="mb-3">
-                <label for="archivo_resultado" class="form-label">Archivo Resultado</label>
+                <label for="archivo_resultado" class="form-label">Archivo Resultado(Opcional)</label>
                 <div id="previewContainer">
                     <img id="previewImage" src="#" alt="Vista previa">
                 </div>
@@ -276,5 +313,55 @@
                 });
             });
         });
+    </script>
+    <script>
+        function checkYear(input) {
+            const year = new Date(input.value).getFullYear();
+            if (year !== 2025) {
+                alert('Solo se permiten fechas dentro del año 2025.');
+                input.value = '';
+            }
+        }
+    </script>
+
+    <style>
+        /* Bloquea visualmente el año y lo pone gris */
+        input[type="date"]::-webkit-datetime-edit-year-field {
+            color: #888;
+            pointer-events: none;
+        }
+        input[type="date"]::-moz-date-year-field {
+            color: #888;
+            pointer-events: none;
+        }
+    </style>
+
+    <script>
+        const allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,;%";
+
+        function allowOnly(e) {
+            const key = e.key;
+
+            // Permitir teclas especiales como Backspace, Enter, Tab, flechas
+            const specialKeys = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Tab", "Enter"];
+            if (specialKeys.includes(key)) return true;
+
+            if (!allowedChars.includes(key)) {
+                e.preventDefault(); // Bloquea la tecla
+                return false;
+            }
+            return true;
+        }
+
+        function handlePaste(e) {
+            const paste = (e.clipboardData || window.clipboardData).getData('text');
+            for (let char of paste) {
+                if (!allowedChars.includes(char)) {
+                    e.preventDefault(); // Bloquea pegar si contiene caracteres no permitidos
+                    return false;
+                }
+            }
+            return true;
+        }
     </script>
 @endsection

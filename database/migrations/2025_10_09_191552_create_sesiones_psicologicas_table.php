@@ -36,6 +36,7 @@ return new class extends Migration
             $table->text('resultado');
             $table->text('observaciones')->nullable();
 
+
             // Archivo adjunto opcional
             $table->string('archivo_resultado')->nullable();
 
