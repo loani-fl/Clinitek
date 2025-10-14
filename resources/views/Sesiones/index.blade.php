@@ -251,16 +251,28 @@
                 <input type="date" id="fechaHasta" class="form-control filtro-input">
             </div>
 
-            <div>
-                <label class="filtro-label" for="filtroTipoExamen">Tipo de Examen</label>
-                <select id="filtroTipoExamen" class="form-select filtro-input">
-                    <option value="">Todos</option>
-                    <option value="Evaluación inicial">Evaluación inicial</option>
-                    <option value="Seguimiento">Seguimiento</option>
-                    <option value="Terapia individual">Terapia individual</option>
-                    <option value="Terapia grupal">Terapia grupal</option>
-                </select>
-            </div>
+           @php
+    $examenes = [
+        "Test de Inteligencia (WAIS)","Test de Raven","Test de Bender",
+        "Test de Machover (Figura Humana)","Test de la Casa-Árbol-Persona (HTP)",
+        "Test de Luscher (Colores)","Test de 16 Factores de Personalidad (16PF)",
+        "Inventario Multifásico de Personalidad de Minnesota (MMPI)","Inventario de Ansiedad de Beck (BAI)",
+        "Inventario de Depresión de Beck (BDI)","Escala de Autoestima de Rosenberg",
+        "Test de Apercepción Temática (TAT)","Test de la Figura Compleja de Rey",
+        "Test de Aptitudes Diferenciales (DAT)","Test de Dominós D48","Test Cleaver","Test DISC"
+    ];
+@endphp
+
+<div>
+    <label class="filtro-label" for="filtroTipoExamen">Tipo de Examen</label>
+    <select id="filtroTipoExamen" class="form-select filtro-input">
+        <option value="">Todos</option>
+        @foreach ($examenes as $examen)
+            <option value="{{ $examen }}">{{ $examen }}</option>
+        @endforeach
+    </select>
+</div>
+
 
             <div style="align-self: flex-end;">
                 <button id="btnRecargar" class="btn btn-secondary">
