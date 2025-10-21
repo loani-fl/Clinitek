@@ -109,10 +109,10 @@ class SesionPsicologicaController extends Controller
     public function store(Request $request)
     {
 
-        // 1️⃣ Guardar temporal si hay archivo
+        // 1️⃣ Subir archivo temporal si existe
         if ($request->hasFile('archivo_resultado')) {
-            $archivoTemp = $request->file('archivo_resultado')->store('temp', 'public');
-            session(['archivo_temp' => $archivoTemp]);
+            $path = $request->file('archivo_resultado')->store('temp', 'public');
+            session(['archivo_temporal' => $path]);
         }
 
         $request->validate([
@@ -158,15 +158,16 @@ class SesionPsicologicaController extends Controller
         ]);
 
 
-        // 3️⃣ Guardar definitivo
-        $rutaArchivo = null;
-        if(session()->has('archivo_temp')) {
-            $temp = session('archivo_temp');
-            $rutaArchivo = str_replace('temp/', 'psicologia/', $temp);
-            \Storage::disk('public')->move($temp, $rutaArchivo);
-            session()->forget('archivo_temp'); // limpiar temporal
+// Guardar archivo definitivo
+        if (session('archivo_temporal')) {
+            $tempPath = session('archivo_temporal');
+            $finalPath = 'archivos_sesiones/' . basename($tempPath);
+            \Storage::disk('public')->move($tempPath, $finalPath);
+            $rutaArchivo = $finalPath;
+            session()->forget('archivo_temporal');
+        } else {
+            $rutaArchivo = null; // <-- Definirlo aunque no haya archivo
         }
-
 
         SesionPsicologica::create([
             'paciente_id' => $request->paciente_id,
@@ -180,6 +181,7 @@ class SesionPsicologicaController extends Controller
             'observaciones' => $request->observaciones,
             'archivo_resultado' => $rutaArchivo,
         ]);
+
 
 
 

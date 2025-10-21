@@ -206,13 +206,14 @@
 
 
                     <!-- Botón Regresar -->
-                    <div class="text-center pt-4">
+                    <div class="d-flex justify-content-center pt-4">
                         <a href="{{ route('sesiones.index') }}"
                            class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2"
                            style="font-size: 0.85rem;">
                             <i class="bi bi-arrow-left"></i> Regresar
                         </a>
                     </div>
+
                 </div>
             </div>
         </div>

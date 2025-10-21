@@ -229,37 +229,29 @@
             </div>
 
             {{-- Archivo --}}
-            @php
-                $archivoTemp = session('archivo_temp'); // archivo temporal
-            @endphp
+            <!-- Archivo Resultado -->
+            <div class="col-md-4">
+                <label for="archivo_resultado" class="form-label">Archivo Resultado (Opcional):</label>
 
-            <div class="mb-3">
-                <label for="archivo_resultado" class="form-label">Archivo Resultado (Opcional)</label>
-
-                {{-- Vista previa --}}
-                <div id="previewContainer" style="{{ $archivoTemp ? '' : 'display:none;' }}">
-                    <img id="previewImage"
-                         style="max-width:200px; display: {{ $archivoTemp && in_array(strtolower(pathinfo($archivoTemp, PATHINFO_EXTENSION)), ['jpg','jpeg','png']) ? 'block' : 'none' }};"
-                         class="img-fluid rounded border"
-                         src="{{ $archivoTemp ? asset('storage/'.$archivoTemp) : '' }}">
-                    <a id="previewPDF"
-                       style="display: {{ $archivoTemp && strtolower(pathinfo($archivoTemp, PATHINFO_EXTENSION)) === 'pdf' ? 'inline-block' : 'none' }};"
-                       target="_blank"
-                       class="btn btn-outline-primary btn-sm"
-                       href="{{ $archivoTemp ? asset('storage/'.$archivoTemp) : '#' }}">Ver PDF</a>
+                <div class="mb-2">
+                    <iframe id="archivoPreview"
+                            src="{{ session('archivo_temporal') ? asset('storage/' . session('archivo_temporal')) : '' }}"
+                            style="width: 100%; height: 100px; {{ session('archivo_temporal') ? '' : 'display:none;' }}"></iframe>
+                </div>
                 </div>
 
-                {{-- Input file --}}
-                <input type="file"
-                       name="archivo_resultado"
-                       id="archivo_resultado"
-                       class="form-control @error('archivo_resultado') is-invalid @enderror"
-                       accept="image/jpeg,image/png,image/jpg,application/pdf">
+                <input
+                    type="file"
+                    name="archivo_resultado"
+                    id="archivo_resultado"
+                    accept=".jpg,.jpeg,.png,.webp,.pdf"
+                    class="form-control @error('archivo_resultado') is-invalid @enderror">
 
                 @error('archivo_resultado')
                 <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+
 
 
 
@@ -371,31 +363,37 @@
     </script>
     {{-- JS para vista previa --}}
     <script>
-        document.getElementById('archivo_resultado').addEventListener('change', function() {
-            const file = this.files[0];
-            const previewContainer = document.getElementById('previewContainer');
-            const previewImage = document.getElementById('previewImage');
-            const previewPDF = document.getElementById('previewPDF');
+        // Previsualización de archivo resultado
+        const archivoInput = document.getElementById('archivo_resultado');
+        const archivoPreview = document.getElementById('archivoPreview');
 
+        archivoInput.addEventListener('change', function(e){
+            const file = e.target.files[0];
             if(file){
-                const ext = file.name.split('.').pop().toLowerCase();
-                previewContainer.style.display = 'block';
-                if(ext === 'pdf'){
-                    previewImage.style.display = 'none';
-                    previewPDF.style.display = 'inline-block';
-                    previewPDF.href = URL.createObjectURL(file);
-                } else {
-                    previewPDF.style.display = 'none';
-                    previewImage.style.display = 'block';
-                    const reader = new FileReader();
-                    reader.onload = e => previewImage.src = e.target.result;
-                    reader.readAsDataURL(file);
+                const reader = new FileReader();
+                reader.onload = function(ev){
+                    if(file.type === 'application/pdf'){
+                        archivoPreview.src = ev.target.result;
+                    } else if(file.type.startsWith('image/')){
+                        archivoPreview.src = ev.target.result;
+                    }
+                    archivoPreview.style.display = 'block';
                 }
+                reader.readAsDataURL(file);
             } else {
-                previewContainer.style.display = 'none';
-                previewImage.style.display = 'none';
-                previewPDF.style.display = 'none';
+                archivoPreview.src = '';
+                archivoPreview.style.display = 'none';
             }
         });
+
+        // Botón Limpiar formulario (si quieres que limpie también el archivo)
+        document.getElementById('btnLimpiar').addEventListener('click', function(){
+            const form = this.closest('form');
+            form.reset();
+            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            archivoPreview.src = '';
+            archivoPreview.style.display = 'none';
+        });
+
     </script>
 @endsection
