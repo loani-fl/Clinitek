@@ -141,6 +141,7 @@ class SesionPsicologicaController extends Controller
 
             //hora final
             'hora_fin.required' => 'Debe indicar la hora de finalización.',
+            'hora_fin.after' => 'La hora de fin debe ser posterior a la hora de inicio.',
             //motivo
             'motivo_consulta.required' => 'Debe ingresar el motivo de la consulta.',
 
