@@ -15,7 +15,6 @@
     position: relative;
     overflow: hidden;
 }
-
 .custom-card::before {
     content: "";
     position: absolute;
@@ -31,7 +30,6 @@
     transform: translate(-50%, -50%);
     pointer-events: none;
 }
-
 input.form-control,
 textarea.form-control,
 select.form-select {
@@ -39,18 +37,15 @@ select.form-select {
     border: 2px solid #ced4da;
     transition: all 0.3s ease;
 }
-
 input.form-control:focus,
 textarea.form-control:focus,
 select.form-select:focus {
     border-color: #007BFF;
     box-shadow: 0 0 0 0.15rem rgba(0,123,255,0.15);
 }
-
 input.is-invalid, textarea.is-invalid, select.is-invalid {
     border-color: red;
 }
-
 .invalid-feedback {
     display: block;
 }
@@ -58,7 +53,7 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
 
 <div class="custom-card">
     <div class="mb-4 text-center border-bottom border-3 border-primary">
-        <h2 class="fw-bold text-black mb-0">Inventario </h2>
+        <h2 class="fw-bold text-black mb-0">Inventario</h2>
     </div>
 
     @if(session('success'))
@@ -73,12 +68,24 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
         <!-- Fila 1 -->
         <div class="row mb-3">
             <div class="col-md-4">
+                <label for="categoria" class="form-label">Categoría <span class="text-danger">*</span></label>
+                <select name="categoria" id="categoria"
+                        class="form-select form-select-sm @error('categoria') is-invalid @enderror" required>
+                    <option value="">Seleccione</option>
+                    <option value="Insumos médicos" {{ old('categoria')=='Insumos médicos'?'selected':'' }}>Insumos médicos</option>
+                    <option value="Equipos" {{ old('categoria')=='Equipos'?'selected':'' }}>Equipos</option>
+                    <option value="Material de limpieza" {{ old('categoria')=='Material de limpieza'?'selected':'' }}>Material de limpieza</option>
+                    <option value="Papelería" {{ old('categoria')=='Papelería'?'selected':'' }}>Papelería</option>
+                </select>
+                @error('categoria') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="col-md-4">
                 <label for="codigo" class="form-label">Código <span class="text-danger">*</span></label>
                 <input type="text" name="codigo" id="codigo"
                        class="form-control form-control-sm @error('codigo') is-invalid @enderror"
-                       maxlength="10" value="{{ old('codigo') }}" required>
+                       maxlength="10" value="{{ old('codigo') }}" readonly required>
                 @error('codigo') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                <small class="text-muted">Ej: MED-001</small>
             </div>
 
             <div class="col-md-4">
@@ -87,20 +94,6 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
                        class="form-control form-control-sm @error('nombre') is-invalid @enderror"
                        maxlength="100" value="{{ old('nombre') }}" required>
                 @error('nombre') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="col-md-4">
-                <label for="categoria" class="form-label">Categoría <span class="text-danger">*</span></label>
-                <select name="categoria" id="categoria"
-                        class="form-select form-select-sm @error('categoria') is-invalid @enderror" required>
-                    <option value="">Seleccione</option>
-                    <option value="Medicamentos" {{ old('categoria')=='Medicamentos'?'selected':'' }}>Medicamentos</option>
-                    <option value="Insumos médicos" {{ old('categoria')=='Insumos médicos'?'selected':'' }}>Insumos médicos</option>
-                    <option value="Equipos" {{ old('categoria')=='Equipos'?'selected':'' }}>Equipos</option>
-                    <option value="Material de limpieza" {{ old('categoria')=='Material de limpieza'?'selected':'' }}>Material de limpieza</option>
-                    <option value="Papelería" {{ old('categoria')=='Papelería'?'selected':'' }}>Papelería</option>
-                </select>
-                @error('categoria') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
 
@@ -115,10 +108,18 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
             </div>
 
             <div class="col-md-4">
-                <label for="unidad" class="form-label">Unidad</label>
-                <input type="text" name="unidad" id="unidad"
-                       class="form-control form-control-sm @error('unidad') is-invalid @enderror"
-                       value="{{ old('unidad') }}" maxlength="50" placeholder="cajas, frascos, etc.">
+                <label for="unidad" class="form-label">Unidad <span class="text-danger">*</span></label>
+                <select name="unidad" id="unidad"
+                        class="form-select form-select-sm @error('unidad') is-invalid @enderror" required>
+                    <option value="">Seleccione</option>
+                    <option value="Cajas" {{ old('unidad')=='Cajas' ? 'selected' : '' }}>Cajas</option>
+                    <option value="Frascos" {{ old('unidad')=='Frascos' ? 'selected' : '' }}>Frascos</option>
+                    <option value="Sobres" {{ old('unidad')=='Sobres' ? 'selected' : '' }}>Sobres</option>
+                    <option value="Paquetes" {{ old('unidad')=='Paquetes' ? 'selected' : '' }}>Paquetes</option>
+                    <option value="Unidades" {{ old('unidad')=='Unidades' ? 'selected' : '' }}>Unidades</option>
+                    <option value="Litros" {{ old('unidad')=='Litros' ? 'selected' : '' }}>Litros</option>
+                    <option value="Mililitros" {{ old('unidad')=='Mililitros' ? 'selected' : '' }}>Mililitros</option>
+                </select>
                 @error('unidad') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
@@ -149,15 +150,15 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
         </div>
 
         <!-- Descripción -->
-<div class="row mb-3">
-    <div class="col-md-12">
-        <label for="descripcion" class="form-label fw-semibold">Descripción <span class="text-danger">*</span></label>
-        <textarea name="descripcion" id="descripcion"
-                  class="form-control form-control-sm @error('descripcion') is-invalid @enderror"
-                  rows="3" maxlength="200">{{ old('descripcion') }}</textarea>
-        @error('descripcion') <div class="invalid-feedback">{{ $message }}</div> @enderror
-    </div>
-</div>
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <label for="descripcion" class="form-label fw-semibold">Descripción <span class="text-danger">*</span></label>
+                <textarea name="descripcion" id="descripcion"
+                          class="form-control form-control-sm @error('descripcion') is-invalid @enderror"
+                          rows="3" maxlength="200">{{ old('descripcion') }}</textarea>
+                @error('descripcion') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+        </div>
 
         <!-- Botones -->
         <div class="d-flex justify-content-center gap-3 mt-4">
@@ -173,8 +174,36 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
         </div>
     </form>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    const categoria = document.getElementById('categoria');
+    const codigo = document.getElementById('codigo');
+    const form = document.querySelector('form');
+
+    // Generar código automáticamente
+    categoria.addEventListener('change', function() {
+        const categoriaSeleccionada = this.value;
+        if (categoriaSeleccionada) {
+            fetch('{{ route("inventario.generarCodigo") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ categoria: categoriaSeleccionada })
+            })
+            .then(res => res.json())
+            .then(data => {
+                codigo.value = data.codigo || '';
+            })
+            .catch(() => codigo.value = '');
+        } else {
+            codigo.value = '';
+        }
+    });
+
+    // Validaciones numéricas y de texto
     const cantidad = document.getElementById('cantidad');
     cantidad.addEventListener('input', function() {
         this.value = this.value.replace(/[^0-9]/g, '').slice(0, 5);
@@ -189,43 +218,49 @@ document.addEventListener('DOMContentLoaded', () => {
         if ((this.value.match(/\./g) || []).length > 1) this.value = this.value.slice(0, -1);
     });
 
-    // Solo letras y espacios para nombre y unidad
-    const soloLetras = ['nombre', 'unidad'];
+    const soloLetras = ['nombre'];
     soloLetras.forEach(id => {
         const input = document.getElementById(id);
         if (input) {
             input.addEventListener('input', function() {
                 this.value = this.value
-                    .replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '') // solo letras y espacios
-                    .replace(/\s{2,}/g, ' ') // evita espacios dobles
-                    .trimStart(); // evita espacio inicial
+                    .replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '')
+                    .replace(/\s{2,}/g, ' ')
+                    .trimStart();
             });
         }
     });
 
-    // Los demás (como descripción y código) mantienen su validación original
-    ['codigo', 'descripcion'].forEach(id => {
-        const input = document.getElementById(id);
-        if (input) {
-            input.addEventListener('input', function() {
-                this.value = this.value.replace(/[^A-Za-z0-9À-ÿ\s.,()-]/g, '').slice(0, this.getAttribute('maxlength'));
-            });
-        }
-    });
-
-    // Botón limpiar (no limpia fecha de ingreso)
-    const form = document.querySelector('form');
+    // Botón limpiar
     const btnLimpiar = document.getElementById('btnLimpiar');
     btnLimpiar.addEventListener('click', () => {
         form.querySelectorAll('input, textarea, select').forEach(input => {
-            if (input.id !== 'fecha_ingreso') {
-                input.value = '';
+            if (input.id !== 'fecha_ingreso') { // mantener fecha ingreso
+                if (input.tagName === 'SELECT') input.selectedIndex = 0;
+                else input.value = '';
                 input.classList.remove('is-invalid');
             }
         });
-        form.querySelectorAll('.invalid-feedback').forEach(msg => msg.remove());
+
+        // Ocultar mensajes de error
+        form.querySelectorAll('.invalid-feedback').forEach(msg => msg.style.display = 'none');
+
+        // Limpiar código generado
+        if (codigo) codigo.value = '';
     });
+
+    // Fecha mínima de vencimiento (1 mes después)
+    const fechaIngreso = document.getElementById('fecha_ingreso');
+    const fechaVencimiento = document.getElementById('fecha_vencimiento');
+    function actualizarMinimoVencimiento() {
+        if (fechaIngreso.value) {
+            const ingreso = new Date(fechaIngreso.value);
+            ingreso.setMonth(ingreso.getMonth() + 1);
+            fechaVencimiento.min = ingreso.toISOString().split('T')[0];
+        }
+    }
+    actualizarMinimoVencimiento();
+    fechaIngreso.addEventListener('change', actualizarMinimoVencimiento);
 });
 </script>
-
 @endsection
