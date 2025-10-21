@@ -50,7 +50,7 @@
 
     <div class="custom-card">
         <div class="mb-4 text-center" style="border-bottom: 3px solid #007BFF;">
-            <h2 class="fw-bold text-black mb-0">Registro de Sesión Psicológica</h2>
+            <h2 class="fw-bold text-black mb-0">Registro de Resultados de S.P </h2>
         </div>
 
         <form id="formSesion" action="{{ route('sesiones.store') }}" method="POST" enctype="multipart/form-data" novalidate>
@@ -169,7 +169,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="tipo_examen" class="form-label">Tipo de examen psicométrico <span class="text-danger">*</span></label>
+                        <label for="tipo_examen" class="form-label">Tipo de examen aplicado <span class="text-danger">*</span></label>
                         <select name="tipo_examen" id="tipo_examen" class="form-select @error('tipo_examen') is-invalid @enderror" required>
                             <option value="">-- Selecciona un examen --</option>
                             @php
@@ -229,16 +229,39 @@
             </div>
 
             {{-- Archivo --}}
+            @php
+                $archivoTemp = session('archivo_temp'); // archivo temporal
+            @endphp
+
             <div class="mb-3">
-                <label for="archivo_resultado" class="form-label">Archivo Resultado(Opcional)</label>
-                <div id="previewContainer">
-                    <img id="previewImage" src="#" alt="Vista previa">
+                <label for="archivo_resultado" class="form-label">Archivo Resultado (Opcional)</label>
+
+                {{-- Vista previa --}}
+                <div id="previewContainer" style="{{ $archivoTemp ? '' : 'display:none;' }}">
+                    <img id="previewImage"
+                         style="max-width:200px; display: {{ $archivoTemp && in_array(strtolower(pathinfo($archivoTemp, PATHINFO_EXTENSION)), ['jpg','jpeg','png']) ? 'block' : 'none' }};"
+                         class="img-fluid rounded border"
+                         src="{{ $archivoTemp ? asset('storage/'.$archivoTemp) : '' }}">
+                    <a id="previewPDF"
+                       style="display: {{ $archivoTemp && strtolower(pathinfo($archivoTemp, PATHINFO_EXTENSION)) === 'pdf' ? 'inline-block' : 'none' }};"
+                       target="_blank"
+                       class="btn btn-outline-primary btn-sm"
+                       href="{{ $archivoTemp ? asset('storage/'.$archivoTemp) : '#' }}">Ver PDF</a>
                 </div>
-                <input type="file" name="archivo_resultado" id="archivo_resultado" class="form-control @error('archivo_resultado') is-invalid @enderror"   accept="image/jpeg,image/png,image/jpg,application/pdf">
+
+                {{-- Input file --}}
+                <input type="file"
+                       name="archivo_resultado"
+                       id="archivo_resultado"
+                       class="form-control @error('archivo_resultado') is-invalid @enderror"
+                       accept="image/jpeg,image/png,image/jpg,application/pdf">
+
                 @error('archivo_resultado')
                 <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+
+
 
             {{-- Botones --}}
             <div class="d-flex justify-content-center gap-3 mt-4">
@@ -282,25 +305,7 @@
                 pacienteSelect.dispatchEvent(new Event('change'));
             }
 
-            // Preview de imagen
-            const archivoInput = document.getElementById('archivo_resultado');
-            const previewContainer = document.getElementById('previewContainer');
-            const previewImage = document.getElementById('previewImage');
 
-            archivoInput.addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if(file && file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewImage.src = e.target.result;
-                        previewContainer.style.display = 'block';
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    previewContainer.style.display = 'none';
-                    previewImage.src = '#';
-                }
-            });
 
             // Botón Limpiar
             document.getElementById('btnLimpiar').addEventListener('click', () => {
@@ -363,5 +368,34 @@
             }
             return true;
         }
+    </script>
+    {{-- JS para vista previa --}}
+    <script>
+        document.getElementById('archivo_resultado').addEventListener('change', function() {
+            const file = this.files[0];
+            const previewContainer = document.getElementById('previewContainer');
+            const previewImage = document.getElementById('previewImage');
+            const previewPDF = document.getElementById('previewPDF');
+
+            if(file){
+                const ext = file.name.split('.').pop().toLowerCase();
+                previewContainer.style.display = 'block';
+                if(ext === 'pdf'){
+                    previewImage.style.display = 'none';
+                    previewPDF.style.display = 'inline-block';
+                    previewPDF.href = URL.createObjectURL(file);
+                } else {
+                    previewPDF.style.display = 'none';
+                    previewImage.style.display = 'block';
+                    const reader = new FileReader();
+                    reader.onload = e => previewImage.src = e.target.result;
+                    reader.readAsDataURL(file);
+                }
+            } else {
+                previewContainer.style.display = 'none';
+                previewImage.style.display = 'none';
+                previewPDF.style.display = 'none';
+            }
+        });
     </script>
 @endsection

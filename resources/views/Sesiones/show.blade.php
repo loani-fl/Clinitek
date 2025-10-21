@@ -169,7 +169,7 @@
                     <!-- Archivo Resultado -->
                     <!-- Archivo Resultado -->
                     <p><strong>Archivo Resultado:</strong><br>
-                        @if(!empty($sesion->archivo_resultado) && file_exists(storage_path('app/public/'.$sesion->archivo_resultado)))
+                        @if(!empty($sesion->archivo_resultado))
                             @php
                                 $fileUrl = asset('storage/'.$sesion->archivo_resultado);
                                 $extension = strtolower(pathinfo($sesion->archivo_resultado, PATHINFO_EXTENSION));

@@ -108,6 +108,13 @@ class SesionPsicologicaController extends Controller
      */
     public function store(Request $request)
     {
+
+        // 1️⃣ Guardar temporal si hay archivo
+        if ($request->hasFile('archivo_resultado')) {
+            $archivoTemp = $request->file('archivo_resultado')->store('temp', 'public');
+            session(['archivo_temp' => $archivoTemp]);
+        }
+
         $request->validate([
             'paciente_id' => 'required|exists:pacientes,id',
             'medico_id' => 'required|exists:medicos,id',
@@ -118,7 +125,8 @@ class SesionPsicologicaController extends Controller
             'tipo_examen' => 'required|string',
             'resultado' => 'required|string|max:300',
             'observaciones' => 'nullable|string|max:250',
-            'archivo_resultado' => 'nullable|file|max:5120|mimes:pdf,jpeg,jpg,png',
+            'archivo_resultado' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120', // 5MB
+
         ], [
             //paciente id
             'paciente_id.required' => 'Debe seleccionar un paciente.',
@@ -141,14 +149,23 @@ class SesionPsicologicaController extends Controller
 
             //reusltado
             'resultado.required' => 'Debe ingresar el resultado de la sesión.',
+
+
+         'archivo_resultado.mimes' => 'El archivo debe ser JPG, PNG o PDF.',
+            'archivo_resultado.max' => 'El archivo no debe superar los 5MB.',
+
         ]);
 
 
-
+        // 3️⃣ Guardar definitivo
         $rutaArchivo = null;
-        if ($request->hasFile('archivo_resultado')) {
-            $rutaArchivo = $request->file('archivo_resultado')->store('psicologia', 'public');
+        if(session()->has('archivo_temp')) {
+            $temp = session('archivo_temp');
+            $rutaArchivo = str_replace('temp/', 'psicologia/', $temp);
+            \Storage::disk('public')->move($temp, $rutaArchivo);
+            session()->forget('archivo_temp'); // limpiar temporal
         }
+
 
         SesionPsicologica::create([
             'paciente_id' => $request->paciente_id,
@@ -163,8 +180,11 @@ class SesionPsicologicaController extends Controller
             'archivo_resultado' => $rutaArchivo,
         ]);
 
+
+
+
         return redirect()->route('sesiones.index')
-            ->with('success', 'Sesión psicológica registrada correctamente ');
+            ->with('success', 'Sesión psicológica registrada correctamente');
     }
 
     /**
