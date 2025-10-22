@@ -75,22 +75,37 @@ class InventarioController extends Controller
 
     public function index(Request $request)
     {
-        $query = $request->input('search');
-
-        $inventarios = Inventario::when($query, function ($q) use ($query) {
-            $query = strtolower($query);
-            $q->where('codigo', 'like', "%{$query}%")
-              ->orWhereRaw('LOWER(nombre) LIKE ?', ["%{$query}%"])
-              ->orWhereRaw('LOWER(categoria) LIKE ?', ["%{$query}%"]);
-        })
-        ->orderBy('id', 'desc')
-        ->paginate(2)
-        ->appends($request->all());
-
+        $query = Inventario::query();
+    
+        // Filtro por búsqueda de texto
+        if ($request->filled('search')) {
+            $search = strtolower($request->input('search'));
+            $query->where(function($q) use ($search) {
+                $q->whereRaw('LOWER(codigo) LIKE ?', ["{$search}%"]) 
+                  ->orWhereRaw('LOWER(nombre) LIKE ?', ["%{$search}%"]);
+            });
+        }
+        
+    
+        // Filtro por categoría
+        if ($request->filled('categoria')) {
+            $query->where('categoria', $request->categoria);
+        }
+    
+        // Filtro por rango de fechas
+        if ($request->filled('fecha_inicio')) {
+            $query->whereDate('fecha_ingreso', '>=', $request->fecha_inicio);
+        }
+        if ($request->filled('fecha_fin')) {
+            $query->whereDate('fecha_ingreso', '<=', $request->fecha_fin);
+        }
+    
+        $inventarios = $query->orderBy('id', 'desc')->paginate(10)->appends($request->all());
+    
         if ($request->ajax()) {
             $html = view('inventario.tabla', compact('inventarios'))->render();
             $pagination = view('inventario.custom-pagination', compact('inventarios'))->render();
-
+    
             return response()->json([
                 'html' => $html,
                 'pagination' => $pagination,
@@ -99,9 +114,14 @@ class InventarioController extends Controller
                 'to' => $inventarios->lastItem(),
             ]);
         }
-
-        return view('inventario.index', compact('inventarios'));
+    
+        // Para mostrar el select de categorías
+        $categorias = Inventario::distinct()->pluck('categoria');
+    
+        return view('inventario.index', compact('inventarios', 'categorias'));
     }
+    
+    
 
     public function show($id)
     {

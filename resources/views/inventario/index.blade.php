@@ -10,7 +10,6 @@ body {
     padding: 0;
     overflow-x: hidden;
 }
-
 .content-wrapper {
     margin-top: 8px;
     margin-left: auto;
@@ -20,7 +19,6 @@ body {
     max-width: 1000px;
     width: 100%;
 }
-
 .custom-card::before {
     content: "";
     position: absolute;
@@ -37,7 +35,6 @@ body {
     pointer-events: none;
     z-index: 0;
 }
-
 .custom-card {
     background-color: #fff;
     border-radius: 1.5rem;
@@ -49,7 +46,6 @@ body {
     max-width: 1000px;
     width: 100%;
 }
-
 .card-header {
     background-color: transparent !important;
     border-bottom: 3px solid #007BFF;
@@ -59,7 +55,6 @@ body {
     align-items: center;
     justify-content: space-between;
 }
-
 .card-header h2 {
     font-size: 1.8rem;
     font-weight: bold;
@@ -67,39 +62,32 @@ body {
     margin: 0 auto;
     text-align: center;
 }
-
 .btn-inicio {
     font-size: 0.9rem;
 }
-
 .table {
     font-size: 0.85rem;
     width: 100%;
     border-collapse: collapse;
 }
-
 .table-responsive {
     flex-grow: 1;
     overflow-y: auto;
     max-width: 100%;
 }
-
 .table th, .table td {
     padding: 0.4rem 0.75rem;
     vertical-align: middle;
     border: 1px solid #dee2e6;
     text-align: center;
 }
-
 .table thead {
     background-color: #007BFF;
     color: white;
 }
-
 .table tbody tr:hover {
     background-color: #e9f2ff;
 }
-
 #mensajeResultados {
     text-align: center;
     margin-top: 0.5rem;
@@ -107,9 +95,9 @@ body {
     color: #555;
     min-height: 2.5em;
 }
-
-tbody td .btn i {
-    margin-right: 0;
+.filter-container input,
+.filter-container select {
+    margin-right: 0.5rem;
 }
 </style>
 
@@ -119,17 +107,33 @@ tbody td .btn i {
             <a href="{{ route('inicio') }}" class="btn btn-light btn-inicio me-3">
                 <i class="bi bi-house-door"></i> Inicio
             </a>
-
             <h2>Inventario</h2>
-
             <a href="{{ route('inventario.create') }}" class="btn btn-primary ms-3">
                 <i class="bi bi-plus-circle"></i> Nuevo Producto
             </a>
         </div>
 
-        {{-- Filtro dinámico --}}
-        <div class="d-flex filter-container mb-3" style="max-width:400px">
-            <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por codigo, nombre o categoría..." value="{{ request('search') }}">
+        {{-- Filtros --}}
+        <div class="d-flex filter-container mb-3" style="gap:0.5rem; flex-wrap: nowrap; align-items: center;">
+            <input type="text" id="filtroBusqueda" class="form-control" placeholder="Buscar por código o nombre" 
+                value="{{ request('search') }}" style="width: 260px;">
+
+                {{-- Select dinámico de categorías (solo las que están registradas) --}}
+<select id="filtroCategoria" class="form-control" style="max-width: 180px;">
+    <option value="">Todas las categorías</option>
+    @foreach($categorias as $cat)
+        <option value="{{ $cat }}" {{ request('categoria') == $cat ? 'selected' : '' }}>{{ $cat }}</option>
+    @endforeach
+</select>
+
+
+            <input type="date" id="fechaInicio" class="form-control" value="{{ request('fecha_inicio') }}" style="max-width: 150px;">
+            <input type="date" id="fechaFin" class="form-control" value="{{ request('fecha_fin') }}" style="max-width: 150px;">
+
+            {{-- Botón limpiar solo con ícono --}}
+            <button type="button" id="btnLimpiarFiltros" class="btn btn-outline-secondary btn-sm" style="padding: 0.25rem 0.35rem;" title="Limpiar filtros">
+                <i class="bi bi-x-circle"></i>
+            </button>
         </div>
 
         {{-- Tabla --}}
@@ -137,6 +141,7 @@ tbody td .btn i {
             @include('inventario.tabla', ['inventarios' => $inventarios])
         </div>
 
+        {{-- Mensaje de resultados --}}
         <div id="mensajeResultados">
             @if($inventarios->total() > 0)
                 Mostrando del {{ $inventarios->firstItem() }} al {{ $inventarios->lastItem() }} de {{ $inventarios->total() }} resultados
@@ -153,11 +158,22 @@ tbody td .btn i {
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function () {
-    function actualizarTabla(page = 1, query = '') {
+    function actualizarTabla(page = 1) {
+        const query = $('#filtroBusqueda').val();
+        const categoria = $('#filtroCategoria').val();
+        const fechaInicio = $('#fechaInicio').val();
+        const fechaFin = $('#fechaFin').val();
+
         $.ajax({
             url: "{{ route('inventario.index') }}",
             type: 'GET',
-            data: { page: page, search: query },
+            data: { 
+                page: page, 
+                search: query, 
+                categoria: categoria, 
+                fecha_inicio: fechaInicio, 
+                fecha_fin: fechaFin 
+            },
             success: function(data) {
                 $('#tabla-container').html(data.html);
                 $('#paginacion-container').html(data.pagination);
@@ -171,17 +187,35 @@ $(document).ready(function () {
         });
     }
 
-    // Filtro dinámico mientras escribes
+    // Filtro de texto solo por código o nombre
     $('#filtroBusqueda').on('input', function() {
-        actualizarTabla(1, $(this).val());
+        actualizarTabla(1);
+    });
+
+    // Filtro de categoría
+    $('#filtroCategoria').on('change', function() {
+        actualizarTabla(1);
+    });
+
+    // Filtro de fechas
+    $('#fechaInicio, #fechaFin').on('change', function() {
+        actualizarTabla(1);
+    });
+
+    // Botón limpiar filtros
+    $('#btnLimpiarFiltros').on('click', function() {
+        $('#filtroBusqueda').val('');
+        $('#filtroCategoria').val('');
+        $('#fechaInicio').val('');
+        $('#fechaFin').val('');
+        actualizarTabla(1);
     });
 
     // Paginación dinámica
     $(document).on('click', '.custom-pagination a', function(e){
         e.preventDefault();
         const page = $(this).data('page');
-        const query = $('#filtroBusqueda').val();
-        actualizarTabla(page, query);
+        actualizarTabla(page);
         $('html, body').animate({ scrollTop: $('.custom-card').offset().top - 20 }, 300);
     });
 });
