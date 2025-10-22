@@ -131,7 +131,7 @@
     padding: 1.2rem;
     border-radius: 10px;
     border: 2px dashed #91cfff;
-    min-height: 150px;
+    min-height: 120px;
 }
 
 .section-title {
@@ -245,14 +245,14 @@
     <!-- Contenido Principal -->
     <div class="content-section">
         
-        <!-- Grid de Información (3 columnas, 2 filas) -->
+        <!-- Grid de Información (3 columnas, 3 filas = 9 campos) -->
         <div class="info-grid">
             <!-- Fila 1 -->
             <div class="info-item">
                 <div class="info-label">
-                    <i class="bi bi-box-seam icon-label"></i> Nombre del Producto
+                    <i class="bi bi-upc-scan icon-label"></i> Código
                 </div>
-                <div class="info-value">{{ $inventario->nombre }}</div>
+                <div class="info-value">{{ $inventario->codigo }}</div>
             </div>
 
             <div class="info-item">
@@ -264,9 +264,9 @@
 
             <div class="info-item">
                 <div class="info-label">
-                    <i class="bi bi-upc-scan icon-label"></i> Código
+                    <i class="bi bi-box-seam icon-label"></i> Nombre del Producto
                 </div>
-                <div class="info-value">{{ $inventario->codigo }}</div>
+                <div class="info-value">{{ $inventario->nombre }}</div>
             </div>
 
             <!-- Fila 2 -->
@@ -276,9 +276,6 @@
                 </div>
                 <div class="info-value">
                     {{ $inventario->cantidad }} 
-                    @if($inventario->unidad)
-                        <small class="text-muted">({{ $inventario->unidad }})</small>
-                    @endif
                     
                     @if($inventario->cantidad == 0)
                         <span class="status-badge status-vencido ms-2">Agotado</span>
@@ -292,11 +289,19 @@
 
             <div class="info-item">
                 <div class="info-label">
+                    <i class="bi bi-inbox icon-label"></i> Unidad de Medida
+                </div>
+                <div class="info-value">{{ $inventario->unidad }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">
                     <i class="bi bi-cash-coin icon-label"></i> Precio Unitario
                 </div>
                 <div class="info-value">L. {{ number_format($inventario->precio_unitario, 2) }}</div>
             </div>
 
+            <!-- Fila 3 -->
             <div class="info-item">
                 <div class="info-label">
                     <i class="bi bi-calendar-check icon-label"></i> Fecha de Ingreso
@@ -304,31 +309,41 @@
                 <div class="info-value">{{ \Carbon\Carbon::parse($inventario->fecha_ingreso)->format('d/m/Y') }}</div>
             </div>
 
-            <!-- Fecha de vencimiento si existe -->
-            @if($inventario->fecha_vencimiento)
             <div class="info-item">
                 <div class="info-label">
                     <i class="bi bi-calendar-x icon-label"></i> Fecha de Vencimiento
                 </div>
                 <div class="info-value">
-                    {{ \Carbon\Carbon::parse($inventario->fecha_vencimiento)->format('d/m/Y') }}
-                    
-                    @php
-                        $hoy = \Carbon\Carbon::now();
-                        $vencimiento = \Carbon\Carbon::parse($inventario->fecha_vencimiento);
-                        $diasRestantes = $hoy->diffInDays($vencimiento, false);
-                    @endphp
-                    
-                    @if($diasRestantes < 0)
-                        <span class="status-badge status-vencido ms-2">Vencido</span>
-                    @elseif($diasRestantes <= 30)
-                        <span class="status-badge status-bajo ms-2">Por vencer</span>
+                    @if($inventario->fecha_vencimiento)
+                        {{ \Carbon\Carbon::parse($inventario->fecha_vencimiento)->format('d/m/Y') }}
+                        
+                        @php
+                            $hoy = \Carbon\Carbon::now();
+                            $vencimiento = \Carbon\Carbon::parse($inventario->fecha_vencimiento);
+                            $diasRestantes = $hoy->diffInDays($vencimiento, false);
+                        @endphp
+                        
+                        @if($diasRestantes < 0)
+                            <span class="status-badge status-vencido ms-2">Vencido</span>
+                        @elseif($diasRestantes <= 30)
+                            <span class="status-badge status-bajo ms-2">Por vencer</span>
+                        @else
+                            <span class="status-badge status-disponible ms-2">Vigente</span>
+                        @endif
                     @else
-                        <span class="status-badge status-disponible ms-2">Vigente</span>
+                        <span class="text-muted">No aplica</span>
                     @endif
                 </div>
             </div>
-            @endif
+
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="bi bi-calculator icon-label"></i> Valor Total del Stock
+                </div>
+                <div class="info-value">
+                    L. {{ number_format($inventario->cantidad * $inventario->precio_unitario, 2) }}
+                </div>
+            </div>
         </div>
 
         <!-- Descripción (ocupa todo el ancho) -->
