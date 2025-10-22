@@ -19,13 +19,13 @@ class SesionPsicologicaController extends Controller
         $fechaInicio = $request->input('fecha_desde');
         $fechaFin = $request->input('fecha_hasta');
         $tipoExamen = $request->input('tipo_examen');
-        $perPage = 10; // Ajusta según necesites
+        $perPage = 6; // Ajusta según necesites
 
         $totalSesiones = SesionPsicologica::count(); // ← CAMBIADO
 
         $sesionesQuery = SesionPsicologica::with(['paciente', 'medico']) // ← CAMBIADO
-            ->orderBy('fecha', 'desc')
-            ->orderBy('hora_inicio', 'desc');
+         ->orderBy('id', 'desc');
+
 
         // Filtro por paciente
         if ($query) {

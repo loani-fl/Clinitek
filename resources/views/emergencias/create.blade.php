@@ -89,7 +89,6 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
 }
 
 .resultado-nombre {
-    font-weight: 600;
     color: #2c3e50;
     margin-bottom: 0.25rem;
     font-size: 0.95rem;
@@ -136,7 +135,6 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     text-align: center;
     letter-spacing: 1px;
-    font-weight: 500;
 }
 
 .row.mb-3 .col-md-3 {
@@ -146,25 +144,21 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
 /* Radios Documentado / Indocumentado */
 .mb-4.d-flex.gap-3 label {
     font-size: 1.3rem;
-    font-weight: 800;
 }
 
 /* Título Datos básicos y contacto */
 .docFields h5.mb-3.text-dark.fw-bold {
     font-size: 1.4rem;
-    font-weight: 700;
 }
 
 /* Etiquetas de los campos */
 .docFields label {
     font-size: 1.1rem;
-    font-weight: 700;
 }
 
 /* Títulos Motivo de la emergencia y Signos Vitales */
 h5.mt-4.mb-3.text-dark.fw-bold {
     font-size: 1.35rem;
-    font-weight: 700;
 }
 
 /* Inputs, selects y textareas */
@@ -185,6 +179,7 @@ h5.mt-4.mb-3.text-dark.fw-bold {
     font-size: 1rem;
 }
 </style>
+
 
 <div class="custom-card">
     <div class="mb-4 text-center" style="border-bottom: 3px solid #007BFF;">
