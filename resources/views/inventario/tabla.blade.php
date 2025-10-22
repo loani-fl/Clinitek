@@ -8,7 +8,6 @@
             <th>Cantidad</th>
             <th>Unidad</th>
             <th>Fecha Ingreso</th>
-            <th>Vencimiento</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -23,7 +22,6 @@
             <td>{{ $item->cantidad }}</td>
             <td>{{ $item->unidad ?? '-' }}</td>
             <td>{{ $item->fecha_ingreso ? \Carbon\Carbon::parse($item->fecha_ingreso)->format('d/m/Y') : '—' }}</td>
-            <td>{{ $item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('d/m/Y') : '—' }}</td>
             <td class="d-flex justify-content-center gap-1">
                 <a href="{{ route('inventario.edit', $item->id) }}" class="btn btn-sm btn-warning">
                     <i class="bi bi-pencil-square"></i>
