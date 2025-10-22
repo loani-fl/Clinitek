@@ -132,20 +132,13 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
             </div>
         </div>
 
-        <!-- Fila 3 -->
+        <!-- Fecha ingreso -->
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="fecha_ingreso" class="form-label">Fecha ingreso <span class="text-danger">*</span></label>
                 <input type="date" name="fecha_ingreso" id="fecha_ingreso"
                        class="form-control form-control-sm"
                        value="{{ old('fecha_ingreso', now()->format('Y-m-d')) }}" required>
-            </div>
-            <div class="col-md-6">
-                <label for="fecha_vencimiento" class="form-label">Fecha vencimiento</label>
-                <input type="date" name="fecha_vencimiento" id="fecha_vencimiento"
-                       class="form-control form-control-sm @error('fecha_vencimiento') is-invalid @enderror"
-                       value="{{ old('fecha_vencimiento') }}">
-                @error('fecha_vencimiento') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
 
@@ -235,32 +228,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLimpiar = document.getElementById('btnLimpiar');
     btnLimpiar.addEventListener('click', () => {
         form.querySelectorAll('input, textarea, select').forEach(input => {
-            if (input.id !== 'fecha_ingreso') { // mantener fecha ingreso
+            if (input.id !== 'fecha_ingreso') {
                 if (input.tagName === 'SELECT') input.selectedIndex = 0;
                 else input.value = '';
                 input.classList.remove('is-invalid');
             }
         });
 
-        // Ocultar mensajes de error
         form.querySelectorAll('.invalid-feedback').forEach(msg => msg.style.display = 'none');
 
-        // Limpiar código generado
         if (codigo) codigo.value = '';
     });
-
-    // Fecha mínima de vencimiento (1 mes después)
-    const fechaIngreso = document.getElementById('fecha_ingreso');
-    const fechaVencimiento = document.getElementById('fecha_vencimiento');
-    function actualizarMinimoVencimiento() {
-        if (fechaIngreso.value) {
-            const ingreso = new Date(fechaIngreso.value);
-            ingreso.setMonth(ingreso.getMonth() + 1);
-            fechaVencimiento.min = ingreso.toISOString().split('T')[0];
-        }
-    }
-    actualizarMinimoVencimiento();
-    fechaIngreso.addEventListener('change', actualizarMinimoVencimiento);
 });
 </script>
 @endsection
