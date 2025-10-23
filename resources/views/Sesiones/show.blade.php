@@ -160,7 +160,7 @@
         <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100 mt-4">
             <div class="card-header-flex">
                 <div class="d-flex justify-content-between align-items-center w-100">
-                    <h5>Detalles de la Sesión Psicológica</h5>
+                    <h5>Detalles de resultados de examenes </h5>
 
                     <!-- Botón de Reporte -->
                     <button onclick="window.print()"
@@ -172,7 +172,7 @@
 
             <div class="card-body px-4 py-3">
                 <!-- Datos Básicos del Paciente -->
-                <div class="section-title">Datos Básicos</div>
+                <div class="section-title">Datos básicos</div>
                 <div class="detalle-grid detalle-basicos">
                     <p><strong>Nombre:</strong><br>{{ $sesion->paciente->nombre ?? '' }}</p>
                     <p><strong>Apellidos:</strong><br>{{ $sesion->paciente->apellidos ?? '' }}</p>
@@ -184,19 +184,19 @@
                 </div>
 
                 <!-- Detalles de la Sesión -->
-                <div class="section-title">Detalles de la Sesión</div>
+                <div class="section-title">Detalles de la sesión</div>
                 <div class="detalle-grid detalle-consulta">
                     <p><strong>Médico:</strong><br>{{ $sesion->medico->nombre ?? '' }}</p>
                     <p><strong>Fecha:</strong><br>{{ \Carbon\Carbon::parse($sesion->fecha)->format('d/m/Y') }}</p>
-                    <p><strong>Hora Inicio:</strong><br>{{ $sesion->hora_inicio }}</p>
-                    <p><strong>Hora Fin:</strong><br>{{ $sesion->hora_fin }}</p>
-                    <p><strong>Tipo Examen:</strong><br>{{ $sesion->tipo_examen }}</p>
+                    <p><strong>Hora inicio:</strong><br>{{ $sesion->hora_inicio }}</p>
+                    <p><strong>Hora final:</strong><br>{{ $sesion->hora_fin }}</p>
+                    <p><strong>Tipo examen:</strong><br>{{ $sesion->tipo_examen }}</p>
                 </div>
 
                 <!-- Información Médica -->
-                <div class="section-title">Información Médica</div>
+                <div class="section-title">Información médica</div>
                 <div class="detalle-grid detalle-medicos">
-                    <p><strong>Motivo de Consulta:</strong><br>
+                    <p><strong>Motivo de consulta:</strong><br>
                         <span style="white-space: pre-line;">{{ $sesion->motivo_consulta ?? 'Sin información.' }}</span></p>
                     <p><strong>Resultado:</strong><br>
                         <span style="white-space: pre-line;">{{ $sesion->resultado ?? 'Sin información.' }}</span></p>
@@ -205,7 +205,7 @@
 
                     <!-- Archivo Resultado -->
                     <!-- Archivo Resultado -->
-                    <p><strong>Archivo Resultado:</strong><br>
+                    <p><strong>Archivo resultado:</strong><br>
                         @if(!empty($sesion->archivo_resultado))
                             @php
                                 $fileUrl = asset('storage/'.$sesion->archivo_resultado);
@@ -216,7 +216,7 @@
                                     class="btn btn-sm btn-warning shadow-sm ver-archivo-btn"
                                     data-url="{{ $fileUrl }}"
                                     data-extension="{{ $extension }}">
-                                <i class="bi bi-file-earmark-text"></i> Ver Archivo
+                                <i class="bi bi-file-earmark-text"></i> Ver archivo
                             </button>
                         @else
                             <a href="#" class="btn btn-sm btn-secondary disabled" tabindex="-1" aria-disabled="true">
@@ -241,16 +241,14 @@
                     </div>
 
 
-
-                    <!-- Botón Regresar -->
-                    <div class="d-flex justify-content-center pt-4">
-                        <a href="{{ route('sesiones.index') }}"
-                           class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2"
-                           style="font-size: 0.85rem;">
-                            <i class="bi bi-arrow-left"></i> Regresar
-                        </a>
-                    </div>
-
+                </div>
+                <!-- Botón Regresar -->
+                <div class="d-flex justify-content-center pt-4">
+                    <a href="{{ route('sesiones.index') }}"
+                       class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2"
+                       style="font-size: 0.85rem;">
+                        <i class="bi bi-arrow-left"></i> Regresar
+                    </a>
                 </div>
             </div>
         </div>
