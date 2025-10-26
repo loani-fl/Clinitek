@@ -104,7 +104,7 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
                 <label for="cantidad" class="form-label">Cantidad <span class="text-danger">*</span></label>
                 <input type="number" name="cantidad" id="cantidad"
                        class="form-control form-control-sm @error('cantidad') is-invalid @enderror"
-                       value="{{ old('cantidad', $inventario->cantidad) }}" min="0">
+                       value="{{ old('cantidad', $inventario->cantidad) }}" min="1" max="99999" required>
                 @error('cantidad') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
@@ -128,25 +128,18 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
                 <label for="precio_unitario" class="form-label">Precio (L.) <span class="text-danger">*</span></label>
                 <input type="number" name="precio_unitario" id="precio_unitario"
                        class="form-control form-control-sm @error('precio_unitario') is-invalid @enderror"
-                       step="0.01" min="0" value="{{ old('precio_unitario', $inventario->precio_unitario) }}">
+                       step="0.01" min="0.01" max="99999.99" value="{{ old('precio_unitario', $inventario->precio_unitario) }}" required>
                 @error('precio_unitario') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
 
-        <!-- Fila 3 -->
+        <!-- Fecha ingreso -->
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="fecha_ingreso" class="form-label">Fecha ingreso <span class="text-danger">*</span></label>
                 <input type="date" name="fecha_ingreso" id="fecha_ingreso"
                        class="form-control form-control-sm"
                        value="{{ old('fecha_ingreso', \Carbon\Carbon::parse($inventario->fecha_ingreso)->format('Y-m-d')) }}" required>
-            </div>
-            <div class="col-md-6">
-                <label for="fecha_vencimiento" class="form-label">Fecha vencimiento</label>
-                <input type="date" name="fecha_vencimiento" id="fecha_vencimiento"
-                       class="form-control form-control-sm @error('fecha_vencimiento') is-invalid @enderror"
-                       value="{{ old('fecha_vencimiento', $inventario->fecha_vencimiento ? \Carbon\Carbon::parse($inventario->fecha_vencimiento)->format('Y-m-d') : '') }}">
-                @error('fecha_vencimiento') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
 
@@ -156,7 +149,7 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
                 <label for="descripcion" class="form-label fw-semibold">Descripción <span class="text-danger">*</span></label>
                 <textarea name="descripcion" id="descripcion"
                           class="form-control form-control-sm @error('descripcion') is-invalid @enderror"
-                          rows="3" maxlength="200">{{ old('descripcion', $inventario->descripcion) }}</textarea>
+                          rows="3" maxlength="200" required>{{ old('descripcion', $inventario->descripcion) }}</textarea>
                 @error('descripcion') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
@@ -170,7 +163,7 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
                 <i class="bi bi-arrow-counterclockwise me-1"></i> Restaurar
             </button>
             <a href="{{ route('inventario.index') }}" class="btn btn-success">
-                <i class="bi bi-arrow-left-circle me-1"></i> Regresar
+                <i class="bi bi-arrow-left"></i> Regresar
             </a>
         </div>
     </form>
@@ -181,6 +174,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const categoria = document.getElementById('categoria');
     const codigo = document.getElementById('codigo');
     const form = document.querySelector('form');
+    const fechaIngreso = document.getElementById('fecha_ingreso');
+
+    // === Limitar fecha de ingreso (igual que CREATE) ===
+    const today = new Date();
+    const maxDate = today.toISOString().split('T')[0];
+    const minDate = new Date();
+    minDate.setMonth(minDate.getMonth() - 2);
+    const minDateStr = minDate.toISOString().split('T')[0];
+
+    fechaIngreso.max = maxDate;
+    fechaIngreso.min = minDateStr;
 
     // Guardar valores originales para restaurar
     const valoresOriginales = {
@@ -191,7 +195,6 @@ document.addEventListener('DOMContentLoaded', () => {
         unidad: '{{ $inventario->unidad ?? "" }}',
         precio_unitario: '{{ $inventario->precio_unitario }}',
         fecha_ingreso: '{{ \Carbon\Carbon::parse($inventario->fecha_ingreso)->format('Y-m-d') }}',
-        fecha_vencimiento: '{{ $inventario->fecha_vencimiento ? \Carbon\Carbon::parse($inventario->fecha_vencimiento)->format('Y-m-d') : "" }}',
         descripcion: `{{ $inventario->descripcion }}`
     };
 
@@ -205,7 +208,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({ categoria: categoriaSeleccionada })
+                body: JSON.stringify({ 
+                    categoria: categoriaSeleccionada,
+                    id: '{{ $inventario->id }}'
+                })
             })
             .then(res => res.json())
             .then(data => {
@@ -217,43 +223,240 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Validaciones numéricas y de texto
+    // === Validación de cantidad (igual que CREATE) ===
     const cantidad = document.getElementById('cantidad');
     cantidad.addEventListener('input', function() {
         this.value = this.value.replace(/[^0-9]/g, '').slice(0, 5);
+        if (this.value.startsWith('0')) this.value = this.value.replace(/^0+/, '');
+        if (this.value !== '' && parseInt(this.value) < 1) this.value = '';
     });
 
+    // === Validación de precio (igual que CREATE) ===
     const precio = document.getElementById('precio_unitario');
     precio.addEventListener('input', function() {
         this.value = this.value.replace(/[^0-9.]/g, '');
         const parts = this.value.split('.');
-        if (parts[0].length > 8) parts[0] = parts[0].slice(0, 8);
+        parts[0] = parts[0].slice(0, 5);  // Máximo 5 dígitos enteros
+        if (parts[1]) parts[1] = parts[1].slice(0, 2);  // Máximo 2 decimales
         this.value = parts.join('.');
-        if ((this.value.match(/\./g) || []).length > 1) this.value = this.value.slice(0, -1);
+        if (parseFloat(this.value) <= 0) this.value = '';
     });
 
-    const soloLetras = ['nombre'];
-    soloLetras.forEach(id => {
-        const input = document.getElementById(id);
-        if (input) {
-            input.addEventListener('input', function() {
-                this.value = this.value
-                    .replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '')
-                    .replace(/\s{2,}/g, ' ')
-                    .trimStart();
-            });
+    // Solo letras para el campo nombre
+    const nombre = document.getElementById('nombre');
+    nombre.addEventListener('input', function() {
+        this.value = this.value
+            .replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '')
+            .replace(/\s{2,}/g, ' ')
+            .trimStart();
+    });
+
+    // === Validación de duplicados en tiempo real ===
+    const inventarioId = '{{ $inventario->id }}';
+    
+    // Validar código duplicado
+    codigo.addEventListener('blur', async function() {
+        const codigoValue = this.value.trim();
+        if (codigoValue && codigoValue !== valoresOriginales.codigo) {
+            try {
+                const response = await fetch('{{ route("inventario.verificarDuplicado") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ 
+                        campo: 'codigo', 
+                        valor: codigoValue,
+                        id: inventarioId 
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.existe) {
+                    codigo.classList.add('is-invalid');
+                    let feedback = codigo.nextElementSibling;
+                    if (!feedback || !feedback.classList.contains('invalid-feedback')) {
+                        feedback = document.createElement('div');
+                        feedback.className = 'invalid-feedback';
+                        codigo.parentNode.appendChild(feedback);
+                    }
+                    feedback.textContent = 'Este código ya está registrado';
+                    feedback.style.display = 'block';
+                } else {
+                    codigo.classList.remove('is-invalid');
+                    const feedback = codigo.nextElementSibling;
+                    if (feedback && feedback.classList.contains('invalid-feedback')) {
+                        feedback.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Error al verificar código:', error);
+            }
+        } else if (codigoValue === valoresOriginales.codigo) {
+            codigo.classList.remove('is-invalid');
+            const feedback = codigo.nextElementSibling;
+            if (feedback && feedback.classList.contains('invalid-feedback')) {
+                feedback.style.display = 'none';
+            }
         }
+    });
+
+    // Validar nombre duplicado
+    nombre.addEventListener('blur', async function() {
+        const nombreValue = this.value.trim();
+        if (nombreValue && nombreValue !== valoresOriginales.nombre) {
+            try {
+                const response = await fetch('{{ route("inventario.verificarDuplicado") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ 
+                        campo: 'nombre', 
+                        valor: nombreValue,
+                        id: inventarioId 
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.existe) {
+                    nombre.classList.add('is-invalid');
+                    let feedback = nombre.nextElementSibling;
+                    if (!feedback || !feedback.classList.contains('invalid-feedback')) {
+                        feedback = document.createElement('div');
+                        feedback.className = 'invalid-feedback';
+                        nombre.parentNode.appendChild(feedback);
+                    }
+                    feedback.textContent = 'Este nombre ya está registrado';
+                    feedback.style.display = 'block';
+                } else {
+                    nombre.classList.remove('is-invalid');
+                    const feedback = nombre.nextElementSibling;
+                    if (feedback && feedback.classList.contains('invalid-feedback')) {
+                        feedback.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Error al verificar nombre:', error);
+            }
+        } else if (nombreValue === valoresOriginales.nombre) {
+            nombre.classList.remove('is-invalid');
+            const feedback = nombre.nextElementSibling;
+            if (feedback && feedback.classList.contains('invalid-feedback')) {
+                feedback.style.display = 'none';
+            }
+        }
+    });
+
+    // Validar en tiempo real mientras escribe (después del blur inicial)
+    let nombreValidado = false;
+    nombre.addEventListener('input', function() {
+        if (nombreValidado && this.value.trim() !== valoresOriginales.nombre) {
+            clearTimeout(nombre.validationTimeout);
+            nombre.validationTimeout = setTimeout(() => {
+                nombre.dispatchEvent(new Event('blur'));
+            }, 500);
+        }
+    });
+    
+    nombre.addEventListener('blur', () => {
+        nombreValidado = true;
+    });
+
+    // === Prevenir envío si hay duplicados ===
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const nombreValue = nombre.value.trim();
+        const codigoValue = codigo.value.trim();
+        let hayErrores = false;
+
+        // Validar nombre si cambió
+        if (nombreValue && nombreValue !== valoresOriginales.nombre) {
+            try {
+                const response = await fetch('{{ route("inventario.verificarDuplicado") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ 
+                        campo: 'nombre', 
+                        valor: nombreValue,
+                        id: inventarioId 
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.existe) {
+                    nombre.classList.add('is-invalid');
+                    let feedback = nombre.nextElementSibling;
+                    if (!feedback || !feedback.classList.contains('invalid-feedback')) {
+                        feedback = document.createElement('div');
+                        feedback.className = 'invalid-feedback';
+                        nombre.parentNode.appendChild(feedback);
+                    }
+                    feedback.textContent = 'Este nombre ya está registrado';
+                    feedback.style.display = 'block';
+                    hayErrores = true;
+                }
+            } catch (error) {
+                console.error('Error al verificar nombre:', error);
+            }
+        }
+
+        // Validar código si cambió
+        if (codigoValue && codigoValue !== valoresOriginales.codigo) {
+            try {
+                const response = await fetch('{{ route("inventario.verificarDuplicado") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ 
+                        campo: 'codigo', 
+                        valor: codigoValue,
+                        id: inventarioId 
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.existe) {
+                    codigo.classList.add('is-invalid');
+                    let feedback = codigo.nextElementSibling;
+                    if (!feedback || !feedback.classList.contains('invalid-feedback')) {
+                        feedback = document.createElement('div');
+                        feedback.className = 'invalid-feedback';
+                        codigo.parentNode.appendChild(feedback);
+                    }
+                    feedback.textContent = 'Este código ya está registrado';
+                    feedback.style.display = 'block';
+                    hayErrores = true;
+                }
+            } catch (error) {
+                console.error('Error al verificar código:', error);
+            }
+        }
+
+        const tieneOtrosErrores = form.querySelectorAll('.is-invalid').length > 0;
+        
+        if (hayErrores || tieneOtrosErrores) {
+            return false;
+        }
+
+        form.submit();
     });
 
     // Botón limpiar/restaurar
     const btnLimpiar = document.getElementById('btnLimpiar');
     btnLimpiar.addEventListener('click', () => {
-        // Restaurar valores originales
         Object.keys(valoresOriginales).forEach(key => {
             const input = document.getElementById(key);
             if (input) {
                 if (input.tagName === 'SELECT') {
-                    // Para selects, buscar la opción con el valor original
                     for (let option of input.options) {
                         if (option.value === valoresOriginales[key]) {
                             input.selectedIndex = option.index;
@@ -267,22 +470,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Ocultar mensajes de error
         form.querySelectorAll('.invalid-feedback').forEach(msg => msg.style.display = 'none');
     });
-
-    // Fecha mínima de vencimiento (1 mes después)
-    const fechaIngreso = document.getElementById('fecha_ingreso');
-    const fechaVencimiento = document.getElementById('fecha_vencimiento');
-    function actualizarMinimoVencimiento() {
-        if (fechaIngreso.value) {
-            const ingreso = new Date(fechaIngreso.value);
-            ingreso.setMonth(ingreso.getMonth() + 1);
-            fechaVencimiento.min = ingreso.toISOString().split('T')[0];
-        }
-    }
-    actualizarMinimoVencimiento();
-    fechaIngreso.addEventListener('change', actualizarMinimoVencimiento);
 });
 </script>
 @endsection

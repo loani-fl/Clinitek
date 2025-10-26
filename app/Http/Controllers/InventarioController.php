@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Inventario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class InventarioController extends Controller
 {
@@ -59,17 +60,18 @@ class InventarioController extends Controller
             ->with('success', "Producto registrado correctamente con código: {$codigo}");
     }
 
-    // ===== Método AJAX para generar código =====
     public function generarCodigo(Request $request)
-    {
-        $request->validate([
-            'categoria' => 'required|string',
-        ]);
+{
+    $request->validate([
+        'categoria' => 'required|string',
+    ]);
 
-        $codigo = Inventario::generarCodigoPorCategoria($request->categoria);
+    $id = $request->id ?? null; // 👈 Recibir ID opcional
+    
+    $codigo = Inventario::generarCodigoPorCategoria($request->categoria, $id);
 
-        return response()->json(['codigo' => $codigo]);
-    }
+    return response()->json(['codigo' => $codigo]);
+}
 
     public function index(Request $request)
     {
@@ -137,13 +139,34 @@ class InventarioController extends Controller
             'nombre' => 'required|string|max:255',
             'categoria' => 'required|string|max:100',
             'cantidad' => 'required|integer|min:1|max:99999',
+            'unidad' => 'required|string',
             'precio_unitario' => 'required|numeric|min:0.01|max:99999.99',
             'descripcion' => 'required|string|max:200',
             'fecha_ingreso' => 'required|date|before_or_equal:today|after_or_equal:' . now()->subMonths(2)->format('Y-m-d'),
+        ], [
+            // Mensajes personalizados
+            'categoria.required' => 'Debe seleccionar una categoría',
+            'codigo.required' => 'El código es obligatorio',
+            'nombre.required' => 'El nombre es obligatorio',
+            'cantidad.required' => 'La cantidad es obligatoria',
+            'cantidad.integer' => 'La cantidad debe ser un número entero',
+            'cantidad.min' => 'La cantidad mínima es 1',
+            'cantidad.max' => 'La cantidad no puede superar 99999',
+            'unidad.required' => 'Debe seleccionar una unidad',
+            'precio_unitario.required' => 'El precio es obligatorio',
+            'precio_unitario.numeric' => 'El precio debe ser un número válido',
+            'precio_unitario.min' => 'El precio mínimo es 0.01',
+            'precio_unitario.max' => 'El precio no puede superar 99999.99',
+            'descripcion.required' => 'La descripción es obligatoria',
+            'descripcion.max' => 'La descripción no puede superar 200 caracteres',
+            'fecha_ingreso.required' => 'La fecha de ingreso es obligatoria',
+            'fecha_ingreso.date' => 'La fecha de ingreso no es válida',
+            'fecha_ingreso.before_or_equal' => 'La fecha de ingreso no puede ser futura',
+            'fecha_ingreso.after_or_equal' => 'La fecha de ingreso no puede ser mayor a 2 meses atrás',
         ]);
-
+    
         $inventario = Inventario::findOrFail($id);
-
+    
         $inventario->update($request->only([
             'codigo',
             'nombre',
@@ -153,9 +176,24 @@ class InventarioController extends Controller
             'precio_unitario',
             'descripcion',
             'fecha_ingreso',
+            'fecha_vencimiento',
         ]));
-
+    
         return redirect()->route('inventario.index')
             ->with('success', 'Producto actualizado correctamente en el inventario.');
     }
+
+    public function verificarDuplicado(Request $request)
+{
+    $campo = $request->campo; // 'nombre' o 'codigo'
+    $valor = $request->valor;
+    $id = $request->id; // ID del registro actual (para excluirlo)
+
+    $existe = DB::table('inventarios')
+        ->where($campo, $valor)
+        ->where('id', '!=', $id) // Excluir el registro actual
+        ->exists();
+
+    return response()->json(['existe' => $existe]);
+}
 }

@@ -303,6 +303,8 @@ Route::get('/inventario/{inventario}', [InventarioController::class, 'show'])->n
 Route::get('/inventario/{inventario}/edit', [InventarioController::class, 'edit'])->name('inventario.edit');
 Route::put('/inventario/{id}', [InventarioController::class, 'update'])->name('inventario.update');
 Route::get('/inventario/{id}', [InventarioController::class, 'show'])->name('inventario.show');
+Route::post('/inventario/verificar-duplicado', [InventarioController::class, 'verificarDuplicado'])
+    ->name('inventario.verificarDuplicado');
 
 Route::post('/inventario/generar-codigo', [InventarioController::class, 'generarCodigo'])
     ->name('inventario.generarCodigo');
