@@ -50,7 +50,7 @@
 
     <div class="custom-card">
         <div class="mb-4 text-center" style="border-bottom: 3px solid #007BFF;">
-            <h2 class="fw-bold text-black mb-0">Registro de Resultados de S.P </h2>
+            <h2 class="fw-bold text-black mb-0">Registro de resultados de examenes psicometricos </h2>
         </div>
 
         <form id="formSesion" action="{{ route('sesiones.store') }}" method="POST" enctype="multipart/form-data" novalidate>
@@ -58,15 +58,19 @@
 
             {{-- Sección Paciente --}}
             <div class="card mb-3 p-3 shadow-sm border">
-                <h5 class="fw-bold mb-3">Información del Paciente</h5>
-                <div class="row g-3">
+                <h5 class="fw-bold mb-3">Información del paciente</h5>
+
+                <div class="row g-3 align-items-end">
+                    <!-- Paciente -->
                     <div class="col-md-6">
                         <label for="paciente_id" class="form-label">Paciente <span class="text-danger">*</span></label>
-                        <select name="paciente_id" id="paciente_id" class="form-select @error('paciente_id') is-invalid @enderror" required>
+                        <select name="paciente_id" id="paciente_id"
+                                class="form-select @error('paciente_id') is-invalid @enderror" required>
                             <option value="">-- Selecciona --</option>
                             @foreach($pacientes as $p)
-                                <option value="{{ $p->id }}" {{ old('paciente_id') == $p->id ? 'selected' : '' }}
-                                data-nacimiento="{{ $p->fecha_nacimiento }}"
+                                <option value="{{ $p->id }}"
+                                        {{ old('paciente_id') == $p->id ? 'selected' : '' }}
+                                        data-nacimiento="{{ $p->fecha_nacimiento }}"
                                         data-genero="{{ $p->genero }}"
                                         data-telefono="{{ $p->telefono }}">
                                     {{ $p->nombre }} {{ $p->apellidos }}
@@ -94,7 +98,7 @@
 
             {{-- Sección Médico y Fecha/Hora --}}
             <div class="card mb-3 p-3 shadow-sm border">
-                <h5 class="fw-bold mb-3">Médico y Horario</h5>
+                <h5 class="fw-bold mb-3">Médico y horario</h5>
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label for="medico_id" class="form-label">Médico <span class="text-danger">*</span></label>
@@ -119,9 +123,6 @@
                             class="form-control @error('fecha') is-invalid @enderror"
                             value="{{ old('fecha', \Carbon\Carbon::now()->format('Y-m-d')) }}"
                             required
-                            min="2025-01-01"
-                            max="2025-12-31"
-                            onchange="checkYear(this)"
                         >
                         @error('fecha')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -130,15 +131,18 @@
 
                     <div class="col-md-2">
                         <label for="hora_inicio" class="form-label">Hora Inicio <span class="text-danger">*</span></label>
-                        <input type="time" name="hora_inicio" id="hora_inicio" class="form-control @error('hora_inicio') is-invalid @enderror"
+                        <input type="time" name="hora_inicio" id="hora_inicio"
+                               class="form-control @error('hora_inicio') is-invalid @enderror"
                                value="{{ old('hora_inicio') }}" required>
                         @error('hora_inicio')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
                     <div class="col-md-2">
                         <label for="hora_fin" class="form-label">Hora Fin <span class="text-danger">*</span></label>
-                        <input type="time" name="hora_fin" id="hora_fin" class="form-control @error('hora_fin') is-invalid @enderror"
+                        <input type="time" name="hora_fin" id="hora_fin"
+                               class="form-control @error('hora_fin') is-invalid @enderror"
                                value="{{ old('hora_fin') }}" required>
                         @error('hora_fin')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -149,7 +153,7 @@
 
             {{-- Sección Motivo y Examen --}}
             <div class="card mb-3 p-3 shadow-sm border">
-                <h5 class="fw-bold mb-3">Motivo y Examen Psicométrico</h5>
+                <h5 class="fw-bold mb-3">Motivo y examen psicométrico</h5>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="motivo_consulta" class="form-label">Motivo de la consulta <span class="text-danger">*</span></label>
@@ -231,7 +235,7 @@
             {{-- Archivo --}}
             <!-- Archivo Resultado -->
             <div class="col-md-4">
-                <label for="archivo_resultado" class="form-label">Archivo Resultado (Opcional):</label>
+                <label for="archivo_resultado" class="form-label">Archivo resultado:</label>
 
                 <div class="mb-2">
                     <iframe id="archivoPreview"
@@ -255,12 +259,20 @@
 
 
 
-            {{-- Botones --}}
-            <div class="d-flex justify-content-center gap-3 mt-4">
-                <button type="submit" class="btn btn-primary">Registrar Sesión</button>
-                <button type="button" id="btnLimpiar" class="btn btn-warning">Limpiar</button>
-                <a href="{{ route('sesiones.index') }}" class="btn btn-success">Regresar</a>
-            </div>
+    {{-- Botones --}}
+    <div class="d-flex justify-content-center gap-3 mt-4">
+        <button type="submit" class="btn btn-primary px-4 shadow-sm d-inline-flex align-items-center gap-2">
+            <i class="bi bi-plus-circle"></i> Registrar
+        </button>
+
+        <button type="button" id="btnLimpiar" class="btn btn-warning px-4 shadow-sm d-inline-flex align-items-center gap-2">
+            <i class="bi bi-trash"></i> Limpiar
+        </button>
+
+        <a href="{{ route('sesiones.index') }}" class="btn btn-success px-4 shadow-sm d-inline-flex align-items-center gap-2">
+            <i class="bi bi-arrow-left"></i> Regresar
+        </a>
+    </div>
         </form>
     </div>
 
@@ -396,4 +408,95 @@
         });
 
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const fechaInput = document.getElementById("fecha");
+
+            // Fecha actual
+            const hoy = new Date();
+
+            // Fecha una semana antes (7 días)
+            const semanaAntes = new Date();
+            semanaAntes.setDate(hoy.getDate() - 7);
+
+            // Convertir a formato YYYY-MM-DD
+            const formatoFecha = (fecha) => fecha.toISOString().split('T')[0];
+
+            // Aplicar límites
+            fechaInput.min = formatoFecha(semanaAntes);
+            fechaInput.max = formatoFecha(hoy);
+
+            // Si la fecha ingresada no está dentro del rango, ajustarla a hoy
+            fechaInput.addEventListener("change", function () {
+                if (this.value < this.min) this.value = this.min;
+                if (this.value > this.max) this.value = this.max;
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const fechaInput = document.getElementById("fecha");
+            const horaInicio = document.getElementById("hora_inicio");
+            const horaFin = document.getElementById("hora_fin");
+
+            // Función para formatear fecha YYYY-MM-DD
+            const formatoFecha = fecha => fecha.toISOString().split('T')[0];
+
+            const hoy = new Date();
+            const fechaActual = formatoFecha(hoy);
+
+            // Limitar fechas
+            const semanaAntes = new Date();
+            semanaAntes.setDate(hoy.getDate() - 7);
+            fechaInput.min = formatoFecha(semanaAntes);
+            fechaInput.max = fechaActual;
+
+            // Si la fecha escrita manualmente es futura, forzar hoy
+            if (fechaInput.value > fechaActual) fechaInput.value = fechaActual;
+
+            // Función que ajusta límites de hora según la fecha
+            function actualizarLimitesHora() {
+                const ahora = new Date();
+                const horaAhora = ahora.toTimeString().slice(0,5); // HH:MM
+
+                if (fechaInput.value === fechaActual) {
+                    // Bloquear horas futuras
+                    horaInicio.max = horaAhora;
+                    horaFin.max = horaAhora;
+
+                    // Limpiar valores inválidos
+                    if (horaInicio.value > horaAhora) horaInicio.value = "";
+                    if (horaFin.value > horaAhora) horaFin.value = "";
+                } else {
+                    // Quitar restricciones si fecha es pasada
+                    horaInicio.removeAttribute("max");
+                    horaFin.removeAttribute("max");
+                }
+            }
+
+            // Función para validar rango hora inicio < hora fin
+            function validarRango() {
+                if (horaInicio.value && horaFin.value && horaFin.value < horaInicio.value) {
+                    alert("La hora de fin no puede ser anterior a la hora de inicio.");
+                    horaFin.value = "";
+                }
+            }
+
+            // Eventos
+            fechaInput.addEventListener("change", actualizarLimitesHora);
+            horaInicio.addEventListener("change", function () {
+                actualizarLimitesHora();
+                validarRango();
+            });
+            horaFin.addEventListener("change", function () {
+                actualizarLimitesHora();
+                validarRango();
+            });
+
+            // Ejecutar al cargar la página
+            actualizarLimitesHora();
+        });
+    </script>
+
 @endsection

@@ -222,10 +222,10 @@
                 <i class="bi bi-house-door"></i> Inicio
             </a>
 
-            <h2>Sesiones Psicológicas</h2>
+            <h2>Sesiones psicológicas</h2>
 
             <a href="{{ route('sesiones.create') }}" class="btn btn-primary ms-3">
-                <i class="bi bi-plus-circle"></i> Nueva Sesión
+                <i class="bi bi-plus-circle"></i> Nueva sesión
             </a>
         </div>
 
@@ -264,7 +264,7 @@
 @endphp
 
 <div>
-    <label class="filtro-label" for="filtroTipoExamen">Tipo de Examen</label>
+    <label class="filtro-label" for="filtroTipoExamen">Tipo de examen</label>
     <select id="filtroTipoExamen" class="form-select filtro-input">
         <option value="">Todos</option>
         @foreach ($examenes as $examen)

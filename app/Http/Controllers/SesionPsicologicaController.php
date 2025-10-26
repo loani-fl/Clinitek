@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\SesionPsicologica;
 use App\Models\Paciente;   // <<--- IMPORTANTE
 use App\Models\Medico;     // <<--- si tienes modelo Medico separado
-
+use Carbon\Carbon;
 class SesionPsicologicaController extends Controller
 {
     /**
@@ -19,13 +19,13 @@ class SesionPsicologicaController extends Controller
         $fechaInicio = $request->input('fecha_desde');
         $fechaFin = $request->input('fecha_hasta');
         $tipoExamen = $request->input('tipo_examen');
-        $perPage = 10; // Ajusta según necesites
+        $perPage = 6; // Ajusta según necesites
 
         $totalSesiones = SesionPsicologica::count(); // ← CAMBIADO
 
         $sesionesQuery = SesionPsicologica::with(['paciente', 'medico']) // ← CAMBIADO
-            ->orderBy('fecha', 'desc')
-            ->orderBy('hora_inicio', 'desc');
+         ->orderBy('id', 'desc');
+
 
         // Filtro por paciente
         if ($query) {
@@ -125,7 +125,7 @@ class SesionPsicologicaController extends Controller
             'tipo_examen' => 'required|string',
             'resultado' => 'required|string|max:300',
             'observaciones' => 'nullable|string|max:250',
-            'archivo_resultado' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120', // 5MB
+            'archivo_resultado' => 'required|nullable|file|mimes:jpg,jpeg,png,pdf|max:5120', // 5MB
 
         ], [
             //paciente id
@@ -140,7 +140,7 @@ class SesionPsicologicaController extends Controller
             'hora_inicio.required' => 'Debe indicar la hora de inicio.',
 
             //hora final
-            'hora_fin.required' => 'Debe indicar la hora de finalización.',
+            'hora_fin.required' => 'Debe indicar la hora final .',
             'hora_fin.after' => 'La hora de fin debe ser posterior a la hora de inicio.',
             //motivo
             'motivo_consulta.required' => 'Debe ingresar el motivo de la consulta.',
@@ -154,6 +154,7 @@ class SesionPsicologicaController extends Controller
 
          'archivo_resultado.mimes' => 'El archivo debe ser JPG, PNG o PDF.',
             'archivo_resultado.max' => 'El archivo no debe superar los 5MB.',
+            'archivo_resultado.required'=> 'El archivo es obligatorio'
 
         ]);
 
@@ -168,6 +169,33 @@ class SesionPsicologicaController extends Controller
         } else {
             $rutaArchivo = null; // <-- Definirlo aunque no haya archivo
         }
+
+        // 4️⃣ Validaciones adicionales de fecha y hora
+        $fecha = Carbon::parse($request->fecha);
+        $horaInicio = Carbon::parse($fecha->format('Y-m-d') . ' ' . $request->hora_inicio);
+        $horaFin = Carbon::parse($fecha->format('Y-m-d') . ' ' . $request->hora_fin);
+        $ahora = Carbon::now();
+
+        // Fecha: no futura y máximo una semana atrás
+        if ($fecha->gt($ahora->copy()->startOfDay())) {
+            return back()->withErrors(['fecha' => 'La fecha no puede ser futura.'])->withInput();
+        }
+
+        if ($fecha->lt($ahora->copy()->subWeek()->startOfDay())) {
+            return back()->withErrors(['fecha' => 'Solo se permiten fechas de hasta una semana atrás.'])->withInput();
+        }
+
+        // Hora: si la fecha es hoy, no permitir horas futuras
+        if ($fecha->isSameDay($ahora)) {
+            if ($horaInicio->gt($ahora)) {
+                return back()->withErrors(['hora_inicio' => 'La hora de inicio no puede ser posterior a la hora actual.'])->withInput();
+            }
+
+            if ($horaFin->gt($ahora)) {
+                return back()->withErrors(['hora_fin' => 'La hora final no puede ser posterior a la hora actual.'])->withInput();
+            }
+        }
+
 
         SesionPsicologica::create([
             'paciente_id' => $request->paciente_id,
