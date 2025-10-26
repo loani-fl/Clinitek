@@ -108,8 +108,7 @@ body {
                 <i class="bi bi-house-door"></i> Inicio
             </a>
             <h2>Inventario</h2>
-            <a href="{{ route('inventario.create') }}" class="btn btn-primary ms-3">
-                <i class="bi bi-plus-circle"></i> Nuevo Producto
+            <a href="{{ route('inventario.create') }}" class="btn btn-primary ms-3"> Nuevo Producto
             </a>
         </div>
 
@@ -132,7 +131,7 @@ body {
 
             {{-- Botón limpiar solo con ícono --}}
             <button type="button" id="btnLimpiarFiltros" class="btn btn-outline-secondary btn-sm" style="padding: 0.25rem 0.35rem;" title="Limpiar filtros">
-                <i class="bi bi-x-circle"></i>
+                <i class="bi bi-arrow-clockwise"></i>
             </button>
         </div>
 

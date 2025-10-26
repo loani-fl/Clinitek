@@ -17,32 +17,32 @@ class InventarioController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255',
             'categoria' => 'required|string|max:100',
-            'cantidad' => 'required|integer|min:0',
-            'unidad' => 'required|string|in:Cajas,Frascos,Sobres,Paquetes,Unidades,Litros,Mililitros,Tabletas,Ampollas',
-            'precio_unitario' => 'required|numeric|min:0',
+            'cantidad' => 'required|integer|min:1|max:99999',
+            'precio_unitario' => 'required|numeric|min:0.01|max:99999.99',
             'descripcion' => 'required|string|max:200',
-            'fecha_ingreso' => 'required|date|before_or_equal:today',
+            'fecha_ingreso' => 'required|date|before_or_equal:today|after_or_equal:' . now()->subMonths(2)->format('Y-m-d'),
         ], [
             'nombre.required' => 'El nombre es obligatorio.',
             'categoria.required' => 'Debe seleccionar una categoría.',
             'cantidad.required' => 'Debe ingresar una cantidad.',
             'cantidad.integer' => 'La cantidad debe ser un número entero.',
-            'cantidad.min' => 'La cantidad no puede ser negativa.',
-            'unidad.required' => 'Debe seleccionar una unidad.',
-            'unidad.in' => 'La unidad seleccionada no es válida.',
+            'cantidad.min' => 'La cantidad no puede ser 0.',
+            'cantidad.max' => 'La cantidad no puede superar 5 cifras.',
             'precio_unitario.required' => 'Debe ingresar el precio.',
             'precio_unitario.numeric' => 'El precio debe ser un número válido.',
-            'precio_unitario.min' => 'El precio no puede ser negativo.',
+            'precio_unitario.min' => 'El precio no puede ser 0.',
+            'precio_unitario.max' => 'El precio no puede superar 5 cifras.',
             'descripcion.required' => 'La descripción es obligatoria.',
             'fecha_ingreso.required' => 'Debe ingresar la fecha de ingreso.',
             'fecha_ingreso.date' => 'La fecha de ingreso no es válida.',
-            'fecha_ingreso.before_or_equal' => 'La fecha de ingreso no puede ser una fecha futura.',
+            'fecha_ingreso.before_or_equal' => 'La fecha de ingreso no puede ser futura.',
+            'fecha_ingreso.after_or_equal' => 'La fecha de ingreso no puede ser mayor a 2 meses atrás.',
         ]);
-    
-        // ✅ Generar código automáticamente según la categoría
+
+        // Generar código automáticamente según la categoría
         $codigo = Inventario::generarCodigoPorCategoria($request->categoria);
-    
-        // ✅ Crear el registro
+
+        // Crear el registro
         Inventario::create([
             'codigo' => $codigo,
             'nombre' => $request->nombre,
@@ -54,11 +54,10 @@ class InventarioController extends Controller
             'fecha_ingreso' => $request->fecha_ingreso,
             'fecha_vencimiento' => $request->fecha_vencimiento,
         ]);
-    
+
         return redirect()->route('inventario.index')
             ->with('success', "Producto registrado correctamente con código: {$codigo}");
     }
-    
 
     // ===== Método AJAX para generar código =====
     public function generarCodigo(Request $request)
@@ -76,12 +75,12 @@ class InventarioController extends Controller
     {
         $query = Inventario::query();
 
-        // Filtro por búsqueda de texto
+        // Filtro por búsqueda de texto (cualquier letra o número)
         if ($request->filled('search')) {
-            $search = strtolower($request->input('search'));
+            $search = $request->input('search');
             $query->where(function ($q) use ($search) {
-                $q->whereRaw('LOWER(codigo) LIKE ?', ["{$search}%"])
-                    ->orWhereRaw('LOWER(nombre) LIKE ?', ["%{$search}%"]);
+                $q->where('codigo', 'LIKE', "%{$search}%")
+                  ->orWhere('nombre', 'LIKE', "%{$search}%");
             });
         }
 
@@ -98,7 +97,7 @@ class InventarioController extends Controller
             $query->whereDate('fecha_ingreso', '<=', $request->fecha_fin);
         }
 
-        $inventarios = $query->orderBy('id', 'desc')->paginate(10)->appends($request->all());
+        $inventarios = $query->orderBy('id', 'desc')->paginate(2)->appends($request->all());
 
         if ($request->ajax()) {
             $html = view('inventario.tabla', compact('inventarios'))->render();
@@ -137,16 +136,14 @@ class InventarioController extends Controller
             'codigo' => 'required|string|max:20',
             'nombre' => 'required|string|max:255',
             'categoria' => 'required|string|max:100',
-            'cantidad' => 'required|integer|min:0',
-            'unidad' => 'required|string|in:Cajas,Frascos,Sobres,Paquetes,Unidades,Litros,Mililitros,Tabletas,Ampollas',
-            'precio_unitario' => 'required|numeric|min:0',
+            'cantidad' => 'required|integer|min:1|max:99999',
+            'precio_unitario' => 'required|numeric|min:0.01|max:99999.99',
             'descripcion' => 'required|string|max:200',
-            'fecha_ingreso' => 'required|date',
+            'fecha_ingreso' => 'required|date|before_or_equal:today|after_or_equal:' . now()->subMonths(2)->format('Y-m-d'),
         ]);
 
         $inventario = Inventario::findOrFail($id);
 
-        // Solo actualizar los campos permitidos
         $inventario->update($request->only([
             'codigo',
             'nombre',

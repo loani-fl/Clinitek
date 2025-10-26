@@ -103,7 +103,7 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
                 <label for="cantidad" class="form-label">Cantidad <span class="text-danger">*</span></label>
                 <input type="number" name="cantidad" id="cantidad"
                        class="form-control form-control-sm @error('cantidad') is-invalid @enderror"
-                       value="{{ old('cantidad') }}" min="0">
+                       value="{{ old('cantidad') }}" min="1" max="99999" required>
                 @error('cantidad') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
@@ -127,7 +127,7 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
                 <label for="precio_unitario" class="form-label">Precio (L.) <span class="text-danger">*</span></label>
                 <input type="number" name="precio_unitario" id="precio_unitario"
                        class="form-control form-control-sm @error('precio_unitario') is-invalid @enderror"
-                       step="0.01" min="0" value="{{ old('precio_unitario') }}">
+                       step="0.01" min="0.01" max="99999.99" value="{{ old('precio_unitario') }}" required>
                 @error('precio_unitario') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
@@ -148,23 +148,25 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
                 <label for="descripcion" class="form-label fw-semibold">Descripción <span class="text-danger">*</span></label>
                 <textarea name="descripcion" id="descripcion"
                           class="form-control form-control-sm @error('descripcion') is-invalid @enderror"
-                          rows="3" maxlength="200">{{ old('descripcion') }}</textarea>
+                          rows="3" maxlength="200" required>{{ old('descripcion') }}</textarea>
                 @error('descripcion') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
 
         <!-- Botones -->
-        <div class="d-flex justify-content-center gap-3 mt-4">
-            <button type="submit" class="btn btn-primary">
-                <i class="bi bi-check-circle me-1"></i> Registrar
-            </button>
-            <button type="button" id="btnLimpiar" class="btn btn-warning">
-                <i class="bi bi-arrow-counterclockwise me-1"></i> Limpiar
-            </button>
-            <a href="{{ route('inventario.index') }}" class="btn btn-success">
-                <i class="bi bi-arrow-left-circle me-1"></i> Regresar
-            </a>
-        </div>
+<div class="d-flex justify-content-center gap-3 mt-4 mb-4">
+    <button type="submit" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Registrar
+    </button>
+    <button type="button" id="btnLimpiar" class="btn btn-warning">
+        <i class="bi bi-trash"></i> Limpiar
+    </button>
+    <a href="{{ route('inventario.index') }}" class="btn btn-success">
+        <i class="bi bi-arrow-left"></i> Regresar
+    </a>
+</div>
+
+
     </form>
 </div>
 
@@ -173,6 +175,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const categoria = document.getElementById('categoria');
     const codigo = document.getElementById('codigo');
     const form = document.querySelector('form');
+    const fechaIngreso = document.getElementById('fecha_ingreso');
+
+    // === Limitar fecha de ingreso ===
+    const today = new Date();
+    const maxDate = today.toISOString().split('T')[0];
+    const minDate = new Date();
+    minDate.setMonth(minDate.getMonth() - 2);
+    const minDateStr = minDate.toISOString().split('T')[0];
+
+    fechaIngreso.max = maxDate;
+    fechaIngreso.min = minDateStr;
 
     // Generar código automáticamente
     categoria.addEventListener('change', function() {
@@ -196,32 +209,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Validaciones numéricas y de texto
+    // Validaciones numéricas
     const cantidad = document.getElementById('cantidad');
     cantidad.addEventListener('input', function() {
         this.value = this.value.replace(/[^0-9]/g, '').slice(0, 5);
+        if (this.value.startsWith('0')) this.value = this.value.replace(/^0+/, '');
+        if (this.value !== '' && parseInt(this.value) < 1) this.value = '';
     });
 
     const precio = document.getElementById('precio_unitario');
     precio.addEventListener('input', function() {
         this.value = this.value.replace(/[^0-9.]/g, '');
         const parts = this.value.split('.');
-        if (parts[0].length > 8) parts[0] = parts[0].slice(0, 8);
+        parts[0] = parts[0].slice(0, 5);
+        if (parts[1]) parts[1] = parts[1].slice(0, 2);
         this.value = parts.join('.');
-        if ((this.value.match(/\./g) || []).length > 1) this.value = this.value.slice(0, -1);
+        if (parseFloat(this.value) <= 0) this.value = '';
     });
 
-    const soloLetras = ['nombre'];
-    soloLetras.forEach(id => {
-        const input = document.getElementById(id);
-        if (input) {
-            input.addEventListener('input', function() {
-                this.value = this.value
-                    .replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '')
-                    .replace(/\s{2,}/g, ' ')
-                    .trimStart();
-            });
-        }
+    // Solo letras para el campo nombre
+    const nombre = document.getElementById('nombre');
+    nombre.addEventListener('input', function() {
+        this.value = this.value
+            .replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '')
+            .replace(/\s{2,}/g, ' ')
+            .trimStart();
     });
 
     // Botón limpiar
@@ -234,10 +246,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 input.classList.remove('is-invalid');
             }
         });
-
         form.querySelectorAll('.invalid-feedback').forEach(msg => msg.style.display = 'none');
-
         if (codigo) codigo.value = '';
+        fechaIngreso.value = maxDate; // Reinicia la fecha actual
     });
 });
 </script>
