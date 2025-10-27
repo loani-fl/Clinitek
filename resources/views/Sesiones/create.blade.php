@@ -130,7 +130,7 @@
                     </div>
 
                     <div class="col-md-2">
-                        <label for="hora_inicio" class="form-label">Hora Inicio <span class="text-danger">*</span></label>
+                        <label for="hora_inicio" class="form-label">Hora inicio <span class="text-danger">*</span></label>
                         <input type="time" name="hora_inicio" id="hora_inicio"
                                class="form-control @error('hora_inicio') is-invalid @enderror"
                                value="{{ old('hora_inicio') }}" required>
@@ -140,7 +140,7 @@
                     </div>
 
                     <div class="col-md-2">
-                        <label for="hora_fin" class="form-label">Hora Fin <span class="text-danger">*</span></label>
+                        <label for="hora_fin" class="form-label">Hora final <span class="text-danger">*</span></label>
                         <input type="time" name="hora_fin" id="hora_fin"
                                class="form-control @error('hora_fin') is-invalid @enderror"
                                value="{{ old('hora_fin') }}" required>
@@ -218,7 +218,7 @@
                         @enderror
                     </div>
                     <div class="col-md-6">
-                        <label for="observaciones" class="form-label">Observaciones(Opcional)</label>
+                        <label for="observaciones" class="form-label">Observaciones(opcional)</label>
                         <textarea
                             name="observaciones"
                             id="observaciones"
@@ -238,18 +238,22 @@
                 <label for="archivo_resultado" class="form-label">Archivo resultado:</label>
 
                 <div class="mb-2">
-                    <iframe id="archivoPreview"
-                            src="{{ session('archivo_temporal') ? asset('storage/' . session('archivo_temporal')) : '' }}"
-                            style="width: 100%; height: 100px; {{ session('archivo_temporal') ? '' : 'display:none;' }}"></iframe>
-                </div>
+                    <img id="archivoPreviewImg"
+                         src="{{ session('archivo_temporal') && !Str::endsWith(session('archivo_temporal'), '.pdf') ? asset('storage/' . session('archivo_temporal')) : '' }}"
+                         alt="Archivo seleccionado"
+                         class="img-thumbnail"
+                         style="max-width: 250px; max-height:150px; {{ session('archivo_temporal') && !Str::endsWith(session('archivo_temporal'), '.pdf') ? '' : 'display:none;' }}">
+                    <iframe id="archivoPreviewPDF"
+                            src="{{ session('archivo_temporal') && Str::endsWith(session('archivo_temporal'), '.pdf') ? asset('storage/' . session('archivo_temporal')) : '' }}"
+                            style="width:100%; height:100px; {{ session('archivo_temporal') && Str::endsWith(session('archivo_temporal'), '.pdf') ? '' : 'display:none;' }}">
+                    </iframe>
                 </div>
 
-                <input
-                    type="file"
-                    name="archivo_resultado"
-                    id="archivo_resultado"
-                    accept=".jpg,.jpeg,.png,.webp,.pdf"
-                    class="form-control @error('archivo_resultado') is-invalid @enderror">
+                <input type="file"
+                       name="archivo_resultado"
+                       id="archivo_resultado"
+                       accept=".jpg,.jpeg,.png,.webp,.pdf"
+                       class="form-control @error('archivo_resultado') is-invalid @enderror">
 
                 @error('archivo_resultado')
                 <div class="invalid-feedback">{{ $message }}</div>
@@ -259,21 +263,30 @@
 
 
 
-    {{-- Botones --}}
-    <div class="d-flex justify-content-center gap-3 mt-4">
-        <button type="submit" class="btn btn-primary px-4 shadow-sm d-inline-flex align-items-center gap-2">
-            <i class="bi bi-plus-circle"></i> Registrar
-        </button>
 
-        <button type="button" id="btnLimpiar" class="btn btn-warning px-4 shadow-sm d-inline-flex align-items-center gap-2">
-            <i class="bi bi-trash"></i> Limpiar
-        </button>
+            {{-- Botones --}}
+            {{-- Botones --}}
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <button type="submit" class="btn btn-primary px-4 shadow-sm d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-plus-circle"></i> Registrar
+                </button>
 
-        <a href="{{ route('sesiones.index') }}" class="btn btn-success px-4 shadow-sm d-inline-flex align-items-center gap-2">
-            <i class="bi bi-arrow-left"></i> Regresar
-        </a>
-    </div>
+                <button type="button" id="btnLimpiar" class="btn btn-warning px-4 shadow-sm d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-trash"></i> Limpiar
+                </button>
+
+                <a href="{{ route('sesiones.index') }}"
+                   onclick="fetch('{{ route('sesiones.limpiarArchivo') }}', {
+           method: 'POST',
+           headers: { 'X-CSRF-TOKEN':'{{ csrf_token() }}' }
+       });"
+                   class="btn btn-success px-4 shadow-sm d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-arrow-left"></i> Regresar
+                </a>
+            </div>
+
         </form>
+
     </div>
 
     <script>
@@ -375,39 +388,60 @@
     </script>
     {{-- JS para vista previa --}}
     <script>
-        // Previsualización de archivo resultado
+        const form = document.getElementById('formSesion'); // Asegúrate de poner id="formSesion" en el form
         const archivoInput = document.getElementById('archivo_resultado');
-        const archivoPreview = document.getElementById('archivoPreview');
+        const archivoPreviewImg = document.getElementById('archivoPreviewImg');
+        const archivoPreviewPDF = document.getElementById('archivoPreviewPDF');
 
+        // Botón Limpiar
+        document.getElementById('btnLimpiar').addEventListener('click', function(){
+            form.reset();
+
+            // Limpiar validaciones
+            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            form.querySelectorAll('.is-valid').forEach(el => el.classList.remove('is-valid'));
+
+            // Limpiar preview
+            archivoPreviewImg.src = '';
+            archivoPreviewImg.style.display = 'none';
+            archivoPreviewPDF.src = '';
+            archivoPreviewPDF.style.display = 'none';
+
+            // Limpiar archivo temporal del backend
+            fetch("{{ route('sesiones.limpiarArchivo') }}", {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN':'{{ csrf_token() }}' }
+            });
+        });
+
+        // Previsualización archivo
         archivoInput.addEventListener('change', function(e){
             const file = e.target.files[0];
             if(file){
                 const reader = new FileReader();
                 reader.onload = function(ev){
-                    if(file.type === 'application/pdf'){
-                        archivoPreview.src = ev.target.result;
-                    } else if(file.type.startsWith('image/')){
-                        archivoPreview.src = ev.target.result;
+                    if(file.type.startsWith('image/')){
+                        archivoPreviewImg.src = ev.target.result;
+                        archivoPreviewImg.style.display = 'block';
+                        archivoPreviewPDF.style.display = 'none';
+                    } else if(file.type === 'application/pdf'){
+                        archivoPreviewPDF.src = ev.target.result;
+                        archivoPreviewPDF.style.display = 'block';
+                        archivoPreviewImg.style.display = 'none';
                     }
-                    archivoPreview.style.display = 'block';
                 }
                 reader.readAsDataURL(file);
             } else {
-                archivoPreview.src = '';
-                archivoPreview.style.display = 'none';
+                archivoPreviewImg.src = '';
+                archivoPreviewImg.style.display = 'none';
+                archivoPreviewPDF.src = '';
+                archivoPreviewPDF.style.display = 'none';
             }
         });
-
-        // Botón Limpiar formulario (si quieres que limpie también el archivo)
-        document.getElementById('btnLimpiar').addEventListener('click', function(){
-            const form = this.closest('form');
-            form.reset();
-            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-            archivoPreview.src = '';
-            archivoPreview.style.display = 'none';
-        });
-
     </script>
+
+
+
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -439,6 +473,7 @@
             const fechaInput = document.getElementById("fecha");
             const horaInicio = document.getElementById("hora_inicio");
             const horaFin = document.getElementById("hora_fin");
+
 
             // Función para formatear fecha YYYY-MM-DD
             const formatoFecha = fecha => fecha.toISOString().split('T')[0];
@@ -478,7 +513,7 @@
             // Función para validar rango hora inicio < hora fin
             function validarRango() {
                 if (horaInicio.value && horaFin.value && horaFin.value < horaInicio.value) {
-                    alert("La hora de fin no puede ser anterior a la hora de inicio.");
+
                     horaFin.value = "";
                 }
             }
@@ -498,5 +533,45 @@
             actualizarLimitesHora();
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('formSesion');
+            const btnLimpiar = document.getElementById('btnLimpiar');
+
+            btnLimpiar.addEventListener('click', function() {
+                // 1️⃣ Resetea todos los campos del formulario
+                form.querySelectorAll('input, select, textarea').forEach(el => {
+                    if(el.type === 'select-one') {
+                        el.selectedIndex = 0; // devuelve "-- Selecciona --"
+                    } else {
+                        el.value = '';
+                    }
+                    // Quita clases de validación
+                    el.classList.remove('is-invalid', 'is-valid');
+                });
+
+                // 2️⃣ Limpia los campos dependientes (edad, género, teléfono)
+                const edadInput = document.getElementById('edad');
+                const generoInput = document.getElementById('genero');
+                const telefonoInput = document.getElementById('telefono');
+                if(edadInput) edadInput.value = '';
+                if(generoInput) generoInput.value = '';
+                if(telefonoInput) telefonoInput.value = '';
+
+                // 3️⃣ Oculta los mensajes de error de Laravel
+                form.querySelectorAll('.invalid-feedback, .valid-feedback').forEach(el => {
+                    el.innerText = '';
+                    el.style.display = 'none';
+                });
+
+                // 4️⃣ Oculta vista previa de archivo
+                const previewContainer = document.getElementById('previewContainer');
+                const previewImage = document.getElementById('previewImage');
+                if(previewContainer) previewContainer.style.display = 'none';
+                if(previewImage) previewImage.src = '#';
+            });
+        });
+    </script>
+
 
 @endsection

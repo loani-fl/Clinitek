@@ -308,3 +308,9 @@ Route::post('/inventario/verificar-duplicado', [InventarioController::class, 've
 
 Route::post('/inventario/generar-codigo', [InventarioController::class, 'generarCodigo'])
     ->name('inventario.generarCodigo');
+
+
+Route::post('/sesiones/limpiar-archivo', function(){
+    session()->forget('archivo_temporal');
+    return response()->json(['ok'=>true]);
+})->name('sesiones.limpiarArchivo');
