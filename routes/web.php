@@ -314,3 +314,14 @@ Route::post('/sesiones/limpiar-archivo', function(){
     session()->forget('archivo_temporal');
     return response()->json(['ok'=>true]);
 })->name('sesiones.limpiarArchivo');
+
+
+//ultrasonidos
+use App\Http\Controllers\UltrasonidoOrderController;
+Route::prefix('ultrasonidos')->name('ultrasonidos.')->group(function() {
+    Route::get('/', [UltrasonidoOrderController::class, 'index'])->name('index');
+    Route::get('/create', [UltrasonidoOrderController::class, 'create'])->name('create');
+    Route::post('/', [UltrasonidoOrderController::class, 'store'])->name('store');
+    Route::get('/{ultrasonido}', [UltrasonidoOrderController::class, 'show'])->name('show');
+
+});
