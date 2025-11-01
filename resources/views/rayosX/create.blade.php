@@ -92,7 +92,7 @@ h2 {
 
 .patient-data-field strong {
     min-width: 100px;
-    font-weight: 600;
+    font-weight: normal;
     color: rgb(3, 12, 22);
     font-size: 0.9rem;
 }
@@ -124,7 +124,7 @@ h2 {
 button.btn-success, button.btn-primary, button.btn-warning, a.btn {
     font-size: 0.95rem;
     padding: 0.40rem 0.5rem;
-    font-weight: 600;
+    font-weight: normal;
     border-radius: 0.4rem;
     margin-left: 0.5rem;
     line-height: 1.2;
@@ -176,7 +176,7 @@ a.btn-primary:hover {
     border-radius: 8px;
     padding: 8px 16px;
     margin: 5px auto;
-    font-weight: 600;
+    font-weight: normal;
     opacity: 0;
     transform: translateY(-20px);
     transition: opacity 0.4s ease, transform 0.4s ease;
@@ -201,6 +201,14 @@ a.btn-primary:hover {
     border: 1px solid #c3e6cb;
 }
 
+/* Mensaje paciente no encontrado */
+#mensajeNoEncontrado {
+    font-size: 0.85rem;
+    color: #000;
+    margin-top: 0.3rem;
+    display: none;
+}
+
 /* Checkboxes - estilo por defecto del navegador */
 .rayosx-grid input[type="checkbox"],
 .examenes-grid input[type="checkbox"] {
@@ -216,7 +224,7 @@ a.btn-primary:hover {
 .examenes-grid label {
     font-size: 0.85rem;
     line-height: 1rem;
-    font-weight: 700;
+    font-weight: normal;
     color: #0f0f0f;
     cursor: pointer;
     user-select: none;
@@ -290,6 +298,7 @@ a.btn-primary:hover {
 .top-controls label {
     font-size: 0.9rem;
     margin-bottom: 0.2rem;
+    font-weight: normal;
 }
 
 #buscarPaciente {
@@ -319,10 +328,12 @@ a.btn-primary {
 
 .row.align-items-center h4 {
     font-size: 1.1rem !important;
+    font-weight: 700 !important;
 }
 
 .row.align-items-center > div > div {
     font-size: 0.9rem !important;
+    font-weight: 700 !important;
 }
 
 /* Card body sin padding extra */
@@ -334,6 +345,7 @@ a.btn-primary {
 .mb-3.text-end {
     margin-bottom: 0.8rem !important;
     font-size: 1rem !important;
+    font-weight: normal !important;
 }
 
 /* Botones más arriba */
@@ -363,7 +375,7 @@ a.btn-primary {
             </div>
         </div>
         <div class="col-md-9 text-center" style="transform: translateX(30%);">
-            <h4 class="mb-0" style="font-size: 1.1rem; font-weight: 600; color: #333; line-height: 1.3;">
+            <h4 class="mb-0" style="font-size: 1.1rem; font-weight: 700; color: #333; line-height: 1.3;">
                 CREAR ORDEN DE RAYOS X
             </h4>
         </div>
@@ -394,7 +406,7 @@ a.btn-primary {
             <div class="top-controls">
                 <!-- Buscar paciente -->
                 <div style="position: relative;">
-                    <label for="buscarPaciente" class="form-label fw-bold">Buscar paciente <span class="text-danger">*</span></label>
+                    <label for="buscarPaciente" class="form-label">Buscar paciente <span class="text-danger">*</span></label>
                     <input type="text" id="buscarPaciente" class="form-control" placeholder="Escribe para buscar..." autocomplete="off" value="{{ old('paciente_nombre', '') }}" required>
                     <input type="hidden" name="paciente_id" id="paciente_id" value="{{ old('paciente_id') }}">
                     <ul id="listaPacientes" class="list-group">
@@ -404,11 +416,12 @@ a.btn-primary {
                             </li>
                         @endforeach
                     </ul>
+                    <div id="mensajeNoEncontrado">Paciente no encontrado.</div>
                 </div>
 
                 <!-- Fecha -->
                 <div>
-                    <label for="fecha" class="form-label fw-bold">Fecha <span class="text-danger">*</span></label>
+                    <label for="fecha" class="form-label">Fecha <span class="text-danger">*</span></label>
                     <input type="date" 
                            id="fecha" 
                            name="fecha" 
@@ -481,7 +494,7 @@ a.btn-primary {
             </div>
 
             {{-- TOTAL DINÁMICO --}}
-            <div class="mb-3 text-end fw-bold" style="font-size: 1rem;">
+            <div class="mb-3 text-end" style="font-size: 1rem;">
                 Total a pagar: L<span id="totalPrecio">0.00</span>
             </div>
 
@@ -515,19 +528,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const dpIdentidad = document.getElementById('dp-identidad');
     const dpGenero = document.getElementById('dp-genero');
 
+    const mensajeNoEncontrado = document.getElementById('mensajeNoEncontrado');
+
     const fechaInput = document.getElementById('fecha');
     const hoy = new Date();
     const dd = String(hoy.getDate()).padStart(2, '0');
     const mm = String(hoy.getMonth() + 1).padStart(2, '0');
     const yyyy = hoy.getFullYear();
     fechaInput.setAttribute('min', `${yyyy}-${mm}-${dd}`);
-
-    const fechaMax = new Date();
-    fechaMax.setMonth(fechaMax.getMonth() + 3);
-    const ddMax = String(fechaMax.getDate()).padStart(2, '0');
-    const mmMax = String(fechaMax.getMonth() + 1).padStart(2, '0');
-    const yyyyMax = fechaMax.getFullYear();
-    fechaInput.setAttribute('max', `${yyyyMax}-${mmMax}-${ddMax}`);
+    fechaInput.setAttribute('max', '2025-12-15');
 
     fechaInput.value = fechaInput.value || `${yyyy}-${mm}-${dd}`;
 
@@ -573,16 +582,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     fechaInput.addEventListener('change', () => {
-        const fechaLimite = new Date('2025-10-31');
+        const fechaLimite = new Date('2025-12-15');
         const fechaSeleccionada = new Date(fechaInput.value);
         if(fechaSeleccionada > fechaLimite) {
-            showMensaje('La fecha no puede ser posterior al 31 de octubre de 2025.', 'error');
+            showMensaje('La fecha no puede ser posterior al 15 de diciembre de 2025.', 'error');
             fechaInput.value = `${yyyy}-${mm}-${dd}`;
         }
     });
 
     inputBuscar.addEventListener('focus', () => {
-        if (inputBuscar.value.trim() !== '') lista.style.display = 'block';
+        if (inputBuscar.value.trim() !== '') {
+            lista.style.display = 'block';
+            const filtro = inputBuscar.value.toLowerCase();
+            let visibleCount = 0;
+            Array.from(lista.children).forEach(li => {
+                const texto = li.textContent.toLowerCase();
+                if (texto.includes(filtro)) {
+                    visibleCount++;
+                }
+            });
+            if (visibleCount === 0) {
+                mensajeNoEncontrado.style.display = 'block';
+            }
+        }
     });
 
     inputBuscar.addEventListener('input', () => {
@@ -605,6 +627,12 @@ document.addEventListener('DOMContentLoaded', function() {
         dpGenero.textContent = '';
         document.getElementById('datosPaciente').style.display = 'none';
         clearMensajes();
+        
+        if (filtro !== '' && visibleCount === 0) {
+            mensajeNoEncontrado.style.display = 'block';
+        } else {
+            mensajeNoEncontrado.style.display = 'none';
+        }
     });
 
     lista.querySelectorAll('.paciente-item').forEach(item => {
