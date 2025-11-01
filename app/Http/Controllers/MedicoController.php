@@ -267,6 +267,7 @@ class MedicoController extends Controller
             'Neurología' => 24800,
             'Psiquiatría' => 14700,
             'Radiología' => 16300,
+            'Ginecología' => 27000,
         ];
 
         $especialidad = $request->input('especialidad');

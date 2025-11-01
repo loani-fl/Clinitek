@@ -233,6 +233,7 @@
                                 <option value="Dermatología" {{ old('especialidad') == 'Dermatología' ? 'selected' : '' }}>Dermatología</option>
                                 <option value="Psiquiatría" {{ old('especialidad') == 'Psiquiatría' ? 'selected' : '' }}>Psiquiatría</option>
                                 <option value="Radiología" {{ old('especialidad') == 'Radiología' ? 'selected' : '' }}>Radiología</option>
+                                <option value="Ginecología" {{ old('especialidad') == 'Ginecología' ? 'selected' : '' }}>Ginecología</option>
                             </select>
                             @error('especialidad')
                                 <div class="invalid-feedback">Seleccione una especialidad.</div>
@@ -336,7 +337,8 @@ document.addEventListener('DOMContentLoaded', function () {
         "Pediatría": 27500,
         "Dermatología": 14200,
         "Psiquiatría": 14700,
-        "Radiología": 16300
+        "Radiología": 16300,
+        "Ginecología":27000
     };
 
     function formatearMoneda(valor) {
