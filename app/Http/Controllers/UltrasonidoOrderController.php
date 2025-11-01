@@ -36,7 +36,7 @@ class UltrasonidoOrderController extends Controller
     {
         $request->validate([
             'paciente_id' => 'required|exists:pacientes,id',
-            'fecha' => 'required|date|before_or_equal:2025-10-31',
+            'fecha' => 'required|date|before_or_equal:today',
             'examenes' => 'required|array|min:1|max:7',
             'examenes.*' => 'in:higado,vesicula,bazo,vejiga,ovarico,utero,tiroides',
         ]);

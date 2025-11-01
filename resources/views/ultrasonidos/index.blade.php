@@ -167,7 +167,7 @@
                 <i class="bi bi-house-door"></i> Inicio
             </a>
 
-            <h2>Órdenes de Ultrasonido</h2>
+            <h2>Órdenes de ultrasonido</h2>
 
             <a href="{{ route('ultrasonidos.create') }}" class="btn btn-primary ms-3">
                 <i class="bi bi-plus-circle"></i> Registrar Orden
