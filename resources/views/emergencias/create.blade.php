@@ -436,11 +436,20 @@ h5.mt-4.mb-3.text-dark.fw-bold {
             </div>
         </div>
 
-        <div class="d-flex justify-content-center gap-3 mt-4">
-            <button type="submit" class="btn btn-primary">Registrar</button>
-            <button type="button" id="btnLimpiar" class="btn btn-warning">Limpiar</button>
-            <a href="{{ route('emergencias.index') }}" class="btn btn-success">Regresar</a>
-        </div>
+        <div class="d-flex justify-content-center gap-3 mt-4 w-100">
+    <button type="submit" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Registrar
+    </button>
+
+    <button type="button" id="btnLimpiar" class="btn btn-warning">
+        <i class="bi bi-trash"></i> Limpiar
+    </button>
+
+    <a href="{{ route('emergencias.index') }}" class="btn btn-success">
+        <i class="bi bi-arrow-left"></i> Regresar
+    </a>
+</div>
+
     </form>
 </div>
 
