@@ -164,7 +164,8 @@ a.btn-primary:hover {
     text-decoration: none;
 }
 
-/* Mensajes emergentes */.mensaje-flash {
+/* Mensajes emergentes */
+.mensaje-flash {
     min-width: 280px;
     max-width: 600px;
     text-align: center;
@@ -194,7 +195,6 @@ a.btn-primary:hover {
     color: #155724;
     border: 1px solid #c3e6cb;
 }
-
 
 /* Hover para checkbox */
 .form-check-input:hover {
@@ -340,14 +340,7 @@ a.btn-primary {
         width: 90%;
     }
 }
-
-
-
-
 </style>
-
-
-
 
 <div class="content-wrapper">
 
@@ -423,87 +416,83 @@ a.btn-primary {
             </div>
 
                 
-{{-- DATOS DEL PACIENTE CON ESTILO SUBRAYADO --}}
-<div id="datosPaciente" style="display: {{ old('paciente_id') ? 'block' : 'none' }}; margin-bottom: 1.5rem;">
+            {{-- DATOS DEL PACIENTE CON ESTILO SUBRAYADO --}}
+            <div id="datosPaciente" style="display: {{ old('paciente_id') ? 'block' : 'none' }}; margin-bottom: 1.5rem;">
 
-    <!-- Primera fila: Nombres y Apellidos -->
-    <div class="patient-data-row">
-        <div class="patient-data-field">
-            <strong>Nombres:</strong>
-            <div id="dp-nombres" class="underline-field-solid">{{ old('nombres') }}</div>
-        </div>
-        <div class="patient-data-field">
-            <strong>Apellidos:</strong>
-            <div id="dp-apellidos" class="underline-field-solid">{{ old('apellidos') }}</div>
-        </div>
-    </div>
+                <!-- Primera fila: Nombres y Apellidos -->
+                <div class="patient-data-row">
+                    <div class="patient-data-field">
+                        <strong>Nombres:</strong>
+                        <div id="dp-nombres" class="underline-field-solid">{{ old('nombres') }}</div>
+                    </div>
+                    <div class="patient-data-field">
+                        <strong>Apellidos:</strong>
+                        <div id="dp-apellidos" class="underline-field-solid">{{ old('apellidos') }}</div>
+                    </div>
+                </div>
 
-    <!-- Segunda fila: Identidad y Género -->
-    <div class="patient-data-row">
-        <div class="patient-data-field">
-            <strong>Identidad:</strong>
-            <div id="dp-identidad" class="underline-field-solid">{{ old('identidad') }}</div>
-        </div>
-        <div class="patient-data-field">
-            <strong>Género:</strong>
-            <div id="dp-genero" class="underline-field-solid">{{ old('genero') }}</div>
-        </div>
-    </div>
+                <!-- Segunda fila: Identidad y Género -->
+                <div class="patient-data-row">
+                    <div class="patient-data-field">
+                        <strong>Identidad:</strong>
+                        <div id="dp-identidad" class="underline-field-solid">{{ old('identidad') }}</div>
+                    </div>
+                    <div class="patient-data-field">
+                        <strong>Género:</strong>
+                        <div id="dp-genero" class="underline-field-solid">{{ old('genero') }}</div>
+                    </div>
+                </div>
 
-</div>
+            </div>
 
-
-{{-- SECCIONES Y EXÁMENES EN GRID DE 3 COLUMNAS --}}
-<div class="secciones-container">
-    @foreach($secciones as $categoria => $examenes)
-        <div class="seccion">
-            <div class="section-title">{{ $categoria }}</div>
-            <div class="examenes-grid">
-                @foreach($examenes as $clave => $datos)
-                    <label>
-                        <input 
-                            type="checkbox" 
-                            class="examen-checkbox" 
-                            name="examenes[]" 
-                            value="{{ $clave }}" 
-                            data-precio="{{ $datos['precio'] }}"
-                            {{ (is_array(old('examenes')) && in_array($clave, old('examenes'))) ? 'checked' : '' }}
-                        >
-                        {{ $datos['nombre'] }}
-                    </label>
+            {{-- SECCIONES Y EXÁMENES EN GRID DE 3 COLUMNAS --}}
+            <div class="secciones-container">
+                @foreach($secciones as $categoria => $examenes)
+                    <div class="seccion">
+                        <div class="section-title">{{ $categoria }}</div>
+                        <div class="examenes-grid">
+                            @foreach($examenes as $clave => $datos)
+                                <label>
+                                    <input 
+                                        type="checkbox" 
+                                        class="examen-checkbox" 
+                                        name="examenes[]" 
+                                        value="{{ $clave }}" 
+                                        data-precio="{{ $datos['precio'] }}"
+                                        {{ (is_array(old('examenes')) && in_array($clave, old('examenes'))) ? 'checked' : '' }}
+                                    >
+                                    {{ $datos['nombre'] }}
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
                 @endforeach
             </div>
-        </div>
-    @endforeach
-</div>
 
-
-    {{-- TOTAL DINÁMICO --}}
-    <div class="mb-3 text-end fw-bold fs-5">
-        Total a pagar: L<span id="totalPrecio">0.00</span>
-    </div>
-</div>
-
-
+            {{-- TOTAL DINÁMICO --}}
+            <div class="mb-3 text-end fw-bold fs-5">
+                Total a pagar: L<span id="totalPrecio">0.00</span>
+            </div>
 
             {{-- BOTONES GUARDAR, LIMPIAR, VOLVER --}}
-            <div class="d-flex justify-content-center gap-3">
-                <button type="submit" class="btn btn-primary px-4 py-2">
-                    <i class="bi bi-save"></i> Guardar y pagar
+            <div class="d-flex justify-content-center gap-3 mt-4 w-100">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Registrar
                 </button>
-                <button type="button" id="btnLimpiar" class="btn btn-warning px-4 py-2">
-                    <i class="bi bi-x-circle"></i> Limpiar
+
+                <button type="button" id="btnLimpiar" class="btn btn-warning">
+                    <i class="bi bi-trash"></i> Limpiar
                 </button>
-                <a href="{{ route('rayosx.index') }}" class="btn btn-success px-4 py-2">
-                    <i class="bi bi-arrow-left-circle"></i> Volver
+
+                <a href="{{ route('rayosx.index') }}" class="btn btn-success">
+                    <i class="bi bi-arrow-left"></i> Regresar
                 </a>
             </div>
+
         </form>
     </div>
 </div>
- </div>
 
- </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const inputBuscar = document.getElementById('buscarPaciente');
@@ -682,6 +671,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-
 
 @endsection
