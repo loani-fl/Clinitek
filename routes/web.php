@@ -129,7 +129,7 @@ Route::prefix('rayosx')->group(function () {
     Route::post('/store', [OrdenRayosXController::class, 'store'])->name('rayosx.store');
     Route::get('/{orden}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
 
-   Route::patch('/{orden}/realizar', [OrdenRayosXController::class, 'marcarRealizado'])->name('rayosx.marcarRealizado');
+    Route::patch('/{orden}/realizar', [OrdenRayosXController::class, 'marcarRealizado'])->name('rayosx.marcarRealizado');
 });
 // Rutas para pago
 // Desde consulta → crea el pago y redirige a show
@@ -168,8 +168,8 @@ Route::post('/rayosx/descripcion-guardar', [OrdenRayosXController::class, 'guard
     ->name('rayosx.descripcion.guardar');
 
 
-    //OOTRAS
-    Route::get('/rayosx', [OrdenRayosXController::class, 'index'])->name('rayosx.index');
+//OOTRAS
+Route::get('/rayosx', [OrdenRayosXController::class, 'index'])->name('rayosx.index');
 Route::get('/rayosx/create', [OrdenRayosXController::class, 'create'])->name('rayosx.create');
 Route::post('/rayosx', [OrdenRayosXController::class, 'store'])->name('rayosx.store');
 Route::get('/rayosx/{id}', [OrdenRayosXController::class, 'show'])->name('rayosx.show');
@@ -311,20 +311,20 @@ Route::post('/inventario/generar-codigo', [InventarioController::class, 'generar
 
 
 
-    use App\Http\Controllers\ControlPrenatalController;
-    
-    // Ruta principal de Ginecología (Index/Dashboard)
-    Route::get('/ginecologia', [ControlPrenatalController::class, 'indexGinecologia'])->name('ginecologia.index');
-    
-    // Rutas de Controles Prenatales
-    Route::get('/controles-prenatales', [ControlPrenatalController::class, 'index'])->name('controles-prenatales.index');
-    Route::get('/controles-prenatales/crear', [ControlPrenatalController::class, 'create'])->name('controles-prenatales.create');
-    Route::post('/controles-prenatales', [ControlPrenatalController::class, 'store'])->name('controles-prenatales.store');
-    Route::get('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'show'])->name('controles-prenatales.show');
-    Route::get('/controles-prenatales/{controlPrenatal}/editar', [ControlPrenatalController::class, 'edit'])->name('controles-prenatales.edit');
-    Route::put('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'update'])->name('controles-prenatales.update');
-    Route::delete('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'destroy'])->name('controles-prenatales.destroy');
-    
+use App\Http\Controllers\ControlPrenatalController;
+
+// Ruta principal de Ginecología (Index/Dashboard)
+Route::get('/ginecologia', [ControlPrenatalController::class, 'indexGinecologia'])->name('ginecologia.index');
+
+// Rutas de Controles Prenatales
+Route::get('/controles-prenatales', [ControlPrenatalController::class, 'index'])->name('controles-prenatales.index');
+Route::get('/controles-prenatales/crear', [ControlPrenatalController::class, 'create'])->name('controles-prenatales.create');
+Route::post('/controles-prenatales', [ControlPrenatalController::class, 'store'])->name('controles-prenatales.store');
+Route::get('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'show'])->name('controles-prenatales.show');
+Route::get('/controles-prenatales/{controlPrenatal}/editar', [ControlPrenatalController::class, 'edit'])->name('controles-prenatales.edit');
+Route::put('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'update'])->name('controles-prenatales.update');
+Route::delete('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'destroy'])->name('controles-prenatales.destroy');
+
 
 Route::post('/sesiones/limpiar-archivo', function(){
     session()->forget('archivo_temporal');
@@ -342,19 +342,17 @@ Route::prefix('ultrasonidos')->name('ultrasonidos.')->group(function() {
 
 });
 Route::get('/ultrasonidos/analisis/{id}', [UltrasonidoOrderController::class, 'analisis'])
-     ->name('ultrasonidos.analisis');
+    ->name('ultrasonidos.analisis');
 
 
 // Guardar el análisis
 Route::post('/ultrasonidos/analisis/{id}', [UltrasonidoOrderController::class, 'storeAnalisis'])
     ->name('ultrasonidos.storeAnalisis');
 
-    Route::get('/ultrasonidos/analisis/{id}', [UltrasonidoOrderController::class, 'analisis'])
+Route::get('/ultrasonidos/analisis/{id}', [UltrasonidoOrderController::class, 'analisis'])
     ->name('ultrasonidos.analisis');
 
 Route::post('/ultrasonidos/guardar-analisis/{id}', [UltrasonidoOrderController::class, 'guardarAnalisis'])
     ->name('ultrasonidos.guardarAnalisis');
 
-
-    
 Route::get('/ginecologia', [ControlPrenatalController::class, 'index'])->name('ginecologia.index');

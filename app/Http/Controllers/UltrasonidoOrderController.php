@@ -102,8 +102,17 @@ class UltrasonidoOrderController extends Controller
             $query->where('estado', $request->estado);
         }
 
-        $ordenes = $query->orderBy('fecha', 'desc')->paginate(10);
+        $ordenes = $query->orderBy('fecha', 'desc')->paginate(2);
 
+        // ✅ Respuesta AJAX
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('ultrasonidos.partials', compact('ordenes'))->render(),
+                'pagination' => $ordenes->links()->toHtml(),
+                'total' => $ordenes->count(),
+                'all' => $ordenes->total()
+            ]);
+        }
         return view('ultrasonidos.index', compact('ordenes'));
     }
 
@@ -212,10 +221,10 @@ public function guardarAnalisis(Request $request, $id)
 
             foreach ($imagenesExamen as $index => $imagen) {
                 $ruta = $imagen->store('ultrasonidos', 'public');
-                
+
                 // Obtener la descripción correspondiente
                 $descripcion = $request->descripciones[$examenIndex][$index] ?? '';
-                
+
                 UltrasonidoImagen::create([
                     'ultrasonido_id' => $orden->id,
                     'tipo_examen' => $examenKey, // <-- ¡LÍNEA MODIFICADA PARA GUARDAR EL TIPO!
