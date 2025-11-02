@@ -74,29 +74,29 @@
                 {{-- Datos Personales de la Paciente --}}
                 <div class="section-title">🧍‍♀️ Datos Personales de la Paciente</div>
                 <div class="row gy-2">
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-6 info-block">
                         <span class="info-label">Nombre Completo:</span>
                         <div class="info-value">{{ $controlPrenatal->paciente->nombre_completo }}</div>
                     </div>
-                    <div class="col-md-4 info-block">
-                        <span class="info-label">Número de Identidad:</span>
-                        <div class="info-value">{{ $controlPrenatal->paciente->numero_identidad }}</div>
-                    </div>
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Edad:</span>
                         <div class="info-value">{{ $controlPrenatal->paciente->edad }} años</div>
                     </div>
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
+                        <span class="info-label">Estado Civil:</span>
+                        <div class="info-value text-capitalize">{{ str_replace('_', ' ', $controlPrenatal->paciente->estado_civil) }}</div>
+                    </div>
+                    <div class="col-md-6 info-block">
+                        <span class="info-label">Número de Identidad:</span>
+                        <div class="info-value">{{ $controlPrenatal->paciente->numero_identidad }}</div>
+                    </div>
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Fecha de Nacimiento:</span>
                         <div class="info-value">{{ $controlPrenatal->paciente->fecha_nacimiento->format('d/m/Y') }}</div>
                     </div>
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Teléfono:</span>
                         <div class="info-value">{{ $controlPrenatal->paciente->telefono }}</div>
-                    </div>
-                    <div class="col-md-4 info-block">
-                        <span class="info-label">Estado Civil:</span>
-                        <div class="info-value text-capitalize">{{ str_replace('_', ' ', $controlPrenatal->paciente->estado_civil) }}</div>
                     </div>
                     <div class="col-md-12 info-block">
                         <span class="info-label">Dirección:</span>
@@ -135,17 +135,22 @@
                         <span class="info-label">Hijos Vivos:</span>
                         <div class="info-value">{{ $controlPrenatal->numero_hijos_vivos }}</div>
                     </div>
-                    @if($controlPrenatal->tipo_partos_anteriores)
-                    <div class="col-md-6 info-block">
-                        <span class="info-label">Tipo de Partos Anteriores:</span>
-                        <textarea class="form-control" rows="2" readonly style="resize:none; background-color:#f8f9fa;">{{ $controlPrenatal->tipo_partos_anteriores }}</textarea>
-                    </div>
-                    @endif
-                    @if($controlPrenatal->complicaciones_previas)
-                    <div class="col-md-6 info-block">
-                        <span class="info-label">Complicaciones Previas:</span>
-                        <textarea class="form-control" rows="2" readonly style="resize:none; background-color:#f8f9fa;">{{ $controlPrenatal->complicaciones_previas }}</textarea>
-                    </div>
+                    @if($controlPrenatal->tipo_partos_anteriores || $controlPrenatal->complicaciones_previas)
+                        @if($controlPrenatal->tipo_partos_anteriores)
+                        <div class="col-md-6 info-block">
+                            <span class="info-label">Tipo de Partos Anteriores:</span>
+                            <textarea class="form-control" rows="2" readonly style="resize:none; background-color:#f8f9fa;">{{ $controlPrenatal->tipo_partos_anteriores }}</textarea>
+                        </div>
+                        @endif
+                        @if($controlPrenatal->complicaciones_previas)
+                        <div class="col-md-6 info-block">
+                            <span class="info-label">Complicaciones Previas:</span>
+                            <textarea class="form-control" rows="2" readonly style="resize:none; background-color:#f8f9fa;">{{ $controlPrenatal->complicaciones_previas }}</textarea>
+                        </div>
+                        @endif
+                        @if($controlPrenatal->tipo_partos_anteriores && !$controlPrenatal->complicaciones_previas)
+                        <div class="col-md-6"></div>
+                        @endif
                     @endif
                 </div>
 
@@ -199,48 +204,48 @@
                 {{-- Datos del Control Prenatal --}}
                 <div class="section-title">📋 Datos del Control Prenatal</div>
                 <div class="row gy-2">
-                    <div class="col-md-3 info-block">
+                    <div class="col-md-4 info-block">
                         <span class="info-label">Fecha del Control:</span>
                         <div class="info-value">{{ $controlPrenatal->fecha_control->format('d/m/Y') }}</div>
                     </div>
-                    <div class="col-md-3 info-block">
+                    <div class="col-md-4 info-block">
                         <span class="info-label">Presión Arterial:</span>
                         <div class="info-value">{{ $controlPrenatal->presion_arterial }} mmHg</div>
                     </div>
-                    <div class="col-md-3 info-block">
-                        <span class="info-label">Frecuencia Cardíaca:</span>
-                        <div class="info-value">{{ $controlPrenatal->frecuencia_cardiaca_materna }} BPM</div>
-                    </div>
-                    <div class="col-md-3 info-block">
+                    <div class="col-md-4 info-block">
                         <span class="info-label">Temperatura:</span>
                         <div class="info-value">{{ $controlPrenatal->temperatura }} °C</div>
                     </div>
-                    <div class="col-md-3 info-block">
-                        <span class="info-label">Peso:</span>
+                    <div class="col-md-4 info-block">
+                        <span class="info-label">Frecuencia Cardíaca Materna:</span>
+                        <div class="info-value">{{ $controlPrenatal->frecuencia_cardiaca_materna }} BPM</div>
+                    </div>
+                    <div class="col-md-4 info-block">
+                        <span class="info-label">Peso Actual:</span>
                         <div class="info-value">{{ $controlPrenatal->peso_actual }} kg</div>
                     </div>
+                    <div class="col-md-4 info-block">
+                        <span class="info-label">Edema:</span>
+                        <div class="info-value text-capitalize">{{ $controlPrenatal->edema }}</div>
+                    </div>
                     @if($controlPrenatal->altura_uterina)
-                    <div class="col-md-3 info-block">
+                    <div class="col-md-4 info-block">
                         <span class="info-label">Altura Uterina:</span>
                         <div class="info-value">{{ $controlPrenatal->altura_uterina }} cm</div>
                     </div>
                     @endif
                     @if($controlPrenatal->latidos_fetales)
-                    <div class="col-md-3 info-block">
+                    <div class="col-md-4 info-block">
                         <span class="info-label">Latidos Fetales:</span>
                         <div class="info-value">{{ $controlPrenatal->latidos_fetales }} BPM</div>
                     </div>
                     @endif
                     @if($controlPrenatal->movimientos_fetales)
-                    <div class="col-md-3 info-block">
+                    <div class="col-md-4 info-block">
                         <span class="info-label">Movimientos Fetales:</span>
                         <div class="info-value">{{ $controlPrenatal->movimientos_fetales }}</div>
                     </div>
                     @endif
-                    <div class="col-md-4 info-block">
-                        <span class="info-label">Edema:</span>
-                        <div class="info-value text-capitalize">{{ $controlPrenatal->edema }}</div>
-                    </div>
                     @if($controlPrenatal->presentacion_fetal)
                     <div class="col-md-4 info-block">
                         <span class="info-label">Presentación Fetal:</span>
