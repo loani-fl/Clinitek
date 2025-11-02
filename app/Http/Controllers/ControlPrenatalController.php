@@ -9,210 +9,210 @@ use Illuminate\Http\Request;
 class ControlPrenatalController extends Controller
 {
     public function index()
-{
-    $controles = ControlPrenatal::with('paciente')->latest()->paginate(15);
-    
-    // Agregar estas variables que faltan
-    $totalControles = ControlPrenatal::count();
-    $controlesHoy = ControlPrenatal::whereDate('fecha_control', today())->count();
-    $proximasCitas = ControlPrenatal::whereDate('fecha_proxima_cita', '>=', today())
-                                     ->orderBy('fecha_proxima_cita')
-                                     ->limit(5)
-                                     ->with('paciente')
-                                     ->get();
-    
-    return view('controlPrenatal.index', compact('controles', 'totalControles', 'controlesHoy', 'proximasCitas'));
-}
+    {
+        $controles = ControlPrenatal::with('paciente')->latest()->paginate(15);
+        
+        $totalControles = ControlPrenatal::count();
+        $controlesHoy = ControlPrenatal::whereDate('fecha_control', today())->count();
+        $proximasCitas = ControlPrenatal::whereDate('fecha_proxima_cita', '>=', today())
+                                         ->orderBy('fecha_proxima_cita')
+                                         ->limit(5)
+                                         ->with('paciente')
+                                         ->get();
+        
+        return view('controlPrenatal.index', compact('controles', 'totalControles', 'controlesHoy', 'proximasCitas'));
+    }
 
     public function create()
     {
         $pacientes = Paciente::orderBy('nombre')->orderBy('apellidos')->get();
-        return view('controlPrenatal.create', compact('pacientes')); // Cambiado
+        return view('controlPrenatal.create', compact('pacientes'));
     }
 
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        // Paciente (nuevo o existente)
-        'paciente_existente' => 'nullable|exists:pacientes,id',
-        'nombre' => 'required_if:paciente_existente,null|string|max:50',
-        'apellidos' => 'required_if:paciente_existente,null|string|max:50',
-        'identidad' => 'required_if:paciente_existente,null|string|max:13|unique:pacientes,identidad',
-        'fecha_nacimiento' => 'required_if:paciente_existente,null|date|before:today',
-        'direccion' => 'required_if:paciente_existente,null|string|max:300',
-        'telefono' => 'required_if:paciente_existente,null|string|max:8',
-        'correo' => 'nullable|email|max:50',
-        'tipo_sangre' => 'nullable|string|max:3',
-        'genero' => 'required_if:paciente_existente,null|string|max:10',
-        'padecimientos' => 'nullable|string|max:200',
-        'medicamentos' => 'nullable|string|max:200',
-        'historial_clinico' => 'nullable|string|max:200',
-        'alergias' => 'nullable|string|max:200',
-        'historial_quirurgico' => 'nullable|string|max:200',
-        
-        // Datos obstétricos
-        'fecha_ultima_menstruacion' => 'required|date|before_or_equal:today',
-        'fecha_probable_parto' => 'required|date|after:fecha_ultima_menstruacion',
-        'semanas_gestacion' => 'required|integer|min:0|max:42',
-        'numero_gestaciones' => 'required|integer|min:1|max:20',
-        'numero_partos' => 'required|integer|min:0|max:20',
-        'numero_abortos' => 'required|integer|min:0|max:20',
-        'numero_hijos_vivos' => 'required|integer|min:0|max:20',
-        'tipo_partos_anteriores' => 'nullable|string|max:255',
-        'complicaciones_previas' => 'nullable|string',
-        
-        // Antecedentes médicos
-        'enfermedades_cronicas' => 'nullable|string',
-        'alergias_control' => 'nullable|string',
-        'cirugias_previas' => 'nullable|string',
-        'medicamentos_actuales' => 'nullable|string',
-        'habitos' => 'nullable|string',
-        'antecedentes_familiares' => 'nullable|string',
-        
-        // Datos del control prenatal actual
-        'fecha_control' => 'required|date|before_or_equal:today',
-        'presion_arterial' => 'required|string|regex:/^\d{2,3}\/\d{2,3}$/',
-        'frecuencia_cardiaca_materna' => 'required|integer|min:40|max:200',
-        'temperatura' => 'required|numeric|min:35|max:42',
-        'peso_actual' => 'required|numeric|min:30|max:200',
-        'altura_uterina' => 'nullable|numeric|min:0|max:50',
-        'latidos_fetales' => 'nullable|integer|min:100|max:180',
-        'movimientos_fetales' => 'nullable|string|max:100',
-        'edema' => 'required|in:ninguno,leve,moderado,severo',
-        'presentacion_fetal' => 'nullable|in:cefalica,podalica,transversa,no_determinada',
-        'resultados_examenes' => 'nullable|string',
-        'observaciones' => 'nullable|string',
-        
-        // Tratamientos y recomendaciones
-        'suplementos' => 'nullable|string',
-        'vacunas_aplicadas' => 'nullable|string',
-        'indicaciones_medicas' => 'nullable|string',
-        'fecha_proxima_cita' => 'nullable|date|after:fecha_control',
-    ], [
-        // Mensajes personalizados para paciente
-        'nombre.required_if' => 'El nombre es obligatorio.',
-        'nombre.max' => 'El nombre no debe exceder 50 caracteres.',
-        'apellidos.required_if' => 'Los apellidos son obligatorios.',
-        'apellidos.max' => 'Los apellidos no deben exceder 50 caracteres.',
-        'identidad.required_if' => 'La identidad es obligatoria.',
-        'identidad.max' => 'La identidad no debe exceder 13 caracteres.',
-        'identidad.unique' => 'Esta identidad ya está registrada.',
-        'fecha_nacimiento.required_if' => 'La fecha de nacimiento es obligatoria.',
-        'fecha_nacimiento.before' => 'La fecha de nacimiento debe ser anterior a hoy.',
-        'direccion.required_if' => 'La dirección es obligatoria.',
-        'direccion.max' => 'La dirección no debe exceder 300 caracteres.',
-        'telefono.required_if' => 'El teléfono es obligatorio.',
-        'telefono.max' => 'El teléfono no debe exceder 8 caracteres.',
-        'correo.email' => 'El correo debe ser una dirección válida.',
-        'correo.max' => 'El correo no debe exceder 50 caracteres.',
-        'genero.required_if' => 'El género es obligatorio.',
-        
-        // Mensajes para datos obstétricos
-        'fecha_ultima_menstruacion.required' => 'La fecha de última menstruación es obligatoria.',
-        'fecha_ultima_menstruacion.before_or_equal' => 'La fecha de última menstruación no puede ser futura.',
-        'fecha_probable_parto.required' => 'La fecha probable de parto es obligatoria.',
-        'fecha_probable_parto.after' => 'La fecha probable de parto debe ser posterior a la fecha de última menstruación.',
-        'semanas_gestacion.required' => 'Las semanas de gestación son obligatorias.',
-        'semanas_gestacion.min' => 'Las semanas de gestación no pueden ser negativas.',
-        'semanas_gestacion.max' => 'Las semanas de gestación no pueden exceder 42.',
-        'numero_gestaciones.required' => 'El número de gestaciones es obligatorio.',
-        'numero_gestaciones.min' => 'El número de gestaciones debe ser al menos 1.',
-        'numero_gestaciones.max' => 'El número de gestaciones no puede exceder 20.',
-        'numero_partos.required' => 'El número de partos es obligatorio.',
-        'numero_partos.min' => 'El número de partos no puede ser negativo.',
-        'numero_partos.max' => 'El número de partos no puede exceder 20.',
-        'numero_abortos.required' => 'El número de abortos es obligatorio.',
-        'numero_abortos.min' => 'El número de abortos no puede ser negativo.',
-        'numero_abortos.max' => 'El número de abortos no puede exceder 20.',
-        'numero_hijos_vivos.required' => 'El número de hijos vivos es obligatorio.',
-        'numero_hijos_vivos.min' => 'El número de hijos vivos no puede ser negativo.',
-        'numero_hijos_vivos.max' => 'El número de hijos vivos no puede exceder 20.',
-        
-        // Mensajes para control prenatal
-        'fecha_control.required' => 'La fecha del control es obligatoria.',
-        'fecha_control.before_or_equal' => 'La fecha del control no puede ser futura.',
-        'presion_arterial.required' => 'La presión arterial es obligatoria.',
-        'presion_arterial.regex' => 'La presión arterial debe tener el formato correcto (ejemplo: 120/80).',
-        'frecuencia_cardiaca_materna.required' => 'La frecuencia cardíaca materna es obligatoria.',
-        'frecuencia_cardiaca_materna.min' => 'La frecuencia cardíaca materna debe ser al menos 40 lpm.',
-        'frecuencia_cardiaca_materna.max' => 'La frecuencia cardíaca materna no puede exceder 200 lpm.',
-        'temperatura.required' => 'La temperatura es obligatoria.',
-        'temperatura.min' => 'La temperatura debe ser al menos 35°C.',
-        'temperatura.max' => 'La temperatura no puede exceder 42°C.',
-        'peso_actual.required' => 'El peso actual es obligatorio.',
-        'peso_actual.min' => 'El peso debe ser al menos 30 kg.',
-        'peso_actual.max' => 'El peso no puede exceder 200 kg.',
-        'altura_uterina.min' => 'La altura uterina no puede ser negativa.',
-        'altura_uterina.max' => 'La altura uterina no puede exceder 50 cm.',
-        'latidos_fetales.min' => 'Los latidos fetales deben ser al menos 100 lpm.',
-        'latidos_fetales.max' => 'Los latidos fetales no pueden exceder 180 lpm.',
-        'edema.required' => 'El nivel de edema es obligatorio.',
-        'edema.in' => 'El nivel de edema seleccionado no es válido.',
-        'presentacion_fetal.in' => 'La presentación fetal seleccionada no es válida.',
-        'fecha_proxima_cita.after' => 'La fecha de próxima cita debe ser posterior a la fecha del control.',
-    ]);
-
-    // Si no se seleccionó paciente existente, crear uno nuevo
-    if (!$request->paciente_existente) {
-        $paciente = Paciente::create([
-            'nombre' => $validated['nombre'],
-            'apellidos' => $validated['apellidos'],
-            'identidad' => $validated['identidad'],
-            'fecha_nacimiento' => $validated['fecha_nacimiento'],
-            'direccion' => $validated['direccion'],
-            'telefono' => $validated['telefono'],
-            'correo' => $validated['correo'] ?? null,
-            'tipo_sangre' => $validated['tipo_sangre'] ?? null,
-            'genero' => $validated['genero'],
-            'padecimientos' => $validated['padecimientos'] ?? '',
-            'medicamentos' => $validated['medicamentos'] ?? '',
-            'historial_clinico' => $validated['historial_clinico'] ?? '',
-            'alergias' => $validated['alergias'] ?? '',
-            'historial_quirurgico' => $validated['historial_quirurgico'] ?? null,
+    {
+        $validated = $request->validate([
+            // Paciente (nuevo o existente)
+            'paciente_existente' => 'nullable|exists:pacientes,id',
+            'nombre' => 'required_if:paciente_existente,null|string|max:50',
+            'apellidos' => 'required_if:paciente_existente,null|string|max:50',
+            'identidad' => 'required_if:paciente_existente,null|string|max:13|unique:pacientes,identidad',
+            'fecha_nacimiento' => 'required_if:paciente_existente,null|date|before:today',
+            'direccion' => 'required_if:paciente_existente,null|string|max:300',
+            'telefono' => 'required_if:paciente_existente,null|string|max:8|regex:/^[2389]\d{7}$/',
+            'correo' => 'nullable|email|max:50',
+            'tipo_sangre' => 'nullable|string|max:3',
+            'genero' => 'required_if:paciente_existente,null|string|max:10',
+            'padecimientos' => 'nullable|string|max:200',
+            'medicamentos' => 'nullable|string|max:200',
+            'historial_clinico' => 'nullable|string|max:200',
+            'alergias' => 'nullable|string|max:200',
+            'historial_quirurgico' => 'nullable|string|max:200',
+            
+            // Datos obstétricos
+            'fecha_ultima_menstruacion' => 'required|date|before_or_equal:today',
+            'fecha_probable_parto' => 'required|date|after:fecha_ultima_menstruacion',
+            'semanas_gestacion' => 'required|integer|min:0|max:42',
+            'numero_gestaciones' => 'required|integer|min:1|max:20',
+            'numero_partos' => 'required|integer|min:0|max:20',
+            'numero_abortos' => 'required|integer|min:0|max:20',
+            'numero_hijos_vivos' => 'required|integer|min:0|max:20',
+            'tipo_partos_anteriores' => 'nullable|string|max:255',
+            'complicaciones_previas' => 'nullable|string',
+            
+            // Antecedentes médicos
+            'enfermedades_cronicas' => 'nullable|string',
+            'alergias_control' => 'nullable|string',
+            'cirugias_previas' => 'nullable|string',
+            'medicamentos_actuales' => 'nullable|string',
+            'habitos' => 'nullable|string',
+            'antecedentes_familiares' => 'nullable|string',
+            
+            // Datos del control prenatal actual
+            'fecha_control' => 'required|date|before_or_equal:today',
+            'presion_arterial' => 'required|string|regex:/^\d{2,3}\/\d{2,3}$/',
+            'frecuencia_cardiaca_materna' => 'required|integer|min:40|max:200',
+            'temperatura' => 'required|numeric|min:35|max:42',
+            'peso_actual' => 'required|numeric|min:30|max:200',
+            'altura_uterina' => 'nullable|numeric|min:0|max:50',
+            'latidos_fetales' => 'nullable|integer|min:100|max:180',
+            'movimientos_fetales' => 'nullable|string|max:100',
+            'edema' => 'required|in:ninguno,leve,moderado,severo',
+            'presentacion_fetal' => 'nullable|in:cefalica,podalica,transversa,no_determinada',
+            'resultados_examenes' => 'nullable|string',
+            'observaciones' => 'nullable|string',
+            
+            // Tratamientos y recomendaciones
+            'suplementos' => 'nullable|string',
+            'vacunas_aplicadas' => 'nullable|string',
+            'indicaciones_medicas' => 'nullable|string',
+            'fecha_proxima_cita' => 'nullable|date|after:fecha_control',
+        ], [
+            // Mensajes personalizados para paciente
+            'nombre.required_if' => 'El nombre es obligatorio.',
+            'nombre.max' => 'El nombre no debe exceder 50 caracteres.',
+            'apellidos.required_if' => 'Los apellidos son obligatorios.',
+            'apellidos.max' => 'Los apellidos no deben exceder 50 caracteres.',
+            'identidad.required_if' => 'La identidad es obligatoria.',
+            'identidad.max' => 'La identidad no debe exceder 13 caracteres.',
+            'identidad.unique' => 'Esta identidad ya está registrada.',
+            'fecha_nacimiento.required_if' => 'La fecha de nacimiento es obligatoria.',
+            'fecha_nacimiento.before' => 'La fecha de nacimiento debe ser anterior a hoy.',
+            'direccion.required_if' => 'La dirección es obligatoria.',
+            'direccion.max' => 'La dirección no debe exceder 300 caracteres.',
+            'telefono.required_if' => 'El teléfono es obligatorio.',
+            'telefono.max' => 'El teléfono no debe exceder 8 caracteres.',
+            'telefono.regex' => 'El teléfono debe iniciar con 2, 3, 8 o 9 y tener 8 dígitos.',
+            'correo.email' => 'El correo debe ser una dirección válida.',
+            'correo.max' => 'El correo no debe exceder 50 caracteres.',
+            'genero.required_if' => 'El género es obligatorio.',
+            
+            // Mensajes para datos obstétricos
+            'fecha_ultima_menstruacion.required' => 'La fecha de última menstruación es obligatoria.',
+            'fecha_ultima_menstruacion.before_or_equal' => 'La fecha de última menstruación no puede ser futura.',
+            'fecha_probable_parto.required' => 'La fecha probable de parto es obligatoria.',
+            'fecha_probable_parto.after' => 'La fecha probable de parto debe ser posterior a la fecha de última menstruación.',
+            'semanas_gestacion.required' => 'Las semanas de gestación son obligatorias.',
+            'semanas_gestacion.min' => 'Las semanas de gestación no pueden ser negativas.',
+            'semanas_gestacion.max' => 'Las semanas de gestación no pueden exceder 42.',
+            'numero_gestaciones.required' => 'El número de gestaciones es obligatorio.',
+            'numero_gestaciones.min' => 'El número de gestaciones debe ser al menos 1.',
+            'numero_gestaciones.max' => 'El número de gestaciones no puede exceder 20.',
+            'numero_partos.required' => 'El número de partos es obligatorio.',
+            'numero_partos.min' => 'El número de partos no puede ser negativo.',
+            'numero_partos.max' => 'El número de partos no puede exceder 20.',
+            'numero_abortos.required' => 'El número de abortos es obligatorio.',
+            'numero_abortos.min' => 'El número de abortos no puede ser negativo.',
+            'numero_abortos.max' => 'El número de abortos no puede exceder 20.',
+            'numero_hijos_vivos.required' => 'El número de hijos vivos es obligatorio.',
+            'numero_hijos_vivos.min' => 'El número de hijos vivos no puede ser negativo.',
+            'numero_hijos_vivos.max' => 'El número de hijos vivos no puede exceder 20.',
+            
+            // Mensajes para control prenatal
+            'fecha_control.required' => 'La fecha del control es obligatoria.',
+            'fecha_control.before_or_equal' => 'La fecha del control no puede ser futura.',
+            'presion_arterial.required' => 'La presión arterial es obligatoria.',
+            'presion_arterial.regex' => 'La presión arterial debe tener el formato correcto (ejemplo: 120/80).',
+            'frecuencia_cardiaca_materna.required' => 'La frecuencia cardíaca materna es obligatoria.',
+            'frecuencia_cardiaca_materna.min' => 'La frecuencia cardíaca materna debe ser al menos 40 lpm.',
+            'frecuencia_cardiaca_materna.max' => 'La frecuencia cardíaca materna no puede exceder 200 lpm.',
+            'temperatura.required' => 'La temperatura es obligatoria.',
+            'temperatura.min' => 'La temperatura debe ser al menos 35°C.',
+            'temperatura.max' => 'La temperatura no puede exceder 42°C.',
+            'peso_actual.required' => 'El peso actual es obligatorio.',
+            'peso_actual.min' => 'El peso debe ser al menos 30 kg.',
+            'peso_actual.max' => 'El peso no puede exceder 200 kg.',
+            'altura_uterina.min' => 'La altura uterina no puede ser negativa.',
+            'altura_uterina.max' => 'La altura uterina no puede exceder 50 cm.',
+            'latidos_fetales.min' => 'Los latidos fetales deben ser al menos 100 lpm.',
+            'latidos_fetales.max' => 'Los latidos fetales no pueden exceder 180 lpm.',
+            'edema.required' => 'El nivel de edema es obligatorio.',
+            'edema.in' => 'El nivel de edema seleccionado no es válido.',
+            'presentacion_fetal.in' => 'La presentación fetal seleccionada no es válida.',
+            'fecha_proxima_cita.after' => 'La fecha de próxima cita debe ser posterior a la fecha del control.',
         ]);
-        $paciente_id = $paciente->id;
-    } else {
-        $paciente_id = $request->paciente_existente;
+
+        // Si no se seleccionó paciente existente, crear uno nuevo
+        if (!$request->paciente_existente) {
+            $paciente = Paciente::create([
+                'nombre' => $validated['nombre'],
+                'apellidos' => $validated['apellidos'],
+                'identidad' => $validated['identidad'],
+                'fecha_nacimiento' => $validated['fecha_nacimiento'],
+                'direccion' => $validated['direccion'],
+                'telefono' => $validated['telefono'],
+                'correo' => $validated['correo'] ?? null,
+                'tipo_sangre' => $validated['tipo_sangre'] ?? null,
+                'genero' => $validated['genero'],
+                'padecimientos' => $validated['padecimientos'] ?? '',
+                'medicamentos' => $validated['medicamentos'] ?? '',
+                'historial_clinico' => $validated['historial_clinico'] ?? '',
+                'alergias' => $validated['alergias'] ?? '',
+                'historial_quirurgico' => $validated['historial_quirurgico'] ?? null,
+            ]);
+            $paciente_id = $paciente->id;
+        } else {
+            $paciente_id = $request->paciente_existente;
+        }
+
+        // Crear control prenatal
+        $validated['paciente_id'] = $paciente_id;
+        
+        // Remover campos de paciente del array validated
+        unset(
+            $validated['paciente_existente'], 
+            $validated['nombre'], 
+            $validated['apellidos'],
+            $validated['identidad'], 
+            $validated['fecha_nacimiento'], 
+            $validated['direccion'], 
+            $validated['telefono'], 
+            $validated['correo'],
+            $validated['tipo_sangre'],
+            $validated['genero'],
+            $validated['padecimientos'],
+            $validated['medicamentos'],
+            $validated['historial_clinico'],
+            $validated['alergias'],
+            $validated['historial_quirurgico']
+        );
+
+        ControlPrenatal::create($validated);
+
+        return redirect()->route('controles-prenatales.index')
+            ->with('success', 'Control prenatal registrado exitosamente.');
     }
-
-    // Crear control prenatal
-    $validated['paciente_id'] = $paciente_id;
-    
-    // Remover campos de paciente del array validated
-    unset(
-        $validated['paciente_existente'], 
-        $validated['nombre'], 
-        $validated['apellidos'],
-        $validated['identidad'], 
-        $validated['fecha_nacimiento'], 
-        $validated['direccion'], 
-        $validated['telefono'], 
-        $validated['correo'],
-        $validated['tipo_sangre'],
-        $validated['genero'],
-        $validated['padecimientos'],
-        $validated['medicamentos'],
-        $validated['historial_clinico'],
-        $validated['alergias'],
-        $validated['historial_quirurgico']
-    );
-
-    ControlPrenatal::create($validated);
-
-    return redirect()->route('controles-prenatales.index')
-        ->with('success', 'Control prenatal registrado exitosamente.');
-}
 
     public function show(ControlPrenatal $controlPrenatal)
     {
         $controlPrenatal->load('paciente');
-        return view('controlPrenatal.show', compact('controlPrenatal')); // Cambiado
+        return view('controlPrenatal.show', compact('controlPrenatal'));
     }
 
     public function edit(ControlPrenatal $controlPrenatal)
     {
         $pacientes = Paciente::orderBy('nombre')->orderBy('apellidos')->get();
-        return view('controlPrenatal.edit', compact('controlPrenatal', 'pacientes')); // Cambiado
+        return view('controlPrenatal.edit', compact('controlPrenatal', 'pacientes'));
     }
 
     public function update(Request $request, ControlPrenatal $controlPrenatal)

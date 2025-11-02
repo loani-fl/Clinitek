@@ -310,7 +310,6 @@ Route::post('/inventario/generar-codigo', [InventarioController::class, 'generar
     ->name('inventario.generarCodigo');
 
 
-<<<<<<< HEAD
 
     use App\Http\Controllers\ControlPrenatalController;
     
@@ -326,8 +325,7 @@ Route::post('/inventario/generar-codigo', [InventarioController::class, 'generar
     Route::put('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'update'])->name('controles-prenatales.update');
     Route::delete('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'destroy'])->name('controles-prenatales.destroy');
     
-    // ... tus otras rutas existentes ...
-=======
+
 Route::post('/sesiones/limpiar-archivo', function(){
     session()->forget('archivo_temporal');
     return response()->json(['ok'=>true]);
@@ -359,4 +357,3 @@ Route::post('/ultrasonidos/guardar-analisis/{id}', [UltrasonidoOrderController::
 
 
     
->>>>>>> 987468748476ae517a111b331f3e3ca5b12d0323

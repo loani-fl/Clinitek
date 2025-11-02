@@ -39,7 +39,6 @@
         .logo-text h1 { color: white; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: 1px; }
         .logo-text p { color: rgba(255, 255, 255, 0.9); font-size: 0.85rem; margin: 0; }
 
-<<<<<<< HEAD
         .logo-image {
             height: 65px;
             width: auto;
@@ -63,8 +62,6 @@
         }
 
         /* Dropdown mejorado */
-=======
->>>>>>> 987468748476ae517a111b331f3e3ca5b12d0323
         .registro-btn {
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid rgba(255, 255, 255, 0.3);
@@ -116,17 +113,12 @@
         .services-wrapper { background: white; border-radius: 30px; padding: 2rem 2rem; box-shadow: 0 10px 40px rgba(0, 74, 173, 0.15); border: 2px solid rgba(0, 74, 173, 0.1); }
 
         /* Grid de servicios */
-<<<<<<< HEAD
         .services-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 1.5rem;
             margin-bottom: 1.5rem;
         }
-=======
-        .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 1.5rem; }
-        .services-grid.second-row { grid-template-columns: repeat(4, 1fr); max-width: 1200px; margin: 0 auto; }
->>>>>>> 987468748476ae517a111b331f3e3ca5b12d0323
 
         .service-card {
             background: linear-gradient(145deg, #f8fbff 0%, #ffffff 100%);
@@ -196,17 +188,10 @@
 
         /* Responsive */
         @media (max-width: 1200px) {
-<<<<<<< HEAD
-            .services-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-=======
             .services-grid { grid-template-columns: repeat(2, 1fr); }
             .services-grid.second-row { grid-template-columns: repeat(2, 1fr); }
->>>>>>> 987468748476ae517a111b331f3e3ca5b12d0323
         }
         @media (max-width: 768px) {
-<<<<<<< HEAD
             .navbar-content {
                 flex-direction: column;
                 gap: 1rem;
@@ -223,12 +208,6 @@
             .services-wrapper {
                 padding: 2rem 1.5rem;
             }
-=======
-            .navbar-content { flex-direction: column; gap: 1rem; }
-            .hero-title { font-size: 2rem; }
-            .services-grid, .services-grid.second-row { grid-template-columns: 1fr; }
-            .services-wrapper { padding: 2rem 1.5rem; }
->>>>>>> 987468748476ae517a111b331f3e3ca5b12d0323
         }
     </style>
 </head>
@@ -243,10 +222,6 @@
                     <p>Sistema de Gestión Médica</p>
                 </div>
             </div>
-<<<<<<< HEAD
-
-=======
->>>>>>> 987468748476ae517a111b331f3e3ca5b12d0323
             <div class="dropdown">
                 <button class="registro-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-grid-3x3-gap-fill"></i> Registros
@@ -284,14 +259,9 @@
                     <article class="service-card"><div class="icon-circle"><i class="bi bi-chat-heart-fill service-icon"></i></div><h3 class="service-title">Psicología</h3><p class="service-desc">Sesiones con expertos y exámenes psicométricos confiables.</p></article>
                 </a>
             </div>
-<<<<<<< HEAD
 
             <!-- Segunda fila - 4 columnas -->
             <div class="services-grid">
-=======
-            <!-- Segunda fila -->
-            <div class="services-grid second-row">
->>>>>>> 987468748476ae517a111b331f3e3ca5b12d0323
                 <a href="{{ route('farmacias.index') }}" style="text-decoration: none; color: inherit;">
                     <article class="service-card"><div class="icon-circle"><i class="bi bi-bag-heart service-icon"></i></div><h3 class="service-title">Farmacia</h3><p class="service-desc">Medicamentos y productos farmacéuticos de alta calidad.</p></article>
                 </a>
