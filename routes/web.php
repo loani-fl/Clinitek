@@ -308,3 +308,21 @@ Route::post('/inventario/verificar-duplicado', [InventarioController::class, 've
 
 Route::post('/inventario/generar-codigo', [InventarioController::class, 'generarCodigo'])
     ->name('inventario.generarCodigo');
+
+
+
+    use App\Http\Controllers\ControlPrenatalController;
+    
+    // Ruta principal de Ginecología (Index/Dashboard)
+    Route::get('/ginecologia', [ControlPrenatalController::class, 'indexGinecologia'])->name('ginecologia.index');
+    
+    // Rutas de Controles Prenatales
+    Route::get('/controles-prenatales', [ControlPrenatalController::class, 'index'])->name('controles-prenatales.index');
+    Route::get('/controles-prenatales/crear', [ControlPrenatalController::class, 'create'])->name('controles-prenatales.create');
+    Route::post('/controles-prenatales', [ControlPrenatalController::class, 'store'])->name('controles-prenatales.store');
+    Route::get('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'show'])->name('controles-prenatales.show');
+    Route::get('/controles-prenatales/{controlPrenatal}/editar', [ControlPrenatalController::class, 'edit'])->name('controles-prenatales.edit');
+    Route::put('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'update'])->name('controles-prenatales.update');
+    Route::delete('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'destroy'])->name('controles-prenatales.destroy');
+    
+    // ... tus otras rutas existentes ...

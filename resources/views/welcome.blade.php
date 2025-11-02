@@ -56,13 +56,12 @@
         }
 
         .logo-image {
-            height: 65px; /* Antes 45px */
+            height: 65px;
             width: auto;
-            max-width: 200px; /* Antes 150px */
+            max-width: 200px;
             object-fit: contain;
             display: block;
         }
-
 
         .logo-text h1 {
             color: white;
@@ -174,12 +173,6 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 1.5rem;
             margin-bottom: 1.5rem;
-        }
-
-        .services-grid.second-row {
-            grid-template-columns: repeat(3, 1fr);
-            max-width: 900px;
-            margin: 0 auto;
         }
 
         .service-card {
@@ -355,9 +348,6 @@
             .services-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-            .services-grid.second-row {
-                grid-template-columns: repeat(2, 1fr);
-            }
         }
 
         @media (max-width: 768px) {
@@ -370,8 +360,7 @@
                 font-size: 2rem;
             }
 
-            .services-grid,
-            .services-grid.second-row {
+            .services-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -386,15 +375,13 @@
     <!-- Navbar superior -->
     <nav class="top-navbar">
         <div class="navbar-content">
-        <div class="logo-section">
-    <img src="{{ asset('images/Barra.png') }}" alt="CLINITEK" class="logo-image">
-    <div class="logo-text">
-        <h1>CLINITEK</h1>
-        <p>Sistema de Gestión Médica</p>
-    </div>
-</div>
-
-
+            <div class="logo-section">
+                <img src="{{ asset('images/Barra.png') }}" alt="CLINITEK" class="logo-image">
+                <div class="logo-text">
+                    <h1>CLINITEK</h1>
+                    <p>Sistema de Gestión Médica</p>
+                </div>
+            </div>
 
             <div class="dropdown">
                 <button class="registro-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -477,8 +464,8 @@
                 </a>
             </div>
 
-            <!-- Segunda fila - 3 columnas centradas -->
-            <div class="services-grid second-row">
+            <!-- Segunda fila - 4 columnas -->
+            <div class="services-grid">
                 <a href="{{ route('farmacias.index') }}" style="text-decoration: none; color: inherit;">
                     <article class="service-card">
                         <div class="icon-circle">
@@ -511,6 +498,18 @@
                         <h3 class="service-title">Inventario</h3>
                         <p class="service-desc">
                             Control completo del inventario y suministros médicos.
+                        </p>
+                    </article>
+                </a>
+
+                <a href="{{ route('ginecologia.index') }}" style="text-decoration: none; color: inherit;">
+                    <article class="service-card">
+                        <div class="icon-circle">
+                            <i class="bi bi-heart-pulse-fill service-icon"></i>
+                        </div>
+                        <h3 class="service-title">Ginecología</h3>
+                        <p class="service-desc">
+                            Control prenatal y atención especializada para la mujer.
                         </p>
                     </article>
                 </a>
