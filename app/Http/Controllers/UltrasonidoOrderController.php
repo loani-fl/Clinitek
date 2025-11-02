@@ -107,10 +107,36 @@ class UltrasonidoOrderController extends Controller
         return view('ultrasonidos.index', compact('ordenes'));
     }
 
- public function show($id)
+// En UltrasonidoOrderController.php
+
+public function show($id)
 {
     $orden = Ultrasonido::with(['paciente', 'medico', 'imagenes'])->findOrFail($id);
-    return view('ultrasonidos.show', compact('orden'));
+    
+    // 1. Mapa de claves a nombres legibles
+    $mapaNombres = [
+        'higado' => 'Ultrasonido Hígado',
+        'vesicula' => 'Ultrasonido Vesícula',
+        'bazo' => 'Ultrasonido Bazo',
+        'vejiga' => 'Ultrasonido Vejiga',
+        'ovarico' => 'Ultrasonido Ovarios',
+        'utero' => 'Ultrasonido Útero',
+        'tiroides' => 'Ultrasonido Tiroides',
+    ];
+
+    // 2. Claves ordenadas para la vista
+    $examenesKeys = $orden->examenes ?? [];
+
+    // 3. Agrupamos las imágenes por la columna 'tipo_examen'
+    $imagenesAgrupadas = $orden->imagenes->groupBy('tipo_examen');
+
+    // 4. Pasamos toda la información necesaria a la vista
+    return view('ultrasonidos.show', compact(
+        'orden', 
+        'mapaNombres', 
+        'examenesKeys', 
+        'imagenesAgrupadas'
+    ));
 }
 
 
@@ -145,9 +171,11 @@ public function analisis($id)
 }
 
 
+// En app/Http/Controllers/UltrasonidoOrderController.php
 
 public function guardarAnalisis(Request $request, $id)
 {
+    // ... (Tu código de validación es correcto, lo omito por brevedad) ...
     $request->validate([
         'medico_id' => 'required|exists:medicos,id',
         'imagenes' => 'required|array',
@@ -158,21 +186,30 @@ public function guardarAnalisis(Request $request, $id)
         'descripciones.*.*' => 'required|string|max:200',
     ], [
         'medico_id.required' => 'Debe seleccionar un médico responsable.',
-        'imagenes.*.*.required' => 'Debe subir una imagen para cada bloque.',
-        'imagenes.*.*.image' => 'El archivo debe ser una imagen.',
-        'imagenes.*.*.mimes' => 'Solo se permiten imágenes JPG, JPEG o PNG.',
-        'imagenes.*.*.max' => 'Cada imagen no debe superar 4 MB.',
-        'descripciones.*.*.required' => 'Debe agregar una descripción para cada imagen.',
+        // ... (El resto de tus mensajes de error) ...
     ]);
 
     $orden = Ultrasonido::findOrFail($id);
     $orden->medico_id = $request->medico_id;
-    $orden->estado = 'completado'; // Opcional: cambiar estado
+    $orden->estado = 'completado';
     $orden->save();
+
+    // 1. OBTENER LAS CLAVES DE EXÁMENES DE LA ORDEN
+    // Esto debería ser un array como ['higado', 'vesicula', 'bazo']
+    $examenesKeys = $orden->examenes ?? []; 
 
     // Procesar imágenes por examen
     if ($request->has('imagenes')) {
+        // $examenIndex es el índice (0, 1, 2...) del grupo de imágenes en el formulario
         foreach ($request->file('imagenes') as $examenIndex => $imagenesExamen) {
+            
+            // 2. Usar el índice para obtener la CLAVE del examen (ej: 'higado')
+            if (!isset($examenesKeys[$examenIndex])) {
+                // Esto podría pasar si el formulario tiene más grupos de campos que exámenes guardados
+                continue; 
+            }
+            $examenKey = $examenesKeys[$examenIndex]; // <-- ¡CLAVE!
+
             foreach ($imagenesExamen as $index => $imagen) {
                 $ruta = $imagen->store('ultrasonidos', 'public');
                 
@@ -181,6 +218,7 @@ public function guardarAnalisis(Request $request, $id)
                 
                 UltrasonidoImagen::create([
                     'ultrasonido_id' => $orden->id,
+                    'tipo_examen' => $examenKey, // <-- ¡LÍNEA MODIFICADA PARA GUARDAR EL TIPO!
                     'ruta' => $ruta,
                     'descripcion' => $descripcion,
                 ]);
@@ -191,7 +229,6 @@ public function guardarAnalisis(Request $request, $id)
     return redirect()->route('ultrasonidos.index')
         ->with('success', 'Análisis de ultrasonido guardado correctamente.');
 }
-
 
 
 }

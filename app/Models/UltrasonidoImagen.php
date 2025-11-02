@@ -10,6 +10,7 @@ class UltrasonidoImagen extends Model
         'ultrasonido_id',
         'ruta',
         'descripcion',
+        'tipo_examen',
     ];
 
     public function ultrasonido()
