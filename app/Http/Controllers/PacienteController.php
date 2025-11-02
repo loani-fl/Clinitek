@@ -441,5 +441,23 @@ public function buscarPaciente(Request $request)
         ], 404);
     }
 }
+public function buscar(Request $request)
+{
+    $busqueda = $request->input('identidad', '');
+    
+    $pacientes = Paciente::where(function($query) use ($busqueda) {
+        $query->where('identidad', 'LIKE', "%{$busqueda}%")
+              ->orWhere('nombre', 'LIKE', "%{$busqueda}%")
+              ->orWhere('apellidos', 'LIKE', "%{$busqueda}%")
+              ->orWhereRaw("CONCAT(nombre, ' ', apellidos) LIKE ?", ["%{$busqueda}%"]);
+    })
+    ->limit(10)
+    ->get();
+    
+    return response()->json([
+        'success' => true,
+        'pacientes' => $pacientes
+    ]);
+}
 
 }
