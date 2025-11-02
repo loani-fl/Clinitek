@@ -97,7 +97,7 @@
     }
     .form-row > div { flex:1 1 220px; }
     
-    #medico_analista_id {
+    #medico_id {
         width: 80%; 
         font-size: 0.85rem;
         padding: 0.3rem 0.5rem;
@@ -121,7 +121,7 @@
         color: #004080;
     }
 
-    /* --- Exámenes --- */
+    /* --- Exámenes (Ultrasonidos) --- */
     .examen-card { 
         margin-bottom:2rem; 
         padding-bottom:0.8rem; 
@@ -195,6 +195,7 @@
         object-fit:contain; 
         border:1px solid #ddd; 
         margin-bottom:0.4rem;
+        display: none;
     }
 
     .input-file-container, .textarea-container { 
@@ -227,6 +228,18 @@
         padding:0.35rem 0.9rem; 
         font-size:0.8rem;
     }
+    .btn {
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
 
     .btn-sm {
         font-size: 0.8rem;
@@ -264,7 +277,7 @@
 </style>
 
 <div class="custom-card">
-    <h2 class="section-title">Análisis de orden rayos x</h2>
+    <h2 class="section-title">Análisis de Ultrasonido</h2>
     <div id="mensaje-dinamico-container"></div>
 
     @if(session('success'))
@@ -286,29 +299,29 @@
     <!-- Datos del paciente -->
     <h4>Datos del paciente:</h4>
     <div class="patient-data-inline">
-        <div><span class="label">Nombres:</span> <span class="underline-field">{{ $orden->paciente->nombre ?? $orden->nombres ?? 'N/A' }}</span></div>
-        <div><span class="label">Apellidos:</span> <span class="underline-field">{{ $orden->paciente->apellidos ?? $orden->apellidos ?? 'N/A' }}</span></div>
-        <div><span class="label">Identidad:</span> <span class="underline-field">{{ $orden->paciente->identidad ?? $orden->identidad ?? 'N/A' }}</span></div>
-        <div><span class="label">Género:</span> <span class="underline-field">{{ $orden->paciente->genero ?? $orden->genero ?? 'N/A' }}</span></div>
+        <div><span class="label">Nombres:</span> <span class="underline-field">{{ $orden->paciente->nombre ?? 'N/A' }}</span></div>
+        <div><span class="label">Apellidos:</span> <span class="underline-field">{{ $orden->paciente->apellidos ?? 'N/A' }}</span></div>
+        <div><span class="label">Identidad:</span> <span class="underline-field">{{ $orden->paciente->identidad ?? 'N/A' }}</span></div>
+        <div><span class="label">Género:</span> <span class="underline-field">{{ $orden->paciente->genero ?? 'N/A' }}</span></div>
     </div>
 
     <!-- Formulario de análisis -->
-    <form action="{{ route('rayosx.storeAnalisis', $orden->id) }}" method="POST" enctype="multipart/form-data" id="form-analisis">
+    <form action="{{ route('ultrasonidos.guardarAnalisis', $orden->id) }}" method="POST" enctype="multipart/form-data" id="form-analisis">
         @csrf
 
         <!-- Fila médico + fecha -->
         <div class="form-row">
             <div>
-                <label for="medico_analista_id" class="form-label medico-label">Médico analista:</label>
-                <select name="medico_analista_id" id="medico_analista_id" class="form-select @error('medico_analista_id') is-invalid @enderror">
-                    <option value="">Seleccionar Médico Analista (Radiológos)</option>
-                    @foreach ($medicosRadiologos as $medico)
-                        <option value="{{ $medico->id }}" {{ (old('medico_analista_id', $orden->medico_analista_id ?? '') == $medico->id) ? 'selected' : '' }}>
+                <label for="medico_id" class="form-label medico-label">Médico responsable:</label>
+                <select name="medico_id" id="medico_id" class="form-select @error('medico_id') is-invalid @enderror">
+                    <option value="">-- Seleccionar Médico --</option>
+                    @foreach($medicos as $medico)
+                        <option value="{{ $medico->id }}" {{ (old('medico_id', $orden->medico_id ?? '') == $medico->id) ? 'selected' : '' }}>
                             {{ $medico->nombre }} {{ $medico->apellidos }}
                         </option>
                     @endforeach
                 </select>
-                @error('medico_analista_id')
+                @error('medico_id')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
@@ -317,46 +330,48 @@
                 <div class="fecha-field">{{ $orden->fecha ?? 'N/A' }}</div>
             </div>
         </div>
-        
-        <h4 class="examen-title">Rayos x ordenados</h4>
 
-        @forelse ($orden->examenes as $examen)
-            @php $bloquesImagenes = $examen->imagenes ?? collect(); @endphp
-            <div class="examen-card">
-                <div class="examen-nombre">
-                    {{ $examenesNombres[$examen->examen_codigo] ?? $examen->examen_codigo }}
-                    <button type="button" class="btn btn-sm btn-success" id="btn-agregar-{{ $examen->id }}" onclick="addImageBlock({{ $examen->id }})">
-                        <i class="bi bi-plus-circle"></i> Agregar imagen
-                    </button>
+        <h4 class="examen-title">Ultrasonidos ordenados</h4>
+
+        <!-- Sección de ultrasonidos con imágenes -->
+        @if(isset($examenesSeleccionados) && $examenesSeleccionados->isNotEmpty())
+            @foreach($examenesSeleccionados as $index => $nombreExamen)
+                <div class="examen-card" data-examen-index="{{ $index }}">
+                    <div class="examen-nombre">
+                        {{ $nombreExamen }}
+                        <button type="button" class="btn btn-sm btn-success" id="btn-agregar-{{ $index }}" onclick="addImageBlock({{ $index }}, '{{ str_replace("'", "\\'", $nombreExamen) }}')">
+                            <i class="bi bi-plus-circle"></i> Agregar imagen
+                        </button>
+                    </div>
+                    <div class="examen-content" id="examen-content-{{ $index }}">
+                        <!-- Los bloques de imágenes se agregarán aquí dinámicamente -->
+                    </div>
                 </div>
-                <div class="examen-content" id="examen-content-{{ $examen->id }}">
-                    @foreach($bloquesImagenes as $i => $bloque)
-                        <div class="image-description-block" data-block-index="{{ $i }}">
-                            <div class="preview-container text-center mb-2">
-                                <img src="{{ asset('storage/'.$bloque->ruta) }}" class="img-preview" alt="Imagen existente">
-                            </div>
-                            <div class="textarea-container mt-2">
-                                <label class="form-label mb-1">Descripción:</label>
-                                <textarea name="descripciones[{{ $examen->id }}][]" class="form-control descripcion-textarea" rows="3" maxlength="200">{{ $bloque->descripcion }}</textarea>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @empty
+            @endforeach
+        @else
             <p class="text-center">No hay exámenes registrados para esta orden.</p>
-        @endforelse
+        @endif
 
-        <div class="btn-group mt-4">
-            <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-save"></i> Guardar análisis</button>
-            <a href="{{ route('rayosx.index') }}" class="btn btn-success btn-sm">
-                <i class="bi bi-arrow-left-circle"></i> Volver
+<!-- Botones de acción con estilo uniforme -->
+        <div class="d-flex justify-content-center gap-3 mt-4 w-100">
+            <button type="submit" class="btn btn-primary px-4 py-2 d-flex align-items-center gap-2 shadow-sm">
+                <i class="bi bi-save"></i>
+                <span>Guardar análisis</span>
+            </button>
+
+            <a href="{{ route('ultrasonidos.index') }}" class="btn btn-success px-4 py-2 d-flex align-items-center gap-2 shadow-sm">
+                <i class="bi bi-arrow-left"></i>
+                <span>Regresar</span>
             </a>
         </div>
+
     </form>
 </div>
 
 <script>
+// Contador global para índices únicos de imágenes por examen
+let imageCounters = {};
+
 // Mostrar mensajes dinámicos con scroll a la página
 function mostrarMensaje(mensaje, tipo='error') {
     const container = document.getElementById('mensaje-dinamico-container');
@@ -410,6 +425,7 @@ function previewImage(event, examenIdIndex) {
     if(input.files && input.files[0]){
         const file = input.files[0];
         const ext = file.name.split('.').pop().toLowerCase();
+        
         if(!['jpg','jpeg','png'].includes(ext)){
             msgError = document.createElement('div');
             msgError.className = 'mensaje-error-imagen';
@@ -420,6 +436,18 @@ function previewImage(event, examenIdIndex) {
             preview.style.display='none';
             return;
         }
+        
+        if(file.size > 4 * 1024 * 1024){
+            msgError = document.createElement('div');
+            msgError.className = 'mensaje-error-imagen';
+            msgError.textContent = 'La imagen no debe superar 4 MB.';
+            bloque.insertBefore(msgError, bloque.firstChild);
+            input.value = '';
+            preview.src='#';
+            preview.style.display='none';
+            return;
+        }
+        
         const reader = new FileReader();
         reader.onload = function(e){ 
             preview.src=e.target.result; 
@@ -432,18 +460,21 @@ function previewImage(event, examenIdIndex) {
     }
 }
 
-// Agregar bloque de imagen con X
-function addImageBlock(examenId){
+// Agregar bloque de imagen para un ultrasonido específico
+function addImageBlock(examenId, nombreExamen){
     const container = document.getElementById('examen-content-'+examenId);
     if(!container) return;
+    
     const blocks = container.querySelectorAll('.image-description-block');
     if(blocks.length >= 3){ 
         document.getElementById('btn-agregar-'+examenId).disabled=true; 
-        mostrarMensaje('Máximo 3 imágenes por examen.', 'info'); 
+        mostrarMensaje('Máximo 3 imágenes por ultrasonido.', 'info'); 
         return; 
     }
 
-    const index = blocks.length;
+    if(!imageCounters[examenId]) imageCounters[examenId] = 0;
+    const index = imageCounters[examenId]++;
+    
     const blockDiv = document.createElement('div'); 
     blockDiv.className='image-description-block'; 
     blockDiv.setAttribute('data-block-index', index);
@@ -452,7 +483,7 @@ function addImageBlock(examenId){
     removeBtn.type='button';
     removeBtn.className='remove-block';
     removeBtn.innerHTML='X';
-    removeBtn.onclick = function(){ removeBlock(removeBtn); };
+    removeBtn.onclick = function(){ removeBlock(removeBtn, examenId); };
     blockDiv.appendChild(removeBtn);
 
     const previewDiv=document.createElement('div'); 
@@ -460,7 +491,6 @@ function addImageBlock(examenId){
     const imgPreview=document.createElement('img'); 
     imgPreview.id=`preview_${examenId}_${index}`; 
     imgPreview.className='img-preview'; 
-    imgPreview.style.display='none'; 
     imgPreview.alt='Vista previa de imagen';
 
     const inputFileDiv=document.createElement('div'); 
@@ -499,41 +529,24 @@ function addImageBlock(examenId){
 }
 
 // Eliminar bloque y actualizar límite
-function removeBlock(button){
+function removeBlock(button, examenId){
     const block = button.closest('.image-description-block');
     if(block){
         const examenContent = block.closest('.examen-content');
         block.remove();
-        const addBtn = document.getElementById('btn-agregar-'+examenContent.id.replace('examen-content-',''));
+        const addBtn = document.getElementById('btn-agregar-'+examenId);
         if(addBtn && examenContent.querySelectorAll('.image-description-block').length < 3){
             addBtn.disabled = false;
         }
     }
 }
 
-// Inicializar bloques automáticamente al cargar la página
-document.addEventListener('DOMContentLoaded', function(){
-    const examenes=@json($orden->examenes->pluck('id'));
-    examenes.forEach(examenId=>{
-        const container=document.getElementById('examen-content-'+examenId);
-        if(container){
-            const bloquesExistentes = container.querySelectorAll('.image-description-block');
-            if(bloquesExistentes.length === 0){
-                addImageBlock(examenId);
-            }
-            if(container.querySelectorAll('.image-description-block').length >= 3){
-                document.getElementById('btn-agregar-'+examenId).disabled=true;
-            }
-        }
-    });
-});
-
 // Validaciones al enviar formulario
 document.getElementById('form-analisis').addEventListener('submit', function(event){
-    const medicoAnalista = this.querySelector('#medico_analista_id');
-    if(!medicoAnalista.value){ 
-        mostrarMensaje('El médico analista es obligatorio.', 'error'); 
-        medicoAnalista.focus();
+    const medico = this.querySelector('#medico_id');
+    if(!medico.value){ 
+        mostrarMensaje('El médico responsable es obligatorio.', 'error'); 
+        medico.focus();
         event.preventDefault();
         return;
     }
@@ -546,7 +559,7 @@ document.getElementById('form-analisis').addEventListener('submit', function(eve
         const bloques = card.querySelectorAll('.image-description-block');
 
         if(bloques.length === 0){
-            mostrarMensaje(`Debes agregar al menos un bloque para el examen "${nombreExamen}".`, 'error');
+            mostrarMensaje(`Debes agregar al menos un bloque para el ultrasonido "${nombreExamen}".`, 'error');
             event.preventDefault();
             return;
         }
@@ -557,7 +570,7 @@ document.getElementById('form-analisis').addEventListener('submit', function(eve
             const textarea = bloque.querySelector('textarea');
 
             if(!fileInput || fileInput.files.length===0){
-                mostrarMensaje(`Falta imagen en el bloque ${j+1} del examen "${nombreExamen}".`, 'error'); 
+                mostrarMensaje(`Falta imagen en el bloque ${j+1} del ultrasonido "${nombreExamen}".`, 'error'); 
                 if(fileInput) fileInput.focus();
                 event.preventDefault();
                 return;
@@ -571,13 +584,23 @@ document.getElementById('form-analisis').addEventListener('submit', function(eve
             }
 
             if(!textarea.value.trim()){
-                mostrarMensaje(`Falta descripción en el bloque ${j+1} del examen "${nombreExamen}".`, 'error'); 
+                mostrarMensaje(`Falta descripción en el bloque ${j+1} del ultrasonido "${nombreExamen}".`, 'error'); 
                 textarea.focus();
                 event.preventDefault();
                 return;
             }
         }
     }
+});
+
+// Inicializar con un bloque por cada ultrasonido al cargar
+document.addEventListener('DOMContentLoaded', function(){
+    const contenedores = document.querySelectorAll('.examen-content');
+    contenedores.forEach((container) => {
+        const examenId = container.id.replace('examen-content-', '');
+        const nombreExamen = container.parentElement.querySelector('.examen-nombre').childNodes[0].textContent.trim();
+        addImageBlock(parseInt(examenId), nombreExamen);
+    });
 });
 </script>
 

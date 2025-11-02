@@ -12,6 +12,8 @@ use App\Models\UltrasonidoVejiga;
 use App\Models\UltrasonidoOvarico;
 use App\Models\UltrasonidoUtero;
 use App\Models\UltrasonidoTiroides;
+use App\Models\Medico;
+use App\Models\UltrasonidoImagen;
 
 class UltrasonidoOrderController extends Controller
 {
@@ -53,11 +55,13 @@ class UltrasonidoOrderController extends Controller
 
         $total = array_sum(array_map(fn($ex) => $precios[$ex], $request->examenes));
 
-        $ultrasonido = Ultrasonido::create([
-            'paciente_id' => $request->paciente_id,
-            'fecha' => $request->fecha,
-            'total' => $total,
-        ]);
+       $ultrasonido = Ultrasonido::create([
+    'paciente_id' => $request->paciente_id,
+    'fecha' => $request->fecha,
+    'total' => $total,
+    'examenes' => $request->examenes, // ✅ Guarda los exámenes seleccionados
+]);
+
 
         foreach ($request->examenes as $examen) {
             $model = match($examen) {
@@ -103,9 +107,91 @@ class UltrasonidoOrderController extends Controller
         return view('ultrasonidos.index', compact('ordenes'));
     }
 
-    public function show(Ultrasonido $ultrasonido)
+ public function show($id)
 {
-    return view('ultrasonidos.show', compact('ultrasonido'));
+    $orden = Ultrasonido::with(['paciente', 'medico', 'imagenes'])->findOrFail($id);
+    return view('ultrasonidos.show', compact('orden'));
 }
+
+
+
+
+public function analisis($id)
+{
+    $orden = Ultrasonido::with([
+        'paciente',
+        'imagenes',
+        'medico'
+    ])->findOrFail($id);
+
+    // Solo mostrar médicos de Ginecología
+    $medicos = Medico::where('especialidad', 'Ginecología')->get();
+
+    // Mapear claves a nombres legibles
+    $mapaNombres = [
+        'higado' => 'Ultrasonido Hígado',
+        'vesicula' => 'Ultrasonido Vesícula',
+        'bazo' => 'Ultrasonido Bazo',
+        'vejiga' => 'Ultrasonido Vejiga',
+        'ovarico' => 'Ultrasonido Ovarios',
+        'utero' => 'Ultrasonido Útero',
+        'tiroides' => 'Ultrasonido Tiroides',
+    ];
+
+    $examenesSeleccionados = collect($orden->examenes ?? [])
+        ->map(fn($ex) => $mapaNombres[$ex] ?? $ex);
+
+    return view('ultrasonidos.analisis', compact('orden', 'medicos', 'examenesSeleccionados'));
+}
+
+
+
+public function guardarAnalisis(Request $request, $id)
+{
+    $request->validate([
+        'medico_id' => 'required|exists:medicos,id',
+        'imagenes' => 'required|array',
+        'imagenes.*' => 'required|array',
+        'imagenes.*.*' => 'required|image|mimes:jpg,jpeg,png|max:4096',
+        'descripciones' => 'required|array',
+        'descripciones.*' => 'required|array',
+        'descripciones.*.*' => 'required|string|max:200',
+    ], [
+        'medico_id.required' => 'Debe seleccionar un médico responsable.',
+        'imagenes.*.*.required' => 'Debe subir una imagen para cada bloque.',
+        'imagenes.*.*.image' => 'El archivo debe ser una imagen.',
+        'imagenes.*.*.mimes' => 'Solo se permiten imágenes JPG, JPEG o PNG.',
+        'imagenes.*.*.max' => 'Cada imagen no debe superar 4 MB.',
+        'descripciones.*.*.required' => 'Debe agregar una descripción para cada imagen.',
+    ]);
+
+    $orden = Ultrasonido::findOrFail($id);
+    $orden->medico_id = $request->medico_id;
+    $orden->estado = 'completado'; // Opcional: cambiar estado
+    $orden->save();
+
+    // Procesar imágenes por examen
+    if ($request->has('imagenes')) {
+        foreach ($request->file('imagenes') as $examenIndex => $imagenesExamen) {
+            foreach ($imagenesExamen as $index => $imagen) {
+                $ruta = $imagen->store('ultrasonidos', 'public');
+                
+                // Obtener la descripción correspondiente
+                $descripcion = $request->descripciones[$examenIndex][$index] ?? '';
+                
+                UltrasonidoImagen::create([
+                    'ultrasonido_id' => $orden->id,
+                    'ruta' => $ruta,
+                    'descripcion' => $descripcion,
+                ]);
+            }
+        }
+    }
+
+    return redirect()->route('ultrasonidos.index')
+        ->with('success', 'Análisis de ultrasonido guardado correctamente.');
+}
+
+
 
 }

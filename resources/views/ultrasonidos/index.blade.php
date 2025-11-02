@@ -238,9 +238,20 @@
                                 @endif
                             </td>
                             <td>
-                                <a href="{{ route('ultrasonidos.show', $orden->id) }}" class="btn btn-sm btn-info">
-                                    <i class="bi bi-eye"></i>
-                                </a>
+                                <!-- Analizar orden de ultrasonido -->
+<a href="{{ route('ultrasonidos.analisis', $orden->id) }}" 
+   class="btn btn-sm btn-outline-success" 
+   title="Analizar orden">
+    <i class="bi bi-clipboard-data"></i>
+</a>
+
+<!-- Ver detalles de ultrasonido -->
+<a href="{{ route('ultrasonidos.show', $orden->id) }}" 
+   class="btn btn-sm btn-outline-info me-2" 
+   title="Ver detalles">
+    <i class="bi bi-eye"></i>
+</a>
+
                             </td>
                         </tr>
                     @empty

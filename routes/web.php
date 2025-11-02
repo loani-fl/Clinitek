@@ -325,3 +325,19 @@ Route::prefix('ultrasonidos')->name('ultrasonidos.')->group(function() {
     Route::get('/{ultrasonido}', [UltrasonidoOrderController::class, 'show'])->name('show');
 
 });
+Route::get('/ultrasonidos/analisis/{id}', [UltrasonidoOrderController::class, 'analisis'])
+     ->name('ultrasonidos.analisis');
+
+
+// Guardar el análisis
+Route::post('/ultrasonidos/analisis/{id}', [UltrasonidoOrderController::class, 'storeAnalisis'])
+    ->name('ultrasonidos.storeAnalisis');
+
+    Route::get('/ultrasonidos/analisis/{id}', [UltrasonidoOrderController::class, 'analisis'])
+    ->name('ultrasonidos.analisis');
+
+Route::post('/ultrasonidos/guardar-analisis/{id}', [UltrasonidoOrderController::class, 'guardarAnalisis'])
+    ->name('ultrasonidos.guardarAnalisis');
+
+
+    
