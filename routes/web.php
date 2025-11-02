@@ -310,6 +310,7 @@ Route::post('/inventario/generar-codigo', [InventarioController::class, 'generar
     ->name('inventario.generarCodigo');
 
 
+<<<<<<< HEAD
 
     use App\Http\Controllers\ControlPrenatalController;
     
@@ -326,3 +327,36 @@ Route::post('/inventario/generar-codigo', [InventarioController::class, 'generar
     Route::delete('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'destroy'])->name('controles-prenatales.destroy');
     
     // ... tus otras rutas existentes ...
+=======
+Route::post('/sesiones/limpiar-archivo', function(){
+    session()->forget('archivo_temporal');
+    return response()->json(['ok'=>true]);
+})->name('sesiones.limpiarArchivo');
+
+
+//ultrasonidos
+use App\Http\Controllers\UltrasonidoOrderController;
+Route::prefix('ultrasonidos')->name('ultrasonidos.')->group(function() {
+    Route::get('/', [UltrasonidoOrderController::class, 'index'])->name('index');
+    Route::get('/create', [UltrasonidoOrderController::class, 'create'])->name('create');
+    Route::post('/', [UltrasonidoOrderController::class, 'store'])->name('store');
+    Route::get('/{ultrasonido}', [UltrasonidoOrderController::class, 'show'])->name('show');
+
+});
+Route::get('/ultrasonidos/analisis/{id}', [UltrasonidoOrderController::class, 'analisis'])
+     ->name('ultrasonidos.analisis');
+
+
+// Guardar el análisis
+Route::post('/ultrasonidos/analisis/{id}', [UltrasonidoOrderController::class, 'storeAnalisis'])
+    ->name('ultrasonidos.storeAnalisis');
+
+    Route::get('/ultrasonidos/analisis/{id}', [UltrasonidoOrderController::class, 'analisis'])
+    ->name('ultrasonidos.analisis');
+
+Route::post('/ultrasonidos/guardar-analisis/{id}', [UltrasonidoOrderController::class, 'guardarAnalisis'])
+    ->name('ultrasonidos.guardarAnalisis');
+
+
+    
+>>>>>>> 987468748476ae517a111b331f3e3ca5b12d0323

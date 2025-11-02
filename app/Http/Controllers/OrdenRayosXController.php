@@ -264,7 +264,7 @@ class OrdenRayosXController extends Controller
     {
         $request->validate([
             'paciente_id' => ['required', 'exists:pacientes,id'],
-            'fecha' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:2025-10-31'],
+            'fecha' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:2025-12-15'],
             'examenes' => ['required', 'array', 'min:1', 'max:10'],
             'examenes.*' => ['string'],
             'imagenes.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],

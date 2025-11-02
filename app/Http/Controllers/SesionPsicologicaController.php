@@ -158,25 +158,12 @@ class SesionPsicologicaController extends Controller
 
         ]);
 
-
-// Guardar archivo definitivo
-        if (session('archivo_temporal')) {
-            $tempPath = session('archivo_temporal');
-            $finalPath = 'archivos_sesiones/' . basename($tempPath);
-            \Storage::disk('public')->move($tempPath, $finalPath);
-            $rutaArchivo = $finalPath;
-            session()->forget('archivo_temporal');
-        } else {
-            $rutaArchivo = null; // <-- Definirlo aunque no haya archivo
-        }
-
-        // 4️⃣ Validaciones adicionales de fecha y hora
+        // 3️⃣ Validaciones adicionales de fecha y hora
         $fecha = Carbon::parse($request->fecha);
         $horaInicio = Carbon::parse($fecha->format('Y-m-d') . ' ' . $request->hora_inicio);
         $horaFin = Carbon::parse($fecha->format('Y-m-d') . ' ' . $request->hora_fin);
         $ahora = Carbon::now();
 
-        // Fecha: no futura y máximo una semana atrás
         if ($fecha->gt($ahora->copy()->startOfDay())) {
             return back()->withErrors(['fecha' => 'La fecha no puede ser futura.'])->withInput();
         }
@@ -185,7 +172,6 @@ class SesionPsicologicaController extends Controller
             return back()->withErrors(['fecha' => 'Solo se permiten fechas de hasta una semana atrás.'])->withInput();
         }
 
-        // Hora: si la fecha es hoy, no permitir horas futuras
         if ($fecha->isSameDay($ahora)) {
             if ($horaInicio->gt($ahora)) {
                 return back()->withErrors(['hora_inicio' => 'La hora de inicio no puede ser posterior a la hora actual.'])->withInput();
@@ -196,10 +182,21 @@ class SesionPsicologicaController extends Controller
             }
         }
 
+        // 4️⃣ Guardar archivo definitivo si existe temporal
+        if (session('archivo_temporal')) {
+            $tempPath = session('archivo_temporal');
+            $finalPath = 'archivos_sesiones/' . basename($tempPath);
+            \Storage::disk('public')->move($tempPath, $finalPath);
+            $rutaArchivo = $finalPath;
+            session()->forget('archivo_temporal');
+        } else {
+            $rutaArchivo = null;
+        }
 
+        // 5️⃣ Crear la sesión
         SesionPsicologica::create([
             'paciente_id' => $request->paciente_id,
-            'medico_id' =>$request->medico_id,
+            'medico_id' => $request->medico_id,
             'fecha' => $request->fecha,
             'hora_inicio' => $request->hora_inicio,
             'hora_fin' => $request->hora_fin,
@@ -210,14 +207,9 @@ class SesionPsicologicaController extends Controller
             'archivo_resultado' => $rutaArchivo,
         ]);
 
-
-
-
-
         return redirect()->route('sesiones.index')
             ->with('success', 'Sesión psicológica registrada correctamente');
     }
-
     /**
      * Display the specified resource.
      */

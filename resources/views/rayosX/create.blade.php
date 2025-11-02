@@ -27,18 +27,19 @@ body {
     text-align: center;
 }
 
-/* Wrapper con margen para que no quede tapado por la barra y más grande */
+/* Wrapper más compacto */
 .content-wrapper {
     margin-top: 60px;
-    max-width: 1200px;
+    max-width: 1000px;
     background-color: #fff;
     margin-left: auto;
     margin-right: auto;
     border-radius: 1.5rem;
-    padding: 3rem 3.5rem;
+    padding: 1rem 2rem;
     position: relative;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    margin-bottom: 40px;
 }
 
 /* Logo translúcido en fondo */
@@ -53,7 +54,7 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    opacity: 0.07;
+    opacity: 0.1;
     transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 0;
@@ -62,46 +63,48 @@ body {
 h2 {
     color: #003366;
     font-weight: 700;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     text-align: center;
+    font-size: 1.1rem;
 }
 
-/* Datos del paciente en línea recta */
+/* Datos del paciente más compactos */
 .patient-data-grid {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
-    margin-bottom: 2rem;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
 }
 
 .patient-data-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 0.8rem;
 }
 
 .patient-data-field {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    min-width: 200px;
+    gap: 0.4rem;
+    min-width: 180px;
     flex: 1;
 }
 
 .patient-data-field strong {
-    min-width: 120px;
-    font-weight: 600;
-    color: #003366;
+    min-width: 100px;
+    font-weight: normal;
+    color: rgb(3, 12, 22);
+    font-size: 0.9rem;
 }
 
 .underline-field {
     border-bottom: 1px dashed #333;
-    min-height: 1.5rem;
+    min-height: 1.2rem;
     padding-left: 4px;
     padding-right: 4px;
     user-select: none;
     flex: 1;
-    font-size: 1rem;
+    font-size: 0.85rem;
 }
 
 /* Lista de pacientes */
@@ -117,13 +120,14 @@ h2 {
     display: none;
 }
 
-/* Botones */
+/* Botones más compactos */
 button.btn-success, button.btn-primary, button.btn-warning, a.btn {
-    font-size: 1.1rem;
-    padding: 0.6rem 1.5rem;
-    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.40rem 0.5rem;
+    font-weight: normal;
     border-radius: 0.4rem;
     margin-left: 0.5rem;
+    line-height: 1.2;
 }
 
 button.btn-warning {
@@ -164,18 +168,20 @@ a.btn-primary:hover {
     text-decoration: none;
 }
 
-/* Mensajes emergentes */.mensaje-flash {
+/* Mensajes emergentes */
+.mensaje-flash {
     min-width: 280px;
     max-width: 600px;
     text-align: center;
     border-radius: 8px;
-    padding: 12px 20px;
+    padding: 8px 16px;
     margin: 5px auto;
-    font-weight: 600;
+    font-weight: normal;
     opacity: 0;
     transform: translateY(-20px);
     transition: opacity 0.4s ease, transform 0.4s ease;
     box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    font-size: 0.9rem;
 }
 
 .mensaje-flash.mostrar {
@@ -195,64 +201,35 @@ a.btn-primary:hover {
     border: 1px solid #c3e6cb;
 }
 
-
-/* Hover para checkbox */
-.form-check-input:hover {
-    border-color: #0056b3;
+/* Mensaje paciente no encontrado */
+#mensajeNoEncontrado {
+    font-size: 0.85rem;
+    color: #000;
+    margin-top: 0.3rem;
+    display: none;
 }
 
-.form-check-label {
-    cursor: pointer;
-    user-select: none;
-    padding-left: 0.3rem;
-}
-
-/* Checkboxes cuadrados */
+/* Checkboxes - estilo por defecto del navegador */
 .rayosx-grid input[type="checkbox"],
 .examenes-grid input[type="checkbox"] {
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    border: 2px solid #bbb;
-    border-radius: 1px;
-    background-color: #fff;
+    width: auto;
+    height: auto;
     cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
     vertical-align: middle;
+    margin-right: 0.35rem;
 }
 
-.rayosx-grid input[type="checkbox"]:hover,
-.examenes-grid input[type="checkbox"]:hover {
-    border-color: #007bff;
-}
-
-.rayosx-grid input[type="checkbox"]:checked,
-.examenes-grid input[type="checkbox"]:checked {
-    background-color: #007bff;
-    border-color: #007bff;
-}
-
-.rayosx-grid input[type="checkbox"]:checked::after,
-.examenes-grid input[type="checkbox"]:checked::after {
-    content: "✔";
-    color: white;
-    font-size: 12px;
-    position: absolute;
-    top: 0;
-    left: 2px;
-}
-
-/* Labels de checkboxes más grandes */
+/* Labels de checkboxes - mismo estilo que exámenes */
 .rayosx-grid label,
 .examenes-grid label {
-    font-size: 1.1rem;
+    font-size: 0.85rem;
     line-height: 1rem;
+    font-weight: normal;
+    color: #0f0f0f;
     cursor: pointer;
     user-select: none;
     display: flex;
     align-items: center;
-    gap: 0.35rem;
 }
 
 /* Contenedor Rayos X en grid */
@@ -269,11 +246,11 @@ a.btn-primary:hover {
 }
 
 .section-title {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     margin: 0 0 0.7rem;
     color: rgb(6, 11, 17);
     font-weight: 700;
-    line-height: 1.5rem;
+    line-height: 1.4rem;
 }
 
 .examenes-grid {
@@ -283,51 +260,97 @@ a.btn-primary:hover {
 }
 
 #totalPrecio {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
 }
 
 .linea-azul {
-    height: 4px;
+    height: 3px;
     background-color: #007BFF;
     width: 100%;
     border-radius: 2px;
-    margin: 2rem 0 1rem 0;
+    margin: 0.5rem 0 0.8rem 0;
 }
 
 .underline-field-solid {
     border-bottom: 1px solid #333;
-    min-height: 1.5rem;
+    min-height: 1.2rem;
     padding-left: 4px;
     padding-right: 4px;
     user-select: none;
     flex: 1;
-    font-size: 1rem;
+    font-size: 0.85rem;
 }
 
-/* Top controls - filtro, fecha, botón */
+/* Top controls más compacto */
 .top-controls {
     display: flex;
     flex-wrap: nowrap;
-    gap: 0.5rem;
+    gap: 0.4rem;
     justify-content: center;
     align-items: flex-end;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .top-controls > div {
     flex: 0 0 auto;
 }
 
+.top-controls label {
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+    font-weight: normal;
+}
+
 #buscarPaciente {
-    width: 300px; /* más grande */
+    width: 260px;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.6rem;
 }
 
 #fecha {
-    width: 130px; /* más compacto */
+    width: 120px;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.6rem;
 }
 
 a.btn-primary {
-    width: 220px; /* tamaño fijo */
+    width: 200px;
+}
+
+/* Header más compacto */
+.row.align-items-center {
+    margin-bottom: 0.5rem;
+}
+
+.row.align-items-center img {
+    height: 50px !important;
+}
+
+.row.align-items-center h4 {
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+}
+
+.row.align-items-center > div > div {
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+}
+
+/* Card body sin padding extra */
+.card-body {
+    padding: 0;
+}
+
+/* Total más compacto */
+.mb-3.text-end {
+    margin-bottom: 0.8rem !important;
+    font-size: 1rem !important;
+    font-weight: normal !important;
+}
+
+/* Botones más arriba */
+.d-flex.justify-content-center.gap-3.mt-4 {
+    margin-top: 1.5rem !important;
 }
 
 /* Responsive */
@@ -340,26 +363,19 @@ a.btn-primary {
         width: 90%;
     }
 }
-
-
-
-
 </style>
-
-
-
 
 <div class="content-wrapper">
 
     <div class="row align-items-center">
         <div class="col-md-3 text-center">
-            <img src="{{ asset('images/logo2.jpg') }}" alt="Logo Clinitek" style="height: 60px; width: auto;">
-            <div style="font-size: 1rem; font-weight: 700; color: #555;">
+            <img src="{{ asset('images/logo2.jpg') }}" alt="Logo Clinitek" style="height: 50px; width: auto;">
+            <div style="font-size: 0.9rem; font-weight: 700; color: #555;">
                 Laboratorio Rayos X Honduras
             </div>
         </div>
         <div class="col-md-9 text-center" style="transform: translateX(30%);">
-            <h4 class="mb-0" style="font-size: 1.2rem; font-weight: 600; color: #333; line-height: 1.3;">
+            <h4 class="mb-0" style="font-size: 1.1rem; font-weight: 700; color: #333; line-height: 1.3;">
                 CREAR ORDEN DE RAYOS X
             </h4>
         </div>
@@ -367,15 +383,15 @@ a.btn-primary {
 
     <div class="linea-azul"></div>
 
-    {{-- Contenedor de mensajes emergentes, justo debajo de la línea azul --}}
-    <div id="mensajes-container" style="text-align: center; margin: 10px 0;"></div>
+    {{-- Contenedor de mensajes emergentes --}}
+    <div id="mensajes-container" style="text-align: center; margin: 5px 0;"></div>
 
     <div class="card-body">
 
         {{-- Mensajes de error del servidor --}}
         @if ($errors->any())
-        <div class="alert alert-danger mb-4">
-            <ul class="mb-0">
+        <div class="alert alert-danger mb-3" style="padding: 0.5rem;">
+            <ul class="mb-0" style="font-size: 0.9rem;">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -390,21 +406,22 @@ a.btn-primary {
             <div class="top-controls">
                 <!-- Buscar paciente -->
                 <div style="position: relative;">
-                    <label for="buscarPaciente" class="form-label fw-bold">Buscar paciente <span class="text-danger">*</span></label>
-                    <input type="text" id="buscarPaciente" class="form-control" placeholder="Escribe para buscar paciente..." autocomplete="off" value="{{ old('paciente_nombre', '') }}" required>
+                    <label for="buscarPaciente" class="form-label">Buscar paciente <span class="text-danger">*</span></label>
+                    <input type="text" id="buscarPaciente" class="form-control" placeholder="Escribe para buscar..." autocomplete="off" value="{{ old('paciente_nombre', '') }}" required>
                     <input type="hidden" name="paciente_id" id="paciente_id" value="{{ old('paciente_id') }}">
                     <ul id="listaPacientes" class="list-group">
                         @foreach ($pacientes as $paciente)
-                            <li class="list-group-item list-group-item-action paciente-item" data-id="{{ $paciente->id }}" data-nombre="{{ $paciente->nombre }}" data-apellidos="{{ $paciente->apellidos ?? '' }}" data-identidad="{{ $paciente->identidad ?? '' }}" data-genero="{{ $paciente->genero ?? '' }}" style="cursor:pointer;">
+                            <li class="list-group-item list-group-item-action paciente-item" data-id="{{ $paciente->id }}" data-nombre="{{ $paciente->nombre }}" data-apellidos="{{ $paciente->apellidos ?? '' }}" data-identidad="{{ $paciente->identidad ?? '' }}" data-genero="{{ $paciente->genero ?? '' }}" style="cursor:pointer; font-size: 0.9rem; padding: 0.4rem 0.6rem;">
                                 {{ $paciente->nombre }} {{ $paciente->apellidos ?? '' }}
                             </li>
                         @endforeach
                     </ul>
+                    <div id="mensajeNoEncontrado">Paciente no encontrado.</div>
                 </div>
 
                 <!-- Fecha -->
                 <div>
-                    <label for="fecha" class="form-label fw-bold">Fecha <span class="text-danger">*</span></label>
+                    <label for="fecha" class="form-label">Fecha <span class="text-danger">*</span></label>
                     <input type="date" 
                            id="fecha" 
                            name="fecha" 
@@ -423,87 +440,83 @@ a.btn-primary {
             </div>
 
                 
-{{-- DATOS DEL PACIENTE CON ESTILO SUBRAYADO --}}
-<div id="datosPaciente" style="display: {{ old('paciente_id') ? 'block' : 'none' }}; margin-bottom: 1.5rem;">
+            {{-- DATOS DEL PACIENTE CON ESTILO SUBRAYADO --}}
+            <div id="datosPaciente" style="display: {{ old('paciente_id') ? 'block' : 'none' }}; margin-bottom: 1rem;">
 
-    <!-- Primera fila: Nombres y Apellidos -->
-    <div class="patient-data-row">
-        <div class="patient-data-field">
-            <strong>Nombres:</strong>
-            <div id="dp-nombres" class="underline-field-solid">{{ old('nombres') }}</div>
-        </div>
-        <div class="patient-data-field">
-            <strong>Apellidos:</strong>
-            <div id="dp-apellidos" class="underline-field-solid">{{ old('apellidos') }}</div>
-        </div>
-    </div>
+                <!-- Primera fila: Nombres y Apellidos -->
+                <div class="patient-data-row">
+                    <div class="patient-data-field">
+                        <strong>Nombres:</strong>
+                        <div id="dp-nombres" class="underline-field-solid">{{ old('nombres') }}</div>
+                    </div>
+                    <div class="patient-data-field">
+                        <strong>Apellidos:</strong>
+                        <div id="dp-apellidos" class="underline-field-solid">{{ old('apellidos') }}</div>
+                    </div>
+                </div>
 
-    <!-- Segunda fila: Identidad y Género -->
-    <div class="patient-data-row">
-        <div class="patient-data-field">
-            <strong>Identidad:</strong>
-            <div id="dp-identidad" class="underline-field-solid">{{ old('identidad') }}</div>
-        </div>
-        <div class="patient-data-field">
-            <strong>Género:</strong>
-            <div id="dp-genero" class="underline-field-solid">{{ old('genero') }}</div>
-        </div>
-    </div>
+                <!-- Segunda fila: Identidad y Género -->
+                <div class="patient-data-row">
+                    <div class="patient-data-field">
+                        <strong>Identidad:</strong>
+                        <div id="dp-identidad" class="underline-field-solid">{{ old('identidad') }}</div>
+                    </div>
+                    <div class="patient-data-field">
+                        <strong>Género:</strong>
+                        <div id="dp-genero" class="underline-field-solid">{{ old('genero') }}</div>
+                    </div>
+                </div>
 
-</div>
+            </div>
 
-
-{{-- SECCIONES Y EXÁMENES EN GRID DE 3 COLUMNAS --}}
-<div class="secciones-container">
-    @foreach($secciones as $categoria => $examenes)
-        <div class="seccion">
-            <div class="section-title">{{ $categoria }}</div>
-            <div class="examenes-grid">
-                @foreach($examenes as $clave => $datos)
-                    <label>
-                        <input 
-                            type="checkbox" 
-                            class="examen-checkbox" 
-                            name="examenes[]" 
-                            value="{{ $clave }}" 
-                            data-precio="{{ $datos['precio'] }}"
-                            {{ (is_array(old('examenes')) && in_array($clave, old('examenes'))) ? 'checked' : '' }}
-                        >
-                        {{ $datos['nombre'] }}
-                    </label>
+            {{-- SECCIONES Y EXÁMENES EN GRID DE 3 COLUMNAS --}}
+            <div class="secciones-container">
+                @foreach($secciones as $categoria => $examenes)
+                    <div class="seccion">
+                        <div class="section-title">{{ $categoria }}</div>
+                        <div class="examenes-grid">
+                            @foreach($examenes as $clave => $datos)
+                                <label>
+                                    <input 
+                                        type="checkbox" 
+                                        class="examen-checkbox" 
+                                        name="examenes[]" 
+                                        value="{{ $clave }}" 
+                                        data-precio="{{ $datos['precio'] }}"
+                                        {{ (is_array(old('examenes')) && in_array($clave, old('examenes'))) ? 'checked' : '' }}
+                                    >
+                                    {{ $datos['nombre'] }}
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
                 @endforeach
             </div>
-        </div>
-    @endforeach
-</div>
 
-
-    {{-- TOTAL DINÁMICO --}}
-    <div class="mb-3 text-end fw-bold fs-5">
-        Total a pagar: L<span id="totalPrecio">0.00</span>
-    </div>
-</div>
-
-
+            {{-- TOTAL DINÁMICO --}}
+            <div class="mb-3 text-end" style="font-size: 1rem;">
+                Total a pagar: L<span id="totalPrecio">0.00</span>
+            </div>
 
             {{-- BOTONES GUARDAR, LIMPIAR, VOLVER --}}
-            <div class="d-flex justify-content-center gap-3">
-                <button type="submit" class="btn btn-primary px-4 py-2">
-                    <i class="bi bi-save"></i> Guardar y pagar
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Registrar
                 </button>
-                <button type="button" id="btnLimpiar" class="btn btn-warning px-4 py-2">
-                    <i class="bi bi-x-circle"></i> Limpiar
+
+                <button type="button" id="btnLimpiar" class="btn btn-warning">
+                    <i class="bi bi-trash"></i> Limpiar
                 </button>
-                <a href="{{ route('rayosx.index') }}" class="btn btn-success px-4 py-2">
-                    <i class="bi bi-arrow-left-circle"></i> Volver
+
+                <a href="{{ route('rayosx.index') }}" class="btn btn-success">
+                    <i class="bi bi-arrow-left"></i> Regresar
                 </a>
             </div>
+
         </form>
     </div>
 </div>
- </div>
 
- </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const inputBuscar = document.getElementById('buscarPaciente');
@@ -515,19 +528,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const dpIdentidad = document.getElementById('dp-identidad');
     const dpGenero = document.getElementById('dp-genero');
 
+    const mensajeNoEncontrado = document.getElementById('mensajeNoEncontrado');
+
     const fechaInput = document.getElementById('fecha');
     const hoy = new Date();
     const dd = String(hoy.getDate()).padStart(2, '0');
     const mm = String(hoy.getMonth() + 1).padStart(2, '0');
     const yyyy = hoy.getFullYear();
     fechaInput.setAttribute('min', `${yyyy}-${mm}-${dd}`);
-
-    const fechaMax = new Date();
-    fechaMax.setMonth(fechaMax.getMonth() + 3);
-    const ddMax = String(fechaMax.getDate()).padStart(2, '0');
-    const mmMax = String(fechaMax.getMonth() + 1).padStart(2, '0');
-    const yyyyMax = fechaMax.getFullYear();
-    fechaInput.setAttribute('max', `${yyyyMax}-${mmMax}-${ddMax}`);
+    fechaInput.setAttribute('max', '2025-12-15');
 
     fechaInput.value = fechaInput.value || `${yyyy}-${mm}-${dd}`;
 
@@ -541,7 +550,7 @@ document.addEventListener('DOMContentLoaded', function() {
         div.style.textAlign = 'center';
         div.style.padding = '8px 12px';
         div.style.borderRadius = '6px';
-        div.style.margin = '10px auto';
+        div.style.margin = '5px auto';
         div.style.maxWidth = 'fit-content';
         div.style.transition = 'opacity 0.4s, transform 0.4s';
         div.style.opacity = '0';
@@ -556,8 +565,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         mensajesContainer.appendChild(div);
-
-        // Hacer scroll hacia el mensaje
         div.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
         setTimeout(() => { div.style.opacity = '1'; div.style.transform = 'translateY(0)'; }, 50);
@@ -574,18 +581,30 @@ document.addEventListener('DOMContentLoaded', function() {
         mensajesContainer.innerHTML = '';
     }
 
-    // Validación específica de fecha máxima: 31 de octubre de 2025
     fechaInput.addEventListener('change', () => {
-        const fechaLimite = new Date('2025-10-31');
+        const fechaLimite = new Date('2025-12-15');
         const fechaSeleccionada = new Date(fechaInput.value);
         if(fechaSeleccionada > fechaLimite) {
-            showMensaje('La fecha no puede ser posterior al 31 de octubre de 2025.', 'error');
-            fechaInput.value = `${yyyy}-${mm}-${dd}`; // reset a hoy
+            showMensaje('La fecha no puede ser posterior al 15 de diciembre de 2025.', 'error');
+            fechaInput.value = `${yyyy}-${mm}-${dd}`;
         }
     });
 
     inputBuscar.addEventListener('focus', () => {
-        if (inputBuscar.value.trim() !== '') lista.style.display = 'block';
+        if (inputBuscar.value.trim() !== '') {
+            lista.style.display = 'block';
+            const filtro = inputBuscar.value.toLowerCase();
+            let visibleCount = 0;
+            Array.from(lista.children).forEach(li => {
+                const texto = li.textContent.toLowerCase();
+                if (texto.includes(filtro)) {
+                    visibleCount++;
+                }
+            });
+            if (visibleCount === 0) {
+                mensajeNoEncontrado.style.display = 'block';
+            }
+        }
     });
 
     inputBuscar.addEventListener('input', () => {
@@ -608,6 +627,12 @@ document.addEventListener('DOMContentLoaded', function() {
         dpGenero.textContent = '';
         document.getElementById('datosPaciente').style.display = 'none';
         clearMensajes();
+        
+        if (filtro !== '' && visibleCount === 0) {
+            mensajeNoEncontrado.style.display = 'block';
+        } else {
+            mensajeNoEncontrado.style.display = 'none';
+        }
     });
 
     lista.querySelectorAll('.paciente-item').forEach(item => {
@@ -682,6 +707,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-
 
 @endsection
