@@ -46,11 +46,6 @@
             border-bottom: 2px solid #0b5ed7;
             padding-bottom: 4px;
         }
-<<<<<<< HEAD
-
-        /* Estilos específicos para Ultrasonido */
-=======
->>>>>>> origin/main
         .examen-card {
             margin-top: 1.5rem;
             border: 1px solid #eee;
@@ -116,10 +111,6 @@
             </div>
 
             <div class="card-body px-3 py-3">
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
                 {{-- Datos de la Orden y Paciente --}}
                 <div class="row gy-2">
                     <div class="col-12"><div class="section-title">Información de la Orden</div></div>
@@ -144,10 +135,6 @@
                         </div>
                     </div>
 
-<<<<<<< HEAD
-                    {{-- Este bloque ahora ocupa el 100% en pantallas medianas --}}
-=======
->>>>>>> origin/main
                     <div class="col-md-12 info-block">
                         <span class="info-label">Médico analista:</span>
                         <div class="info-value">
@@ -157,24 +144,13 @@
                     </div>
                 </div>
 
-<<<<<<< HEAD
-
-
-=======
                 {{-- Mostrar imágenes --}}
->>>>>>> origin/main
                 @if($orden->imagenes->isEmpty())
                     <div class="alert alert-info text-center mt-3">
-                       Este paciente aún no tiene análisis de ultrasonido registrados.
+                        Este paciente aún no tiene análisis de ultrasonido registrados.
                     </div>
                 @else
-<<<<<<< HEAD
-
                     @foreach($examenesKeys as $examenKey)
-
-=======
-                    @foreach($examenesKeys as $examenKey)
->>>>>>> origin/main
                         @php
                             $nombreExamen = $mapaNombres[$examenKey] ?? ucfirst($examenKey);
                             $imagenesDelExamen = $imagenesAgrupadas[$examenKey] ?? collect();
@@ -183,10 +159,6 @@
                         @if($imagenesDelExamen->isNotEmpty())
                             <div class="examen-card">
                                 <h4>{{ $nombreExamen }}</h4>
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
                                 <div class="imagenes-container">
                                     @foreach($imagenesDelExamen as $imagen)
                                         <div class="imagen-block"
@@ -194,15 +166,9 @@
                                              data-bs-target="#imagenModal"
                                              data-ruta="{{ asset('storage/' . $imagen->ruta) }}"
                                              data-descripcion="{{ $imagen->descripcion }}">
-<<<<<<< HEAD
 
                                             <img src="{{ asset('storage/' . $imagen->ruta) }}"
-                                                 alt="Imagen de {{ $nombreExamen }}" {{-- ¡VARIABLE CORREGIDA A $nombreExamen! --}}
-=======
-                                            
-                                            <img src="{{ asset('storage/' . $imagen->ruta) }}" 
                                                  alt="Imagen de {{ $nombreExamen }}"
->>>>>>> origin/main
                                                  title="Haga clic para ampliar">
 
                                             <span class="info-label" style="font-size:0.9rem; color:#007BFF;">Descripción:</span>
@@ -215,11 +181,7 @@
                     @endforeach
                 @endif
 
-<<<<<<< HEAD
-                {{-- Botón de Regreso --}}
-=======
                 {{-- Botón de regreso --}}
->>>>>>> origin/main
                 <div class="text-center pt-4">
                     <a href="{{ route('ultrasonidos.index') }}" class="btn btn-success px-4 shadow-sm">
                         <i class="bi bi-arrow-left"></i> Volver
@@ -248,28 +210,23 @@
         </div>
     </div>
 
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const imagenModal = document.getElementById('imagenModal');
-            const modalImagenAmpliada = document.getElementById('modalImagenAmpliada');
-            const modalDescripcion = document.getElementById('modalDescripcion');
-<<<<<<< HEAD
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const imagenModal = document.getElementById('imagenModal');
+                const modalImagenAmpliada = document.getElementById('modalImagenAmpliada');
+                const modalDescripcion = document.getElementById('modalDescripcion');
 
-            // Evento para cargar la imagen y descripción en el modal
-=======
-            
->>>>>>> origin/main
-            imagenModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const ruta = button.getAttribute('data-ruta');
-                const descripcion = button.getAttribute('data-descripcion');
+                imagenModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const ruta = button.getAttribute('data-ruta');
+                    const descripcion = button.getAttribute('data-descripcion');
 
-                modalImagenAmpliada.src = ruta;
-                modalDescripcion.textContent = descripcion || 'Sin descripción proporcionada.';
+                    modalImagenAmpliada.src = ruta;
+                    modalDescripcion.textContent = descripcion || 'Sin descripción proporcionada.';
+                });
             });
-        });
-    </script>
-@endpush
+        </script>
+    @endpush
 
 @endsection
