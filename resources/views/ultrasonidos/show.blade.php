@@ -4,18 +4,17 @@
 
 @section('content')
     @php
-        // Aseguramos que las variables de fecha y nombres sean accesibles si las necesitas
         use Carbon\Carbon;
     @endphp
 
     <style>
-        /* Estilos base de tu plantilla (replicados para consistencia) */
+        /* Estilos visuales */
         .custom-card::before {
             content: "";
             position: absolute;
             top: 50%; left: 50%;
             width: 800px; height: 800px;
-            background-image: url('/images/logo2.jpg'); /* Ajustar a la ruta de tu logo */
+            background-image: url('/images/logo2.jpg');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -47,8 +46,11 @@
             border-bottom: 2px solid #0b5ed7;
             padding-bottom: 4px;
         }
+<<<<<<< HEAD
 
         /* Estilos específicos para Ultrasonido */
+=======
+>>>>>>> origin/main
         .examen-card {
             margin-top: 1.5rem;
             border: 1px solid #eee;
@@ -72,7 +74,7 @@
             justify-content: flex-start;
         }
         .imagen-block {
-            flex: 0 0 calc(33.33% - 1rem); /* 3 por fila en pantallas grandes */
+            flex: 0 0 calc(33.33% - 1rem);
             min-width: 280px;
             max-width: 300px;
             border: 1px solid #ddd;
@@ -89,7 +91,7 @@
         }
         .imagen-block img {
             width: 100%;
-            height: 180px; /* Altura fija para uniformidad */
+            height: 180px;
             object-fit: cover;
             border-radius: 0.3rem;
             margin-bottom: 0.5rem;
@@ -110,57 +112,81 @@
     <div class="container mt-3">
         <div class="card custom-card shadow-sm border rounded-4">
             <div class="card-header text-center py-3" style="background-color:#fff; border-bottom:4px solid #0d6efd;">
-                <h3 class="mb-0 fw-bold text-dark">Resultados de ultrasonidos </h3>
+                <h3 class="mb-0 fw-bold text-dark">Resultados de Ultrasonido</h3>
             </div>
 
             <div class="card-body px-3 py-3">
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
                 {{-- Datos de la Orden y Paciente --}}
                 <div class="row gy-2">
                     <div class="col-12"><div class="section-title">Información de la Orden</div></div>
 
                     <div class="col-md-4 info-block">
                         <span class="info-label">Paciente:</span>
-                        <div class="info-value">{{ $orden->paciente->nombre }} {{ $orden->paciente->apellidos }}</div>
+                        <div class="info-value">
+                            {{ $orden->paciente?->nombre ?? 'Sin paciente' }}
+                            {{ $orden->paciente?->apellidos ?? '' }}
+                        </div>
                     </div>
                     <div class="col-md-4 info-block">
                         <span class="info-label">Identidad:</span>
-                        <div class="info-value">{{ $orden->paciente->identidad ?? '—' }}</div>
+                        <div class="info-value">
+                            {{ $orden->paciente?->identidad ?? '—' }}
+                        </div>
                     </div>
                     <div class="col-md-4 info-block">
                         <span class="info-label">Fecha de Orden:</span>
-                        <div class="info-value">{{ $orden->created_at->format('d/m/Y h:i A') }}</div>
+                        <div class="info-value">
+                            {{ optional($orden->created_at)->format('d/m/Y h:i A') ?? '—' }}
+                        </div>
                     </div>
 
+<<<<<<< HEAD
                     {{-- Este bloque ahora ocupa el 100% en pantallas medianas --}}
+=======
+>>>>>>> origin/main
                     <div class="col-md-12 info-block">
-                        <span class="info-label">Medico analista:</span>
-                        <div class="info-value">{{ $orden->medico->nombre }} {{ $orden->medico->apellidos }}</div>
+                        <span class="info-label">Médico analista:</span>
+                        <div class="info-value">
+                            {{ $orden->medico?->nombre ?? 'No asignado' }}
+                            {{ $orden->medico?->apellidos ?? '' }}
+                        </div>
                     </div>
-                    {{-- **EL BLOQUE DEL ESTADO HA SIDO ELIMINADO** --}}
                 </div>
 
+<<<<<<< HEAD
 
 
+=======
+                {{-- Mostrar imágenes --}}
+>>>>>>> origin/main
                 @if($orden->imagenes->isEmpty())
                     <div class="alert alert-info text-center mt-3">
-                        No hay imágenes adjuntas para esta orden de ultrasonido.
+                       Este paciente aún no tiene análisis de ultrasonido registrados.
                     </div>
                 @else
+<<<<<<< HEAD
 
                     @foreach($examenesKeys as $examenKey)
 
+=======
+                    @foreach($examenesKeys as $examenKey)
+>>>>>>> origin/main
                         @php
-                            // Obtener el nombre legible y las imágenes de ese examen
                             $nombreExamen = $mapaNombres[$examenKey] ?? ucfirst($examenKey);
                             $imagenesDelExamen = $imagenesAgrupadas[$examenKey] ?? collect();
                         @endphp
 
                         @if($imagenesDelExamen->isNotEmpty())
                             <div class="examen-card">
-                                {{-- ¡VARIABLE CORREGIDA A $nombreExamen! --}}
                                 <h4>{{ $nombreExamen }}</h4>
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
                                 <div class="imagenes-container">
                                     @foreach($imagenesDelExamen as $imagen)
                                         <div class="imagen-block"
@@ -168,9 +194,15 @@
                                              data-bs-target="#imagenModal"
                                              data-ruta="{{ asset('storage/' . $imagen->ruta) }}"
                                              data-descripcion="{{ $imagen->descripcion }}">
+<<<<<<< HEAD
 
                                             <img src="{{ asset('storage/' . $imagen->ruta) }}"
                                                  alt="Imagen de {{ $nombreExamen }}" {{-- ¡VARIABLE CORREGIDA A $nombreExamen! --}}
+=======
+                                            
+                                            <img src="{{ asset('storage/' . $imagen->ruta) }}" 
+                                                 alt="Imagen de {{ $nombreExamen }}"
+>>>>>>> origin/main
                                                  title="Haga clic para ampliar">
 
                                             <span class="info-label" style="font-size:0.9rem; color:#007BFF;">Descripción:</span>
@@ -181,16 +213,18 @@
                             </div>
                         @endif
                     @endforeach
-
                 @endif
 
+<<<<<<< HEAD
                 {{-- Botón de Regreso --}}
+=======
+                {{-- Botón de regreso --}}
+>>>>>>> origin/main
                 <div class="text-center pt-4">
                     <a href="{{ route('ultrasonidos.index') }}" class="btn btn-success px-4 shadow-sm">
                         <i class="bi bi-arrow-left"></i> Volver
                     </a>
                 </div>
-
             </div>
         </div>
     </div>
@@ -220,8 +254,12 @@
             const imagenModal = document.getElementById('imagenModal');
             const modalImagenAmpliada = document.getElementById('modalImagenAmpliada');
             const modalDescripcion = document.getElementById('modalDescripcion');
+<<<<<<< HEAD
 
             // Evento para cargar la imagen y descripción en el modal
+=======
+            
+>>>>>>> origin/main
             imagenModal.addEventListener('show.bs.modal', function (event) {
                 const button = event.relatedTarget;
                 const ruta = button.getAttribute('data-ruta');
