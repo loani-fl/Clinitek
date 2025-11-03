@@ -47,7 +47,7 @@
             border-bottom: 2px solid #0b5ed7;
             padding-bottom: 4px;
         }
-        
+
         /* Estilos específicos para Ultrasonido */
         .examen-card {
             margin-top: 1.5rem;
@@ -114,11 +114,11 @@
             </div>
 
             <div class="card-body px-3 py-3">
-                
+
                 {{-- Datos de la Orden y Paciente --}}
                 <div class="row gy-2">
                     <div class="col-12"><div class="section-title">Información de la Orden</div></div>
-                    
+
                     <div class="col-md-4 info-block">
                         <span class="info-label">Paciente:</span>
                         <div class="info-value">{{ $orden->paciente->nombre }} {{ $orden->paciente->apellidos }}</div>
@@ -131,7 +131,7 @@
                         <span class="info-label">Fecha de Orden:</span>
                         <div class="info-value">{{ $orden->created_at->format('d/m/Y h:i A') }}</div>
                     </div>
-                    
+
                     {{-- Este bloque ahora ocupa el 100% en pantallas medianas --}}
                     <div class="col-md-12 info-block">
                         <span class="info-label">Medico analista:</span>
@@ -140,16 +140,16 @@
                     {{-- **EL BLOQUE DEL ESTADO HA SIDO ELIMINADO** --}}
                 </div>
 
-              
+
 
                 @if($orden->imagenes->isEmpty())
                     <div class="alert alert-info text-center mt-3">
                         No hay imágenes adjuntas para esta orden de ultrasonido.
                     </div>
                 @else
-                    
+
                     @foreach($examenesKeys as $examenKey)
-                        
+
                         @php
                             // Obtener el nombre legible y las imágenes de ese examen
                             $nombreExamen = $mapaNombres[$examenKey] ?? ucfirst($examenKey);
@@ -160,19 +160,19 @@
                             <div class="examen-card">
                                 {{-- ¡VARIABLE CORREGIDA A $nombreExamen! --}}
                                 <h4>{{ $nombreExamen }}</h4>
-                                
+
                                 <div class="imagenes-container">
                                     @foreach($imagenesDelExamen as $imagen)
-                                        <div class="imagen-block" 
-                                             data-bs-toggle="modal" 
+                                        <div class="imagen-block"
+                                             data-bs-toggle="modal"
                                              data-bs-target="#imagenModal"
                                              data-ruta="{{ asset('storage/' . $imagen->ruta) }}"
                                              data-descripcion="{{ $imagen->descripcion }}">
-                                            
-                                            <img src="{{ asset('storage/' . $imagen->ruta) }}" 
+
+                                            <img src="{{ asset('storage/' . $imagen->ruta) }}"
                                                  alt="Imagen de {{ $nombreExamen }}" {{-- ¡VARIABLE CORREGIDA A $nombreExamen! --}}
                                                  title="Haga clic para ampliar">
-                                            
+
                                             <span class="info-label" style="font-size:0.9rem; color:#007BFF;">Descripción:</span>
                                             <p class="descripcion-text">{{ $imagen->descripcion ?? 'Sin descripción.' }}</p>
                                         </div>
@@ -183,7 +183,7 @@
                     @endforeach
 
                 @endif
-                
+
                 {{-- Botón de Regreso --}}
                 <div class="text-center pt-4">
                     <a href="{{ route('ultrasonidos.index') }}" class="btn btn-success px-4 shadow-sm">
@@ -194,7 +194,7 @@
             </div>
         </div>
     </div>
-    
+
     {{-- MODAL PARA AMPLIAR IMAGEN --}}
     <div class="modal fade" id="imagenModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -207,7 +207,7 @@
                     <img id="modalImagenAmpliada" src="" class="img-fluid" style="max-height: 80vh; width: auto; object-fit: contain;">
                 </div>
                 <div class="modal-footer justify-content-start">
-                    <strong class="info-label">Descripción:</strong> 
+                    <strong class="info-label">Descripción:</strong>
                     <p id="modalDescripcion" class="mb-0 text-break" style="font-size:0.95rem;"></p>
                 </div>
             </div>
@@ -220,13 +220,13 @@
             const imagenModal = document.getElementById('imagenModal');
             const modalImagenAmpliada = document.getElementById('modalImagenAmpliada');
             const modalDescripcion = document.getElementById('modalDescripcion');
-            
+
             // Evento para cargar la imagen y descripción en el modal
             imagenModal.addEventListener('show.bs.modal', function (event) {
                 const button = event.relatedTarget;
                 const ruta = button.getAttribute('data-ruta');
                 const descripcion = button.getAttribute('data-descripcion');
-                
+
                 modalImagenAmpliada.src = ruta;
                 modalDescripcion.textContent = descripcion || 'Sin descripción proporcionada.';
             });
