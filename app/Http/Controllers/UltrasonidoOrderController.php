@@ -21,6 +21,7 @@ class UltrasonidoOrderController extends Controller
     {
         $pacientes = Paciente::all();
 
+        // Todos los ultrasonidos como elementos individuales
         $secciones = [
             'Hígado' => ['higado' => ['nombre' => 'Ultrasonido Hígado', 'precio' => 150]],
             'Vesícula' => ['vesicula' => ['nombre' => 'Ultrasonido Vesícula', 'precio' => 120]],
@@ -29,6 +30,27 @@ class UltrasonidoOrderController extends Controller
             'Ovarios' => ['ovarico' => ['nombre' => 'Ultrasonido Ovarios', 'precio' => 130]],
             'Útero' => ['utero' => ['nombre' => 'Ultrasonido Útero', 'precio' => 130]],
             'Tiroides' => ['tiroides' => ['nombre' => 'Ultrasonido Tiroides', 'precio' => 140]],
+            // Aquí agregamos los 20 ultrasonidos adicionales como elementos individuales
+            'Pelvico Transabdominal' => ['pelvico_transabdominal' => ['nombre' => 'Ultrasonido pélvico transabdominal', 'precio' => 150]],
+            'Transvaginal' => ['transvaginal' => ['nombre' => 'Ultrasonido transvaginal', 'precio' => 150]],
+            'Sonohisterografía' => ['sonohisterografia' => ['nombre' => 'Sonohisterografía', 'precio' => 160]],
+            'Doppler Ginecológico' => ['doppler_ginecologico' => ['nombre' => 'Ultrasonido Doppler ginecológico', 'precio' => 170]],
+            'Obstétrico Temprano' => ['obstetrico_temprano' => ['nombre' => 'Ultrasonido obstétrico temprano', 'precio' => 140]],
+            'Morfológico' => ['morfologico' => ['nombre' => 'Ultrasonido morfológico', 'precio' => 200]],
+            'Crecimiento Fetal' => ['crecimiento_fetal' => ['nombre' => 'Ultrasonido de crecimiento fetal', 'precio' => 180]],
+            'Bienestar Fetal' => ['bienestar_fetal' => ['nombre' => 'Ultrasonido de bienestar fetal', 'precio' => 175]],
+            'Ultrasonido 3D' => ['ultrasonido_3d' => ['nombre' => 'Ultrasonido 3D', 'precio' => 220]],
+            'Ultrasonido 4D' => ['ultrasonido_4d' => ['nombre' => 'Ultrasonido 4D', 'precio' => 250]],
+            'Ovario y Útero' => ['ovario_utero' => ['nombre' => 'Ultrasonido de ovario y útero', 'precio' => 150]],
+            'Control DIU' => ['control_diu' => ['nombre' => 'Ultrasonido para control de DIU', 'precio' => 130]],
+            'Detección Endometriosis' => ['deteccion_endometriosis' => ['nombre' => 'Ultrasonido para detección de endometriosis', 'precio' => 180]],
+            'Mamario' => ['mamario' => ['nombre' => 'Ultrasonido mamario', 'precio' => 140]],
+            'Tiroides Adicional' => ['tiroides_adicional' => ['nombre' => 'Ultrasonido de tiroides', 'precio' => 120]],
+            'Pelvis con Contraste' => ['pelvis_con_contraste' => ['nombre' => 'Ultrasonido de pelvis con contraste', 'precio' => 210]],
+            'Folicular' => ['folicular' => ['nombre' => 'Ultrasonido folicular', 'precio' => 130]],
+            'Placenta' => ['placenta' => ['nombre' => 'Ultrasonido de placenta', 'precio' => 160]],
+            'Transrectal' => ['transrectal' => ['nombre' => 'Ultrasonido transrectal', 'precio' => 180]],
+            'Mama 3D' => ['mama_3d' => ['nombre' => 'Ultrasonido de mama 3D', 'precio' => 200]],
         ];
 
         return view('ultrasonidos.create', compact('pacientes', 'secciones'));
@@ -36,34 +58,45 @@ class UltrasonidoOrderController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'paciente_id' => 'required|exists:pacientes,id',
-            'fecha' => 'required|date|before_or_equal:today',
-            'examenes' => 'required|array|min:1|max:7',
-            'examenes.*' => 'in:higado,vesicula,bazo,vejiga,ovarico,utero,tiroides',
-        ]);
+        $validKeys = array_merge(
+            ['higado','vesicula','bazo','vejiga','ovarico','utero','tiroides'],
+            [
+                'pelvico_transabdominal','transvaginal','sonohisterografia','doppler_ginecologico',
+                'obstetrico_temprano','morfologico','crecimiento_fetal','bienestar_fetal',
+                'ultrasonido_3d','ultrasonido_4d','ovario_utero','control_diu',
+                'deteccion_endometriosis','mamario','tiroides_adicional','pelvis_con_contraste',
+                'folicular','placenta','transrectal','mama_3d'
+            ]
+        );
 
         $precios = [
-            'higado' => 150,
-            'vesicula' => 120,
-            'bazo' => 100,
-            'vejiga' => 90,
-            'ovarico' => 130,
-            'utero' => 130,
-            'tiroides' => 140,
+            'higado' => 150,'vesicula' => 120,'bazo' => 100,'vejiga' => 90,'ovarico' => 130,
+            'utero' => 130,'tiroides' => 140,'pelvico_transabdominal' => 150,'transvaginal' => 150,
+            'sonohisterografia' => 160,'doppler_ginecologico' => 170,'obstetrico_temprano' => 140,
+            'morfologico' => 200,'crecimiento_fetal' => 180,'bienestar_fetal' => 175,'ultrasonido_3d' => 220,
+            'ultrasonido_4d' => 250,'ovario_utero' => 150,'control_diu' => 130,'deteccion_endometriosis' => 180,
+            'mamario' => 140,'tiroides_adicional' => 120,'pelvis_con_contraste' => 210,'folicular' => 130,
+            'placenta' => 160,'transrectal' => 180,'mama_3d' => 200
         ];
+
+        $request->validate([
+            'paciente_id' => 'required|exists:pacientes,id',
+            'fecha' => 'required|date|after_or_equal:today',
+            'examenes' => 'required|array|min:1|max:7',
+            'examenes.*' => 'in:' . implode(',', $validKeys),
+        ]);
 
         $total = array_sum(array_map(fn($ex) => $precios[$ex], $request->examenes));
 
-       $ultrasonido = Ultrasonido::create([
-    'paciente_id' => $request->paciente_id,
-    'fecha' => $request->fecha,
-    'total' => $total,
-    'examenes' => $request->examenes, // ✅ Guarda los exámenes seleccionados
-]);
-
+        $ultrasonido = Ultrasonido::create([
+            'paciente_id' => $request->paciente_id,
+            'fecha' => $request->fecha,
+            'total' => $total,
+            'examenes' => $request->examenes,
+        ]);
 
         foreach ($request->examenes as $examen) {
+            // Solo modelos para los 7 iniciales
             $model = match($examen) {
                 'higado' => UltrasonidoHigado::class,
                 'vesicula' => UltrasonidoVesicula::class,
@@ -72,14 +105,15 @@ class UltrasonidoOrderController extends Controller
                 'ovarico' => UltrasonidoOvarico::class,
                 'utero' => UltrasonidoUtero::class,
                 'tiroides' => UltrasonidoTiroides::class,
+                default => null
             };
-            $model::create(['ultrasonido_id' => $ultrasonido->id]);
-
+            if ($model) {
+                $model::create(['ultrasonido_id' => $ultrasonido->id]);
+            }
         }
 
         return redirect()->route('ultrasonidos.index')->with('success', 'Orden de ultrasonido creada correctamente.');
     }
-
     public function index(Request $request)
     {
         $query = Ultrasonido::with('paciente');
