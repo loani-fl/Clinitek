@@ -67,7 +67,14 @@
         justify-content: center;
     }
     .card-header {
-    background-color: transparent !important;
+        background-color: transparent !important;
+    }
+    .filter-container {
+    display: flex;
+    gap: 1rem;           /* ← ESPACIO ENTRE CADA FILTRO */
+    padding: 10px;
+   
+    margin-bottom: 1.5rem;
 }
 
 </style>
@@ -139,13 +146,25 @@
 $(document).ready(function () {
 
     function actualizarMensaje(total, all, query) {
-        if (query === '') {
+        const fechaDesde = $('#fechaDesde').val();
+        const fechaHasta = $('#fechaHasta').val();
+
+        // Sin filtros
+        if (query === '' && fechaDesde === '' && fechaHasta === '') {
             $('#mensajeResultados').html('');
-        } else if (total === 0) {
-            $('#mensajeResultados').html(`No se encontraron resultados para "<strong>${query}</strong>".`);
-        } else {
-            $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
+            return;
         }
+
+        // Cero resultados
+        if (total === 0) {
+            $('#mensajeResultados').html(`<strong>No se encontraron resultados.</strong>`);
+            return;
+        }
+
+        // Con resultados
+        $('#mensajeResultados').html(
+            `<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`
+        );
     }
 
     function cargarDatos(page = 1, query = '') {
@@ -153,7 +172,7 @@ $(document).ready(function () {
         const fechaHasta = $('#fechaHasta').val();
 
         $.ajax({
-            url: "{{ route('controles-prenatales.index') }}",   // ✅ RUTA CORRECTA
+            url: "{{ route('controles-prenatales.index') }}",
             type: 'GET',
             data: {
                 page,
@@ -182,12 +201,12 @@ $(document).ready(function () {
         $('#filtroBusqueda, #fechaDesde, #fechaHasta').val('');
         cargarDatos(1, '');
     });
-  $(document).on('click', '.btn-paginate', function() {
-    const page = $(this).data('page');
-    const query = $('#filtroBusqueda').val();
-    cargarDatos(page, query);
-});
 
+    $(document).on('click', '.btn-paginate', function() {
+        const page = $(this).data('page');
+        const query = $('#filtroBusqueda').val();
+        cargarDatos(page, query);
+    });
 
 });
 </script>
