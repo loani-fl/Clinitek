@@ -106,12 +106,25 @@
 
     <div class="container mt-3">
         <div class="card custom-card shadow-sm border rounded-4">
-            <div class="card-header text-center py-3" style="background-color:#fff; border-bottom:4px solid #0d6efd;">
-                <h3 class="mb-0 fw-bold text-dark">Resultados de Ultrasonido</h3>
+
+            <div class="card-header py-3" style="background-color:#fff;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0 fw-bold text-dark">Resultados de Ultrasonido</h3>
+
+                    <button class="btn btn-warning px-4 shadow-sm d-flex align-items-center gap-2"
+                            style="border-radius: 6px;"
+                            onclick="imprimirReporte()">
+                        <i class="bi bi-printer"></i> Imprimir reporte
+                    </button>
+                </div>
             </div>
 
+            <!-- Línea azul -->
+            <div style="height:4px; background:#0d6efd; width:100%;"></div>
+
             <div class="card-body px-3 py-3">
-                {{-- Datos de la Orden y Paciente --}}
+
+            {{-- Datos de la Orden y Paciente --}}
                 <div class="row gy-2">
                     <div class="col-12"><div class="section-title">Información de la Orden</div></div>
 
@@ -227,6 +240,8 @@
                 });
             });
         </script>
+
+
     @endpush
 
 @endsection
