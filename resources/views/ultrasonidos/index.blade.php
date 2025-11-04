@@ -153,19 +153,35 @@
                 <div style="align-self: flex-end;">
                     <button id="btnRecargar" class="btn btn-secondary"><i class="bi bi-arrow-clockwise"></i></button>
                 </div>
+
+
             </div>
 
             <div id="tabla-container">
                 @include('ultrasonidos.partials')
             </div>
 
+
             <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
+
+            {{-- Leyenda de estados centrada --}}
+            <div class="status-legend text-center mb-3">
+    <span class="d-inline-flex align-items-center me-3">
+        <span class="estado-circle estado-pendiente"></span> Pendiente
+    </span>
+                <span class="d-inline-flex align-items-center">
+        <span class="estado-circle estado-realizado"></span> Realizado
+    </span>
+            </div>
+
 
             <div id="paginacion-container" class="pagination-container">
                 {{ $ordenes->onEachSide(1)->links('pagination::bootstrap-5') }}
             </div>
 
         </div>
+
+
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
