@@ -443,21 +443,63 @@ public function buscarPaciente(Request $request)
 }
 public function buscar(Request $request)
 {
-    $busqueda = $request->input('identidad', '');
-    
+    $busqueda = $request->input('identidad', ''); 
+    if (empty($busqueda)) {
+        return response()->json([
+            'success' => false,
+            'pacientes' => []
+        ]);
+    }
+
     $pacientes = Paciente::where(function($query) use ($busqueda) {
-        $query->where('identidad', 'LIKE', "%{$busqueda}%")
-              ->orWhere('nombre', 'LIKE', "%{$busqueda}%")
+        $query->where('nombre', 'LIKE', "%{$busqueda}%")
               ->orWhere('apellidos', 'LIKE', "%{$busqueda}%")
-              ->orWhereRaw("CONCAT(nombre, ' ', apellidos) LIKE ?", ["%{$busqueda}%"]);
+              ->orWhere('identidad', 'LIKE', "%{$busqueda}%");
     })
-    ->limit(10)
+    ->where('genero', 'Femenino') 
+    ->select('id', 'nombre', 'apellidos', 'identidad')
+    ->orderBy('nombre')
+    ->orderBy('apellidos')
+    ->limit(10) 
     ->get();
-    
+
     return response()->json([
         'success' => true,
         'pacientes' => $pacientes
     ]);
+}
+
+public function obtenerDatos($id)
+{
+    try {
+        $paciente = Paciente::findOrFail($id);
+        
+        return response()->json([
+            'success' => true,
+            'paciente' => [
+                'id' => $paciente->id,
+                'nombre' => $paciente->nombre,
+                'apellidos' => $paciente->apellidos,
+                'identidad' => $paciente->identidad,
+                'fecha_nacimiento' => $paciente->fecha_nacimiento,
+                'telefono' => $paciente->telefono,
+                'correo' => $paciente->correo,
+                'tipo_sangre' => $paciente->tipo_sangre,
+                'genero' => $paciente->genero,
+                'direccion' => $paciente->direccion,
+                'padecimientos' => $paciente->padecimientos,
+                'medicamentos' => $paciente->medicamentos,
+                'alergias' => $paciente->alergias,
+                'historial_quirurgico' => $paciente->historial_quirurgico,
+                'historial_clinico' => $paciente->historial_clinico,
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Paciente no encontrado'
+        ], 404);
+    }
 }
 
 }

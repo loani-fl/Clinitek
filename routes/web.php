@@ -324,7 +324,7 @@ Route::get('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController
 Route::get('/controles-prenatales/{controlPrenatal}/editar', [ControlPrenatalController::class, 'edit'])->name('controles-prenatales.edit');
 Route::put('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'update'])->name('controles-prenatales.update');
 Route::delete('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'destroy'])->name('controles-prenatales.destroy');
-
+Route::get('pacientes/datos/{id}', [PacienteController::class, 'obtenerDatos'])->name('pacientes.datos');
 
 Route::post('/sesiones/limpiar-archivo', function(){
     session()->forget('archivo_temporal');
@@ -354,3 +354,4 @@ Route::get('/ultrasonidos/analisis/{id}', [UltrasonidoOrderController::class, 'a
 
 Route::post('/ultrasonidos/guardar-analisis/{id}', [UltrasonidoOrderController::class, 'guardarAnalisis'])
     ->name('ultrasonidos.guardarAnalisis');
+    

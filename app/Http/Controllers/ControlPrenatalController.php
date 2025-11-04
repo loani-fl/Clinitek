@@ -31,6 +31,7 @@ class ControlPrenatalController extends Controller
 
     public function store(Request $request)
     {
+        // Validaciones
         $validated = $request->validate([
             // Paciente (nuevo o existente)
             'paciente_existente' => 'nullable|exists:pacientes,id',
@@ -41,8 +42,8 @@ class ControlPrenatalController extends Controller
             'direccion' => 'required_if:paciente_existente,null|string|max:300',
             'telefono' => 'required_if:paciente_existente,null|string|max:8|regex:/^[2389]\d{7}$/',
             'correo' => 'nullable|email|max:50',
-            'tipo_sangre' => 'nullable|string|max:3',
-            'genero' => 'required_if:paciente_existente,null|string|max:10',
+            'tipo_sangre' => 'nullable|string|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'genero' => 'required_if:paciente_existente,null|string|in:Femenino',
             'padecimientos' => 'nullable|string|max:200',
             'medicamentos' => 'nullable|string|max:200',
             'historial_clinico' => 'nullable|string|max:200',
@@ -53,20 +54,10 @@ class ControlPrenatalController extends Controller
             'fecha_ultima_menstruacion' => 'required|date|before_or_equal:today',
             'fecha_probable_parto' => 'required|date|after:fecha_ultima_menstruacion',
             'semanas_gestacion' => 'required|integer|min:0|max:42',
-            'numero_gestaciones' => 'required|integer|min:1|max:20',
             'numero_partos' => 'required|integer|min:0|max:20',
             'numero_abortos' => 'required|integer|min:0|max:20',
-            'numero_hijos_vivos' => 'required|integer|min:0|max:20',
             'tipo_partos_anteriores' => 'nullable|string|max:255',
             'complicaciones_previas' => 'nullable|string',
-            
-            // Antecedentes médicos
-            'enfermedades_cronicas' => 'nullable|string',
-            'alergias_control' => 'nullable|string',
-            'cirugias_previas' => 'nullable|string',
-            'medicamentos_actuales' => 'nullable|string',
-            'habitos' => 'nullable|string',
-            'antecedentes_familiares' => 'nullable|string',
             
             // Datos del control prenatal actual
             'fecha_control' => 'required|date|before_or_equal:today',
@@ -89,11 +80,11 @@ class ControlPrenatalController extends Controller
             'fecha_proxima_cita' => 'nullable|date|after:fecha_control',
         ], [
             // Mensajes personalizados para paciente
-            'nombre.required_if' => 'El nombre es obligatorio.',
+            'nombre.required_if' => 'El nombre es obligatorio cuando no se selecciona una paciente existente.',
             'nombre.max' => 'El nombre no debe exceder 50 caracteres.',
-            'apellidos.required_if' => 'Los apellidos son obligatorios.',
+            'apellidos.required_if' => 'Los apellidos son obligatorios cuando no se selecciona una paciente existente.',
             'apellidos.max' => 'Los apellidos no deben exceder 50 caracteres.',
-            'identidad.required_if' => 'La identidad es obligatoria.',
+            'identidad.required_if' => 'La identidad es obligatoria cuando no se selecciona una paciente existente.',
             'identidad.max' => 'La identidad no debe exceder 13 caracteres.',
             'identidad.unique' => 'Esta identidad ya está registrada.',
             'fecha_nacimiento.required_if' => 'La fecha de nacimiento es obligatoria.',
@@ -101,11 +92,13 @@ class ControlPrenatalController extends Controller
             'direccion.required_if' => 'La dirección es obligatoria.',
             'direccion.max' => 'La dirección no debe exceder 300 caracteres.',
             'telefono.required_if' => 'El teléfono es obligatorio.',
-            'telefono.max' => 'El teléfono no debe exceder 8 caracteres.',
-            'telefono.regex' => 'El teléfono debe iniciar con 2, 3, 8 o 9 y tener 8 dígitos.',
+            'telefono.max' => 'El teléfono debe tener exactamente 8 dígitos.',
+            'telefono.regex' => 'El teléfono debe iniciar con 2, 3, 8 o 9 y tener 8 dígitos en total.',
             'correo.email' => 'El correo debe ser una dirección válida.',
             'correo.max' => 'El correo no debe exceder 50 caracteres.',
+            'tipo_sangre.in' => 'El tipo de sangre seleccionado no es válido.',
             'genero.required_if' => 'El género es obligatorio.',
+            'genero.in' => 'El género debe ser Femenino para controles prenatales.',
             
             // Mensajes para datos obstétricos
             'fecha_ultima_menstruacion.required' => 'La fecha de última menstruación es obligatoria.',
@@ -115,18 +108,12 @@ class ControlPrenatalController extends Controller
             'semanas_gestacion.required' => 'Las semanas de gestación son obligatorias.',
             'semanas_gestacion.min' => 'Las semanas de gestación no pueden ser negativas.',
             'semanas_gestacion.max' => 'Las semanas de gestación no pueden exceder 42.',
-            'numero_gestaciones.required' => 'El número de gestaciones es obligatorio.',
-            'numero_gestaciones.min' => 'El número de gestaciones debe ser al menos 1.',
-            'numero_gestaciones.max' => 'El número de gestaciones no puede exceder 20.',
             'numero_partos.required' => 'El número de partos es obligatorio.',
             'numero_partos.min' => 'El número de partos no puede ser negativo.',
             'numero_partos.max' => 'El número de partos no puede exceder 20.',
             'numero_abortos.required' => 'El número de abortos es obligatorio.',
             'numero_abortos.min' => 'El número de abortos no puede ser negativo.',
             'numero_abortos.max' => 'El número de abortos no puede exceder 20.',
-            'numero_hijos_vivos.required' => 'El número de hijos vivos es obligatorio.',
-            'numero_hijos_vivos.min' => 'El número de hijos vivos no puede ser negativo.',
-            'numero_hijos_vivos.max' => 'El número de hijos vivos no puede exceder 20.',
             
             // Mensajes para control prenatal
             'fecha_control.required' => 'La fecha del control es obligatoria.',
@@ -146,6 +133,7 @@ class ControlPrenatalController extends Controller
             'altura_uterina.max' => 'La altura uterina no puede exceder 50 cm.',
             'latidos_fetales.min' => 'Los latidos fetales deben ser al menos 100 lpm.',
             'latidos_fetales.max' => 'Los latidos fetales no pueden exceder 180 lpm.',
+            'movimientos_fetales.max' => 'Los movimientos fetales no deben exceder 100 caracteres.',
             'edema.required' => 'El nivel de edema es obligatorio.',
             'edema.in' => 'El nivel de edema seleccionado no es válido.',
             'presentacion_fetal.in' => 'La presentación fetal seleccionada no es válida.',
@@ -164,10 +152,10 @@ class ControlPrenatalController extends Controller
                 'correo' => $validated['correo'] ?? null,
                 'tipo_sangre' => $validated['tipo_sangre'] ?? null,
                 'genero' => $validated['genero'],
-                'padecimientos' => $validated['padecimientos'] ?? '',
-                'medicamentos' => $validated['medicamentos'] ?? '',
-                'historial_clinico' => $validated['historial_clinico'] ?? '',
-                'alergias' => $validated['alergias'] ?? '',
+                'padecimientos' => $validated['padecimientos'] ?? null,
+                'medicamentos' => $validated['medicamentos'] ?? null,
+                'historial_clinico' => $validated['historial_clinico'] ?? null,
+                'alergias' => $validated['alergias'] ?? null,
                 'historial_quirurgico' => $validated['historial_quirurgico'] ?? null,
             ]);
             $paciente_id = $paciente->id;
@@ -175,29 +163,43 @@ class ControlPrenatalController extends Controller
             $paciente_id = $request->paciente_existente;
         }
 
-        // Crear control prenatal
-        $validated['paciente_id'] = $paciente_id;
-        
-        // Remover campos de paciente del array validated
-        unset(
-            $validated['paciente_existente'], 
-            $validated['nombre'], 
-            $validated['apellidos'],
-            $validated['identidad'], 
-            $validated['fecha_nacimiento'], 
-            $validated['direccion'], 
-            $validated['telefono'], 
-            $validated['correo'],
-            $validated['tipo_sangre'],
-            $validated['genero'],
-            $validated['padecimientos'],
-            $validated['medicamentos'],
-            $validated['historial_clinico'],
-            $validated['alergias'],
-            $validated['historial_quirurgico']
-        );
+        // Calcular numero_gestaciones basado en partos y abortos
+        $numero_gestaciones = $validated['numero_partos'] + $validated['numero_abortos'] + 1; // +1 por el embarazo actual
 
-        ControlPrenatal::create($validated);
+        // Calcular numero_hijos_vivos (asumiendo que todos los partos resultaron en hijos vivos, se puede ajustar)
+        $numero_hijos_vivos = $validated['numero_partos'];
+
+        // Crear control prenatal
+        $datosControl = [
+            'paciente_id' => $paciente_id,
+            'fecha_ultima_menstruacion' => $validated['fecha_ultima_menstruacion'],
+            'fecha_probable_parto' => $validated['fecha_probable_parto'],
+            'semanas_gestacion' => $validated['semanas_gestacion'],
+            'numero_gestaciones' => $numero_gestaciones,
+            'numero_partos' => $validated['numero_partos'],
+            'numero_abortos' => $validated['numero_abortos'],
+            'numero_hijos_vivos' => $numero_hijos_vivos,
+            'tipo_partos_anteriores' => $validated['tipo_partos_anteriores'],
+            'complicaciones_previas' => $validated['complicaciones_previas'],
+            'fecha_control' => $validated['fecha_control'],
+            'presion_arterial' => $validated['presion_arterial'],
+            'frecuencia_cardiaca_materna' => $validated['frecuencia_cardiaca_materna'],
+            'temperatura' => $validated['temperatura'],
+            'peso_actual' => $validated['peso_actual'],
+            'altura_uterina' => $validated['altura_uterina'],
+            'latidos_fetales' => $validated['latidos_fetales'],
+            'movimientos_fetales' => $validated['movimientos_fetales'],
+            'edema' => $validated['edema'],
+            'presentacion_fetal' => $validated['presentacion_fetal'],
+            'resultados_examenes' => $validated['resultados_examenes'],
+            'observaciones' => $validated['observaciones'],
+            'suplementos' => $validated['suplementos'],
+            'vacunas_aplicadas' => $validated['vacunas_aplicadas'],
+            'indicaciones_medicas' => $validated['indicaciones_medicas'],
+            'fecha_proxima_cita' => $validated['fecha_proxima_cita'],
+        ];
+
+        ControlPrenatal::create($datosControl);
 
         return redirect()->route('controles-prenatales.index')
             ->with('success', 'Control prenatal registrado exitosamente.');
@@ -222,20 +224,10 @@ class ControlPrenatalController extends Controller
             'fecha_ultima_menstruacion' => 'required|date|before_or_equal:today',
             'fecha_probable_parto' => 'required|date|after:fecha_ultima_menstruacion',
             'semanas_gestacion' => 'required|integer|min:0|max:42',
-            'numero_gestaciones' => 'required|integer|min:1|max:20',
             'numero_partos' => 'required|integer|min:0|max:20',
             'numero_abortos' => 'required|integer|min:0|max:20',
-            'numero_hijos_vivos' => 'required|integer|min:0|max:20',
             'tipo_partos_anteriores' => 'nullable|string|max:255',
             'complicaciones_previas' => 'nullable|string',
-            
-            // Antecedentes médicos
-            'enfermedades_cronicas' => 'nullable|string',
-            'alergias' => 'nullable|string',
-            'cirugias_previas' => 'nullable|string',
-            'medicamentos_actuales' => 'nullable|string',
-            'habitos' => 'nullable|string',
-            'antecedentes_familiares' => 'nullable|string',
             
             // Datos del control prenatal actual
             'fecha_control' => 'required|date|before_or_equal:today',
@@ -257,6 +249,10 @@ class ControlPrenatalController extends Controller
             'indicaciones_medicas' => 'nullable|string',
             'fecha_proxima_cita' => 'nullable|date|after:fecha_control',
         ]);
+
+        // Recalcular numero_gestaciones y numero_hijos_vivos
+        $validated['numero_gestaciones'] = $validated['numero_partos'] + $validated['numero_abortos'] + 1;
+        $validated['numero_hijos_vivos'] = $validated['numero_partos'];
 
         $controlPrenatal->update($validated);
 
