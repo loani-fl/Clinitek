@@ -1,16 +1,13 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UltrasonidoImagen extends Model
+class UltrasonidoEndometriosis extends Model
 {
     protected $fillable = [
         'ultrasonido_id',
-        'ruta',
-        'descripcion',
-        'tipo_examen',
+        'observaciones',
     ];
 
     public function ultrasonido()
@@ -18,4 +15,3 @@ class UltrasonidoImagen extends Model
         return $this->belongsTo(Ultrasonido::class);
     }
 }
-

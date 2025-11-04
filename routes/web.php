@@ -355,3 +355,5 @@ Route::get('/ultrasonidos/analisis/{id}', [UltrasonidoOrderController::class, 'a
 Route::post('/ultrasonidos/guardar-analisis/{id}', [UltrasonidoOrderController::class, 'guardarAnalisis'])
     ->name('ultrasonidos.guardarAnalisis');
     
+
+Route::get('/ginecologia', [ControlPrenatalController::class, 'index'])->name('ginecologia.index');

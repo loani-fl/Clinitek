@@ -8,20 +8,67 @@ use Illuminate\Http\Request;
 
 class ControlPrenatalController extends Controller
 {
-    public function index()
+   public function index(Request $request)
     {
-        $controles = ControlPrenatal::with('paciente')->latest()->paginate(15);
-        
+        $query = $request->input('search', '');
+        $fechaInicio = $request->input('fecha_desde');
+        $fechaFin = $request->input('fecha_hasta');
+        $perPage = 5; // cantidad por página
+
         $totalControles = ControlPrenatal::count();
-        $controlesHoy = ControlPrenatal::whereDate('fecha_control', today())->count();
-        $proximasCitas = ControlPrenatal::whereDate('fecha_proxima_cita', '>=', today())
-                                         ->orderBy('fecha_proxima_cita')
-                                         ->limit(5)
-                                         ->with('paciente')
-                                         ->get();
-        
-        return view('controlPrenatal.index', compact('controles', 'totalControles', 'controlesHoy', 'proximasCitas'));
+
+        $controlesQuery = ControlPrenatal::with('paciente')
+            ->orderBy('fecha_control', 'desc');
+
+        // Filtro por nombre/apellido
+        if ($query) {
+            $controlesQuery->whereHas('paciente', function($q) use ($query) {
+                $q->where('nombre', 'like', "%$query%")
+                  ->orWhere('apellidos', 'like', "%$query%");
+            });
+        }
+
+        // Filtro por fechas
+        if ($fechaInicio) $controlesQuery->where('fecha_control', '>=', $fechaInicio);
+        if ($fechaFin) $controlesQuery->where('fecha_control', '<=', $fechaFin);
+
+        $isSearch = ($query || $fechaInicio || $fechaFin);
+
+        $totalFiltrado = $controlesQuery->count();
+        $controles = $controlesQuery->paginate($perPage);
+
+        $controles->appends([
+            'search' => $query,
+            'fecha_desde' => $fechaInicio,
+            'fecha_hasta' => $fechaFin
+        ]);
+
+        // Petición AJAX
+        if ($request->ajax()) {
+            $currentPage = $controles->currentPage();
+            $lastPage = max($controles->lastPage(), 1);
+
+            $customPagination = view('controlPrenatal.custom-pagination', [
+                'currentPage' => $currentPage,
+                'lastPage' => $lastPage,
+                'hasMorePages' => $controles->hasMorePages(),
+                'onFirstPage' => $controles->onFirstPage(),
+                'from' => $controles->firstItem() ?? 0,
+                'to' => $controles->lastItem() ?? 0,
+                'total' => $controles->total(),
+            ])->render();
+
+            return response()->json([
+                'html' => view('controlPrenatal.tabla', compact('controles', 'isSearch'))->render(),
+                'pagination' => $customPagination,
+                'total' => $totalFiltrado,
+                'all' => $totalControles,
+            ]);
+        }
+
+        return view('controlPrenatal.index', compact('controles', 'isSearch', 'totalControles'));
     }
+
 
     public function create()
     {
@@ -268,16 +315,5 @@ class ControlPrenatalController extends Controller
             ->with('success', 'Control prenatal eliminado exitosamente.');
     }
     
-    public function indexGinecologia()
-    {
-        $totalControles = ControlPrenatal::count();
-        $controlesHoy = ControlPrenatal::whereDate('fecha_control', today())->count();
-        $proximasCitas = ControlPrenatal::whereDate('fecha_proxima_cita', '>=', today())
-                                         ->orderBy('fecha_proxima_cita')
-                                         ->limit(5)
-                                         ->with('paciente')
-                                         ->get();
-        
-        return view('controlPrenatal.index', compact('totalControles', 'controlesHoy', 'proximasCitas'));
-    }
+ 
 }

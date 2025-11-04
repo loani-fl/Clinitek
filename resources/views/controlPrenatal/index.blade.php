@@ -1,173 +1,186 @@
 @extends('layouts.app')
 
+@section('title', 'Control Prenatal')
+
 @section('content')
-<div class="container py-4">
-    <div class="row">
-        <!-- Header -->
-        <div class="col-12 mb-4">
-            <div class="card shadow-lg border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <div class="card-body text-white p-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h2 class="mb-2">
-                                <i class="bi bi-heart-pulse-fill"></i> Ginecología
-                            </h2>
-                            <p class="mb-0 opacity-75">Sistema de Control Prenatal</p>
-                        </div>
-                        <a href="{{ route('controles-prenatales.create') }}" class="btn btn-light btn-lg shadow">
-                            <i class="bi bi-plus-circle"></i> Registro de Control Prenatal
-                        </a>
-                    </div>
-                </div>
+<style>
+    body {
+        background-color: #e8f4fc;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+    .content-wrapper {
+        margin-top: 50px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 1rem;
+        position: relative;
+        max-width: 1000px;
+        width: 100%;
+    }
+    .custom-card::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 800px;
+        height: 800px;
+        background-image: url('{{ asset("images/logo2.jpg") }}');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.15;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 0;
+    }
+    .custom-card {
+        background-color: #fff;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        position: relative;
+        z-index: 1;
+        max-width: 1000px;
+        width: 100%;
+    }
+    .card-header {
+        border-bottom: 3px solid #007BFF;
+        margin-bottom: 1rem;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .card-header h2 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #003366;
+        margin: 0 auto;
+    }
+    .pagination-container {
+        font-size: 0.9rem;
+        margin-top: 1rem;
+        display: flex;
+        justify-content: center;
+    }
+</style>
+
+<div class="content-wrapper">
+    <div class="card custom-card shadow-sm">
+        <div class="card-header">
+            <a href="{{ route('inicio') }}" class="btn btn-light btn-inicio me-3">
+                <i class="bi bi-house-door"></i> Inicio
+            </a>
+
+            <h2>Control Prenatal</h2>
+
+            <a href="{{ route('controles-prenatales.create') }}" class="btn btn-primary ms-3">
+                <i class="bi bi-plus-circle"></i> Nuevo Control
+            </a>
+        </div>
+
+        {{-- Filtros --}}
+        <div class="d-flex filter-container mb-3">
+            <div>
+                <label for="filtroBusqueda" class="filtro-label">Paciente</label>
+                <input type="text" id="filtroBusqueda" class="form-control filtro-input"
+                       placeholder="Buscar paciente..." autocomplete="off" value="{{ request('search') }}">
+            </div>
+            <div>
+                <label for="fechaDesde" class="filtro-label">Desde</label>
+                <input type="date" id="fechaDesde" class="form-control filtro-input" value="{{ request('fecha_desde') }}">
+            </div>
+            <div>
+                <label for="fechaHasta" class="filtro-label">Hasta</label>
+                <input type="date" id="fechaHasta" class="form-control filtro-input" value="{{ request('fecha_hasta') }}">
+            </div>
+            <div style="align-self: flex-end;">
+                <button id="btnRecargar" class="btn btn-secondary">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
             </div>
         </div>
 
-        <!-- Estadísticas -->
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body text-center">
-                    <div class="mb-3">
-                        <i class="bi bi-clipboard-data" style="font-size: 3rem; color: #667eea;"></i>
-                    </div>
-                    <h3 class="fw-bold" style="color: #667eea;">{{ $totalControles }}</h3>
-                    <p class="text-muted mb-0">Total de Controles</p>
-                </div>
-            </div>
+        {{-- Tabla --}}
+        <div id="tabla-container">
+            @include('controlPrenatal.tabla', ['controles' => $controles])
         </div>
 
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body text-center">
-                    <div class="mb-3">
-                        <i class="bi bi-calendar-check" style="font-size: 3rem; color: #f093fb;"></i>
-                    </div>
-                    <h3 class="fw-bold" style="color: #f093fb;">{{ $controlesHoy }}</h3>
-                    <p class="text-muted mb-0">Controles Hoy</p>
-                </div>
-            </div>
-        </div>
+        <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
 
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body text-center">
-                    <div class="mb-3">
-                        <i class="bi bi-clock-history" style="font-size: 3rem; color: #4facfe;"></i>
-                    </div>
-                    <h3 class="fw-bold" style="color: #4facfe;">{{ $proximasCitas->count() }}</h3>
-                    <p class="text-muted mb-0">Próximas Citas</p>
-                </div>
-            </div>
+        {{-- Paginación --}}
+        <div id="paginacion-container" class="pagination-container">
+            @include('controlPrenatal.custom-pagination', [
+                'currentPage' => $controles->currentPage(),
+                'lastPage' => $controles->lastPage(),
+                'hasMorePages' => $controles->hasMorePages(),
+                'onFirstPage' => $controles->onFirstPage(),
+                'from' => $controles->firstItem(),
+                'to' => $controles->lastItem(),
+                'total' => $controles->total(),
+            ])
         </div>
-
-        <!-- Acciones Rápidas -->
-        <div class="col-12 mb-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-0 pt-4">
-                    <h5 class="mb-0">
-                        <i class="bi bi-lightning-charge-fill text-warning"></i> Acciones Rápidas
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <a href="{{ route('controles-prenatales.create') }}" class="btn btn-primary w-100 py-3 shadow-sm">
-                                <i class="bi bi-plus-lg d-block mb-2" style="font-size: 1.5rem;"></i>
-                                Nuevo Control
-                            </a>
-                        </div>
-                        <div class="col-md-3">
-                            <a href="{{ route('controles-prenatales.index') }}" class="btn btn-info w-100 py-3 shadow-sm text-white">
-                                <i class="bi bi-list-ul d-block mb-2" style="font-size: 1.5rem;"></i>
-                                Ver Todos
-                            </a>
-                        </div>
-                        <div class="col-md-3">
-                            <a href="{{ route('pacientes.index') }}" class="btn btn-success w-100 py-3 shadow-sm">
-                                <i class="bi bi-people-fill d-block mb-2" style="font-size: 1.5rem;"></i>
-                                Pacientes
-                            </a>
-                        </div>
-                        <div class="col-md-3">
-                            <a href="/" class="btn btn-secondary w-100 py-3 shadow-sm">
-                                <i class="bi bi-house-fill d-block mb-2" style="font-size: 1.5rem;"></i>
-                                Inicio
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Próximas Citas -->
-        @if($proximasCitas->count() > 0)
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-0 pt-4">
-                    <h5 class="mb-0">
-                        <i class="bi bi-calendar2-event text-primary"></i> Próximas Citas Programadas
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Paciente</th>
-                                    <th>Identidad</th>
-                                    <th>Fecha de Cita</th>
-                                    <th>Semanas de Gestación</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($proximasCitas as $cita)
-                                <tr>
-                                    <td>
-                                        <i class="bi bi-person-circle text-primary"></i>
-                                        {{ $cita->paciente->nombre_completo }}
-                                    </td>
-                                    <td>{{ $cita->paciente->numero_identidad }}</td>
-                                    <td>
-                                        <span class="badge bg-info">
-                                            <i class="bi bi-calendar3"></i>
-                                            {{ $cita->fecha_proxima_cita->format('d/m/Y') }}
-                                        </span>
-                                    </td>
-                                    <td>{{ $cita->semanas_gestacion }} semanas</td>
-                                    <td>
-                                        <a href="{{ route('controles-prenatales.show', $cita) }}" class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-eye"></i> Ver
-                                        </a>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endif
     </div>
 </div>
 
-@push('styles')
-<style>
-    .card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function () {
+    function actualizarMensaje(total, all, query) {
+        if (query === '') {
+            $('#mensajeResultados').html('');
+        } else if (total === 0) {
+            $('#mensajeResultados').html(`No se encontraron resultados para "<strong>${query}</strong>".`);
+        } else {
+            $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
+        }
     }
-    
-    .card:hover {
-        transform: translateY(-5px);
+
+    function cargarDatos(page = 1, query = '') {
+        const fechaDesde = $('#fechaDesde').val();
+        const fechaHasta = $('#fechaHasta').val();
+
+        $.ajax({
+           url: "{{ route('ginecologia.index') }}",
+            type: 'GET',
+            data: {
+                page,
+                search: query,
+                fecha_desde: fechaDesde,
+                fecha_hasta: fechaHasta
+            },
+            success: function(data) {
+                $('#tabla-container').html(data.html);
+                $('#paginacion-container').html(data.pagination);
+                actualizarMensaje(data.total, data.all, query);
+            },
+            error: function(xhr) {
+                let msg = 'Error al cargar los datos.';
+                if(xhr.responseJSON && xhr.responseJSON.message) msg += ' ' + xhr.responseJSON.message;
+                $('#mensajeResultados').html(msg);
+            }
+        });
     }
-    
-    .btn {
-        transition: all 0.3s ease;
-    }
-    
-    .btn:hover {
-        transform: translateY(-2px);
-    }
-</style>
-@endpush
+
+    // Inicial
+    cargarDatos(1, $('#filtroBusqueda').val());
+
+    // Eventos
+    $('#filtroBusqueda').on('keyup', function () { cargarDatos(1, $(this).val()); });
+    $('#fechaDesde, #fechaHasta').on('change', function () { cargarDatos(1, $('#filtroBusqueda').val()); });
+    $('#btnRecargar').on('click', function () {
+        $('#filtroBusqueda, #fechaDesde, #fechaHasta').val('');
+        cargarDatos(1, '');
+    });
+    $(document).on('click', '.pagination a', function(e) {
+        e.preventDefault();
+        const page = new URLSearchParams($(this).attr('href').split('?')[1]).get('page') || 1;
+        cargarDatos(page, $('#filtroBusqueda').val());
+    });
+});
+</script>
 @endsection

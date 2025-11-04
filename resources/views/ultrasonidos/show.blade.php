@@ -1,355 +1,248 @@
 @extends('layouts.app')
 
+@section('title', 'Resultados de Ultrasonido')
+
 @section('content')
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
-<style>
-    body {
-        background-color: #e8f4fc;
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-    }
-
-    .custom-card {
-        max-width: 900px;
-        background-color: #fff;
-        margin: 20px auto 40px auto;
-        border-radius: 1rem;
-        padding: 1.5rem 2rem;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-        position: relative;
-        background-image: url('/images/logo2.jpg');
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-    }
-
-    .custom-card::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: rgba(255,255,255,0.9);
-        border-radius: 1rem;
-        z-index: 0;
-    }
-
-    .custom-card > * {
-        position: relative;
-        z-index: 1;
-    }
-
-    /* Header */
-    .header-flex {
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-
-    .header-flex h2 {
-        margin: 0;
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #003366;
-        border-bottom: 2px solid #007BFF;
-        padding-bottom: 0.4rem;
-        display: inline-block;
-    }
-
-    h4 {
-        color: #003366;
-        font-weight: 700;
-        margin-top: 1rem;
-        margin-bottom: 0.7rem;
-        font-size: 0.95rem;
-    }
-
-    /* Datos del paciente */
-    .datos-paciente-flex {
-        display: flex;
-        gap: 1.5rem;
-        flex-wrap: wrap;
-        margin-bottom: 1rem;
-        list-style: none;
-        padding-left: 0;
-    }
-
-    .datos-paciente-flex li {
-        flex: 1 1 200px;
-        padding: 0.3rem 0;
-        border-bottom: 1px solid #ccc;
-        display: flex;
-        gap: 0.5rem;
-        color: #222;
-        font-weight: 600;
-        font-size: 0.85rem;
-    }
-
-    .datos-paciente-flex li strong {
-        width: 80px;
-        color: #004080;
-        font-weight: 700;
-    }
-
-    /* Médico info */
-    .medico-info {
-        font-size: 0.85rem;
-        color: #222;
-        font-weight: 600;
-        margin: 0.5rem 0 1rem 0;
-    }
-
-    .medico-info strong {
-        color: #004080;
-        font-weight: 700;
-    }
-
-    /* Tarjetas de exámenes */
-    .examen-card {
-        margin-bottom: 2rem;
-        padding-bottom: 0.8rem;
-        border-bottom: 2px solid #007BFF;
-    }
-
-    .examen-card:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
-    }
-
-    .examen-nombre {
-        font-weight: 700;
-        font-size: 0.95rem;
-        color: #004080;
-        margin-bottom: 0.5rem;
-    }
-
-    /* Galería de imágenes */
-    .img-gallery {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.8rem;
-    }
-
-    .img-card {
-        flex: 1 1 calc(33.33% - 0.8rem);
-        max-width: calc(33.33% - 0.8rem);
-        border-radius: 0.4rem;
-        overflow: hidden;
-        background-color: #f8f9fa;
-        cursor: pointer;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border: 1px solid #ddd;
-        padding: 0.5rem;
-    }
-
-    .img-card:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-    }
-
-    @media (max-width: 992px) {
-        .img-card {
-            flex: 1 1 calc(50% - 0.8rem);
-            max-width: calc(50% - 0.8rem);
-        }
-    }
-
-    @media (max-width: 576px) {
-        .img-card {
-            flex: 1 1 100%;
-            max-width: 100%;
-        }
-    }
-
-    .img-preview {
-        width: 100%;
-        height: 130px;
-        display: block;
-        border-radius: 0.3rem;
-        object-fit: cover;
-    }
-
-    .img-description {
-        font-size: 0.75rem;
-        color: #555;
-        margin-top: 0.4rem;
-        text-align: center;
-        line-height: 1.2;
-        white-space: normal;
-        overflow-wrap: break-word;
-    }
-
-    /* Modal navegación */
-    .modal-nav {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 2rem;
-        color: #ff8c00;
-        text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
-        cursor: pointer;
-        z-index: 1055;
-        user-select: none;
-        transition: color 0.2s ease;
-    }
-
-    .modal-nav:hover {
-        color: #ffa500;
-    }
-
-    .modal-prev {
-        left: 10px;
-    }
-
-    .modal-next {
-        right: 10px;
-    }
-
-    .modal-content img {
-        width: 100%;
-        height: auto;
-        object-fit: contain;
-    }
-
-    [id^="modal-desc-"] {
-        overflow-y: auto;
-        white-space: normal;
-        overflow-wrap: break-word;
-        line-height: 1.4rem;
-        font-size: 0.85rem;
-    }
-
-    .no-images {
-        font-size: 0.85rem;
-        color: #666;
-        font-style: italic;
-        text-align: center;
-        padding: 1rem;
-    }
-
-    .btn-group-bottom {
-        display: flex;
-        justify-content: center;
-        gap: 0.6rem;
-        margin-top: 1.2rem;
-    }
-
-    .btn-group-bottom .btn {
-        min-width: 120px;
-        padding: 0.35rem 0.9rem;
-        font-size: 0.8rem;
-    }
-</style>
-
-<div class="custom-card">
-    <!-- Header con título -->
-    <div class="header-flex">
-        <h2>Informe de Ultrasonido</h2>
-    </div>
-
-    <!-- Datos del paciente -->
-    <h4>Datos del paciente</h4>
-    <ul class="datos-paciente-flex">
-        <li><strong>Nombre</strong> {{ $orden->paciente->nombre ?? 'N/A' }}</li>
-        <li><strong>Apellidos</strong> {{ $orden->paciente->apellidos ?? 'N/A' }}</li>
-        <li><strong>Identidad</strong> {{ $orden->paciente->identidad ?? 'N/A' }}</li>
-        <li><strong>Género</strong> {{ $orden->paciente->genero ?? 'N/A' }}</li>
-        <li><strong>Edad</strong> {{ $orden->paciente->edad ?? 'No especificada' }}</li>
-        <li><strong>Fecha estudio</strong> {{ $orden->fecha ?? $orden->created_at->format('d/m/Y') }}</li>
-    </ul>
-
-    <!-- Médico responsable -->
-    <h4>Médico Responsable</h4>
-    <p class="medico-info">
-        <strong>Médico</strong> {{ $orden->medico ? $orden->medico->nombre . ' ' . $orden->medico->apellidos : 'Sin asignar' }}
-    </p>
-
-    <!-- Exámenes realizados -->
-    <h4>Ultrasonidos realizados</h4>
-    
     @php
-        $examenesPorNombre = $orden->imagenes->groupBy('examen_nombre');
+        use Carbon\Carbon;
     @endphp
 
-    @forelse ($examenesPorNombre as $nombreExamen => $imagenes)
-        <div class="examen-card">
-            <div class="examen-nombre">
-                {{ $nombreExamen ?? 'Ultrasonido sin especificar' }}
+    <style>
+        /* Estilos visuales */
+        .custom-card::before {
+            content: "";
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 800px; height: 800px;
+            background-image: url('/images/logo2.jpg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.12;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .custom-card {
+            max-width: 1000px;
+            background-color: #fff;
+            border: 1px solid #91cfff;
+            border-radius: 12px;
+            margin: 1.5rem auto;
+            padding: 1.2rem;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .info-label { font-weight: 700; font-size: 1rem; color: #003366; display:block; }
+        .info-value { font-size: 1.05rem; color: #222; margin-top: 4px; }
+        .info-block { padding: 6px 8px; }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 1rem;
+            margin-bottom: 0.6rem;
+            color: #0b5ed7;
+            border-bottom: 2px solid #0b5ed7;
+            padding-bottom: 4px;
+        }
+        .examen-card {
+            margin-top: 1.5rem;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background-color: #f7f9fc;
+        }
+        .examen-card h4 {
+            color: #004080;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            border-bottom: 1px dashed #007BFF;
+            padding-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        .imagenes-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: flex-start;
+        }
+        .imagen-block {
+            flex: 0 0 calc(33.33% - 1rem);
+            min-width: 280px;
+            max-width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            padding: 0.75rem;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .imagen-block:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .imagen-block img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 0.3rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+        .imagen-block .descripcion-text {
+            font-size: 0.85rem;
+            margin: 0;
+            padding: 0.5rem 0;
+            color: #555;
+            white-space: pre-wrap;
+            background-color: #f8f8f8;
+            padding: 8px;
+            border-radius: 4px;
+        }
+    </style>
+
+    <div class="container mt-3">
+        <div class="card custom-card shadow-sm border rounded-4">
+
+            <div class="card-header py-3" style="background-color:#fff;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0 fw-bold text-dark">Resultados de Ultrasonido</h3>
+
+                    <!-- Botón de Reporte -->
+                    <button onclick="window.print()"
+                            class="btn btn-warning btn-sm d-inline-flex align-items-center gap-2 shadow-sm">
+                        <i class="bi bi-printer"></i> Imprimir reporte
+                    </button>
+
+                </div>
             </div>
 
-            @if($imagenes && $imagenes->count() > 0)
-                <div class="img-gallery" id="gallery-{{ $loop->index }}">
-                    @foreach ($imagenes as $index => $imagen)
-                        @if($imagen->ruta)
-                            <div class="img-card" onclick="openModal({{ $loop->parent->index }}, {{ $index }})">
-                                <img src="{{ asset('storage/' . $imagen->ruta) }}" 
-                                     class="img-preview" 
-                                     alt="{{ $imagen->descripcion ?? 'Imagen de ultrasonido' }}" />
-                                <p class="img-description">
-                                    {{ $imagen->descripcion ?? 'Sin descripción' }}
-                                </p>
-                            </div>
-                        @endif
-                    @endforeach
-                </div>
+            <!-- Línea azul -->
+            <div style="height:4px; background:#0d6efd; width:100%;"></div>
 
-                <!-- Modal -->
-                <div class="modal fade" id="modal-{{ $loop->index }}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered modal-lg">
-                        <div class="modal-content position-relative bg-dark">
-                            <span class="modal-nav modal-prev" onclick="prevImage({{ $loop->index }})">&lt;</span>
-                            <span class="modal-nav modal-next" onclick="nextImage({{ $loop->index }})">&gt;</span>
-                            <img id="modal-img-{{ $loop->index }}" src="" alt="">
-                            <div id="modal-desc-{{ $loop->index }}" class="p-2 text-center text-white"></div>
+            <div class="card-body px-3 py-3">
+
+            {{-- Datos de la Orden y Paciente --}}
+                <div class="row gy-2">
+                    <div class="col-12"><div class="section-title">Información de la Orden</div></div>
+
+                    <div class="col-md-4 info-block">
+                        <span class="info-label">Paciente:</span>
+                        <div class="info-value">
+                            {{ $orden->paciente?->nombre ?? 'Sin paciente' }}
+                            {{ $orden->paciente?->apellidos ?? '' }}
+                        </div>
+                    </div>
+                    <div class="col-md-4 info-block">
+                        <span class="info-label">Identidad:</span>
+                        <div class="info-value">
+                            {{ $orden->paciente?->identidad ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="col-md-4 info-block">
+                        <span class="info-label">Fecha de Orden:</span>
+                        <div class="info-value">
+                            {{ optional($orden->created_at)->format('d/m/Y h:i A') ?? '—' }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 info-block">
+                        <span class="info-label">Médico analista:</span>
+                        <div class="info-value">
+                            {{ $orden->medico?->nombre ?? 'No asignado' }}
+                            {{ $orden->medico?->apellidos ?? '' }}
                         </div>
                     </div>
                 </div>
-            @else
-                <p class="no-images">Sin imágenes registradas</p>
-            @endif
+
+                {{-- Mostrar imágenes --}}
+                @if($orden->imagenes->isEmpty())
+                    <div class="alert alert-info text-center mt-3">
+                        Este paciente aún no tiene análisis de ultrasonido registrados.
+                    </div>
+                @else
+                    @foreach($examenesKeys as $examenKey)
+                        @php
+                            $nombreExamen = $mapaNombres[$examenKey] ?? ucfirst($examenKey);
+                            $imagenesDelExamen = $imagenesAgrupadas[$examenKey] ?? collect();
+                        @endphp
+
+                        @if($imagenesDelExamen->isNotEmpty())
+                            <div class="examen-card">
+                                <h4>{{ $nombreExamen }}</h4>
+                                <div class="imagenes-container">
+                                    @foreach($imagenesDelExamen as $imagen)
+                                        <div class="imagen-block"
+                                             data-bs-toggle="modal"
+                                             data-bs-target="#imagenModal"
+                                             data-ruta="{{ asset('storage/' . $imagen->ruta) }}"
+                                             data-descripcion="{{ $imagen->descripcion }}">
+
+                                            <img src="{{ asset('storage/' . $imagen->ruta) }}"
+                                                 alt="Imagen de {{ $nombreExamen }}"
+                                                 title="Haga clic para ampliar">
+
+                                            <span class="info-label" style="font-size:0.9rem; color:#007BFF;">Descripción:</span>
+                                            <p class="descripcion-text">{{ $imagen->descripcion ?? 'Sin descripción.' }}</p>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
+                @endif
+
+                {{-- Botón de regreso --}}
+                <div class="text-center pt-4">
+                    <a href="{{ route('ultrasonidos.index') }}" class="btn btn-success px-4 shadow-sm">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
         </div>
-    @empty
-        <p class="no-images">No hay ultrasonidos registrados para esta orden.</p>
-    @endforelse
-
-    <!-- Botón volver -->
-    <div class="btn-group-bottom">
-        <a href="{{ route('ultrasonidos.index') }}" class="btn btn-success">
-            <i class="bi bi-arrow-left-circle"></i> Volver
-        </a>
     </div>
-</div>
 
-<script>
-    const examsImages = {};
-    @foreach ($examenesPorNombre as $index => $imagenes)
-        examsImages[{{ $loop->index }}] = [
-            @foreach ($imagenes as $imagen)
-                { src: "{{ asset('storage/' . $imagen->ruta) }}", desc: "{{ $imagen->descripcion ?? '' }}" },
-            @endforeach
-        ];
-    @endforeach
+    {{-- MODAL PARA AMPLIAR IMAGEN --}}
+    <div class="modal fade" id="imagenModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Detalle de Imagen</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-0">
+                    <img id="modalImagenAmpliada" src="" class="img-fluid" style="max-height: 80vh; width: auto; object-fit: contain;">
+                </div>
+                <div class="modal-footer justify-content-start">
+                    <strong class="info-label">Descripción:</strong>
+                    <p id="modalDescripcion" class="mb-0 text-break" style="font-size:0.95rem;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    const currentIndex = {};
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const imagenModal = document.getElementById('imagenModal');
+                const modalImagenAmpliada = document.getElementById('modalImagenAmpliada');
+                const modalDescripcion = document.getElementById('modalDescripcion');
 
-    function openModal(examenId, index) {
-        currentIndex[examenId] = index;
-        const modal = new bootstrap.Modal(document.getElementById(`modal-${examenId}`));
-        document.getElementById(`modal-img-${examenId}`).src = examsImages[examenId][index].src;
-        document.getElementById(`modal-desc-${examenId}`).innerText = examsImages[examenId][index].desc;
-        modal.show();
-    }
+                imagenModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const ruta = button.getAttribute('data-ruta');
+                    const descripcion = button.getAttribute('data-descripcion');
 
-    function nextImage(examenId) {
-        currentIndex[examenId] = (currentIndex[examenId] + 1) % examsImages[examenId].length;
-        document.getElementById(`modal-img-${examenId}`).src = examsImages[examenId][currentIndex[examenId]].src;
-        document.getElementById(`modal-desc-${examenId}`).innerText = examsImages[examenId][currentIndex[examenId]].desc;
-    }
+                    modalImagenAmpliada.src = ruta;
+                    modalDescripcion.textContent = descripcion || 'Sin descripción proporcionada.';
+                });
+            });
+        </script>
 
-    function prevImage(examenId) {
-        currentIndex[examenId] = (currentIndex[examenId] - 1 + examsImages[examenId].length) % examsImages[examenId].length;
-        document.getElementById(`modal-img-${examenId}`).src = examsImages[examenId][currentIndex[examenId]].src;
-        document.getElementById(`modal-desc-${examenId}`).innerText = examsImages[examenId][currentIndex[examenId]].desc;
-    }
-</script>
+
+    @endpush
+
 @endsection
