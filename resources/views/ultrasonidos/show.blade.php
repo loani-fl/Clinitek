@@ -111,11 +111,12 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h3 class="mb-0 fw-bold text-dark">Resultados de Ultrasonido</h3>
 
-                    <button class="btn btn-warning px-4 shadow-sm d-flex align-items-center gap-2"
-                            style="border-radius: 6px;"
-                            onclick="imprimirReporte()">
+                    <!-- Botón de Reporte -->
+                    <button onclick="window.print()"
+                            class="btn btn-warning btn-sm d-inline-flex align-items-center gap-2 shadow-sm">
                         <i class="bi bi-printer"></i> Imprimir reporte
                     </button>
+
                 </div>
             </div>
 
