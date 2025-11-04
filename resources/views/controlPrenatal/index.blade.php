@@ -66,6 +66,10 @@
         display: flex;
         justify-content: center;
     }
+    .card-header {
+    background-color: transparent !important;
+}
+
 </style>
 
 <div class="content-wrapper">
@@ -106,7 +110,10 @@
 
         {{-- Tabla --}}
         <div id="tabla-container">
-            @include('controlPrenatal.tabla', ['controles' => $controles])
+            @include('controlPrenatal.tabla', [
+                'controles' => $controles,
+                'isSearch' => $isSearch
+            ])
         </div>
 
         <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
@@ -130,6 +137,7 @@
 
 <script>
 $(document).ready(function () {
+
     function actualizarMensaje(total, all, query) {
         if (query === '') {
             $('#mensajeResultados').html('');
@@ -145,7 +153,7 @@ $(document).ready(function () {
         const fechaHasta = $('#fechaHasta').val();
 
         $.ajax({
-           url: "{{ route('ginecologia.index') }}",
+            url: "{{ route('controles-prenatales.index') }}",   // ✅ RUTA CORRECTA
             type: 'GET',
             data: {
                 page,
@@ -159,9 +167,7 @@ $(document).ready(function () {
                 actualizarMensaje(data.total, data.all, query);
             },
             error: function(xhr) {
-                let msg = 'Error al cargar los datos.';
-                if(xhr.responseJSON && xhr.responseJSON.message) msg += ' ' + xhr.responseJSON.message;
-                $('#mensajeResultados').html(msg);
+                $('#mensajeResultados').html('Error al cargar los datos.');
             }
         });
     }
@@ -176,11 +182,14 @@ $(document).ready(function () {
         $('#filtroBusqueda, #fechaDesde, #fechaHasta').val('');
         cargarDatos(1, '');
     });
-    $(document).on('click', '.pagination a', function(e) {
-        e.preventDefault();
-        const page = new URLSearchParams($(this).attr('href').split('?')[1]).get('page') || 1;
-        cargarDatos(page, $('#filtroBusqueda').val());
-    });
+  $(document).on('click', '.btn-paginate', function() {
+    const page = $(this).data('page');
+    const query = $('#filtroBusqueda').val();
+    cargarDatos(page, query);
+});
+
+
 });
 </script>
+
 @endsection
