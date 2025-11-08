@@ -66,6 +66,17 @@
         display: flex;
         justify-content: center;
     }
+    .card-header {
+        background-color: transparent !important;
+    }
+    .filter-container {
+    display: flex;
+    gap: 1rem;           /* ← ESPACIO ENTRE CADA FILTRO */
+    padding: 10px;
+   
+    margin-bottom: 1.5rem;
+}
+
 </style>
 
 <div class="content-wrapper">
@@ -106,7 +117,10 @@
 
         {{-- Tabla --}}
         <div id="tabla-container">
-            @include('controlPrenatal.tabla', ['controles' => $controles])
+            @include('controlPrenatal.tabla', [
+                'controles' => $controles,
+                'isSearch' => $isSearch
+            ])
         </div>
 
         <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
@@ -130,14 +144,27 @@
 
 <script>
 $(document).ready(function () {
+
     function actualizarMensaje(total, all, query) {
-        if (query === '') {
+        const fechaDesde = $('#fechaDesde').val();
+        const fechaHasta = $('#fechaHasta').val();
+
+        // Sin filtros
+        if (query === '' && fechaDesde === '' && fechaHasta === '') {
             $('#mensajeResultados').html('');
-        } else if (total === 0) {
-            $('#mensajeResultados').html(`No se encontraron resultados para "<strong>${query}</strong>".`);
-        } else {
-            $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
+            return;
         }
+
+        // Cero resultados
+        if (total === 0) {
+            $('#mensajeResultados').html(`<strong>No se encontraron resultados.</strong>`);
+            return;
+        }
+
+        // Con resultados
+        $('#mensajeResultados').html(
+            `<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`
+        );
     }
 
     function cargarDatos(page = 1, query = '') {
@@ -145,7 +172,7 @@ $(document).ready(function () {
         const fechaHasta = $('#fechaHasta').val();
 
         $.ajax({
-           url: "{{ route('ginecologia.index') }}",
+            url: "{{ route('controles-prenatales.index') }}",
             type: 'GET',
             data: {
                 page,
@@ -159,9 +186,7 @@ $(document).ready(function () {
                 actualizarMensaje(data.total, data.all, query);
             },
             error: function(xhr) {
-                let msg = 'Error al cargar los datos.';
-                if(xhr.responseJSON && xhr.responseJSON.message) msg += ' ' + xhr.responseJSON.message;
-                $('#mensajeResultados').html(msg);
+                $('#mensajeResultados').html('Error al cargar los datos.');
             }
         });
     }
@@ -176,11 +201,14 @@ $(document).ready(function () {
         $('#filtroBusqueda, #fechaDesde, #fechaHasta').val('');
         cargarDatos(1, '');
     });
-    $(document).on('click', '.pagination a', function(e) {
-        e.preventDefault();
-        const page = new URLSearchParams($(this).attr('href').split('?')[1]).get('page') || 1;
-        cargarDatos(page, $('#filtroBusqueda').val());
+
+    $(document).on('click', '.btn-paginate', function() {
+        const page = $(this).data('page');
+        const query = $('#filtroBusqueda').val();
+        cargarDatos(page, query);
     });
+
 });
 </script>
+
 @endsection

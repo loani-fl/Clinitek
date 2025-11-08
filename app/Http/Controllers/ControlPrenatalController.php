@@ -13,7 +13,7 @@ class ControlPrenatalController extends Controller
         $query = $request->input('search', '');
         $fechaInicio = $request->input('fecha_desde');
         $fechaFin = $request->input('fecha_hasta');
-        $perPage = 5; // cantidad por página
+        $perPage = 1; // cantidad por página
 
         $totalControles = ControlPrenatal::count();
 
