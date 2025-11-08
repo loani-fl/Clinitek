@@ -639,9 +639,18 @@ label {
 
             <!-- Botones de Acción -->
             <div class="d-flex justify-content-center gap-3 mt-4">
-                <button type="submit" class="btn btn-primary">Registrar control</button>
-                <button type="button" id="btnLimpiar" class="btn btn-warning">Limpiar</button>
-                <a href="{{ route('controles-prenatales.index') }}" class="btn btn-success">Regresar</a>
+            <button type="submit" class="btn btn-primary px-4 shadow-sm d-inline-flex align-items-center gap-2">
+                <i class="bi bi-plus-circle"></i> Registrar
+            </button>
+
+                <button type="button" id="btnLimpiar" class="btn btn-warning px-4 shadow-sm d-inline-flex align-items-center gap-2">
+                <i class="bi bi-trash"></i> Limpiar
+            </button>
+
+                <a href="{{ route('controles-prenatales.index') }}" class="btn btn-success">
+                <i class="bi bi-arrow-left"></i> Regresar
+            </a>
+
             </div>
         </div>
     </form>

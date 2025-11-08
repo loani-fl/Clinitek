@@ -318,7 +318,7 @@ Route::get('/ginecologia', [ControlPrenatalController::class, 'indexGinecologia'
 
 // Rutas de Controles Prenatales
 Route::get('/controles-prenatales', [ControlPrenatalController::class, 'index'])->name('controles-prenatales.index');
-Route::get('/controles-prenatales/crear', [ControlPrenatalController::class, 'create'])->name('controles-prenatales.create');
+Route::get('/controles-prenatales/create', [ControlPrenatalController::class, 'create'])->name('controles-prenatales.create');
 Route::post('/controles-prenatales', [ControlPrenatalController::class, 'store'])->name('controles-prenatales.store');
 Route::get('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'show'])->name('controles-prenatales.show');
 Route::get('/controles-prenatales/{controlPrenatal}/editar', [ControlPrenatalController::class, 'edit'])->name('controles-prenatales.edit');
