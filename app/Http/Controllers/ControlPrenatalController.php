@@ -84,7 +84,17 @@ class ControlPrenatalController extends Controller
             'paciente_existente' => 'nullable|exists:pacientes,id',
             'nombre' => 'required_if:paciente_existente,null|string|max:50',
             'apellidos' => 'required_if:paciente_existente,null|string|max:50',
-            'identidad' => 'required_if:paciente_existente,null|string|max:13|unique:pacientes,identidad',
+            'identidad' => [
+    'required_if:paciente_existente,null',
+    'string',
+    'max:13',
+    function ($attribute, $value, $fail) use ($request) {
+        if (!$request->paciente_existente && \App\Models\Paciente::where('identidad', $value)->exists()) {
+            $fail('Esta identidad ya está registrada en otro paciente.');
+        }
+    },
+],
+
             'fecha_nacimiento' => 'required_if:paciente_existente,null|date|before:today',
             'direccion' => 'required_if:paciente_existente,null|string|max:300',
             'telefono' => 'required_if:paciente_existente,null|string|max:8|regex:/^[2389]\d{7}$/',
@@ -99,7 +109,7 @@ class ControlPrenatalController extends Controller
             
             // Datos obstétricos
             'fecha_ultima_menstruacion' => 'required|date|before_or_equal:today',
-            'fecha_probable_parto' => 'required|date|after:fecha_ultima_menstruacion',
+            'fecha_probable_parto' => 'required|date|after_or_equal:fecha_ultima_menstruacion',
             'semanas_gestacion' => 'required|integer|min:0|max:42',
             'numero_partos' => 'required|integer|min:0|max:20',
             'numero_abortos' => 'required|integer|min:0|max:20',
@@ -108,7 +118,7 @@ class ControlPrenatalController extends Controller
             
             // Datos del control prenatal actual
             'fecha_control' => 'required|date|before_or_equal:today',
-            'presion_arterial' => 'required|string|regex:/^\d{2,3}\/\d{2,3}$/',
+            'presion_arterial' => 'required|string|regex:/^\d{2,3}\/\d{1,3}$/',
             'frecuencia_cardiaca_materna' => 'required|integer|min:40|max:200',
             'temperatura' => 'required|numeric|min:35|max:42',
             'peso_actual' => 'required|numeric|min:30|max:200',

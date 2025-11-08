@@ -379,44 +379,51 @@ public function obtenerDatosPaciente($id)
 public function buscarPaciente(Request $request)
 {
     try {
-        $identidad = $request->get('identidad');
-        
-        if (empty($identidad)) {
+        $busqueda = $request->get('identidad');
+
+        if (empty($busqueda)) {
             return response()->json([
                 'success' => false,
                 'pacientes' => [],
-                'message' => 'Debe proporcionar un número de identidad'
+                'message' => 'Debe escribir nombre o identidad para buscar.'
             ]);
         }
-        
-        // Busca TODOS los pacientes que coincidan (máximo 10)
-        $pacientes = Paciente::where('identidad', 'LIKE', '%' . $identidad . '%')
-                             ->limit(10)
-                             ->get(['id', 'nombre', 'apellidos', 'identidad']);
-        
+
+        // Buscar por nombre, apellidos o identidad (máximo 10 resultados)
+        $pacientes = Paciente::where('nombre', 'LIKE', "%{$busqueda}%")
+            ->orWhere('apellidos', 'LIKE', "%{$busqueda}%")
+            ->orWhere('identidad', 'LIKE', "%{$busqueda}%")
+            ->where('genero', 'Femenino') // si solo quieres mujeres en control prenatal
+            ->orderBy('nombre')
+            ->orderBy('apellidos')
+            ->limit(10)
+            ->get(['id', 'nombre', 'apellidos', 'identidad']);
+
         if ($pacientes->count() > 0) {
             return response()->json([
                 'success' => true,
                 'pacientes' => $pacientes
             ]);
         }
-        
+
         return response()->json([
             'success' => false,
             'pacientes' => [],
-            'message' => 'No se encontraron pacientes'
+            'message' => 'No se encontraron pacientes.'
         ]);
-        
     } catch (\Exception $e) {
         \Log::error('Error al buscar paciente: ' . $e->getMessage());
-        
+
         return response()->json([
             'success' => false,
             'pacientes' => [],
             'message' => 'Error en el servidor: ' . $e->getMessage()
         ], 500);
     }
-}public function obtenerDatosPacienteCompleto($id)
+}
+
+
+public function obtenerDatosPacienteCompleto($id)
 {
     try {
         $paciente = Paciente::findOrFail($id);

@@ -699,6 +699,12 @@ document.querySelector('form').addEventListener('submit', function(e) {
 // Llamar al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
     actualizarEstadoSecciones();
+    
+    // Si hay un paciente en old() al recargar (errores de validación), cargarlo
+    const pacienteExistenteId = document.getElementById('paciente_existente').value;
+    if (pacienteExistenteId) {
+        cargarPacienteExistente(pacienteExistenteId);
+    }
 });
 
 // ========== BÚSQUEDA DE PACIENTES ==========
@@ -769,6 +775,10 @@ function buscarPacientes(busqueda) {
 }
 
 function seleccionarPaciente(id) {
+    cargarPacienteExistente(id, true); // true indica que es selección manual
+}
+
+function cargarPacienteExistente(id, esSeleccionManual = false) {
     fetch(`{{ url('pacientes/datos') }}/${id}`)
         .then(res => res.json())
         .then(data => {
@@ -832,23 +842,30 @@ function seleccionarPaciente(id) {
 
                 document.getElementById('buscarIdentidad').value = p.identidad || '';
                 document.getElementById('listaResultados').style.display = 'none';
-                document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-success mt-2"><i class="fas fa-check-circle"></i> Paciente cargada correctamente</div>';
+                
+                // Solo mostrar mensaje si viene de la búsqueda manual
+                if (esSeleccionManual) {
+                    document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-success mt-2"><i class="fas fa-check-circle"></i> Paciente cargada correctamente</div>';
+                    setTimeout(() => { document.getElementById('mensajeBusqueda').innerHTML = ''; }, 3000);
+                }
 
                 // Actualizar estado de secciones
                 actualizarEstadoSecciones();
 
                 // Log para debug - verificar qué datos llegan
                 console.log('Datos de paciente cargados:', p);
-
-                setTimeout(() => { document.getElementById('mensajeBusqueda').innerHTML = ''; }, 3000);
             } else {
-                document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-danger mt-2">No se encontraron datos del paciente</div>';
+                if (esSeleccionManual) {
+                    document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-danger mt-2">No se encontraron datos del paciente</div>';
+                }
                 console.error('Respuesta sin datos de paciente:', data);
             }
         })
         .catch((error) => {
             console.error('Error al cargar paciente:', error);
-            document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-danger mt-2">Error al cargar datos del paciente</div>';
+            if (esSeleccionManual) {
+                document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-danger mt-2">Error al cargar datos del paciente</div>';
+            }
         });
 }
 
@@ -959,6 +976,8 @@ document.getElementById('btnLimpiar').addEventListener('click', () => {
     // Restaurar fecha actual
     document.querySelector('input[name="fecha_control"]').value = '{{ date("Y-m-d") }}';
 });
+
+
 </script>
 
 @endsection
