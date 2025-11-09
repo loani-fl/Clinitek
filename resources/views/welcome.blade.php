@@ -275,7 +275,8 @@
                 <article class="service-card"><div class="icon-circle"><i class="bi bi-clipboard-data-fill service-icon"></i></div><h3 class="service-title">Inventario</h3><p class="service-desc">Control completo del inventario y suministros médicos.</p></article>
             </a>
 
-            <a href="{{ route('ginecologia.index') }}" style="text-decoration: none; color: inherit;">
+            <a href="{{ route('controles-prenatales.index') }}"
+ style="text-decoration: none; color: inherit;">
                 <article class="service-card">
                     <div class="icon-circle">
                         <i class="bi bi-heart-pulse-fill service-icon"></i>

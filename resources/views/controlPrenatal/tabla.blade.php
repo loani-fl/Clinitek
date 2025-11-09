@@ -1,35 +1,50 @@
 <div class="table-responsive">
-    <table class="table table-striped table-bordered">
+@if($controles->count() > 0)
+    <table class="table table-striped table-bordered table-hover">
         <thead>
             <tr>
                 <th>#</th>
-                <th>Nombres</th>
-                <th>Apellidos</th>
+                <th>Paciente</th>
+               
                 <th>Fecha Control</th>
                 <th>Próxima Cita</th>
-                <th>Semanas de Gestación</th>
+                <th>Semanas</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($controles as $index => $cita)
+            @foreach($controles as $index => $control)
                 <tr>
                     <td>{{ $controles->firstItem() + $index }}</td>
-                    <td>{{ $cita->paciente->nombre ?? 'N/A' }}</td>
-                    <td>{{ $cita->paciente->apellidos ?? 'N/A' }}</td>
-                    <td>{{ optional($cita->fecha_control)->format('d/m/Y') ?? 'N/A' }}</td>
-                    <td>{{ optional($cita->fecha_proxima_cita)->format('d/m/Y') ?? 'N/A' }}</td>
-                    <td>{{ $cita->semanas_gestacion ?? 'N/A' }} sem</td>
+                    <td>{{ $control->paciente->nombre ?? 'N/A' }} {{ $control->paciente->apellidos ?? '' }}</td>
+                
+                    <td>{{ optional($control->fecha_control)->format('d/m/Y') ?? 'N/A' }}</td>
+                    <td>{{ optional($control->fecha_proxima_cita)->format('d/m/Y') ?? 'N/A' }}</td>
+                    <td>
+                        @php
+                            $semanas = $control->semanas_gestacion ?? 0;
+                            if ($semanas <= 13) $clase = 'bg-info';
+                            elseif ($semanas <= 27) $clase = 'bg-warning';
+                            else $clase = 'bg-danger';
+                        @endphp
+                        <span class="badge {{ $clase }}">{{ $semanas }} sem</span>
+                    </td>
                     <td class="text-center">
-                        <a href="{{ route('controles-prenatales.show', $cita->id) }}" class="btn btn-sm btn-outline-info" title="Ver detalles">
+                        <a href="{{ route('controles-prenatales.show', $control->id) }}" class="btn btn-sm btn-outline-info" title="Ver detalles">
                             <i class="bi bi-eye"></i>
                         </a>
-                      
                     </td>
                 </tr>
-            @empty
-                <tr><td colspan="7" class="text-center">No hay controles registrados.</td></tr>
-            @endforelse
+            @endforeach
         </tbody>
     </table>
+@else
+    <div class="text-center py-4">
+        <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+        <p class="mt-2">No hay controles prenatales registrados</p>
+        <a href="{{ route('controles-prenatales.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Registrar Primer Control
+        </a>
+    </div>
+@endif
 </div>

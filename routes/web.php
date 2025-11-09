@@ -314,7 +314,7 @@ Route::post('/inventario/generar-codigo', [InventarioController::class, 'generar
 use App\Http\Controllers\ControlPrenatalController;
 
 // Ruta principal de Ginecología (Index/Dashboard)
-Route::get('/ginecologia', [ControlPrenatalController::class, 'indexGinecologia'])->name('ginecologia.index');
+//Route::get('/ginecologia', [ControlPrenatalController::class, 'indexGinecologia'])->name('ginecologia.index');
 
 // Rutas de Controles Prenatales
 Route::get('/controles-prenatales', [ControlPrenatalController::class, 'index'])->name('controles-prenatales.index');
@@ -356,5 +356,3 @@ Route::post('/ultrasonidos/guardar-analisis/{id}', [UltrasonidoOrderController::
     ->name('ultrasonidos.guardarAnalisis');
 
 
-Route::get('/ginecologia', [ControlPrenatalController::class, 'index'])->name('ginecologia.index');
-Route::resource('controles-prenatales', ControlPrenatalController::class);
