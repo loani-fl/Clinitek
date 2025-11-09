@@ -108,6 +108,44 @@
         .estado-pendiente {
             background-color: yellow;
         }
+        /* ⚠️ Ajuste: min-height reducido para no crear tanto espacio vacío */
+        .custom-card::before {
+            position: absolute;
+            z-index: -1 !important;
+            pointer-events: none;
+
+        /* <- ajusta aquí si quieres menos/más espacio */
+        }
+
+        /* PAGINACIÓN CENTRADA */
+        .pagination-container {
+            width: 100%;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .pagination { display: flex !important; justify-content: center !important; }
+
+        /* opcional: evitar que el texto "Mostrando..." se salga de ancho */
+        .pagination-info {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 6px;
+        }
+        .pagination li a,
+        .pagination li span {
+            white-space: nowrap !important;
+
+        }
+        .pagination {
+            flex-wrap: nowrap !important;
+        }
+
+
     </style>
 
     <div class="content-wrapper">
@@ -189,14 +227,26 @@
         $(document).ready(function () {
 
             function actualizarMensaje(total, all, query) {
-                if (query === '') {
+                const fechaDesde = $('#fechaDesde').val();
+                const fechaHasta = $('#fechaHasta').val();
+                const estado = $('#filtroEstado').val();
+
+                // Detectar si hay alguno de los filtros activos
+                const filtrosActivos = query !== '' || fechaDesde !== '' || fechaHasta !== '' || estado !== '';
+
+                if (!filtrosActivos) {
                     $('#mensajeResultados').html('');
-                } else if (total === 0) {
-                    $('#mensajeResultados').html(`No se encontraron resultados para "<strong>${query}</strong>".`);
-                } else {
-                    $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
+                    return;
                 }
+
+                if (total === 0) {
+                    $('#mensajeResultados').html(`No se encontraron resultados.`);
+                    return;
+                }
+
+                $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
             }
+
 
             function cargarDatos(page = 1, query = '') {
                 const fechaDesde = $('#fechaDesde').val();
