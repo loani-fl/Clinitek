@@ -672,7 +672,9 @@ document.addEventListener('DOMContentLoaded', function() {
         checkboxes.forEach(chk => {
             if (chk.checked) total += parseFloat(chk.dataset.precio) || 0;
         });
-        document.getElementById('totalPrecio').textContent = total.toFixed(2);
+        //AQUI TOQUE PARA LA COMA
+       document.getElementById('totalPrecio').textContent = total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
     }
     actualizarTotal();
 
