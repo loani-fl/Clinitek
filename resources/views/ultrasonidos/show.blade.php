@@ -9,11 +9,11 @@
 
 <style>
     .custom-card {
-        max-width: 850px; /* ✅ antes 1000px */
+        max-width: 850px;
         background-color: #fff;
         border: 1px solid #91cfff;
         border-radius: .8rem;
-        padding: 1.2rem; /* ✅ menos padding */
+        padding: 1.2rem;
         margin: .8rem auto;
         position: relative;
     }
@@ -22,7 +22,7 @@
         content: "";
         position: absolute;
         top: 50%; left: 50%;
-        width: 600px; height: 600px; /* ✅ antes 800px */
+        width: 600px; height: 600px;
         background-image: url('/images/logo2.jpg');
         background-size: contain;
         background-repeat: no-repeat;
@@ -34,7 +34,7 @@
     }
 
     .titulo-principal {
-        font-size: 1.5rem; /* ✅ antes 1.8 */
+        font-size: 1.5rem;
         font-weight: 700;
         color: #003366;
         text-align: center;
@@ -44,7 +44,7 @@
     }
 
     .linea-azul {
-        height: 3px; /* ✅ antes 4 */
+        height: 3px;
         width: 100%;
         background: #0d6efd;
         margin-bottom: 15px;
@@ -53,7 +53,7 @@
     }
 
     .section-title {
-        font-size: 1rem; /* ✅ antes 1.2 */
+        font-size: 1rem;
         font-weight: 700;
         margin-bottom: 4px;
         color: #0b5ed7;
@@ -75,7 +75,7 @@
         font-weight: 700;
         border-bottom: 1px dashed #0d6efd;
         padding-bottom: 0.3rem;
-        font-size: 1rem; /* ✅ antes 1.1 */
+        font-size: 1rem;
         margin-bottom: 0.6rem;
     }
 
@@ -83,49 +83,84 @@
         background-color: #fff;
         border: 1px solid #ddd;
         border-radius: 6px;
-        padding: .5rem; /* ✅ antes .7 */
-        width: 240px; /* ✅ antes 290 */
+        padding: .5rem;
+        width: 240px;
         cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .imagen-block img {
-        height: 150px; /* ✅ antes 180px */
+        height: 150px;
         object-fit: cover;
+        width: 100%;
+        border-radius: 4px;
+        margin-bottom: 6px;
+    }
+
+    /* Descripción estilo textarea */
+    .imagen-block p {
+        font-size: 0.95rem;
+        color: #333;
+        background-color: #f8f9fa;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #e0e0e0;
+        width: 100%;
+        min-height: 50px;
+        white-space: pre-wrap;       /* Respeta saltos de línea */
+        word-wrap: break-word;       /* Rompe palabras largas */
+        overflow-wrap: break-word;
+        margin: 0;
+    }
+
+    /* Modal descripción */
+    #modalDescripcion {
+        display: block;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+        line-height: 1.4;
+        font-size: 0.95rem;
+        color: #333;
+        text-align: left;
+        margin: 0;
     }
 </style>
 
 <div class="container mt-3">
     <div class="custom-card shadow-sm">
 
-        <h3 class="titulo-principal">Resultados de Ultrasonido</h3>
+        <h3 class="titulo-principal">Resultados de ultrasonido</h3>
         <div class="linea-azul"></div>
 
-        {{-- INFORMACIÓN --}}
-        <div class="row gy-1 mb-2">
-            <div class="col-12">
-                <div class="section-title">Información de la Orden</div>
-            </div>
+  {{-- INFORMACIÓN --}}
+<div class="section-title">detalles de la orden</div>
 
-            <div class="col-md-4">
-                <strong>Paciente:</strong><br>
-                {{ $orden->paciente?->nombre }} {{ $orden->paciente?->apellidos }}
-            </div>
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-2">
+    <div>
+        <strong>Paciente:</strong><br>
+        {{ $orden->paciente?->nombre }} {{ $orden->paciente?->apellidos }}
+    </div>
 
-            <div class="col-md-4">
-                <strong>Identidad:</strong><br>
-                {{ $orden->paciente?->identidad ?? '—' }}
-            </div>
+    <div>
+        <strong>Identidad:</strong><br>
+        {{ $orden->paciente?->identidad ?? '—' }}
+    </div>
 
-            <div class="col-md-4">
-                <strong>Fecha de Orden:</strong><br>
-                {{ optional($orden->created_at)->format('d/m/Y h:i A') }}
-            </div>
+    <div>
+        <strong>Fecha de orden:</strong><br>
+        {{ optional($orden->created_at)->format('d/m/Y h:i A') }}
+    </div>
 
-            <div class="col-md-12 mt-1">
-                <strong>Médico analista:</strong><br>
-                {{ $orden->medico?->nombre }} {{ $orden->medico?->apellidos }}
-            </div>
-        </div>
+    <div>
+        <strong>Médico analista:</strong><br>
+        {{ $orden->medico?->nombre }} {{ $orden->medico?->apellidos }}
+    </div>
+</div>
+
 
         {{-- IMÁGENES --}}
         @if($orden->imagenes->isEmpty())
@@ -153,8 +188,7 @@
 
                                     <img src="{{ asset('storage/' . $imagen->ruta) }}" class="w-100">
 
-                                    <small class="text-primary fw-bold">Descripción:</small>
-                                    <p class="mb-1">{{ $imagen->descripcion ?? 'Sin descripción.' }}</p>
+                                    <p>{{ $imagen->descripcion ?? 'Sin descripción.' }}</p>
                                 </div>
                             @endforeach
                         </div>
@@ -177,7 +211,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5>Detalle de Imagen</h5>
+                <h5>Detalle de imagen</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center p-0">
@@ -185,7 +219,7 @@
             </div>
             <div class="modal-footer">
                 <strong>Descripción:</strong>
-                <p id="modalDescripcion" class="mb-0 text-break"></p>
+                <p id="modalDescripcion" class="mb-0"></p>
             </div>
         </div>
     </div>

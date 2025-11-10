@@ -86,10 +86,10 @@
                 <i class="bi bi-house-door"></i> Inicio
             </a>
 
-            <h2>Control Prenatal</h2>
+            <h2>Controles prenatales</h2>
 
             <a href="{{ route('controles-prenatales.create') }}" class="btn btn-primary ms-3">
-                <i class="bi bi-plus-circle"></i> Nuevo Control
+                <i class="bi bi-plus-circle"></i> Nuevo control
             </a>
         </div>
 

@@ -6,8 +6,8 @@
                 <th>#</th>
                 <th>Paciente</th>
                
-                <th>Fecha Control</th>
-                <th>Próxima Cita</th>
+                <th>Fecha control</th>
+                <th>Próxima cita</th>
                 <th>Semanas</th>
                 <th>Acciones</th>
             </tr>
@@ -43,7 +43,7 @@
         <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
         <p class="mt-2">No hay controles prenatales registrados</p>
         <a href="{{ route('controles-prenatales.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Registrar Primer Control
+            <i class="bi bi-plus-circle"></i> Registrar primer control
         </a>
     </div>
 @endif
