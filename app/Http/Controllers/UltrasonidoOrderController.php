@@ -81,7 +81,7 @@ class UltrasonidoOrderController extends Controller
 
         $request->validate([
             'paciente_id' => 'required|exists:pacientes,id',
-            'fecha' => 'required|date|after_or_equal:today',
+            'fecha' => 'required|date|date_equals:today', // <-- solo permite la fecha actual
             'examenes' => 'required|array|min:1|max:7',
             'examenes.*' => 'in:' . implode(',', $validKeys),
         ]);
@@ -96,7 +96,6 @@ class UltrasonidoOrderController extends Controller
         ]);
 
         foreach ($request->examenes as $examen) {
-            // Solo modelos para los 7 iniciales
             $model = match($examen) {
                 'higado' => UltrasonidoHigado::class,
                 'vesicula' => UltrasonidoVesicula::class,
@@ -114,6 +113,7 @@ class UltrasonidoOrderController extends Controller
 
         return redirect()->route('ultrasonidos.index')->with('success', 'Orden de ultrasonido creada correctamente.');
     }
+    
     public function index(Request $request)
     {
         $query = Ultrasonido::with('paciente');
@@ -155,7 +155,7 @@ class UltrasonidoOrderController extends Controller
 public function show($id)
 {
     $orden = Ultrasonido::with(['paciente', 'medico', 'imagenes'])->findOrFail($id);
-
+    
     // 1. Mapa de claves a nombres legibles
     $mapaNombres = [
         'higado' => 'Ultrasonido Hígado',
@@ -175,9 +175,9 @@ public function show($id)
 
     // 4. Pasamos toda la información necesaria a la vista
     return view('ultrasonidos.show', compact(
-        'orden',
-        'mapaNombres',
-        'examenesKeys',
+        'orden', 
+        'mapaNombres', 
+        'examenesKeys', 
         'imagenesAgrupadas'
     ));
 }
@@ -234,22 +234,22 @@ public function guardarAnalisis(Request $request, $id)
 
     $orden = Ultrasonido::findOrFail($id);
     $orden->medico_id = $request->medico_id;
-    $orden->estado = 'Realizado';
+    $orden->estado = 'completado';
     $orden->save();
 
     // 1. OBTENER LAS CLAVES DE EXÁMENES DE LA ORDEN
     // Esto debería ser un array como ['higado', 'vesicula', 'bazo']
-    $examenesKeys = $orden->examenes ?? [];
+    $examenesKeys = $orden->examenes ?? []; 
 
     // Procesar imágenes por examen
     if ($request->has('imagenes')) {
         // $examenIndex es el índice (0, 1, 2...) del grupo de imágenes en el formulario
         foreach ($request->file('imagenes') as $examenIndex => $imagenesExamen) {
-
+            
             // 2. Usar el índice para obtener la CLAVE del examen (ej: 'higado')
             if (!isset($examenesKeys[$examenIndex])) {
                 // Esto podría pasar si el formulario tiene más grupos de campos que exámenes guardados
-                continue;
+                continue; 
             }
             $examenKey = $examenesKeys[$examenIndex]; // <-- ¡CLAVE!
 

@@ -28,9 +28,7 @@ body {
     pointer-events: none; z-index: 0;
 }
 
-h2 {
-    color: #003366; font-weight: 700; margin-bottom: 1rem; text-align: center; font-size: 1.1rem;
-}
+h2 { color: #003366; font-weight: 700; margin-bottom: 1rem; text-align: center; font-size: 1.1rem; }
 
 /* Datos del paciente */
 .patient-data-grid { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
@@ -47,9 +45,7 @@ h2 {
 }
 
 /* Botones */
-button, a.btn {
-    font-size: 0.95rem; padding: 0.4rem 0.5rem; font-weight: normal; border-radius: 0.4rem; margin-left:0.5rem; line-height:1.2;
-}
+button, a.btn { font-size: 0.95rem; padding: 0.4rem 0.5rem; font-weight: normal; border-radius: 0.4rem; margin-left:0.5rem; line-height:1.2; }
 button.btn-warning { color:#212529; background-color:#ffc107; border-color:#ffc107; }
 button.btn-warning:hover { background-color:#e0a800; border-color:#d39e00; }
 button.btn-success { background-color:#198754; border-color:#198754; color:white; }
@@ -58,10 +54,7 @@ a.btn-primary { background-color:#0d6efd; border-color:#0d6efd; color:white; tex
 a.btn-primary:hover { background-color:#0b5ed7; border-color:#0a58ca; color:white; }
 
 /* Mensajes flash */
-.mensaje-flash {
-    min-width:280px; max-width:600px; text-align:center; border-radius:8px; padding:8px 16px; margin:5px auto; font-weight: normal;
-    opacity:0; transform:translateY(-20px); transition: opacity 0.4s, transform 0.4s; box-shadow:0 4px 12px rgba(0,0,0,0.25); font-size:0.9rem;
-}
+.mensaje-flash { min-width:280px; max-width:600px; text-align:center; border-radius:8px; padding:8px 16px; margin:5px auto; font-weight: normal; opacity:0; transform:translateY(-20px); transition: opacity 0.4s, transform 0.4s; box-shadow:0 4px 12px rgba(0,0,0,0.25); font-size:0.9rem; }
 .mensaje-flash.mostrar { opacity:1; transform:translateY(0); }
 .mensaje-flash.error { background-color:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
 .mensaje-flash.exito { background-color:#d4edda; color:#155724; border:1px solid #c3e6cb; }
@@ -92,7 +85,6 @@ a.btn-primary { width:200px; }
 </style>
 
 <div class="content-wrapper">
-
     <div class="row align-items-center">
         <div class="col-md-3 text-center">
             <img src="{{ asset('images/logo2.jpg') }}" alt="Logo Clinitek" style="height:50px; width:auto;">
@@ -121,12 +113,16 @@ a.btn-primary { width:200px; }
         <div class="top-controls">
             <div style="position:relative;">
                 <label for="buscarPaciente" class="form-label">Buscar paciente <span class="text-danger">*</span></label>
-                <input type="text" id="buscarPaciente" class="form-control" placeholder="Escribe para buscar..." autocomplete="off" value="{{ old('paciente_nombre','') }}" required>
+                <input type="text" id="buscarPaciente" class="form-control" placeholder="Escribe para buscar..." autocomplete="off"
+                    value="{{ old('paciente_nombre', $pacientes->firstWhere('id', old('paciente_id')) ? $pacientes->firstWhere('id', old('paciente_id'))->nombre.' '.$pacientes->firstWhere('id', old('paciente_id'))->apellidos : '') }}"
+                    required>
                 <input type="hidden" name="paciente_id" id="paciente_id" value="{{ old('paciente_id') }}">
                 <ul id="listaPacientes" class="list-group">
                     @foreach ($pacientes as $paciente)
                         <li class="list-group-item list-group-item-action paciente-item" 
-                            data-id="{{ $paciente->id }}" data-nombre="{{ $paciente->nombre }}" data-apellidos="{{ $paciente->apellidos ?? '' }}" data-identidad="{{ $paciente->identidad ?? '' }}" data-genero="{{ $paciente->genero ?? '' }}" style="cursor:pointer; font-size:0.9rem; padding:0.4rem 0.6rem;">
+                            data-id="{{ $paciente->id }}" data-nombre="{{ $paciente->nombre }}" data-apellidos="{{ $paciente->apellidos ?? '' }}" 
+                            data-identidad="{{ $paciente->identidad ?? '' }}" data-genero="{{ $paciente->genero ?? '' }}" 
+                            style="cursor:pointer; font-size:0.9rem; padding:0.4rem 0.6rem;">
                             {{ $paciente->nombre }} {{ $paciente->apellidos ?? '' }}
                         </li>
                     @endforeach
@@ -136,7 +132,9 @@ a.btn-primary { width:200px; }
 
             <div>
                 <label for="fecha" class="form-label">Fecha <span class="text-danger">*</span></label>
-                <input type="date" id="fecha" name="fecha" class="form-control" value="{{ old('fecha',date('Y-m-d')) }}" required>
+                <input type="date" name="fecha" id="fecha"
+                       value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" 
+                       class="form-control" required>
             </div>
 
             <div>
@@ -150,12 +148,28 @@ a.btn-primary { width:200px; }
         {{-- Datos paciente --}}
         <div id="datosPaciente" style="display:{{ old('paciente_id')?'block':'none' }}; margin-bottom:1rem;">
             <div class="patient-data-row">
-                <div class="patient-data-field"><strong>Nombres:</strong><div id="dp-nombres" class="underline-field-solid">{{ old('nombres') }}</div></div>
-                <div class="patient-data-field"><strong>Apellidos:</strong><div id="dp-apellidos" class="underline-field-solid">{{ old('apellidos') }}</div></div>
+                <div class="patient-data-field"><strong>Nombres:</strong>
+                    <div id="dp-nombres" class="underline-field-solid">
+                        {{ old('paciente_id') && $pacientes->firstWhere('id', old('paciente_id')) ? $pacientes->firstWhere('id', old('paciente_id'))->nombre : '' }}
+                    </div>
+                </div>
+                <div class="patient-data-field"><strong>Apellidos:</strong>
+                    <div id="dp-apellidos" class="underline-field-solid">
+                        {{ old('paciente_id') && $pacientes->firstWhere('id', old('paciente_id')) ? $pacientes->firstWhere('id', old('paciente_id'))->apellidos : '' }}
+                    </div>
+                </div>
             </div>
             <div class="patient-data-row">
-                <div class="patient-data-field"><strong>Identidad:</strong><div id="dp-identidad" class="underline-field-solid">{{ old('identidad') }}</div></div>
-                <div class="patient-data-field"><strong>Género:</strong><div id="dp-genero" class="underline-field-solid">{{ old('genero') }}</div></div>
+                <div class="patient-data-field"><strong>Identidad:</strong>
+                    <div id="dp-identidad" class="underline-field-solid">
+                        {{ old('paciente_id') && $pacientes->firstWhere('id', old('paciente_id')) ? $pacientes->firstWhere('id', old('paciente_id'))->identidad : '' }}
+                    </div>
+                </div>
+                <div class="patient-data-field"><strong>Género:</strong>
+                    <div id="dp-genero" class="underline-field-solid">
+                        {{ old('paciente_id') && $pacientes->firstWhere('id', old('paciente_id')) ? $pacientes->firstWhere('id', old('paciente_id'))->genero : '' }}
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -167,7 +181,8 @@ a.btn-primary { width:200px; }
                     <div class="examenes-grid">
                         @foreach($examenes as $clave => $datos)
                             <label>
-                                <input type="checkbox" class="examen-checkbox" name="examenes[]" value="{{ $clave }}" data-precio="{{ $datos['precio'] }}" {{ (is_array(old('examenes')) && in_array($clave,old('examenes')))?'checked':'' }}>
+                                <input type="checkbox" class="examen-checkbox" name="examenes[]" value="{{ $clave }}" data-precio="{{ $datos['precio'] }}" 
+                                       {{ (is_array(old('examenes')) && in_array($clave,old('examenes')))?'checked':'' }}>
                                 {{ $datos['nombre'] }}
                             </label>
                         @endforeach
@@ -216,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } 
 
     // Autocompletado paciente
-    inputBuscar.addEventListener('input', ()=>{
+    inputBuscar.addEventListener('input', ()=> {
         const filtro = inputBuscar.value.toLowerCase();
         let visibleCount=0;
         Array.from(lista.children).forEach(li=>{
@@ -266,9 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 seleccionados++; 
             }
         });
-        // ✅ Mostrar con comas en miles y 2 decimales
         totalSpan.textContent = total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
         checkboxes.forEach(cb=>{
             cb.disabled = seleccionados >= MAX_EXAMENES && !cb.checked;
         });
@@ -300,18 +313,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Limpiar
-    document.getElementById('btnLimpiar').addEventListener('click', ()=>{
-        inputBuscar.value=''; 
-        inputHiddenId.value=''; 
-        dpNombres.textContent=''; 
-        dpApellidos.textContent=''; 
-        dpIdentidad.textContent=''; 
-        dpGenero.textContent=''; 
-        document.getElementById('datosPaciente').style.display='none'; 
-        fechaInput.value = `${yyyy}-${mm}-${dd}`; 
-        checkboxes.forEach(cb=>{ cb.checked=false; cb.disabled=false; }); 
-        actualizarTotal(); 
-    }); 
+    document.getElementById('btnLimpiar').addEventListener('click', ()=> {
+        inputBuscar.value = '';
+        inputHiddenId.value = '';
+        dpNombres.textContent = '';
+        dpApellidos.textContent = '';
+        dpIdentidad.textContent = '';
+        dpGenero.textContent = '';
+        document.getElementById('datosPaciente').style.display = 'none';
+        checkboxes.forEach(cb => { cb.checked = false; cb.disabled = false; });
+        actualizarTotal();
+        const alertas = document.querySelectorAll('.alert, .mensaje-flash');
+        alertas.forEach(a => a.remove());
+        lista.style.display = 'none';
+        form.classList.remove('was-validated');
+    });
 });
 </script>
 @endsection
