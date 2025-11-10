@@ -132,7 +132,6 @@ label {
     font-size: 1.05rem;
 }
 
-/* Estilos para mostrar datos como label */
 .dato-paciente-label {
     display: block;
     padding: 0.5rem 0;
@@ -143,7 +142,6 @@ label {
     border: none;
 }
 
-/* Secciones bloqueadas */
 .seccion-bloqueada {
     position: relative;
     pointer-events: none;
@@ -161,7 +159,6 @@ label {
     z-index: 10;
 }
 
-/* Mensaje de advertencia */
 .mensaje-seleccion {
     display: none;
     position: fixed;
@@ -194,12 +191,10 @@ label {
     color: #ffc107;
 }
 
-/* Ocultar datos del paciente hasta que sea seleccionado */
 .datos-paciente-ocultos {
     display: none;
 }
 
-/* Mostrar datos cuando paciente está seleccionado */
 .paciente-seleccionado .datos-paciente-ocultos {
     display: block;
 }
@@ -219,7 +214,6 @@ label {
                 <i class="fas fa-user-circle"></i> Selección de Paciente
             </h5>
             
-            <!-- Buscador de pacientes -->
             <div class="d-flex align-items-center mb-4" style="gap: 1.25rem;">
                 <label class="fw-bold mb-0" style="white-space: nowrap; font-size: 0.95rem;">
                     <i class="fas fa-search"></i> BUSCAR PACIENTE
@@ -244,31 +238,39 @@ label {
 
             <input type="hidden" name="paciente_existente" id="paciente_existente" value="{{ old('paciente_existente') }}">
 
-            <!-- Datos de la paciente seleccionada -->
             <div class="datos-paciente-ocultos" id="datosPacienteSeleccionada">
                 <hr class="my-3">
+                
+                <input type="hidden" name="nombre" id="nombre" value="{{ old('nombre') }}">
+                <input type="hidden" name="apellidos" id="apellidos" value="{{ old('apellidos') }}">
+                <input type="hidden" name="identidad" id="identidad" value="{{ old('identidad') }}">
+                <input type="hidden" name="fecha_nacimiento" id="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}">
+                <input type="hidden" name="telefono" id="telefono" value="{{ old('telefono') }}">
+                <input type="hidden" name="correo" id="correo" value="{{ old('correo') }}">
+                <input type="hidden" name="tipo_sangre" id="tipo_sangre" value="{{ old('tipo_sangre') }}">
+                <input type="hidden" name="genero" id="genero" value="{{ old('genero') }}">
+                <input type="hidden" name="direccion" id="direccion" value="{{ old('direccion') }}">
+                <input type="hidden" name="padecimientos" id="padecimientos" value="{{ old('padecimientos') }}">
+                <input type="hidden" name="medicamentos" id="medicamentos" value="{{ old('medicamentos') }}">
+                <input type="hidden" name="alergias" id="alergias" value="{{ old('alergias') }}">
+                <input type="hidden" name="historial_quirurgico" id="historial_quirurgico" value="{{ old('historial_quirurgico') }}">
+                <input type="hidden" name="historial_clinico" id="historial_clinico" value="{{ old('historial_clinico') }}">
+                
                 <div class="row mb-3">
                     <div class="col-md-3">
                         <label>Nombre</label>
-                        <input type="hidden" name="nombre" id="nombre">
                         <span class="dato-paciente-label" id="nombre_label"></span>
                     </div>
-
                     <div class="col-md-3">
                         <label>Apellidos</label>
-                        <input type="hidden" name="apellidos" id="apellidos">
                         <span class="dato-paciente-label" id="apellidos_label"></span>
                     </div>
-
                     <div class="col-md-3">
                         <label>Identidad</label>
-                        <input type="hidden" name="identidad" id="identidad">
                         <span class="dato-paciente-label" id="identidad_label"></span>
                     </div>
-
                     <div class="col-md-3">
                         <label>Fecha de nacimiento</label>
-                        <input type="hidden" name="fecha_nacimiento" id="fecha_nacimiento">
                         <span class="dato-paciente-label" id="fecha_nacimiento_label"></span>
                     </div>
                 </div>
@@ -276,25 +278,18 @@ label {
                 <div class="row mb-3">
                     <div class="col-md-3">
                         <label>Teléfono</label>
-                        <input type="hidden" name="telefono" id="telefono">
                         <span class="dato-paciente-label" id="telefono_label"></span>
                     </div>
-
                     <div class="col-md-3">
                         <label>Correo electrónico</label>
-                        <input type="hidden" name="correo" id="correo">
                         <span class="dato-paciente-label" id="correo_label"></span>
                     </div>
-
                     <div class="col-md-3">
                         <label>Tipo de sangre</label>
-                        <input type="hidden" name="tipo_sangre" id="tipo_sangre">
                         <span class="dato-paciente-label" id="tipo_sangre_label"></span>
                     </div>
-
                     <div class="col-md-3">
                         <label>Género</label>
-                        <input type="hidden" name="genero" id="genero">
                         <span class="dato-paciente-label" id="genero_label"></span>
                     </div>
                 </div>
@@ -302,7 +297,6 @@ label {
                 <div class="row mb-3">
                     <div class="col-md-12">
                         <label>Dirección</label>
-                        <input type="hidden" name="direccion" id="direccion">
                         <span class="dato-paciente-label" id="direccion_label"></span>
                     </div>
                 </div>
@@ -310,13 +304,10 @@ label {
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label>Padecimientos</label>
-                        <input type="hidden" name="padecimientos" id="padecimientos">
                         <span class="dato-paciente-label" id="padecimientos_label"></span>
                     </div>
-
                     <div class="col-md-6">
                         <label>Medicamentos</label>
-                        <input type="hidden" name="medicamentos" id="medicamentos">
                         <span class="dato-paciente-label" id="medicamentos_label"></span>
                     </div>
                 </div>
@@ -324,13 +315,10 @@ label {
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label>Alergias</label>
-                        <input type="hidden" name="alergias" id="alergias">
                         <span class="dato-paciente-label" id="alergias_label"></span>
                     </div>
-
                     <div class="col-md-6">
                         <label>Historial quirúrgico</label>
-                        <input type="hidden" name="historial_quirurgico" id="historial_quirurgico">
                         <span class="dato-paciente-label" id="historial_quirurgico_label"></span>
                     </div>
                 </div>
@@ -338,14 +326,12 @@ label {
                 <div class="row mb-3">
                     <div class="col-md-12">
                         <label>Historial clínico</label>
-                        <input type="hidden" name="historial_clinico" id="historial_clinico">
                         <span class="dato-paciente-label" id="historial_clinico_label"></span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Contenedor de secciones bloqueadas -->
         <div id="seccionesBloqueadas" class="seccion-bloqueada">
             <!-- SECCIÓN 2: DATOS OBSTÉTRICOS -->
             <div class="mb-4">
@@ -374,9 +360,10 @@ label {
 
                     <div class="col-md-4">
                         <label>Semanas de gestación <span class="text-danger">*</span></label>
-                        <input type="number" name="semanas_gestacion" id="semanas_gestacion" min="0" max="42"
+                        <input type="number" name="semanas_gestacion" id="semanas_gestacion"
                                class="form-control @error('semanas_gestacion') is-invalid @enderror" 
-                               value="{{ old('semanas_gestacion') }}" placeholder="0-42">
+                               value="{{ old('semanas_gestacion') }}" 
+                               min="0" max="42" placeholder="0-42">
                         <small class="text-muted">Rango: 0-42 semanas</small>
                         @error('semanas_gestacion')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -385,43 +372,47 @@ label {
                 </div>
 
                 <div class="row mb-3">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label>Número de partos <span class="text-danger">*</span></label>
-                        <input type="number" name="numero_partos" id="numero_partos" min="0" max="20"
+                        <input type="number" name="numero_partos" id="numero_partos"
                                class="form-control @error('numero_partos') is-invalid @enderror" 
-                               value="{{ old('numero_partos') }}" placeholder="0-20">
+                               value="{{ old('numero_partos') }}" 
+                               min="0" max="20" placeholder="0-20">
+                        <small class="text-muted">Rango: 0-20</small>
                         @error('numero_partos')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label>Número de abortos <span class="text-danger">*</span></label>
-                        <input type="number" name="numero_abortos" id="numero_abortos" min="0" max="20"
+                        <input type="number" name="numero_abortos" id="numero_abortos"
                                class="form-control @error('numero_abortos') is-invalid @enderror" 
-                               value="{{ old('numero_abortos') }}" placeholder="0-20">
+                               value="{{ old('numero_abortos') }}" 
+                               min="0" max="20" placeholder="0-20">
+                        <small class="text-muted">Rango: 0-20</small>
                         @error('numero_abortos')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-4">
-                        <label>Tipo de partos anteriores</label>
-                        <input type="text" name="tipo_partos_anteriores" maxlength="255"
-                               class="form-control @error('tipo_partos_anteriores') is-invalid @enderror" 
-                               value="{{ old('tipo_partos_anteriores') }}" 
-                               placeholder="Ej: 2 naturales, 1 cesárea">
-                        @error('tipo_partos_anteriores')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
 
                 <div class="row mb-3">
-                    <div class="col-md-12">
-                        <label>Complicaciones en embarazos previos</label>
+                    <div class="col-md-6">
+                        <label>Tipo de partos anteriores</label>
+                        <textarea name="tipo_partos_anteriores" rows="2"
+                                  class="form-control @error('tipo_partos_anteriores') is-invalid @enderror" 
+                                  placeholder="Natural, cesárea, etc.">{{ old('tipo_partos_anteriores') }}</textarea>
+                        @error('tipo_partos_anteriores')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Complicaciones previas</label>
                         <textarea name="complicaciones_previas" rows="2"
-                                  class="form-control @error('complicaciones_previas') is-invalid @enderror">{{ old('complicaciones_previas') }}</textarea>
+                                  class="form-control @error('complicaciones_previas') is-invalid @enderror" 
+                                  placeholder="Preeclampsia, hemorragias, etc.">{{ old('complicaciones_previas') }}</textarea>
                         @error('complicaciones_previas')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -438,7 +429,7 @@ label {
                         <label>Fecha del control <span class="text-danger">*</span></label>
                         <input type="date" name="fecha_control" 
                                class="form-control @error('fecha_control') is-invalid @enderror" 
-                               value="{{ date('Y-m-d') }}"
+                               value="{{ old('fecha_control', date('Y-m-d')) }}"
                                readonly
                                style="background-color: #e9ecef; cursor: not-allowed;">
                         <small class="text-muted">Fecha actual (no modificable)</small>
@@ -459,20 +450,6 @@ label {
                     </div>
 
                     <div class="col-md-4">
-                        <label>Frecuencia cardíaca materna <span class="text-danger">*</span></label>
-                        <input type="number" name="frecuencia_cardiaca_materna" id="frecuencia_cardiaca_materna"
-                               class="form-control @error('frecuencia_cardiaca_materna') is-invalid @enderror" 
-                               value="{{ old('frecuencia_cardiaca_materna') }}" 
-                               min="40" max="200" placeholder="60-100">
-                        <small class="text-muted">Rango: 40-200 lpm</small>
-                        @error('frecuencia_cardiaca_materna')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-4">
                         <label>Temperatura (°C) <span class="text-danger">*</span></label>
                         <input type="number" name="temperatura" id="temperatura"
                                class="form-control @error('temperatura') is-invalid @enderror" 
@@ -483,7 +460,9 @@ label {
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                </div>
 
+                <div class="row mb-3">
                     <div class="col-md-4">
                         <label>Peso actual (kg) <span class="text-danger">*</span></label>
                         <input type="number" name="peso_actual" id="peso_actual"
@@ -497,11 +476,24 @@ label {
                     </div>
 
                     <div class="col-md-4">
-                        <label>Altura uterina</label>
-                        <input type="number" name="altura_uterina" 
+                        <label>Frecuencia cardíaca materna <span class="text-danger">*</span></label>
+                        <input type="number" name="frecuencia_cardiaca_materna" id="frecuencia_cardiaca_materna"
+                               class="form-control @error('frecuencia_cardiaca_materna') is-invalid @enderror" 
+                               value="{{ old('frecuencia_cardiaca_materna') }}" 
+                               min="40" max="200" placeholder="60-100">
+                        <small class="text-muted">Rango: 40-200 lpm</small>
+                        @error('frecuencia_cardiaca_materna')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Altura uterina (cm)</label>
+                        <input type="number" name="altura_uterina" id="altura_uterina"
                                class="form-control @error('altura_uterina') is-invalid @enderror" 
                                value="{{ old('altura_uterina') }}" 
                                step="0.1" min="0" max="50" placeholder="25.0">
+                        <small class="text-muted">Rango: 0-50 cm</small>
                         @error('altura_uterina')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -509,29 +501,6 @@ label {
                 </div>
 
                 <div class="row mb-3">
-                    <div class="col-md-4">
-                        <label>Latidos fetales</label>
-                        <input type="number" name="latidos_fetales" 
-                               class="form-control @error('latidos_fetales') is-invalid @enderror" 
-                               value="{{ old('latidos_fetales') }}" 
-                               min="100" max="180" placeholder="120-160">
-                        <small class="text-muted">Rango: 100-180 lpm</small>
-                        @error('latidos_fetales')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-4">
-                        <label>Movimientos fetales</label>
-                        <input type="text" name="movimientos_fetales" maxlength="100"
-                               class="form-control @error('movimientos_fetales') is-invalid @enderror" 
-                               value="{{ old('movimientos_fetales') }}" 
-                               placeholder="Presentes/Ausentes">
-                        @error('movimientos_fetales')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
                     <div class="col-md-4">
                         <label>Edema <span class="text-danger">*</span></label>
                         <select name="edema" id="edema"
@@ -546,12 +515,35 @@ label {
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
+                    <div class="col-md-4">
+                        <label>Latidos fetales (lpm)</label>
+                        <input type="number" name="latidos_fetales" id="latidos_fetales"
+                               class="form-control @error('latidos_fetales') is-invalid @enderror" 
+                               value="{{ old('latidos_fetales') }}" 
+                               min="100" max="180" placeholder="120-160">
+                        <small class="text-muted">Rango: 100-180 lpm</small>
+                        @error('latidos_fetales')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Movimientos fetales</label>
+                        <input type="text" name="movimientos_fetales" id="movimientos_fetales" maxlength="100"
+                               class="form-control @error('movimientos_fetales') is-invalid @enderror" 
+                               value="{{ old('movimientos_fetales') }}" 
+                               placeholder="Presentes/Ausentes">
+                        @error('movimientos_fetales')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label>Presentación fetal</label>
-                        <select name="presentacion_fetal" 
+                        <select name="presentacion_fetal" id="presentacion_fetal"
                                 class="form-select @error('presentacion_fetal') is-invalid @enderror">
                             <option value="">Seleccione...</option>
                             <option value="cefalica" {{ old('presentacion_fetal') == 'cefalica' ? 'selected' : '' }}>Cefálica</option>
@@ -637,26 +629,23 @@ label {
                 </div>
             </div>
 
-            <!-- Botones de Acción -->
             <div class="d-flex justify-content-center gap-3 mt-4">
-            <button type="submit" class="btn btn-primary px-4 shadow-sm d-inline-flex align-items-center gap-2">
-                <i class="bi bi-plus-circle"></i> Registrar
-            </button>
+                <button type="submit" class="btn btn-primary px-4 shadow-sm d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-plus-circle"></i> Registrar
+                </button>
 
                 <button type="button" id="btnLimpiar" class="btn btn-warning px-4 shadow-sm d-inline-flex align-items-center gap-2">
-                <i class="bi bi-trash"></i> Limpiar
-            </button>
+                    <i class="bi bi-trash"></i> Limpiar
+                </button>
 
                 <a href="{{ route('controles-prenatales.index') }}" class="btn btn-success">
-                <i class="bi bi-arrow-left"></i> Regresar
-            </a>
-
+                    <i class="bi bi-arrow-left"></i> Regresar
+                </a>
             </div>
         </div>
     </form>
 </div>
 
-<!-- Mensaje de notificación flotante -->
 <div id="mensajeSeleccionPaciente" class="mensaje-seleccion">
     <i class="fas fa-exclamation-triangle"></i>
     <strong>Debe seleccionar una paciente antes de continuar.</strong>
@@ -671,45 +660,35 @@ function actualizarEstadoSecciones() {
     const datosPaciente = document.getElementById('datosPacienteSeleccionada');
     
     if (pacienteId) {
-        // Hay paciente seleccionada - desbloquear secciones
         seccionesBloqueadas.classList.remove('seccion-bloqueada');
         mensajeSeleccion.style.display = 'none';
         datosPaciente.style.display = 'block';
         document.getElementById('seccionPaciente').classList.add('paciente-seleccionado');
     } else {
-        // No hay paciente seleccionada - bloquear secciones
         seccionesBloqueadas.classList.add('seccion-bloqueada');
-        mensajeSeleccion.style.display = 'none'; // Oculto por defecto
+        mensajeSeleccion.style.display = 'none';
         datosPaciente.style.display = 'none';
         document.getElementById('seccionPaciente').classList.remove('paciente-seleccionado');
     }
 }
 
-// Validar antes de enviar el formulario
 document.querySelector('form').addEventListener('submit', function(e) {
     const pacienteId = document.getElementById('paciente_existente').value;
     const mensajeSeleccion = document.getElementById('mensajeSeleccionPaciente');
     
     if (!pacienteId) {
         e.preventDefault();
-        
-        // Mostrar notificación flotante
         mensajeSeleccion.style.display = 'block';
-        
-        // Ocultar mensaje después de 4 segundos
         setTimeout(() => {
             mensajeSeleccion.style.display = 'none';
         }, 4000);
-        
         return false;
     }
 });
 
-// Llamar al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
     actualizarEstadoSecciones();
     
-    // Si hay un paciente en old() al recargar (errores de validación), cargarlo
     const pacienteExistenteId = document.getElementById('paciente_existente').value;
     if (pacienteExistenteId) {
         cargarPacienteExistente(pacienteExistenteId);
@@ -734,7 +713,6 @@ document.getElementById('buscarIdentidad').addEventListener('input', function() 
         return;
     }
 
-    // Buscar inmediatamente desde el primer carácter
     timeoutBusqueda = setTimeout(() => {
         buscarPacientes(busqueda);
     }, 300);
@@ -784,7 +762,7 @@ function buscarPacientes(busqueda) {
 }
 
 function seleccionarPaciente(id) {
-    cargarPacienteExistente(id, true); // true indica que es selección manual
+    cargarPacienteExistente(id, true);
 }
 
 function cargarPacienteExistente(id, esSeleccionManual = false) {
@@ -796,7 +774,6 @@ function cargarPacienteExistente(id, esSeleccionManual = false) {
                 
                 document.getElementById('paciente_existente').value = id;
                 
-                // Cargar valores en inputs ocultos - con validación
                 document.getElementById('nombre').value = p.nombre || '';
                 document.getElementById('apellidos').value = p.apellidos || '';
                 document.getElementById('identidad').value = p.identidad || '';
@@ -812,29 +789,23 @@ function cargarPacienteExistente(id, esSeleccionManual = false) {
                 document.getElementById('historial_quirurgico').value = p.historial_quirurgico || '';
                 document.getElementById('historial_clinico').value = p.historial_clinico || '';
 
-                // Mostrar valores en los labels - mostrando datos reales o N/A
                 document.getElementById('nombre_label').textContent = p.nombre || 'N/A';
                 document.getElementById('apellidos_label').textContent = p.apellidos || 'N/A';
                 document.getElementById('identidad_label').textContent = p.identidad || 'N/A';
                 
-                // Formatear fecha de nacimiento si existe
                 let fechaNac = 'N/A';
                 let fechaNacInput = '';
                 if (p.fecha_nacimiento) {
                     try {
-                        // Extraer solo la parte de la fecha (YYYY-MM-DD)
                         fechaNacInput = p.fecha_nacimiento.split('T')[0];
-                        
-                        // Crear fecha para mostrar
                         const partes = fechaNacInput.split('-');
-                        fechaNac = `${partes[2]}/${partes[1]}/${partes[0]}`; // DD/MM/YYYY
+                        fechaNac = `${partes[2]}/${partes[1]}/${partes[0]}`;
                     } catch (e) {
                         fechaNac = p.fecha_nacimiento;
                         fechaNacInput = p.fecha_nacimiento;
                     }
                 }
                 
-                // Actualizar input oculto con formato correcto
                 document.getElementById('fecha_nacimiento').value = fechaNacInput;
                 document.getElementById('fecha_nacimiento_label').textContent = fechaNac;
                 
@@ -852,22 +823,16 @@ function cargarPacienteExistente(id, esSeleccionManual = false) {
                 document.getElementById('buscarIdentidad').value = p.identidad || '';
                 document.getElementById('listaResultados').style.display = 'none';
                 
-                // Solo mostrar mensaje si viene de la búsqueda manual
                 if (esSeleccionManual) {
                     document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-success mt-2"><i class="fas fa-check-circle"></i> Paciente cargada correctamente</div>';
                     setTimeout(() => { document.getElementById('mensajeBusqueda').innerHTML = ''; }, 3000);
                 }
 
-                // Actualizar estado de secciones
                 actualizarEstadoSecciones();
-
-                // Log para debug - verificar qué datos llegan
-                console.log('Datos de paciente cargados:', p);
             } else {
                 if (esSeleccionManual) {
                     document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-danger mt-2">No se encontraron datos del paciente</div>';
                 }
-                console.error('Respuesta sin datos de paciente:', data);
             }
         })
         .catch((error) => {
@@ -890,7 +855,6 @@ function limpiarCamposPaciente() {
         if(label) label.textContent = '';
     });
     
-    // Actualizar estado de secciones
     actualizarEstadoSecciones();
 }
 
@@ -903,8 +867,6 @@ document.addEventListener('click', function(e) {
 });
 
 // ========== VALIDACIONES DE FORMATO ==========
-
-// Formato automático de Presión Arterial
 document.getElementById('presion_arterial').addEventListener('input', function(e) {
     let valor = this.value.replace(/[^0-9]/g, '');
     
@@ -927,7 +889,6 @@ document.getElementById('presion_arterial').addEventListener('input', function(e
     this.value = valor;
 });
 
-// Validación de Frecuencia Cardíaca Materna
 document.getElementById('frecuencia_cardiaca_materna').addEventListener('input', function(e) {
     let valor = this.value.replace(/[^0-9]/g, '');
     
@@ -938,7 +899,6 @@ document.getElementById('frecuencia_cardiaca_materna').addEventListener('input',
     this.value = valor;
 });
 
-// Validación de Temperatura
 document.getElementById('temperatura').addEventListener('input', function(e) {
     let valor = this.value.replace(/[^0-9.]/g, '');
 
@@ -982,11 +942,8 @@ document.getElementById('btnLimpiar').addEventListener('click', () => {
     
     limpiarCamposPaciente();
     
-    // Restaurar fecha actual
     document.querySelector('input[name="fecha_control"]').value = '{{ date("Y-m-d") }}';
 });
-
-
 </script>
 
 @endsection
