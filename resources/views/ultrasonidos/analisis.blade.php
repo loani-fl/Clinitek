@@ -229,17 +229,16 @@
         font-size:0.8rem;
     }
     .btn {
-    font-size: 0.95rem;
-    font-weight: 600;
-    border-radius: 0.5rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+        font-size: 0.95rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
 
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
 
     .btn-sm {
         font-size: 0.8rem;
@@ -352,7 +351,7 @@
             <p class="text-center">No hay exámenes registrados para esta orden.</p>
         @endif
 
-<!-- Botones de acción con estilo uniforme -->
+        <!-- Botones de acción con estilo uniforme -->
         <div class="d-flex justify-content-center gap-3 mt-4 w-100">
             <button type="submit" class="btn btn-primary px-4 py-2 d-flex align-items-center gap-2 shadow-sm">
                 <i class="bi bi-save"></i>
@@ -545,7 +544,7 @@ function removeBlock(button, examenId){
 document.getElementById('form-analisis').addEventListener('submit', function(event){
     const medico = this.querySelector('#medico_id');
     if(!medico.value){ 
-        mostrarMensaje('El médico responsable es obligatorio.', 'error'); 
+        mostrarMensaje('El médico es obligatorio.', 'error'); 
         medico.focus();
         event.preventDefault();
         return;
@@ -559,7 +558,7 @@ document.getElementById('form-analisis').addEventListener('submit', function(eve
         const bloques = card.querySelectorAll('.image-description-block');
 
         if(bloques.length === 0){
-            mostrarMensaje(`Debes agregar al menos un bloque para el ultrasonido "${nombreExamen}".`, 'error');
+            mostrarMensaje(`Se debe realizar al menos un análisis de "${nombreExamen}".`, 'error');
             event.preventDefault();
             return;
         }
@@ -570,7 +569,7 @@ document.getElementById('form-analisis').addEventListener('submit', function(eve
             const textarea = bloque.querySelector('textarea');
 
             if(!fileInput || fileInput.files.length===0){
-                mostrarMensaje(`Falta imagen en el bloque ${j+1} del ultrasonido "${nombreExamen}".`, 'error'); 
+                mostrarMensaje(`Falta imagen en "${nombreExamen}".`, 'error'); 
                 if(fileInput) fileInput.focus();
                 event.preventDefault();
                 return;
@@ -584,7 +583,7 @@ document.getElementById('form-analisis').addEventListener('submit', function(eve
             }
 
             if(!textarea.value.trim()){
-                mostrarMensaje(`Falta descripción en el bloque ${j+1} del ultrasonido "${nombreExamen}".`, 'error'); 
+                mostrarMensaje(`Falta descripción en "${nombreExamen}".`, 'error'); 
                 textarea.focus();
                 event.preventDefault();
                 return;
