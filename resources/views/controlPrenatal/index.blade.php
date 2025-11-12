@@ -101,14 +101,14 @@
             
             {{-- NUEVO: Select para tipo de fecha --}}
             <div>
-                <label for="tipoFecha" class="filtro-label">Filtrar por</label>
+                <label for="tipoFecha" class="filtro-label">Filtrar por fecha:</label>
                 <select id="tipoFecha" class="form-control filtro-input" style="cursor: pointer;">
                     <option value="">-- Seleccione --</option>
                     <option value="fecha_control" {{ request('tipo_fecha') == 'fecha_control' ? 'selected' : '' }}>
-                        Fecha de Control
+                        De control
                     </option>
                     <option value="fecha_proxima_cita" {{ request('tipo_fecha') == 'fecha_proxima_cita' ? 'selected' : '' }}>
-                        Próxima Cita
+                        Próxima cita
                     </option>
                 </select>
             </div>
