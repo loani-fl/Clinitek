@@ -137,7 +137,7 @@
                     padding: 12px;  /* asegurar padding interno */
                 }
 
-
+            }
         }
 
     </style>
