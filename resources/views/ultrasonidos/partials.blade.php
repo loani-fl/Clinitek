@@ -31,10 +31,20 @@
 
             <td>
                 <a href="{{ route('ultrasonidos.analisis', $orden->id) }}"
-                   class="btn btn-sm btn-outline-success"><i class="bi bi-clipboard-data"></i></a>
+                   class="btn btn-sm btn-outline-success"
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="top"
+                   title="crear análisis ">
+                    <i class="bi bi-clipboard-data"></i>
+                </a>
 
                 <a href="{{ route('ultrasonidos.show', $orden->id) }}"
-                   class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                   class="btn btn-sm btn-outline-info"
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="top"
+                   title="Ver resultados del análisis">
+                    <i class="bi bi-eye"></i>
+                </a>
             </td>
         </tr>
     @empty
