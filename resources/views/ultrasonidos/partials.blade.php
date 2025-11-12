@@ -30,13 +30,24 @@
             </td>
 
             <td>
-                <a href="{{ route('ultrasonidos.analisis', $orden->id) }}"
-                   class="btn btn-sm btn-outline-success"
-                   data-bs-toggle="tooltip"
-                   data-bs-placement="top"
-                   title="crear análisis ">
-                    <i class="bi bi-clipboard-data"></i>
-                </a>
+                {{-- Si el análisis ya está realizado, deshabilitar el botón --}}
+                @if(strtolower($orden->estado) == 'realizado')
+                    <button class="btn btn-sm btn-secondary"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="El análisis ya fue realizado"
+                            disabled>
+                        <i class="bi bi-clipboard-data"></i>
+                    </button>
+                @else
+                    <a href="{{ route('ultrasonidos.analisis', $orden->id) }}"
+                       class="btn btn-sm btn-outline-success"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Crear análisis">
+                        <i class="bi bi-clipboard-data"></i>
+                    </a>
+                @endif
 
                 <a href="{{ route('ultrasonidos.show', $orden->id) }}"
                    class="btn btn-sm btn-outline-info"
@@ -54,4 +65,11 @@
     @endforelse
     </tbody>
 </table>
-
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    });
+</script>

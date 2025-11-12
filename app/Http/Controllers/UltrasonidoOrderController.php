@@ -138,15 +138,17 @@ class UltrasonidoOrderController extends Controller
             $query->where('estado', $request->estado);
         }
 
-        $ordenes = $query->orderBy('fecha', 'desc')->paginate(2);
+        $ordenes = $query->latest()->paginate(4);
+
 
         // ✅ Respuesta AJAX
         if ($request->ajax()) {
             return response()->json([
                 'html' => view('ultrasonidos.partials', compact('ordenes'))->render(),
                 'pagination' => $ordenes->links()->toHtml(),
-                'total' => $ordenes->count(),
-                'all' => $ordenes->total()
+                'total' => $ordenes->total(),
+                'all' => Ultrasonido::count(),
+
             ]);
         }
         return view('ultrasonidos.index', compact('ordenes'));

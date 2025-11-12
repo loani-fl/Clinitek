@@ -29,21 +29,21 @@
             overflow: hidden;
             z-index: 1;
         }
-        .info-label { 
-            font-weight: 700; 
-            font-size: 0.95rem; 
-            color: #003366; 
+        .info-label {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #003366;
             display: block;
             margin-bottom: 4px;
         }
-        .info-value { 
-            font-size: 1rem; 
-            color: #222; 
+        .info-value {
+            font-size: 1rem;
+            color: #222;
             padding: 8px 0;
         }
-        .info-value-textarea { 
-            font-size: 1rem; 
-            color: #222; 
+        .info-value-textarea {
+            font-size: 1rem;
+            color: #222;
             background-color: #f8f9fa;
             padding: 12px;
             border-radius: 6px;
@@ -51,7 +51,7 @@
             min-height: 80px;
             white-space: pre-wrap;
         }
-        .info-block { 
+        .info-block {
             padding: 6px 0;
             margin-bottom: 8px;
         }
@@ -73,12 +73,84 @@
         @media (max-width: 768px) {
             .info-value { font-size: 0.95rem; }
         }
+        /* --- Solo impresión --- */
+        @media print {
+            /* Ocultar todos los botones */
+            button, a.btn {
+                display: none !important;
+            }
+
+            @media print {
+                /* Mantener ancho completo */
+                body, html {
+                    width: 100%;
+                    margin: 0;
+                    padding: 0;
+                }
+
+                .container {
+                    width: 100% !important;
+                    padding: 0 !important;
+                }
+
+                .custom-card {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    margin: 0 auto;
+                    box-shadow: none;
+                    border: 1px solid #91cfff;
+                    padding: 1.5rem; /* aumentar padding para impresión */
+                }
+
+                /* Mantener columnas y filas */
+                .row {
+                    display: flex !important;
+                    flex-wrap: wrap;
+                    margin-bottom: 1rem; /* espacio entre filas */
+                }
+
+                .col-md-4, .col-md-6, .col-md-12 {
+                    padding-left: 0.75rem;  /* espacio horizontal */
+                    padding-right: 0.75rem;
+                    margin-bottom: 1rem;     /* espacio vertical entre columnas */
+                    float: left;
+                    width: auto !important;
+                    flex: 0 0 auto;
+                }
+
+                /* Espaciado de bloques de información */
+                .info-block {
+                    padding: 12px 0 !important;   /* más espacio entre cada bloque */
+                    margin-bottom: 12px !important;
+                }
+
+                .section-title {
+                    margin-top: 2rem !important;  /* más separación antes de secciones */
+                    margin-bottom: 1.2rem !important;
+                    padding-bottom: 6px;
+                }
+
+                /* Mantener áreas de texto */
+                .info-value-textarea {
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                    padding: 12px;  /* asegurar padding interno */
+                }
+
+
+        }
+
     </style>
 
     <div class="container mt-3">
         <div class="card custom-card shadow-sm border rounded-4">
-            <div class="card-header text-center py-3" style="background-color:#fff; border-bottom:4px solid #0d6efd;">
-                <h3 class="mb-0 fw-bold text-dark">Detalles del control prenatal</h3>
+            <div class="card-header d-flex justify-content-between align-items-center py-3"
+                 style="background-color:#fff; border-bottom:4px solid #0d6efd;">
+                <h3 class="mb-0 fw-bold text-dark" style="margin-left: 10px;">Detalles del control prenatal</h3>
+
+                <button onclick="window.print()" class="btn btn-warning btn-sm">
+                    Imprimir Reporte
+                </button>
             </div>
 
             <div class="card-body px-3 py-3">
@@ -107,7 +179,7 @@
                         <div class="info-value">{{ $controlPrenatal->paciente->fecha_nacimiento->format('d/m/Y') }}</div>
                     </div>
                 </div>
-                
+
                 <div class="row gy-2">
                     <div class="col-md-4 info-block">
                         <span class="info-label">Edad:</span>
@@ -159,7 +231,7 @@
                         <div class="info-value">{{ $controlPrenatal->semanas_gestacion }} semanas</div>
                     </div>
                 </div>
-                
+
                 <div class="row gy-2">
                     <div class="col-md-4 info-block">
                         <span class="info-label">Número de partos:</span>
@@ -270,7 +342,7 @@
                         <div class="info-value">{{ $controlPrenatal->indicaciones_medicas ?? 'N/A' }}</div>
                     </div>
                 </div>
-                
+
                 <div class="row gy-2">
                     <div class="col-md-6 info-block">
                         <span class="info-label">Fecha de próxima cita:</span>
