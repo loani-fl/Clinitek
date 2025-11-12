@@ -8,66 +8,74 @@ use Illuminate\Http\Request;
 
 class ControlPrenatalController extends Controller
 {
-   public function index(Request $request)
-    {
-        $query = $request->input('search', '');
-        $fechaInicio = $request->input('fecha_desde');
-        $fechaFin = $request->input('fecha_hasta');
-        $perPage = 4; // cantidad por página
+public function index(Request $request)
+{
+    $query = $request->input('search', '');
+    $fechaInicio = $request->input('fecha_desde');
+    $fechaFin = $request->input('fecha_hasta');
+    $tipoFecha = $request->input('tipo_fecha'); // ← SIN default, puede ser null
+    $perPage = 4;
 
-        $totalControles = ControlPrenatal::count();
+    $totalControles = ControlPrenatal::count();
 
-        $controlesQuery = ControlPrenatal::with('paciente')
-            ->orderBy('fecha_control', 'desc');
+    $controlesQuery = ControlPrenatal::with('paciente')
+        ->orderBy('fecha_control', 'desc');
 
-        // Filtro por nombre/apellido
-        if ($query) {
-            $controlesQuery->whereHas('paciente', function($q) use ($query) {
-                $q->where('nombre', 'like', "%$query%")
-                  ->orWhere('apellidos', 'like', "%$query%");
-            });
-        }
-
-        // Filtro por fechas
-        if ($fechaInicio) $controlesQuery->where('fecha_control', '>=', $fechaInicio);
-        if ($fechaFin) $controlesQuery->where('fecha_control', '<=', $fechaFin);
-
-        $isSearch = ($query || $fechaInicio || $fechaFin);
-
-        $totalFiltrado = $controlesQuery->count();
-        $controles = $controlesQuery->paginate($perPage);
-
-        $controles->appends([
-            'search' => $query,
-            'fecha_desde' => $fechaInicio,
-            'fecha_hasta' => $fechaFin
-        ]);
-
-        // Petición AJAX
-        if ($request->ajax()) {
-            $currentPage = $controles->currentPage();
-            $lastPage = max($controles->lastPage(), 1);
-
-            $customPagination = view('controlPrenatal.custom-pagination', [
-                'currentPage' => $currentPage,
-                'lastPage' => $lastPage,
-                'hasMorePages' => $controles->hasMorePages(),
-                'onFirstPage' => $controles->onFirstPage(),
-                'from' => $controles->firstItem() ?? 0,
-                'to' => $controles->lastItem() ?? 0,
-                'total' => $controles->total(),
-            ])->render();
-
-            return response()->json([
-                'html' => view('controlPrenatal.tabla', compact('controles', 'isSearch'))->render(),
-                'pagination' => $customPagination,
-                'total' => $totalFiltrado,
-                'all' => $totalControles,
-            ]);
-        }
-
-        return view('controlPrenatal.index', compact('controles', 'isSearch', 'totalControles'));
+    // Filtro por nombre/apellido
+    if ($query) {
+        $controlesQuery->whereHas('paciente', function($q) use ($query) {
+            $q->where('nombre', 'like', "%$query%")
+              ->orWhere('apellidos', 'like', "%$query%");
+        });
     }
+
+    // ✅ SOLO FILTRAR SI SE SELECCIONÓ UN TIPO DE FECHA
+    if ($tipoFecha && in_array($tipoFecha, ['fecha_control', 'fecha_proxima_cita'])) {
+        if ($fechaInicio) {
+            $controlesQuery->where($tipoFecha, '>=', $fechaInicio);
+        }
+        if ($fechaFin) {
+            $controlesQuery->where($tipoFecha, '<=', $fechaFin);
+        }
+    }
+
+    $isSearch = ($query || $fechaInicio || $fechaFin);
+
+    $totalFiltrado = $controlesQuery->count();
+    $controles = $controlesQuery->paginate($perPage);
+
+    $controles->appends([
+        'search' => $query,
+        'fecha_desde' => $fechaInicio,
+        'fecha_hasta' => $fechaFin,
+        'tipo_fecha' => $tipoFecha
+    ]);
+
+    // Petición AJAX
+    if ($request->ajax()) {
+        $currentPage = $controles->currentPage();
+        $lastPage = max($controles->lastPage(), 1);
+
+        $customPagination = view('controlPrenatal.custom-pagination', [
+            'currentPage' => $currentPage,
+            'lastPage' => $lastPage,
+            'hasMorePages' => $controles->hasMorePages(),
+            'onFirstPage' => $controles->onFirstPage(),
+            'from' => $controles->firstItem() ?? 0,
+            'to' => $controles->lastItem() ?? 0,
+            'total' => $controles->total(),
+        ])->render();
+
+        return response()->json([
+            'html' => view('controlPrenatal.tabla', compact('controles', 'isSearch'))->render(),
+            'pagination' => $customPagination,
+            'total' => $totalFiltrado,
+            'all' => $totalControles,
+        ]);
+    }
+
+    return view('controlPrenatal.index', compact('controles', 'isSearch', 'totalControles'));
+}
 
 
     public function create()
