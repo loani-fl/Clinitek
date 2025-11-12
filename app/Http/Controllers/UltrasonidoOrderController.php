@@ -14,6 +14,8 @@ use App\Models\UltrasonidoUtero;
 use App\Models\UltrasonidoTiroides;
 use App\Models\Medico;
 use App\Models\UltrasonidoImagen;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class UltrasonidoOrderController extends Controller
 {
@@ -182,9 +184,6 @@ public function show($id)
     ));
 }
 
-
-
-
 public function analisis($id)
 {
     $orden = Ultrasonido::with([
@@ -192,6 +191,12 @@ public function analisis($id)
         'imagenes',
         'medico'
     ])->findOrFail($id);
+
+    // ✅ Validar si ya fue analizado
+    if ($orden->estado === 'Realizado') {
+        return redirect()->route('ultrasonidos.index')
+            ->with('error', 'Esta orden ya ha sido analizada y no puede modificarse.');
+    }
 
     // Solo mostrar médicos de Ginecología
     $medicos = Medico::where('especialidad', 'Ginecología')->get();
@@ -208,70 +213,140 @@ public function analisis($id)
     ];
 
     $examenesSeleccionados = collect($orden->examenes ?? [])
-        ->map(fn($ex) => $mapaNombres[$ex] ?? $ex);
+        ->map(fn($ex) => $mapaNombres[$ex] ?? ucfirst(str_replace('_', ' ', $ex)));
 
     return view('ultrasonidos.analisis', compact('orden', 'medicos', 'examenesSeleccionados'));
 }
 
-
-// En app/Http/Controllers/UltrasonidoOrderController.php
-
 public function guardarAnalisis(Request $request, $id)
 {
-    // ... (Tu código de validación es correcto, lo omito por brevedad) ...
+    $orden = Ultrasonido::findOrFail($id);
+
+    // ✅ Validar que no esté ya realizado
+    if ($orden->estado === 'Realizado') {
+        return redirect()->route('ultrasonidos.index')
+            ->with('error', 'Esta orden ya ha sido analizada previamente.');
+    }
+
+    // Validación básica del médico
     $request->validate([
         'medico_id' => 'required|exists:medicos,id',
-        'imagenes' => 'required|array',
-        'imagenes.*' => 'required|array',
-        'imagenes.*.*' => 'required|image|mimes:jpg,jpeg,png|max:4096',
-        'descripciones' => 'required|array',
-        'descripciones.*' => 'required|array',
-        'descripciones.*.*' => 'required|string|max:200',
     ], [
         'medico_id.required' => 'Debe seleccionar un médico responsable.',
-        // ... (El resto de tus mensajes de error) ...
+        'medico_id.exists' => 'El médico seleccionado no es válido.',
     ]);
 
-    $orden = Ultrasonido::findOrFail($id);
-    $orden->medico_id = $request->medico_id;
-    $orden->estado = 'Realizado';
-    $orden->save();
-
-    // 1. OBTENER LAS CLAVES DE EXÁMENES DE LA ORDEN
-    // Esto debería ser un array como ['higado', 'vesicula', 'bazo']
+    // Obtener las claves de exámenes de la orden
     $examenesKeys = $orden->examenes ?? [];
 
-    // Procesar imágenes por examen
-    if ($request->has('imagenes')) {
-        // $examenIndex es el índice (0, 1, 2...) del grupo de imágenes en el formulario
-        foreach ($request->file('imagenes') as $examenIndex => $imagenesExamen) {
+    if (empty($examenesKeys)) {
+        return back()->with('error', 'No hay ultrasonidos registrados en esta orden.');
+    }
 
-            // 2. Usar el índice para obtener la CLAVE del examen (ej: 'higado')
+    // Validar que se enviaron imágenes
+    if (!$request->has('imagenes') || empty($request->file('imagenes'))) {
+        return back()->with('error', 'Debes agregar al menos una imagen para cada ultrasonido.');
+    }
+
+    $imagenes = $request->file('imagenes');
+    $descripciones = $request->input('descripciones', []);
+
+    // Mapear claves a nombres legibles para mensajes de error
+    $mapaNombres = [
+        'higado' => 'Ultrasonido Hígado',
+        'vesicula' => 'Ultrasonido Vesícula',
+        'bazo' => 'Ultrasonido Bazo',
+        'vejiga' => 'Ultrasonido Vejiga',
+        'ovarico' => 'Ultrasonido Ovarios',
+        'utero' => 'Ultrasonido Útero',
+        'tiroides' => 'Ultrasonido Tiroides',
+    ];
+
+    // Validar cada grupo de exámenes
+    foreach ($examenesKeys as $index => $examenKey) {
+        $nombreExamen = $mapaNombres[$examenKey] ?? ucfirst(str_replace('_', ' ', $examenKey));
+
+        // Verificar que tenga imágenes
+        if (!isset($imagenes[$index]) || empty($imagenes[$index])) {
+            return back()->with('error', "Falta la imagen del ultrasonido: {$nombreExamen}");
+        }
+
+        // Verificar que tenga descripciones
+        if (!isset($descripciones[$index]) || empty($descripciones[$index])) {
+            return back()->with('error', "Falta la descripción del ultrasonido: {$nombreExamen}");
+        }
+
+        $imagenesExamen = $imagenes[$index];
+        $descripcionesExamen = $descripciones[$index];
+
+        // Validar que cada imagen tenga su descripción
+        if (count($imagenesExamen) !== count($descripcionesExamen)) {
+            return back()->with('error', "Información incompleta para el ultrasonido: {$nombreExamen}");
+        }
+
+        // Validar cada imagen
+        foreach ($imagenesExamen as $imgIndex => $imagen) {
+            if (!$imagen->isValid()) {
+                return back()->with('error', "La imagen del ultrasonido {$nombreExamen} no es válida.");
+            }
+
+            $extension = strtolower($imagen->getClientOriginalExtension());
+            if (!in_array($extension, ['jpg', 'jpeg', 'png'])) {
+                return back()->with('error', "La imagen del ultrasonido {$nombreExamen} debe ser JPG, JPEG o PNG.");
+            }
+
+            if ($imagen->getSize() > 4 * 1024 * 1024) {
+                return back()->with('error', "La imagen del ultrasonido {$nombreExamen} supera el tamaño máximo de 4 MB.");
+            }
+
+            $descripcion = trim($descripcionesExamen[$imgIndex] ?? '');
+            if (empty($descripcion)) {
+                return back()->with('error', "Falta la descripción del ultrasonido: {$nombreExamen}");
+            }
+
+            if (strlen($descripcion) > 200) {
+                return back()->with('error', "La descripción del ultrasonido {$nombreExamen} es muy larga (máximo 200 caracteres).");
+            }
+        }
+    }
+
+    // Si todas las validaciones pasan, proceder a guardar
+    DB::beginTransaction();
+    try {
+        $orden->medico_id = $request->medico_id;
+        $orden->estado = 'Realizado';
+        $orden->save();
+
+        // Procesar y guardar cada imagen con su descripción
+        foreach ($request->file('imagenes') as $examenIndex => $imagenesExamen) {
             if (!isset($examenesKeys[$examenIndex])) {
-                // Esto podría pasar si el formulario tiene más grupos de campos que exámenes guardados
                 continue;
             }
-            $examenKey = $examenesKeys[$examenIndex]; // <-- ¡CLAVE!
+
+            $examenKey = $examenesKeys[$examenIndex];
 
             foreach ($imagenesExamen as $index => $imagen) {
                 $ruta = $imagen->store('ultrasonidos', 'public');
-
-                // Obtener la descripción correspondiente
                 $descripcion = $request->descripciones[$examenIndex][$index] ?? '';
 
                 UltrasonidoImagen::create([
                     'ultrasonido_id' => $orden->id,
-                    'tipo_examen' => $examenKey, // <-- ¡LÍNEA MODIFICADA PARA GUARDAR EL TIPO!
+                    'tipo_examen' => $examenKey,
                     'ruta' => $ruta,
                     'descripcion' => $descripcion,
                 ]);
             }
         }
+
+        DB::commit();
+        return redirect()->route('ultrasonidos.index')
+            ->with('success', 'Análisis de ultrasonido guardado correctamente.');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        \Log::error('Error al guardar análisis de ultrasonido: ' . $e->getMessage());
+        return back()->with('error', 'Ocurrió un error al guardar el análisis. Por favor, inténtalo de nuevo.');
     }
-
-    return redirect()->route('ultrasonidos.index')
-        ->with('success', 'Análisis de ultrasonido guardado correctamente.');
 }
-
 
 }
