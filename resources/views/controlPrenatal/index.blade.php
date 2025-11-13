@@ -70,13 +70,11 @@
         background-color: transparent !important;
     }
     .filter-container {
-    display: flex;
-    gap: 1rem;           /* ← ESPACIO ENTRE CADA FILTRO */
-    padding: 10px;
-   
-    margin-bottom: 1.5rem;
-}
-
+        display: flex;
+        gap: 1rem;
+        padding: 10px;
+        margin-bottom: 1.5rem;
+    }
 </style>
 
 <div class="content-wrapper">
@@ -86,20 +84,35 @@
                 <i class="bi bi-house-door"></i> Inicio
             </a>
 
-            <h2>Control Prenatal</h2>
+            <h2>Controles prenatales</h2>
 
             <a href="{{ route('controles-prenatales.create') }}" class="btn btn-primary ms-3">
-                <i class="bi bi-plus-circle"></i> Nuevo Control
+                <i class="bi bi-plus-circle"></i> Nuevo control
             </a>
         </div>
 
         {{-- Filtros --}}
         <div class="d-flex filter-container mb-3">
-            <div>
+            <div style="flex: 1.5;">
                 <label for="filtroBusqueda" class="filtro-label">Paciente</label>
                 <input type="text" id="filtroBusqueda" class="form-control filtro-input"
-                       placeholder="Buscar paciente..." autocomplete="off" value="{{ request('search') }}">
+                       placeholder="Buscar por nombres y apellidos" autocomplete="off" value="{{ request('search') }}">
             </div>
+            
+            {{-- NUEVO: Select para tipo de fecha --}}
+            <div>
+                <label for="tipoFecha" class="filtro-label">Filtrar por fecha:</label>
+                <select id="tipoFecha" class="form-control filtro-input" style="cursor: pointer;">
+                    <option value="">-- Seleccione --</option>
+                    <option value="fecha_control" {{ request('tipo_fecha') == 'fecha_control' ? 'selected' : '' }}>
+                        Fecha de control
+                    </option>
+                    <option value="fecha_proxima_cita" {{ request('tipo_fecha') == 'fecha_proxima_cita' ? 'selected' : '' }}>
+                        Fecha de próxima cita
+                    </option>
+                </select>
+            </div>
+            
             <div>
                 <label for="fechaDesde" class="filtro-label">Desde</label>
                 <input type="date" id="fechaDesde" class="form-control filtro-input" value="{{ request('fecha_desde') }}">
@@ -170,15 +183,17 @@ $(document).ready(function () {
     function cargarDatos(page = 1, query = '') {
         const fechaDesde = $('#fechaDesde').val();
         const fechaHasta = $('#fechaHasta').val();
+        const tipoFecha = $('#tipoFecha').val(); // ← NUEVO
 
         $.ajax({
-            url: "{{ route('controles-prenatales.index') }}",
+            url: "{{ route('controles-prenatales.index') }}", // ← MISMA RUTA
             type: 'GET',
             data: {
                 page,
                 search: query,
                 fecha_desde: fechaDesde,
-                fecha_hasta: fechaHasta
+                fecha_hasta: fechaHasta,
+                tipo_fecha: tipoFecha // ← NUEVO PARÁMETRO
             },
             success: function(data) {
                 $('#tabla-container').html(data.html);
@@ -195,10 +210,18 @@ $(document).ready(function () {
     cargarDatos(1, $('#filtroBusqueda').val());
 
     // Eventos
-    $('#filtroBusqueda').on('keyup', function () { cargarDatos(1, $(this).val()); });
-    $('#fechaDesde, #fechaHasta').on('change', function () { cargarDatos(1, $('#filtroBusqueda').val()); });
+    $('#filtroBusqueda').on('keyup', function () { 
+        cargarDatos(1, $(this).val()); 
+    });
+    
+    // ← AGREGADO #tipoFecha al evento change
+    $('#fechaDesde, #fechaHasta, #tipoFecha').on('change', function () { 
+        cargarDatos(1, $('#filtroBusqueda').val()); 
+    });
+    
     $('#btnRecargar').on('click', function () {
         $('#filtroBusqueda, #fechaDesde, #fechaHasta').val('');
+        $('#tipoFecha').val(''); // ← RESETEAR a "-- Seleccione --"
         cargarDatos(1, '');
     });
 

@@ -4,43 +4,57 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
-    body { background-color: #e8f4fc; margin:0; padding:0; min-height:100vh; position:relative; }
-
-    .custom-card { 
-        max-width:900px; 
-        background-color:#fff; 
-        margin:20px auto 40px auto; 
-        border-radius:1rem; 
-        padding:1.5rem 2rem; 
+    body { 
+        background-color: #e8f4fc; 
+        margin:0; 
+        padding:0; 
+        min-height:100vh; 
         position:relative; 
-        overflow:visible; 
-        z-index:1; 
-        box-shadow:0 3px 10px rgb(0 0 0 / 0.08); 
-        background-image: url('/images/logo2.jpg'); 
-        background-size:contain; 
-        background-repeat:no-repeat; 
-        background-position:center; 
-        opacity:1; 
     }
-    .custom-card::before { 
-        content:""; 
-        position:absolute; 
-        inset:0; 
-        background:rgba(255,255,255,0.9); 
-        border-radius:1rem; 
-        z-index:0; 
-    }
-    .custom-card > * { position:relative; z-index:1; }
 
-    .section-title { 
-        font-size: 1.3rem;
-        font-weight: 700; 
+    /* Wrapper compacto */
+    .content-wrapper {
+        margin-top: 60px; 
+        max-width: 1000px; 
+        background-color: #fff;
+        margin-left: auto; 
+        margin-right: auto; 
+        border-radius: 1.5rem;
+        padding: 1rem 2rem; 
+        position: relative; 
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    /* Logo translúcido */
+    .content-wrapper::before {
+        content: "";
+        position: absolute; 
+        top: 50%; 
+        left: 50%;
+        width: 2200px; 
+        height: 2200px;
+        background-image: url('{{ asset('images/logo2.jpg') }}');
+        background-size: contain; 
+        background-repeat: no-repeat;
+        background-position: center; 
+        opacity: 0.1;
+        transform: translate(-50%, -50%);
+        pointer-events: none; 
+        z-index: 0;
+    }
+
+    h2, h5 { 
         color: #003366; 
-        border-bottom: 2px solid #007BFF; 
-        padding-bottom: 0.4rem;
-        margin-bottom: 1rem;
-        user-select: none; 
-        text-align: center;
+        font-weight: 700; 
+        margin-bottom: 1rem; 
+        text-align: center; 
+        position: relative;
+        z-index: 1;
+    }
+    
+    h5 { 
+        font-size: 1.2rem; 
     }
 
     h4 { 
@@ -50,40 +64,69 @@
         margin-bottom:0.7rem; 
         user-select:none;
         font-size: 0.95rem;
+        position: relative;
+        z-index: 1;
     }
 
-    /* --- DATOS DEL PACIENTE --- */
-    .patient-data-inline { 
-        display:flex; 
-        flex-wrap:wrap; 
-        gap:1.5rem; 
-        margin-bottom:1.5rem;
-        margin-top:1rem;
-        font-size:0.85rem;
-        font-weight:600;
-        color:#000; 
-    }
-    .patient-data-inline span.label { 
-        font-weight:700; 
-        color:#004080; 
-        margin-right:0.3rem; 
-    }
-    .patient-data-inline .underline-field {
-        font-weight:600; 
-        color:#222;
+    /* Datos del paciente */
+    .patient-block {
+        background-color: #f0f7ff;
+        padding: 1rem 1.2rem;
+        border-radius: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        position: relative;
+        z-index: 1;
     }
 
-    /* Subrayado para campos */
-    .underline-field { 
-        border-bottom:1px solid #004080; 
-        padding:0 3px; 
+    .patient-data-row { 
+        display: flex; 
+        flex-wrap: wrap; 
+        gap: 0.8rem; 
+        margin-bottom: 0.3rem;
     }
-    .underline-field.thin { 
-        border-bottom:0.5px solid #666; 
-        font-weight:600; 
-        display:inline-block;
-        width:100px;
-        text-align:center;
+    
+    .patient-data-row:last-child {
+        margin-bottom: 0;
+    }
+    
+    .patient-data-row:first-child {
+        margin-bottom: 1rem;
+    }
+    
+    .patient-data-field { 
+        display: flex; 
+        align-items: center; 
+        gap: 0.4rem; 
+        min-width: 180px; 
+        flex: 1; 
+    }
+    
+    .patient-data-field strong { 
+        min-width: 100px; 
+        font-weight: normal; 
+        color: rgb(3,12,22); 
+        font-size: 0.95rem; 
+    }
+    
+    .underline-field-solid { 
+        border-bottom: 1px solid #333; 
+        min-height: 1.2rem; 
+        padding: 0 4px; 
+        user-select: none; 
+        flex:1; 
+        font-size:0.85rem; 
+    }
+
+    /* Sección de exámenes */
+    .examen-block {
+        background-color: #f0f7ff;
+        padding: 1rem 1rem;
+        border-radius: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        position: relative;
+        z-index: 1;
     }
 
     /* --- Fila médico y fecha --- */
@@ -94,6 +137,8 @@
         align-items:flex-end; 
         margin-bottom:1.2rem; 
         margin-top:1.5rem;
+        position: relative;
+        z-index: 1;
     }
     .form-row > div { flex:1 1 220px; }
     
@@ -125,7 +170,9 @@
     .examen-card { 
         margin-bottom:2rem; 
         padding-bottom:0.8rem; 
-        border-bottom:2px solid #007BFF; 
+        border-bottom:2px solid #007BFF;
+        position: relative;
+        z-index: 1;
     }
     .examen-card:last-child { 
         border-bottom:none; 
@@ -154,6 +201,8 @@
         color: #000;
         font-weight: 700;
         font-size: 1.1rem;
+        position: relative;
+        z-index: 1;
     }
 
     /* --- Bloques de imágenes --- */
@@ -166,6 +215,7 @@
         border-radius:0.4rem; 
         padding:0.5rem;
         position: relative;
+        background-color: white;
     }
 
     .remove-block {
@@ -214,32 +264,29 @@
         font-size: 0.85rem;
     }
 
+    /* Línea azul */
+    .linea-azul { 
+        height:3px; 
+        background-color:#007BFF; 
+        width:100%; 
+        border-radius:2px; 
+        margin:0.3rem 0 1rem 0;
+        position: relative;
+        z-index: 1;
+    }
+
     /* Botones */
-    .btn-group { 
-        display:flex !important; 
-        justify-content:center !important; 
-        gap:0.6rem; 
-        margin-top:1.2rem; 
-        align-items:center; 
-    }
-    .btn-group .btn { 
-        min-width:120px; 
-        flex:0 0 auto; 
-        padding:0.35rem 0.9rem; 
-        font-size:0.8rem;
-    }
     .btn {
-    font-size: 0.95rem;
-    font-weight: 600;
-    border-radius: 0.5rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+        font-size: 0.95rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
 
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
 
     .btn-sm {
         font-size: 0.8rem;
@@ -252,7 +299,9 @@
         flex-direction:column; 
         align-items:center; 
         gap:0.4rem; 
-        margin-bottom:0.8rem; 
+        margin-bottom:0.8rem;
+        position: relative;
+        z-index: 1;
     }
 
     .mensaje-error-imagen {
@@ -264,6 +313,8 @@
     .alert {
         font-size: 0.85rem;
         padding: 0.6rem 1rem;
+        position: relative;
+        z-index: 1;
     }
 
     @media(max-width:991px) { 
@@ -276,8 +327,19 @@
     }
 </style>
 
-<div class="custom-card">
-    <h2 class="section-title">Análisis de Ultrasonido</h2>
+<div class="content-wrapper">
+    <div class="row align-items-center mb-3" style="position: relative; z-index: 1;">
+        <div class="col-md-3 text-center">
+            <img src="{{ asset('images/logo2.jpg') }}" alt="Logo Clinitek" style="height:50px; width:auto;">
+            <div style="font-size:0.9rem; font-weight:700; color:#555;">Laboratorio ultrasonidos Honduras</div>
+        </div>
+        <div class="col-md-9 text-center" style="transform: translateX(30%);">
+            <h4 class="mb-0" style="font-size:1.1rem; font-weight:700; color:#333; line-height:1.3;">Análisis de Ultrasonido</h4>
+        </div>
+    </div>
+
+    <div class="linea-azul"></div>
+
     <div id="mensaje-dinamico-container"></div>
 
     @if(session('success'))
@@ -296,64 +358,86 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
-    <!-- Datos del paciente -->
-    <h4>Datos del paciente:</h4>
-    <div class="patient-data-inline">
-        <div><span class="label">Nombres:</span> <span class="underline-field">{{ $orden->paciente->nombre ?? 'N/A' }}</span></div>
-        <div><span class="label">Apellidos:</span> <span class="underline-field">{{ $orden->paciente->apellidos ?? 'N/A' }}</span></div>
-        <div><span class="label">Identidad:</span> <span class="underline-field">{{ $orden->paciente->identidad ?? 'N/A' }}</span></div>
-        <div><span class="label">Género:</span> <span class="underline-field">{{ $orden->paciente->genero ?? 'N/A' }}</span></div>
-    </div>
-
     <!-- Formulario de análisis -->
     <form action="{{ route('ultrasonidos.guardarAnalisis', $orden->id) }}" method="POST" enctype="multipart/form-data" id="form-analisis">
         @csrf
 
-        <!-- Fila médico + fecha -->
-        <div class="form-row">
-            <div>
-                <label for="medico_id" class="form-label medico-label">Médico responsable:</label>
-                <select name="medico_id" id="medico_id" class="form-select @error('medico_id') is-invalid @enderror">
-                    <option value="">-- Seleccionar Médico --</option>
-                    @foreach($medicos as $medico)
-                        <option value="{{ $medico->id }}" {{ (old('medico_id', $orden->medico_id ?? '') == $medico->id) ? 'selected' : '' }}>
-                            {{ $medico->nombre }} {{ $medico->apellidos }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('medico_id')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+        <!-- Datos del paciente -->
+        <div class="patient-block">
+            <h5>Datos del paciente</h5>
+            <div class="patient-data-row">
+                <div class="patient-data-field">
+                    <strong>Nombres:</strong>
+                    <div class="underline-field-solid">{{ $orden->paciente->nombre ?? 'N/A' }}</div>
+                </div>
+                <div class="patient-data-field">
+                    <strong>Apellidos:</strong>
+                    <div class="underline-field-solid">{{ $orden->paciente->apellidos ?? 'N/A' }}</div>
+                </div>
             </div>
-            <div>
-                <label for="fecha" class="form-label fecha-label">Fecha:</label>
-                <div class="fecha-field">{{ $orden->fecha ?? 'N/A' }}</div>
+            <div class="patient-data-row">
+                <div class="patient-data-field">
+                    <strong>Identidad:</strong>
+                    <div class="underline-field-solid">{{ $orden->paciente->identidad ?? 'N/A' }}</div>
+                </div>
+                <div class="patient-data-field">
+                    <strong>Género:</strong>
+                    <div class="underline-field-solid">{{ $orden->paciente->genero ?? 'N/A' }}</div>
+                </div>
+                <div class="patient-data-field">
+                    <strong>Fecha:</strong>
+                    <div class="underline-field-solid">{{ $orden->fecha ?? 'N/A' }}</div>
+                </div>
+            </div>
+            
+            <h5 style="margin-top: 1.5rem;">Médico analista</h5>
+            <div class="patient-data-row">
+                <div class="patient-data-field" style="flex: 1 1 45%;">
+                    <strong>Médico analista:</strong>
+                    <select name="medico_id" id="medico_id" class="form-select form-select-sm @error('medico_id') is-invalid @enderror" style="flex: 1; border: 1.5px solid #004080; font-size: 0.85rem;">
+                        <option value="">-- Seleccionar Médico --</option>
+                        @foreach($medicos as $medico)
+                            <option value="{{ $medico->id }}" {{ (old('medico_id', $orden->medico_id ?? '') == $medico->id) ? 'selected' : '' }}>
+                                {{ $medico->nombre }} {{ $medico->apellidos }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('medico_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="patient-data-field" style="flex: 1 1 45%;">
+                    <strong>Médico:</strong>
+                    <div class="underline-field-solid" id="medico-nombre-display"></div>
+                </div>
             </div>
         </div>
 
-        <h4 class="examen-title">Ultrasonidos ordenados</h4>
+        <!-- Sección de ultrasonidos -->
+        <div class="examen-block">
+            <h5>Ultrasonidos ordenados</h5>
 
-        <!-- Sección de ultrasonidos con imágenes -->
-        @if(isset($examenesSeleccionados) && $examenesSeleccionados->isNotEmpty())
-            @foreach($examenesSeleccionados as $index => $nombreExamen)
-                <div class="examen-card" data-examen-index="{{ $index }}">
-                    <div class="examen-nombre">
-                        {{ $nombreExamen }}
-                        <button type="button" class="btn btn-sm btn-success" id="btn-agregar-{{ $index }}" onclick="addImageBlock({{ $index }}, '{{ str_replace("'", "\\'", $nombreExamen) }}')">
-                            <i class="bi bi-plus-circle"></i> Agregar imagen
-                        </button>
+            @if(isset($examenesSeleccionados) && $examenesSeleccionados->isNotEmpty())
+                @foreach($examenesSeleccionados as $index => $nombreExamen)
+                    <div class="examen-card" data-examen-index="{{ $index }}">
+                        <div class="examen-nombre">
+                            {{ $nombreExamen }}
+                            <button type="button" class="btn btn-sm btn-success" id="btn-agregar-{{ $index }}" onclick="addImageBlock({{ $index }}, '{{ str_replace("'", "\\'", $nombreExamen) }}')">
+                                <i class="bi bi-plus-circle"></i> Agregar imagen
+                            </button>
+                        </div>
+                        <div class="examen-content" id="examen-content-{{ $index }}">
+                            <!-- Los bloques de imágenes se agregarán aquí dinámicamente -->
+                        </div>
                     </div>
-                    <div class="examen-content" id="examen-content-{{ $index }}">
-                        <!-- Los bloques de imágenes se agregarán aquí dinámicamente -->
-                    </div>
-                </div>
-            @endforeach
-        @else
-            <p class="text-center">No hay exámenes registrados para esta orden.</p>
-        @endif
+                @endforeach
+            @else
+                <p class="text-center">No hay exámenes registrados para esta orden.</p>
+            @endif
+        </div>
 
-<!-- Botones de acción con estilo uniforme -->
-        <div class="d-flex justify-content-center gap-3 mt-4 w-100">
+        <!-- Botones de acción -->
+        <div class="d-flex justify-content-center gap-3 mt-4 w-100" style="position: relative; z-index: 1;">
             <button type="submit" class="btn btn-primary px-4 py-2 d-flex align-items-center gap-2 shadow-sm">
                 <i class="bi bi-save"></i>
                 <span>Guardar análisis</span>
@@ -545,7 +629,7 @@ function removeBlock(button, examenId){
 document.getElementById('form-analisis').addEventListener('submit', function(event){
     const medico = this.querySelector('#medico_id');
     if(!medico.value){ 
-        mostrarMensaje('El médico responsable es obligatorio.', 'error'); 
+        mostrarMensaje('El médico es obligatorio.', 'error'); 
         medico.focus();
         event.preventDefault();
         return;
@@ -559,7 +643,7 @@ document.getElementById('form-analisis').addEventListener('submit', function(eve
         const bloques = card.querySelectorAll('.image-description-block');
 
         if(bloques.length === 0){
-            mostrarMensaje(`Debes agregar al menos un bloque para el ultrasonido "${nombreExamen}".`, 'error');
+            mostrarMensaje(`Se debe realizar al menos un análisis de ${nombreExamen}.`, 'error');
             event.preventDefault();
             return;
         }
@@ -570,7 +654,7 @@ document.getElementById('form-analisis').addEventListener('submit', function(eve
             const textarea = bloque.querySelector('textarea');
 
             if(!fileInput || fileInput.files.length===0){
-                mostrarMensaje(`Falta imagen en el bloque ${j+1} del ultrasonido "${nombreExamen}".`, 'error'); 
+                mostrarMensaje(`Falta la imagen de ${nombreExamen}.`, 'error'); 
                 if(fileInput) fileInput.focus();
                 event.preventDefault();
                 return;
@@ -584,7 +668,7 @@ document.getElementById('form-analisis').addEventListener('submit', function(eve
             }
 
             if(!textarea.value.trim()){
-                mostrarMensaje(`Falta descripción en el bloque ${j+1} del ultrasonido "${nombreExamen}".`, 'error'); 
+                mostrarMensaje(`Falta la descripción de ${nombreExamen}.`, 'error'); 
                 textarea.focus();
                 event.preventDefault();
                 return;
@@ -600,6 +684,25 @@ document.addEventListener('DOMContentLoaded', function(){
         const examenId = container.id.replace('examen-content-', '');
         const nombreExamen = container.parentElement.querySelector('.examen-nombre').childNodes[0].textContent.trim();
         addImageBlock(parseInt(examenId), nombreExamen);
+    });
+
+    // Actualizar nombre del médico cuando se selecciona
+    const medicoSelect = document.getElementById('medico_id');
+    const medicoDisplay = document.getElementById('medico-nombre-display');
+    
+    // Mostrar nombre del médico si ya hay uno seleccionado
+    if(medicoSelect.value) {
+        const selectedOption = medicoSelect.options[medicoSelect.selectedIndex];
+        medicoDisplay.textContent = selectedOption.text;
+    }
+    
+    medicoSelect.addEventListener('change', function() {
+        if(this.value) {
+            const selectedOption = this.options[this.selectedIndex];
+            medicoDisplay.textContent = selectedOption.text;
+        } else {
+            medicoDisplay.textContent = '-- Seleccione un médico --';
+        }
     });
 });
 </script>

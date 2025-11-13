@@ -63,11 +63,12 @@
         padding: 0;
         margin-bottom: 2rem;
     }
-
-    .patient-data-grid strong {
-        color:rgb(3, 12, 22);
-        font-weight: 600;
-    }
+.patient-data-grid strong {
+    min-width: 100px;  /* Añadido para alinear mejor */
+    font-weight: normal;  /* Cambiado de 600 a normal */
+    color: rgb(3, 12, 22);
+    font-size: 0.9rem;  /* Añadido para consistencia */
+}
 
     .underline-field {
         border-bottom: 1px solid #000;
@@ -122,39 +123,45 @@
         display: none;
     }
 
- .secciones-container {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.3rem 0.10rem; /* aún menos espacio horizontal y vertical */
-        margin-top: 0.3rem;
-    }
+.secciones-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.3rem 0.10rem;  /* Mismo espaciado que rayos X */
+    margin-top: 0.3rem;
+}
 
     .seccion {
         padding: 0;
     }
 
-   .section-title {
-    font-size: 1.1rem;         /* más grande */
+.examenes-grid label {
+    font-size: 0.85rem;
+    line-height: 1rem;
+    font-weight: normal;  /* Cambiado de 700 a normal */
+    color: #0f0f0f; 
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+}
+
+/* También asegúrate de que los títulos de sección mantengan su negrita */
+.section-title {
+    font-size: 1.1rem;
     margin: 0 0 0.7rem;
     color: rgb(6, 11, 17);
-    font-weight: 700;          /* más negrita */
-    line-height: 1.4rem;       /* un poco más alto */
+    font-weight: 700;  /* Esto sí mantiene la negrita */
+    line-height: 1.4rem;
 }
 
 
-    .examenes-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 0.15rem; /* menos espacio entre checkboxes */
-    }
+   .examenes-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;  /* Mismo espaciado que rayos X */
+}
 
-    .examenes-grid label {
-        font-size: 0.85rem;
-        line-height: 1rem;
-
-         font-weight: 700;       /* Más negrita */
-    color: #0f0f0fff; 
-    }
+   
  .d-flex.justify-content-center.gap-3.mt-4 {
         margin-top: 2rem !important; /* para separarlos bien de las secciones */
     }
@@ -166,6 +173,26 @@
     font-weight: 600;
     border-radius: 0.3rem;
     width: 100%;
+}
+.examenes-grid input[type="checkbox"] {
+    width: auto;
+    height: auto;
+    cursor: pointer;
+    vertical-align: middle;
+    margin-right: 0.35rem;  /* Mismo margen que rayos X */
+}.underline-field {
+    border-bottom: 1px solid #000;
+    min-height: 1.2rem;  /* Cambiado de 1.4rem a 1.2rem como rayos X */
+    padding-left: 4px;
+    padding-right: 4px;
+    font-size: 0.85rem;  /* Cambiado de 0.95rem a 0.85rem como rayos X */
+    flex: 1;
+    user-select: none;
+}
+
+/* Botones - mismo espaciado que rayos X */
+.d-flex.justify-content-center.gap-3.mt-4 {
+    margin-top: 1.5rem !important;  /* Cambiado de 2rem a 1.5rem */
 }
 
 

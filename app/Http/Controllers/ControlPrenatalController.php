@@ -15,10 +15,10 @@ class ControlPrenatalController extends Controller
         $fechaFin = $request->input('fecha_hasta');
         $perPage = 1;
 
-        $totalControles = ControlPrenatal::count();
+    $totalControles = ControlPrenatal::count();
 
-        $controlesQuery = ControlPrenatal::with('paciente')
-            ->orderBy('fecha_control', 'desc');
+    $controlesQuery = ControlPrenatal::with('paciente')
+        ->orderBy('fecha_control', 'desc');
 
         if ($query) {
             $controlesQuery->whereHas('paciente', function($q) use ($query) {
