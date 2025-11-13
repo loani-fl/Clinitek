@@ -80,66 +80,62 @@
                 display: none !important;
             }
 
-            @media print {
-                /* Mantener ancho completo */
-                body, html {
-                    width: 100%;
-                    margin: 0;
-                    padding: 0;
-                }
+            /* Mantener ancho completo */
+            body, html {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
 
-                .container {
-                    width: 100% !important;
-                    padding: 0 !important;
-                }
+            .container {
+                width: 100% !important;
+                padding: 0 !important;
+            }
 
-                .custom-card {
-                    width: 100% !important;
-                    max-width: 100% !important;
-                    margin: 0 auto;
-                    box-shadow: none;
-                    border: 1px solid #91cfff;
-                    padding: 1.5rem; /* aumentar padding para impresión */
-                }
+            .custom-card {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 auto;
+                box-shadow: none;
+                border: 1px solid #91cfff;
+                padding: 1.5rem;
+            }
 
-                /* Mantener columnas y filas */
-                .row {
-                    display: flex !important;
-                    flex-wrap: wrap;
-                    margin-bottom: 1rem; /* espacio entre filas */
-                }
+            /* Mantener columnas y filas */
+            .row {
+                display: flex !important;
+                flex-wrap: wrap;
+                margin-bottom: 1rem;
+            }
 
-                .col-md-4, .col-md-6, .col-md-12 {
-                    padding-left: 0.75rem;  /* espacio horizontal */
-                    padding-right: 0.75rem;
-                    margin-bottom: 1rem;     /* espacio vertical entre columnas */
-                    float: left;
-                    width: auto !important;
-                    flex: 0 0 auto;
-                }
+            .col-md-3, .col-md-4, .col-md-6, .col-md-12 {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+                margin-bottom: 1rem;
+                float: left;
+                width: auto !important;
+                flex: 0 0 auto;
+            }
 
-                /* Espaciado de bloques de información */
-                .info-block {
-                    padding: 12px 0 !important;   /* más espacio entre cada bloque */
-                    margin-bottom: 12px !important;
-                }
+            /* Espaciado de bloques de información */
+            .info-block {
+                padding: 12px 0 !important;
+                margin-bottom: 12px !important;
+            }
 
-                .section-title {
-                    margin-top: 2rem !important;  /* más separación antes de secciones */
-                    margin-bottom: 1.2rem !important;
-                    padding-bottom: 6px;
-                }
+            .section-title {
+                margin-top: 2rem !important;
+                margin-bottom: 1.2rem !important;
+                padding-bottom: 6px;
+            }
 
-                /* Mantener áreas de texto */
-                .info-value-textarea {
-                    white-space: pre-wrap;
-                    word-break: break-word;
-                    padding: 12px;  /* asegurar padding interno */
-                }
-
+            /* Mantener áreas de texto */
+            .info-value-textarea {
+                white-space: pre-wrap;
+                word-break: break-word;
+                padding: 12px;
             }
         }
-
     </style>
 
     <div class="container mt-3">
@@ -166,41 +162,38 @@
                     <i class="fas fa-user-circle"></i> Datos personales de la paciente
                 </div>
                 <div class="row gy-2">
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Nombre completo:</span>
                         <div class="info-value">{{ $controlPrenatal->paciente->nombre_completo }}</div>
                     </div>
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Número de identidad:</span>
                         <div class="info-value">{{ $controlPrenatal->paciente->identidad ?? 'N/A' }}</div>
                     </div>
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Fecha de nacimiento:</span>
                         <div class="info-value">{{ $controlPrenatal->paciente->fecha_nacimiento->format('d/m/Y') }}</div>
                     </div>
-                </div>
-
-                <div class="row gy-2">
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Edad:</span>
                         <div class="info-value">{{ $controlPrenatal->paciente->edad }} años</div>
                     </div>
-                    <div class="col-md-4 info-block">
-                        <span class="info-label">Género:</span>
-                        <div class="info-value">{{ $controlPrenatal->paciente->genero }}</div>
-                    </div>
-                    <div class="col-md-4 info-block">
-                        <span class="info-label">Tipo de sangre:</span>
-                        <div class="info-value">{{ $controlPrenatal->paciente->tipo_sangre ?? 'N/A' }}</div>
-                    </div>
                 </div>
 
                 <div class="row gy-2">
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
+                        <span class="info-label">Género:</span>
+                        <div class="info-value">{{ $controlPrenatal->paciente->genero }}</div>
+                    </div>
+                    <div class="col-md-3 info-block">
+                        <span class="info-label">Tipo de sangre:</span>
+                        <div class="info-value">{{ $controlPrenatal->paciente->tipo_sangre ?? 'N/A' }}</div>
+                    </div>
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Teléfono:</span>
                         <div class="info-value">{{ $controlPrenatal->paciente->telefono }}</div>
                     </div>
-                    <div class="col-md-8 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Correo electrónico:</span>
                         <div class="info-value">{{ $controlPrenatal->paciente->correo ?? 'N/A' }}</div>
                     </div>
@@ -218,32 +211,35 @@
                     <i class="fas fa-baby"></i> Datos obstétricos
                 </div>
                 <div class="row gy-2">
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Fecha última menstruación:</span>
                         <div class="info-value">{{ $controlPrenatal->fecha_ultima_menstruacion->format('d/m/Y') }}</div>
                     </div>
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Fecha probable de parto:</span>
                         <div class="info-value">{{ $controlPrenatal->fecha_probable_parto->format('d/m/Y') }}</div>
                     </div>
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Semanas de gestación:</span>
                         <div class="info-value">{{ $controlPrenatal->semanas_gestacion }} semanas</div>
+                    </div>
+                    <div class="col-md-3 info-block">
+                        <span class="info-label">Número de partos:</span>
+                        <div class="info-value">{{ $controlPrenatal->numero_partos }}</div>
                     </div>
                 </div>
 
                 <div class="row gy-2">
-                    <div class="col-md-4 info-block">
-                        <span class="info-label">Número de partos:</span>
-                        <div class="info-value">{{ $controlPrenatal->numero_partos }}</div>
-                    </div>
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Número de abortos:</span>
                         <div class="info-value">{{ $controlPrenatal->numero_abortos }}</div>
                     </div>
-                    <div class="col-md-4 info-block">
+                </div>
+
+                <div class="row gy-2">
+                    <div class="col-md-12 info-block">
                         <span class="info-label">Tipo de partos anteriores:</span>
-                        <div class="info-value">{{ $controlPrenatal->tipo_partos_anteriores ?? 'N/A' }}</div>
+                        <div class="info-value-textarea">{{ $controlPrenatal->tipo_partos_anteriores ?? 'N/A' }}</div>
                     </div>
                 </div>
 
@@ -259,52 +255,49 @@
                     <i class="fas fa-heartbeat"></i> Datos del control prenatal
                 </div>
                 <div class="row gy-2">
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Fecha del control:</span>
                         <div class="info-value">{{ $controlPrenatal->fecha_control->format('d/m/Y') }}</div>
                     </div>
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Presión arterial:</span>
                         <div class="info-value">{{ $controlPrenatal->presion_arterial }} mmHg</div>
                     </div>
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Temperatura:</span>
                         <div class="info-value">{{ $controlPrenatal->temperatura }} °C</div>
                     </div>
-                </div>
-
-                <div class="row gy-2">
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Peso actual:</span>
                         <div class="info-value">{{ $controlPrenatal->peso_actual }} kg</div>
                     </div>
-                    <div class="col-md-4 info-block">
+                </div>
+
+                <div class="row gy-2">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Frecuencia cardíaca materna:</span>
                         <div class="info-value">{{ $controlPrenatal->frecuencia_cardiaca_materna }} BPM</div>
                     </div>
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Altura uterina:</span>
                         <div class="info-value">{{ $controlPrenatal->altura_uterina ?? 'N/A' }} {{ $controlPrenatal->altura_uterina ? 'cm' : '' }}</div>
                     </div>
-                </div>
-
-                <div class="row gy-2">
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Edema:</span>
                         <div class="info-value text-capitalize">{{ $controlPrenatal->edema }}</div>
                     </div>
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Latidos fetales:</span>
                         <div class="info-value">{{ $controlPrenatal->latidos_fetales ?? 'N/A' }} {{ $controlPrenatal->latidos_fetales ? 'BPM' : '' }}</div>
-                    </div>
-                    <div class="col-md-4 info-block">
-                        <span class="info-label">Movimientos fetales:</span>
-                        <div class="info-value">{{ $controlPrenatal->movimientos_fetales ?? 'N/A' }}</div>
                     </div>
                 </div>
 
                 <div class="row gy-2">
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
+                        <span class="info-label">Movimientos fetales:</span>
+                        <div class="info-value">{{ $controlPrenatal->movimientos_fetales ?? 'N/A' }}</div>
+                    </div>
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Presentación fetal:</span>
                         <div class="info-value text-capitalize">{{ $controlPrenatal->presentacion_fetal ? str_replace('_', ' ', $controlPrenatal->presentacion_fetal) : 'N/A' }}</div>
                     </div>
@@ -329,26 +322,26 @@
                     <i class="fas fa-pills"></i> Tratamientos y recomendaciones
                 </div>
                 <div class="row gy-2">
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Suplementos:</span>
                         <div class="info-value">{{ $controlPrenatal->suplementos ?? 'N/A' }}</div>
                     </div>
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Vacunas aplicadas:</span>
                         <div class="info-value">{{ $controlPrenatal->vacunas_aplicadas ?? 'N/A' }}</div>
                     </div>
-                    <div class="col-md-4 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Indicaciones médicas:</span>
                         <div class="info-value">{{ $controlPrenatal->indicaciones_medicas ?? 'N/A' }}</div>
+                    </div>
+                    <div class="col-md-3 info-block">
+                        <span class="info-label">Fecha de próxima cita:</span>
+                        <div class="info-value">{{ $controlPrenatal->fecha_proxima_cita ? $controlPrenatal->fecha_proxima_cita->format('d/m/Y') : 'N/A' }}</div>
                     </div>
                 </div>
 
                 <div class="row gy-2">
-                    <div class="col-md-6 info-block">
-                        <span class="info-label">Fecha de próxima cita:</span>
-                        <div class="info-value">{{ $controlPrenatal->fecha_proxima_cita ? $controlPrenatal->fecha_proxima_cita->format('d/m/Y') : 'N/A' }}</div>
-                    </div>
-                    <div class="col-md-6 info-block">
+                    <div class="col-md-3 info-block">
                         <span class="info-label">Registrado:</span>
                         <div class="info-value">{{ $controlPrenatal->created_at->format('d/m/Y H:i:s') }}</div>
                     </div>
