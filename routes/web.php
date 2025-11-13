@@ -316,6 +316,10 @@ use App\Http\Controllers\ControlPrenatalController;
 // Ruta principal de Ginecología (Index/Dashboard)
 //Route::get('/ginecologia', [ControlPrenatalController::class, 'indexGinecologia'])->name('ginecologia.index');
 
+// Rutas de búsqueda de pacientes
+Route::get('/pacientes/buscar', [PacienteController::class, 'buscar'])->name('pacientes.buscar');
+Route::get('/pacientes/datos/{id}', [PacienteController::class, 'obtenerDatos'])->name('pacientes.datos');
+
 // Rutas de Controles Prenatales
 Route::get('/controles-prenatales', [ControlPrenatalController::class, 'index'])->name('controles-prenatales.index');
 Route::get('/controles-prenatales/crear', [ControlPrenatalController::class, 'create'])->name('controles-prenatales.create');
@@ -324,13 +328,11 @@ Route::get('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController
 Route::get('/controles-prenatales/{controlPrenatal}/editar', [ControlPrenatalController::class, 'edit'])->name('controles-prenatales.edit');
 Route::put('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'update'])->name('controles-prenatales.update');
 Route::delete('/controles-prenatales/{controlPrenatal}', [ControlPrenatalController::class, 'destroy'])->name('controles-prenatales.destroy');
-Route::get('pacientes/datos/{id}', [PacienteController::class, 'obtenerDatos'])->name('pacientes.datos');
 
 Route::post('/sesiones/limpiar-archivo', function(){
     session()->forget('archivo_temporal');
     return response()->json(['ok'=>true]);
 })->name('sesiones.limpiarArchivo');
-
 
 //ultrasonidos
 use App\Http\Controllers\UltrasonidoOrderController;

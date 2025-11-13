@@ -375,11 +375,13 @@ public function obtenerDatosPaciente($id)
     ]);
 }
 
-
 public function buscarPaciente(Request $request)
 {
     try {
-        $busqueda = $request->get('identidad');
+        // acepta "identidad", "search" o "busqueda"
+        $busqueda = $request->get('identidad') 
+                   ?? $request->get('search') 
+                   ?? $request->get('busqueda');
 
         if (empty($busqueda)) {
             return response()->json([
@@ -389,15 +391,18 @@ public function buscarPaciente(Request $request)
             ]);
         }
 
-        // Buscar por nombre, apellidos o identidad (máximo 10 resultados)
-        $pacientes = Paciente::where('nombre', 'LIKE', "%{$busqueda}%")
-            ->orWhere('apellidos', 'LIKE', "%{$busqueda}%")
-            ->orWhere('identidad', 'LIKE', "%{$busqueda}%")
-            ->where('genero', 'Femenino') // si solo quieres mujeres en control prenatal
-            ->orderBy('nombre')
-            ->orderBy('apellidos')
-            ->limit(10)
-            ->get(['id', 'nombre', 'apellidos', 'identidad']);
+        // búsqueda por nombre, apellidos o identidad (solo Femenino)
+        $pacientes = Paciente::where(function ($q) use ($busqueda) {
+            $q->where('nombre', 'LIKE', "%{$busqueda}%")
+              ->orWhere('apellidos', 'LIKE', "%{$busqueda}%")
+              ->orWhere('identidad', 'LIKE', "%{$busqueda}%");
+        })
+        ->whereRaw('LOWER(genero) = ?', ['femenino'])
+        ->orderBy('nombre')
+        ->orderBy('apellidos')
+        ->limit(10)
+        ->get(['id', 'nombre', 'apellidos', 'identidad']);
+    
 
         if ($pacientes->count() > 0) {
             return response()->json([
@@ -409,11 +414,10 @@ public function buscarPaciente(Request $request)
         return response()->json([
             'success' => false,
             'pacientes' => [],
-            'message' => 'No se encontraron pacientes.'
+            'message' => 'No se encontraron pacientes femeninas.'
         ]);
     } catch (\Exception $e) {
         \Log::error('Error al buscar paciente: ' . $e->getMessage());
-
         return response()->json([
             'success' => false,
             'pacientes' => [],
@@ -421,6 +425,8 @@ public function buscarPaciente(Request $request)
         ], 500);
     }
 }
+
+
 
 
 public function obtenerDatosPacienteCompleto($id)
@@ -450,29 +456,33 @@ public function obtenerDatosPacienteCompleto($id)
 }
 public function buscar(Request $request)
 {
-    $busqueda = $request->input('identidad', ''); 
-    if (empty($busqueda)) {
+    $busqueda = trim($request->input('identidad', ''));
+
+    $pacientes = Paciente::query()
+        ->when($busqueda, function ($query, $busqueda) {
+            $query->where(function ($q) use ($busqueda) {
+                $q->where('nombre', 'LIKE', "%{$busqueda}%")
+                  ->orWhere('apellidos', 'LIKE', "%{$busqueda}%")
+                  ->orWhere('identidad', 'LIKE', "%{$busqueda}%");
+            });
+        })
+        ->where('genero', 'Femenino')  // ✅ Comparación exacta
+        ->orderBy('nombre')
+        ->orderBy('apellidos')
+        ->limit(10)
+        ->get(['id', 'nombre', 'apellidos', 'identidad', 'genero']);
+
+    if ($pacientes->isNotEmpty()) {
         return response()->json([
-            'success' => false,
-            'pacientes' => []
+            'success' => true,
+            'pacientes' => $pacientes
         ]);
     }
 
-    $pacientes = Paciente::where(function($query) use ($busqueda) {
-        $query->where('nombre', 'LIKE', "%{$busqueda}%")
-              ->orWhere('apellidos', 'LIKE', "%{$busqueda}%")
-              ->orWhere('identidad', 'LIKE', "%{$busqueda}%");
-    })
-    ->where('genero', 'Femenino') 
-    ->select('id', 'nombre', 'apellidos', 'identidad')
-    ->orderBy('nombre')
-    ->orderBy('apellidos')
-    ->limit(10) 
-    ->get();
-
     return response()->json([
-        'success' => true,
-        'pacientes' => $pacientes
+        'success' => false,
+        'pacientes' => [],
+        'message' => 'No se encontraron pacientes femeninas con ese nombre o identidad.'
     ]);
 }
 
