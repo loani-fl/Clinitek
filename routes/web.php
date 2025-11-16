@@ -358,3 +358,9 @@ Route::post('/ultrasonidos/guardar-analisis/{id}', [UltrasonidoOrderController::
     ->name('ultrasonidos.guardarAnalisis');
 
 
+    // usuarios de acceso
+    use App\Http\Controllers\UsuarioController;
+
+    Route::resource('usuarios', UsuarioController::class);
+    
+    
