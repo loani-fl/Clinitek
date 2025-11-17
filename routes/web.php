@@ -362,7 +362,7 @@ Route::post('/ultrasonidos/guardar-analisis/{id}', [UltrasonidoOrderController::
     use App\Http\Controllers\UsuarioController;
 
     Route::resource('usuarios', UsuarioController::class);
-    
+
 
 
 
@@ -413,3 +413,13 @@ Route::middleware(['auth.custom'])->group(function () {
     // Route::resource('/productos', ProductoController::class);
     // Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
 });
+
+
+// VISTA de asignar roles
+
+
+Route::get('/usuarios/{id}/asignar', [UsuarioController::class, 'asignarVista'])
+    ->name('usuarios.asignar');
+
+Route::put('/usuarios/{id}/asignar', [UsuarioController::class, 'asignarUpdate'])
+    ->name('usuarios.updateRoles');

@@ -17,6 +17,18 @@
             <td>{{ ucfirst($usuario->rol) }}</td>
             <td>
                 <div class="d-flex justify-content-center gap-1">
+
+
+                    {{-- 🔐 BOTÓN ASIGNAR ROL --}}
+                    <a href="{{ route('usuarios.asignar', $usuario->id) }}"
+                       class="btn btn-warning"
+                       style="width:36px; height:36px; display:flex; justify-content:center; align-items:center;"
+                       title="Asignar Rol">
+                        <i class="bi bi-shield-lock"></i>
+                    </a>
+
+
+
                     <a href="{{ route('usuarios.show', $usuario->id) }}" class="btn btn-ver" title="Ver">
                         <i class="bi bi-eye"></i>
                     </a>

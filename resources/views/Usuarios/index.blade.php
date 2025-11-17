@@ -156,13 +156,15 @@
             </a>
             <h2>Usuarios</h2>
             <a href="{{ route('usuarios.create') }}" class="btn btn-primary ms-3"> Nuevo Usuario </a>
+
+
         </div>
 
         {{-- Filtros --}}
         <div class="d-flex filter-container mb-3" style="gap:0.5rem; flex-wrap: nowrap; align-items: center;">
-            <input type="text" id="filtroBusqueda" class="form-control" placeholder="Buscar por nombre o email" 
+            <input type="text" id="filtroBusqueda" class="form-control" placeholder="Buscar por nombre o email"
                 value="{{ request('search') }}" style="width: 260px;">
-            
+
             <select id="filtroRol" class="form-control" style="max-width: 180px;">
                 <option value="">Todos los roles</option>
                 <option value="admin" {{ request('rol') == 'admin' ? 'selected' : '' }}>Admin</option>
@@ -204,7 +206,7 @@ $(document).ready(function () {
             success: function(data) {
                 $('#tabla-container').html(data.html);
                 $('#paginacion-container').html(data.pagination);
-                $('#mensajeResultados').html(data.total > 0 
+                $('#mensajeResultados').html(data.total > 0
                     ? `Mostrando del ${data.from} al ${data.to} de ${data.total} resultados`
                     : 'No se encontraron resultados.');
             },

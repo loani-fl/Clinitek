@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+
 
 class UsuarioController extends Controller
 {
     public function index(Request $request)
     {
         $query = Usuario::orderBy('id', 'desc');
-    
+
         // Filtro por búsqueda (nombre o email)
         if ($request->filled('search')) {
             $search = $request->search;
@@ -20,18 +23,18 @@ class UsuarioController extends Controller
                   ->orWhere('email', 'like', "%{$search}%");
             });
         }
-    
+
         // Filtro por rol
         if ($request->filled('rol')) {
             $query->where('rol', $request->rol);
         }
-    
+
         $usuarios = $query->paginate(2)->withQueryString();
-    
+
         if ($request->ajax()) {
             $html = view('Usuarios.partials.tabla', compact('usuarios'))->render();
             $pagination = view('Usuarios.partials.custom-pagination', compact('usuarios'))->render();
-    
+
             return response()->json([
                 'html' => $html,
                 'pagination' => $pagination,
@@ -41,10 +44,10 @@ class UsuarioController extends Controller
                 'total' => $usuarios->total(),
             ]);
         }
-    
+
         return view('Usuarios.index', compact('usuarios'));
     }
-    
+
     public function create()
     {
         return view('usuarios.create');
@@ -120,4 +123,31 @@ class UsuarioController extends Controller
         $usuario->delete();
         return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado correctamente.');
     }
+
+
+
+
+    public function asignarVista($id)
+    {
+        $user = Usuario::findOrFail($id);
+        $roles = Role::all();
+        $permisos = Permission::all();
+
+        return view('usuarios.asignar', compact('user', 'roles', 'permisos'));
+    }
+
+    public function asignarUpdate(Request $request, $id)
+    {
+        $user = Usuario::findOrFail($id);
+
+        $roles = $request->input('roles', []);
+        $permisos = $request->input('permisos', []);
+
+        $user->syncRoles($roles);
+        $user->syncPermissions($permisos);
+
+        return redirect()->back()->with('success', 'Roles y permisos actualizados correctamente.');
+    }
+
+
 }
