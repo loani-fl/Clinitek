@@ -363,4 +363,53 @@ Route::post('/ultrasonidos/guardar-analisis/{id}', [UltrasonidoOrderController::
 
     Route::resource('usuarios', UsuarioController::class);
     
-    
+
+
+
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PasswordController;
+
+// ========================================
+// RUTAS DE AUTENTICACIÓN
+// ========================================
+
+// Mostrar formulario de login
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login.form');
+
+// Procesar inicio de sesión
+Route::post('/login', [AuthController::class, 'login'])->name('login.process');
+
+// Cerrar sesión
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout'); // GET para enlaces o botones
+
+// Formulario de recuperación
+Route::get('/password/forgot', [PasswordController::class, 'showForgot'])->name('password.forgot');
+
+// Procesar la recuperación de contraseña
+Route::post('/password/forgot', [PasswordController::class, 'reset'])->name('password.reset');
+
+
+// ========================================
+// REDIRECCIÓN DEL "/" AL LOGIN
+// ========================================
+// Ahora, al entrar a http://127.0.0.1:8000/ siempre se mostrará el login
+Route::get('/', function () {
+    return redirect()->route('login.form');
+});
+
+
+// ========================================
+// RUTAS PROTEGIDAS (solo accesibles con sesión)
+// ========================================
+Route::middleware(['auth.custom'])->group(function () {
+
+    // Ruta principal del sistema (dashboard/inicio)
+    Route::get('/inicio', function () {
+        return view('welcome'); // resources/views/dashboard/inicio.blade.php
+    })->name('inicio');
+
+    // Aquí puedes agregar más rutas protegidas
+    // Route::resource('/usuarios', UsuarioController::class);
+    // Route::resource('/productos', ProductoController::class);
+    // Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+});
