@@ -231,6 +231,7 @@
                 <li><a class="dropdown-item" href="{{ route('empleado.index') }}"><i class="bi bi-person-badge"></i> Gestión de empleados</a></li>
                 <li><a class="dropdown-item" href="{{ route('pacientes.index') }}"><i class="bi bi-people"></i> Gestión de pacientes</a></li>
                 <li><a class="dropdown-item" href="{{ route('usuarios.index') }}"><i class="bi bi-person-plus"></i> Gestión de usuarios</a></li>
+                <li><a class="dropdown-item" href="{{ route('roles.index') }}"><i class="bi bi-person-plus"></i> Gestión de roles</a></li>
             </ul>
         </div>
     </div>
