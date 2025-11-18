@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-@section('title', 'Listado de Pacientes')
-
 @section('content')
 <style>
     body {
@@ -11,6 +9,7 @@
         overflow-x: hidden;
     }
 
+    /* Barra fija arriba */
     .header {
         background-color: #007BFF;
         position: fixed;
@@ -20,16 +19,17 @@
         box-shadow: 0 2px 5px rgba(0,0,0,0.15);
     }
 
+    /* Contenedor principal centrado con margen top para no tapar navbar */
     .content-wrapper {
-        margin-top: 50px;
+        margin-top: 60px;
+        max-width: 900px;
         margin-left: auto;
         margin-right: auto;
         padding: 1rem;
         position: relative;
-        max-width: 1000px;
-        width: 100%;
     }
 
+    /* Logo translúcido de fondo */
     .custom-card::before {
         content: "";
         position: absolute;
@@ -47,6 +47,7 @@
         z-index: 0;
     }
 
+    /* Tarjeta blanca con sombra y bordes redondeados */
     .custom-card {
         background-color: #fff;
         border-radius: 1.5rem;
@@ -54,12 +55,10 @@
         overflow: hidden;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         position: relative;
-        border-radius: 10px;
         z-index: 1;
-        max-width: 1000px;
-        width: 100%;
     }
 
+    /* Encabezado de la tarjeta */
     .card-header {
         background-color: transparent !important;
         border-bottom: 3px solid #007BFF;
@@ -69,13 +68,7 @@
         position: relative;
     }
 
-    .card-header h3 {
-        font-size: 1.8rem;
-        font-weight: bold;
-        color: #003366;
-        margin: 0;
-    }
-
+    /* Botón inicio en la esquina superior derecha dentro del header */
     .btn-inicio {
         position: absolute;
         top: 50%;
@@ -84,6 +77,7 @@
         font-size: 0.9rem;
     }
 
+    /* Contenedor del filtro */
     .d-flex.filter-container {
         justify-content: flex-start;
         align-items: center;
@@ -92,22 +86,16 @@
         margin-bottom: 1rem;
     }
 
+    /* Input filtro tamaño igual */
     .filtro-input {
         font-size: 0.85rem;
         max-width: 300px;
         flex-grow: 1;
     }
 
+    /* Tabla con estilo igual */
     .table {
-        font-size: 0.5rem;
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .table-responsive {
-        flex-grow: 1;
-        overflow-y: auto;
-        max-width: 100%;
+        font-size: 0.9rem;
     }
 
     thead tr {
@@ -129,6 +117,18 @@
         text-align: center;
     }
 
+    table th:nth-child(2), table td:nth-child(2),
+    table th:nth-child(3), table td:nth-child(3),
+    table th:nth-child(4), table td:nth-child(4) {
+        width: 150px;
+    }
+
+    table th:nth-child(5), table td:nth-child(5) {
+        width: 120px;
+        text-align: center;
+        white-space: nowrap;
+    }
+
     .pagination-container {
         font-size: 0.9rem;
         margin-top: 1rem;
@@ -137,118 +137,163 @@
     }
 </style>
 
-<!--<div class="header d-flex justify-content-between align-items-center px-3 py-2">
+{{-- Barra superior fija --}}
+<div class="header d-flex justify-content-between align-items-center px-3 py-2" style="background-color: #007BFF;">
     <div class="d-flex align-items-center">
         <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto;">
         <div class="fw-bold text-white ms-2" style="font-size: 1.5rem;">Clinitek</div>
     </div>
 
-    <div class="d-flex gap-3 flex-wrap">
-        <a href="{{ route('puestos.create') }}" class="nav-link text-white">Crear puesto</a>
-        <a href="{{ route('pacientes.create') }}" class="nav-link text-white">Registrar paciente</a>
-        <a href="{{ route('medicos.create') }}" class="nav-link text-white">Registrar médico</a>
+    {{-- Menú desplegable estilo Bootstrap --}}
+    <div class="dropdown">
+        <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            ☰
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" href="{{ route('puestos.create') }}">Crear puesto</a></li>
+            <li><a class="dropdown-item" href="{{ route('empleado.create') }}">Registrar empleado</a></li>
+            <li><a class="dropdown-item" href="{{ route('medicos.create') }}">Registrar médico</a></li>
+        </ul>
     </div>
 </div>
--->
 
 <div class="content-wrapper">
     <div class="card custom-card shadow-sm">
-        <div class="card-header d-flex align-items-center justify-content-between">
-            
-            <!-- Botón Inicio a la izquierda -->
-            <a href="{{ route('inicio') }}" class="btn btn-light me-3">
+
+        <div class="card-header">
+            <h5 class="mb-0 text-dark text-center" style="font-size: 2.25rem; font-weight: bold;">Lista de pacientes</h5>
+        </div>
+
+        {{-- Mensaje de éxito --}}
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+              <strong>{{ session('success') }}</strong>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+        @endif
+
+        {{-- Filtro y botón Inicio --}}
+        <div class="p-3">
+            <div class="d-flex justify-content-center align-items-center gap-2 mb-3 flex-wrap">
+                <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por nombre, apellido o identidad...">
+            </div>
+
+            <a href="{{ route('inicio') }}" class="btn btn-light btn-inicio">
                 <i class="bi bi-house-door"></i> Inicio
             </a>
-            
-            <!-- Título centrado y que tome todo el espacio disponible -->
-            <h2 class="fw-bold mb-0 flex-grow-1 text-center">Listado de pacientes</h2>
-            
-            <!-- Botón Registrar paciente a la derecha -->
-            <a href="{{ route('pacientes.create') }}" class="btn btn-primary ms-3">
-                <i class="bi bi-person-plus"></i> Registrar paciente
-            </a>
-            
-        </div>
-            
-
-
-
-
-
-
-        <div class="d-flex filter-container">
-            <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por nombre, apellido o identidad">
         </div>
 
-        <div id="tabla-container" class="table-responsive">
-            @include('pacientes.partials.tabla')
+        {{-- Tabla de pacientes --}}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre(s)</th>
+                        <th>Apellidos</th>
+                        <th>Identidad</th>
+                        <th>Género</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaPacientes">
+                    @forelse ($pacientes as $index => $paciente)
+                    <tr>
+                        <td>{{ $pacientes->firstItem() + $index }}</td>
+                        <td>{{ $paciente->nombre }}</td>
+                        <td>{{ $paciente->apellidos }}</td>
+                        <td>{{ $paciente->identidad }}</td>
+                        <td>
+                            <span class="badge
+                              {{ $paciente->genero === 'Masculino' ? 'bg-primary' :
+                                 ($paciente->genero === 'Femenino' ? 'bg-warning text-dark' : 'bg-info') }}">
+                              {{ $paciente->genero ?? 'No especificado' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2 justify-content-center">
+                                <a href="{{ route('pacientes.show', $paciente->id) }}" class="btn btn-sm btn-outline-info me-2" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ route('pacientes.edit', $paciente->id) }}" class="btn btn-sm btn-outline-warning" title="Editar paciente">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="text-center">No hay pacientes registrados.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
 
         <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
 
-        <div id="paginacion-container" class="pagination-container">
-            {{ $pacientes->onEachSide(1)->links('pagination::bootstrap-5') }}
-        </div>
+        @if ($pacientes->hasPages())
+            <div class="pagination-container">
+                {{ $pacientes->links('pagination::bootstrap-4') }}
+            </div>
+        @endif
     </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+@php
+    $totalPacientes = method_exists($pacientes, 'total') ? $pacientes->total() : $pacientes->count();
+@endphp
+
 <script>
 $(document).ready(function () {
-    function actualizarMensaje(total, all, query) {
-        if (query === '') {
+    const noResultadosRow = $('<tr class="no-resultados"><td colspan="6" class="text-center">No hay pacientes que coincidan con la búsqueda.</td></tr>');
+    noResultadosRow.hide();
+    $('#tablaPacientes').append(noResultadosRow);
+
+    function actualizarMensaje(totalVisible, filtroVacio) {
+        if (filtroVacio) {
             $('#mensajeResultados').html('');
-        } else if (total === 0) {
-            $('#mensajeResultados').html(`No se encontraron resultados para "<strong>${query}</strong>" de un total de ${all}.`);
+        } else if (totalVisible === 0) {
+            $('#mensajeResultados').html('No hay pacientes que coincidan con la búsqueda.');
         } else {
-            $('#mensajeResultados').html(`<strong>Se encontraron ${total} resultado${total > 1 ? 's' : ''} de ${all}.</strong>`);
+            $('#mensajeResultados').html(`<strong>Se encontraron ${totalVisible} resultado${totalVisible > 1 ? 's' : ''}.</strong>`);
         }
     }
 
-    function cargarDatos(page = 1, query = '') {
-        $.ajax({
-            url: "{{ route('pacientes.index') }}",
-            type: 'GET',
-            data: { page, search: query },
-            success: function(data) {
-                $('#tabla-container').html(data.html);
-                $('#paginacion-container').html(data.pagination);
-                actualizarMensaje(data.total, data.all, query);
-            },
-            error: function(xhr) {
-                let msg = 'Error al cargar los datos.';
-                if(xhr.responseJSON && xhr.responseJSON.message) {
-                    msg += ' ' + xhr.responseJSON.message;
-                }
-                $('#mensajeResultados').html(msg);
+    function filtrarTabla() {
+        let valor = $('#filtroBusqueda').val().toLowerCase();
+        let totalVisible = 0;
+
+        $('#tablaPacientes tr').not('.no-resultados').each(function () {
+            let textoFila = $(this).text().toLowerCase();
+            if (textoFila.indexOf(valor) > -1) {
+                $(this).show();
+                totalVisible++;
+            } else {
+                $(this).hide();
             }
+        });
+
+        if (totalVisible === 0) {
+            noResultadosRow.show();
+        } else {
+            noResultadosRow.hide();
+        }
+
+        actualizarMensaje(totalVisible, valor === '');
+
+        // Reenumerar visibles
+        let indice = 1;
+        $('#tablaPacientes tr:visible').not('.no-resultados').each(function () {
+            $(this).find('td:first').text(indice++);
         });
     }
 
-    // Carga inicial sin filtro
-    cargarDatos();
+    $('#filtroBusqueda').on('keyup', filtrarTabla);
 
-    // Filtrar al escribir
-    $('#filtroBusqueda').on('keyup', function () {
-        let query = $(this).val();
-        cargarDatos(1, query);
-    });
-
-    // Paginación con delegación, para capturar clicks en links creados dinámicamente
-    $(document).on('click', '.pagination a', function(e) {
-        e.preventDefault();
-        let url = $(this).attr('href');
-        let params = new URLSearchParams(url.split('?')[1]);
-        let page = params.get('page') || 1;
-        let query = $('#filtroBusqueda').val();
-        cargarDatos(page, query);
-
-        // Actualizar URL sin recargar
-        let newUrl = url.split('?')[0] + '?page=' + page;
-        if (query) newUrl += '&search=' + encodeURIComponent(query);
-        window.history.pushState("", "", newUrl);
-    });
+    $('#mensajeResultados').text('');
 });
 </script>
 @endsection

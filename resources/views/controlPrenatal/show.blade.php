@@ -340,12 +340,6 @@
                     </div>
                 </div>
 
-                <div class="row gy-2">
-                    <div class="col-md-3 info-block">
-                        <span class="info-label">Registrado:</span>
-                        <div class="info-value">{{ $controlPrenatal->created_at->format('d/m/Y H:i:s') }}</div>
-                    </div>
-                </div>
 
                 {{-- Botones de acción --}}
                 <div class="text-center pt-4">
