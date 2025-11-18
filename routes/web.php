@@ -423,6 +423,11 @@ Route::get('/usuarios/{id}/asignar', [UsuarioController::class, 'asignarVista'])
 
 Route::put('/usuarios/{id}/asignar', [UsuarioController::class, 'asignarUpdate'])
     ->name('usuarios.updateRoles');
+    Route::get('/usuarios/{id}/asignar', [UsuarioController::class, 'asignarVista'])
+    ->name('usuarios.asignar');
+
+Route::put('/usuarios/{id}/asignar', [UsuarioController::class, 'asignarUpdate'])
+    ->name('usuarios.updateRoles');
 
 
 use App\Http\Controllers\RoleController;
