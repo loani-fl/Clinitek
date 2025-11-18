@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Http\Request;
+
 
 class RayosxOrderExamen extends Model
 {
@@ -19,7 +21,14 @@ class RayosxOrderExamen extends Model
         return $this->belongsTo(RayosxOrder::class, 'rayosx_order_id');
     }
     
+
+    public function paciente()
+    {
+        return $this->orden->paciente();
+    }
+
      public function imagenes()
+
     {
         return $this->hasMany(RayosxOrderExamenImagen::class, 'rayosx_order_examen_id');
     }
