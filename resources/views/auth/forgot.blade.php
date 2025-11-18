@@ -11,15 +11,23 @@
     .navbar,
     footer,
     .fixed-top,
+    .dropdown,
+    .btn-outline-light,
     [class*="navbar"],
     [class*="nav-"],
+    [class*="dropdown"],
     [id*="navbar"],
-    [id*="nav"] {
+    [id*="nav"],
+    [id*="dropdown"] {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
         height: 0 !important;
+        width: 0 !important;
         overflow: hidden !important;
+        position: absolute !important;
+        pointer-events: none !important;
+        z-index: -9999 !important;
     }
 
     html, body {
@@ -60,6 +68,7 @@
         left: 0;
         overflow: hidden;
         padding: 40px 20px;
+        z-index: 99999 !important;
     }
 
     .recovery-wrapper::before {
@@ -91,7 +100,7 @@
             0 0 0 1px rgba(255, 255, 255, 0.15),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
         position: relative;
-        z-index: 1;
+        z-index: 100000 !important;
         animation: slideIn 0.6s ease-out;
         border: 1px solid rgba(255, 255, 255, 0.18);
     }
@@ -164,8 +173,13 @@
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 24px;
         position: relative;
+    }
+
+    .form-group.has-error .form-control-modern {
+        border-color: rgba(220, 53, 69, 0.6);
+        background: rgba(220, 53, 69, 0.08);
     }
 
     .form-label {
@@ -215,6 +229,33 @@
         transform: translateY(-2px);
     }
 
+    /* Mensajes de error estilo Google */
+    .error-message {
+        display: none;
+        color: #ff6b6b;
+        font-size: 12px;
+        font-weight: 500;
+        margin-top: 6px;
+        padding-left: 2px;
+        animation: fadeIn 0.3s ease;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .error-message.show {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .btn-recovery {
         width: 100%;
         padding: 14px;
@@ -232,7 +273,7 @@
         margin-top: 12px;
     }
 
-    .btn-recovery:hover {
+    .btn-recovery:hover:not(:disabled) {
         transform: translateY(-3px);
         box-shadow: 
             0 12px 35px rgba(102, 126, 234, 0.6),
@@ -241,6 +282,11 @@
 
     .btn-recovery:active {
         transform: translateY(-1px);
+    }
+
+    .btn-recovery:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
     }
 
     .back-login {
@@ -267,54 +313,6 @@
 
     .back-login svg {
         margin-right: 6px;
-    }
-
-    .alert-modern {
-        background: rgba(220, 53, 69, 0.15);
-        border: 1px solid rgba(220, 53, 69, 0.35);
-        color: white;
-        padding: 14px 18px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        font-size: 13px;
-        font-weight: 500;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.2);
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    }
-
-    .alert-modern ul {
-        margin: 0;
-        padding-left: 20px;
-    }
-
-    .alert-modern li {
-        margin-bottom: 5px;
-    }
-
-    .alert-modern li:last-child {
-        margin-bottom: 0;
-    }
-
-    .alert-success-modern {
-        background: rgba(72, 187, 120, 0.15);
-        border: 1px solid rgba(72, 187, 120, 0.35);
-        color: white;
-        padding: 14px 18px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        font-size: 13px;
-        font-weight: 500;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 4px 15px rgba(72, 187, 120, 0.2);
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        display: flex;
-        align-items: center;
-    }
-
-    .alert-success-modern strong {
-        margin-right: 8px;
-        font-size: 18px;
     }
 
     /* Responsive Design */
@@ -414,26 +412,10 @@
             <p class="recovery-subtitle">Ingresa tu correo y nueva contraseña</p>
         </div>
 
-        @if(session('success'))
-            <div class="alert-success-modern">
-                <strong>✓</strong> {{ session('success') }}
-            </div>
-        @endif
-
-        @if($errors->any())
-            <div class="alert-modern">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('password.reset') }}">
+        <form method="POST" action="{{ route('password.reset') }}" id="recoveryForm" autocomplete="off">
             @csrf
 
-            <div class="form-group">
+            <div class="form-group" id="emailGroup">
                 <label class="form-label">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -447,12 +429,19 @@
                     id="usuario" 
                     class="form-control-modern" 
                     placeholder="ejemplo@correo.com"
-                    value="{{ old('usuario') }}"
-                    required
+                    value="{{ request('email') ?? old('usuario') }}"
+                    autocomplete="off"
                 >
+                <div class="error-message" id="emailError">
+                    @error('usuario')
+                        {{ $message }}
+                    @else
+                        Ingresa un correo electrónico válido
+                    @enderror
+                </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="passwordGroup">
                 <label class="form-label">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -466,11 +455,18 @@
                     id="password" 
                     class="form-control-modern" 
                     placeholder="••••••••"
-                    required
+                    autocomplete="new-password"
                 >
+                <div class="error-message" id="passwordError">
+                    @error('password')
+                        {{ $message }}
+                    @else
+                        La contraseña debe tener al menos 4 caracteres
+                    @enderror
+                </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="confirmGroup">
                 <label class="form-label">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 2L2 7l10 5 10-5-10-5z"/>
@@ -484,8 +480,9 @@
                     id="password_confirmation" 
                     class="form-control-modern" 
                     placeholder="••••••••"
-                    required
+                    autocomplete="new-password"
                 >
+                <div class="error-message" id="confirmError">Las contraseñas no coinciden</div>
             </div>
 
             <button type="submit" class="btn-recovery">
@@ -504,4 +501,147 @@
         </form>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('recoveryForm');
+    const emailInput = document.getElementById('usuario');
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('password_confirmation');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const confirmError = document.getElementById('confirmError');
+    const emailGroup = document.getElementById('emailGroup');
+    const passwordGroup = document.getElementById('passwordGroup');
+    const confirmGroup = document.getElementById('confirmGroup');
+
+    // Capturar el email de la URL si existe
+    const urlParams = new URLSearchParams(window.location.search);
+    const emailFromUrl = urlParams.get('email');
+    
+    if (emailFromUrl && !emailInput.value) {
+        emailInput.value = emailFromUrl;
+    }
+
+    // Mostrar errores del servidor si existen
+    @if($errors->has('usuario'))
+        emailError.classList.add('show');
+        emailGroup.classList.add('has-error');
+    @endif
+
+    @if($errors->has('password'))
+        passwordError.classList.add('show');
+        passwordGroup.classList.add('has-error');
+    @endif
+
+    // Validación en tiempo real para email
+    emailInput.addEventListener('blur', function() {
+        validateEmail();
+    });
+
+    emailInput.addEventListener('input', function() {
+        if (emailError.classList.contains('show')) {
+            validateEmail();
+        }
+    });
+
+    // Validación en tiempo real para contraseña
+    passwordInput.addEventListener('blur', function() {
+        validatePassword();
+    });
+
+    passwordInput.addEventListener('input', function() {
+        if (passwordError.classList.contains('show')) {
+            validatePassword();
+        }
+        if (confirmInput.value !== '') {
+            validateConfirm();
+        }
+    });
+
+    // Validación en tiempo real para confirmar contraseña
+    confirmInput.addEventListener('blur', function() {
+        validateConfirm();
+    });
+
+    confirmInput.addEventListener('input', function() {
+        if (confirmError.classList.contains('show')) {
+            validateConfirm();
+        }
+    });
+
+    // Validación al enviar el formulario
+    form.addEventListener('submit', function(e) {
+        const emailValid = validateEmail();
+        const passwordValid = validatePassword();
+        const confirmValid = validateConfirm();
+
+        if (!emailValid || !passwordValid || !confirmValid) {
+            e.preventDefault();
+        }
+    });
+
+    function validateEmail() {
+        const email = emailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (email === '') {
+            emailError.textContent = 'El correo electrónico es obligatorio';
+            emailError.classList.add('show');
+            emailGroup.classList.add('has-error');
+            return false;
+        } else if (!emailRegex.test(email)) {
+            emailError.textContent = 'Ingresa un correo electrónico válido';
+            emailError.classList.add('show');
+            emailGroup.classList.add('has-error');
+            return false;
+        } else {
+            emailError.classList.remove('show');
+            emailGroup.classList.remove('has-error');
+            return true;
+        }
+    }
+
+    function validatePassword() {
+        const password = passwordInput.value;
+
+        if (password === '') {
+            passwordError.textContent = 'La contraseña es obligatoria';
+            passwordError.classList.add('show');
+            passwordGroup.classList.add('has-error');
+            return false;
+        } else if (password.length < 4) {
+            passwordError.textContent = 'La contraseña debe tener al menos 4 caracteres';
+            passwordError.classList.add('show');
+            passwordGroup.classList.add('has-error');
+            return false;
+        } else {
+            passwordError.classList.remove('show');
+            passwordGroup.classList.remove('has-error');
+            return true;
+        }
+    }
+
+    function validateConfirm() {
+        const password = passwordInput.value;
+        const confirm = confirmInput.value;
+
+        if (confirm === '') {
+            confirmError.textContent = 'Debes confirmar tu contraseña';
+            confirmError.classList.add('show');
+            confirmGroup.classList.add('has-error');
+            return false;
+        } else if (password !== confirm) {
+            confirmError.textContent = 'Las contraseñas no coinciden';
+            confirmError.classList.add('show');
+            confirmGroup.classList.add('has-error');
+            return false;
+        } else {
+            confirmError.classList.remove('show');
+            confirmGroup.classList.remove('has-error');
+            return true;
+        }
+    }
+});
+</script>
 @endsection

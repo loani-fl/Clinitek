@@ -11,6 +11,8 @@ class PasswordController extends Controller
     // Mostrar formulario de recuperación
     public function showForgot()
     {
+        // La vista recibirá automáticamente el parámetro 'email' desde la URL
+        // mediante request('email') que ya pusimos en la vista
         return view('auth.forgot');
     }
 
@@ -18,28 +20,31 @@ class PasswordController extends Controller
     public function reset(Request $request)
     {
         $request->validate([
-            'usuario' => 'required|string',
+            'usuario' => 'required|email',
             'password' => 'required|confirmed|min:4'
         ], [
-            'usuario.required' => 'El usuario es obligatorio.',
-            'password.required' => 'La contraseña es obligatoria.',
-            'password.confirmed' => 'Las contraseñas no coinciden.',
-            'password.min' => 'La contraseña debe tener al menos 4 caracteres.'
+            'usuario.required' => 'El correo electrónico es obligatorio',
+            'usuario.email' => 'Ingresa un correo electrónico válido',
+            'password.required' => 'La contraseña es obligatoria',
+            'password.confirmed' => 'Las contraseñas no coinciden',
+            'password.min' => 'La contraseña debe tener al menos 4 caracteres'
         ]);
 
-       
+        // Buscar usuario por email
         $usuario = Usuario::where('email', $request->usuario)->first();
 
-
         if (!$usuario) {
-            return back()->withErrors(['usuario' => 'El usuario no existe']);
+            return back()
+                ->withInput($request->only('usuario'))
+                ->withErrors(['usuario' => 'El correo no está registrado']);
         }
 
+        // Actualizar contraseña
         $usuario->update([
             'password' => Hash::make($request->password)
         ]);
 
-       return redirect()->route('login.form')->with('success', 'Contraseña actualizada correctamente.');
-
+        return redirect()->route('login.form')
+            ->with('success', 'Contraseña actualizada correctamente');
     }
 }

@@ -17,22 +17,31 @@ class AuthController extends Controller
     // Procesar login
     public function login(Request $request)
     {
+        // Validación mejorada
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required|min:6'
+        ], [
+            'email.required' => 'El correo electrónico es obligatorio',
+            'email.email' => 'Ingresa un correo electrónico válido',
+            'password.required' => 'La contraseña es obligatoria',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres'
         ]);
 
         // Buscar usuario
         $usuario = Usuario::where('email', $request->email)->first();
 
-       if (!$usuario) {
-    return back()->withErrors(['email' => 'El correo no está registrado']);
-}
+        if (!$usuario) {
+            return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['email' => 'El correo no está registrado']);
+        }
 
-if (!Hash::check($request->password, $usuario->password)) {
-    return back()->withErrors(['password' => 'Contraseña incorrecta']);
-}
-
+        if (!Hash::check($request->password, $usuario->password)) {
+            return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['password' => 'Contraseña incorrecta']);
+        }
 
         // Crear sesión
         session([

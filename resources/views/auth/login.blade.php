@@ -9,15 +9,23 @@
     .navbar,
     footer,
     .fixed-top,
+    .dropdown,
+    .btn-outline-light,
     [class*="navbar"],
     [class*="nav-"],
+    [class*="dropdown"],
     [id*="navbar"],
-    [id*="nav"] {
+    [id*="nav"],
+    [id*="dropdown"] {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
         height: 0 !important;
+        width: 0 !important;
         overflow: hidden !important;
+        position: absolute !important;
+        pointer-events: none !important;
+        z-index: -9999 !important;
     }
 
     html, body {
@@ -162,8 +170,13 @@
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 24px;
         position: relative;
+    }
+
+    .form-group.has-error .form-control-modern {
+        border-color: rgba(220, 53, 69, 0.6);
+        background: rgba(220, 53, 69, 0.08);
     }
 
     .form-label {
@@ -213,6 +226,33 @@
         transform: translateY(-2px);
     }
 
+    /* Mensajes de error estilo Google */
+    .error-message {
+        display: none;
+        color: #ff6b6b;
+        font-size: 12px;
+        font-weight: 500;
+        margin-top: 6px;
+        padding-left: 2px;
+        animation: fadeIn 0.3s ease;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .error-message.show {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .btn-login {
         width: 100%;
         padding: 14px;
@@ -230,7 +270,7 @@
         margin-top: 12px;
     }
 
-    .btn-login:hover {
+    .btn-login:hover:not(:disabled) {
         transform: translateY(-3px);
         box-shadow: 
             0 12px 35px rgba(102, 126, 234, 0.6),
@@ -239,6 +279,11 @@
 
     .btn-login:active {
         transform: translateY(-1px);
+    }
+
+    .btn-login:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
     }
 
     .forgot-password {
@@ -265,27 +310,6 @@
 
     .forgot-password svg {
         margin-right: 6px;
-    }
-
-    .alert-modern {
-        background: rgba(220, 53, 69, 0.15);
-        border: 1px solid rgba(220, 53, 69, 0.35);
-        color: white;
-        padding: 14px 18px;
-        border-radius: 12px;
-        margin-bottom: 25px;
-        font-size: 14px;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.2);
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    }
-
-    .alert-modern strong {
-        margin-right: 8px;
-        font-size: 18px;
     }
 
     /* Responsive Design */
@@ -385,22 +409,10 @@
             <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
         </div>
 
-        @error('email')
-            <div class="alert-modern">
-                <strong>⚠️</strong> {{ $message }}
-            </div>
-        @enderror
-
-        @error('password')
-            <div class="alert-modern">
-                <strong>⚠️</strong> {{ $message }}
-            </div>
-        @enderror
-
-        <form action="{{ route('login.process') }}" method="POST">
+        <form action="{{ route('login.process') }}" method="POST" id="loginForm" autocomplete="off">
             @csrf
 
-            <div class="form-group">
+            <div class="form-group" id="emailGroup">
                 <label class="form-label">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -411,14 +423,22 @@
                 <input 
                     type="email" 
                     name="email" 
+                    id="email"
                     class="form-control-modern" 
                     placeholder="ejemplo@correo.com"
-                    required
                     value="{{ old('email') }}"
+                    autocomplete="off"
                 >
+                <div class="error-message" id="emailError">
+                    @error('email')
+                        {{ $message }}
+                    @else
+                        Ingresa un correo electrónico válido
+                    @enderror
+                </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="passwordGroup">
                 <label class="form-label">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -429,18 +449,26 @@
                 <input 
                     type="password" 
                     name="password" 
+                    id="password"
                     class="form-control-modern" 
                     placeholder="••••••••"
-                    required
+                    autocomplete="new-password"
                 >
+                <div class="error-message" id="passwordError">
+                    @error('password')
+                        {{ $message }}
+                    @else
+                        La contraseña es obligatoria
+                    @enderror
+                </div>
             </div>
 
-            <button type="submit" class="btn-login">
+            <button type="submit" class="btn-login" id="submitBtn">
                 Ingresar
             </button>
 
             <div class="forgot-password">
-                <a href="{{ route('password.forgot') }}">
+                <a href="javascript:void(0)" onclick="goToForgotPassword()">
                     <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/>
                         <line x1="12" y1="16" x2="12" y2="12"/>
@@ -452,4 +480,113 @@
         </form>
     </div>
 </div>
+
+<script>
+function goToForgotPassword() {
+    const email = document.getElementById('email').value.trim();
+    const forgotUrl = "{{ route('password.forgot') }}";
+    
+    if (email) {
+        window.location.href = forgotUrl + '?email=' + encodeURIComponent(email);
+    } else {
+        window.location.href = forgotUrl;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const emailGroup = document.getElementById('emailGroup');
+    const passwordGroup = document.getElementById('passwordGroup');
+
+    // Mostrar errores del servidor si existen
+    @if($errors->has('email'))
+        emailError.classList.add('show');
+        emailGroup.classList.add('has-error');
+    @endif
+
+    @if($errors->has('password'))
+        passwordError.classList.add('show');
+        passwordGroup.classList.add('has-error');
+    @endif
+
+    // Validación en tiempo real para email
+    emailInput.addEventListener('blur', validateEmail);
+    emailInput.addEventListener('input', function() {
+        if (emailError.classList.contains('show')) {
+            validateEmail();
+        }
+    });
+
+    // Validación en tiempo real para contraseña
+    passwordInput.addEventListener('blur', validatePassword);
+    passwordInput.addEventListener('input', function() {
+        if (passwordError.classList.contains('show')) {
+            validatePassword();
+        }
+    });
+
+    // Validación al enviar el formulario
+    form.addEventListener('submit', function(e) {
+        const emailValid = validateEmail();
+        const passwordValid = validatePassword();
+
+        if (!emailValid || !passwordValid) {
+            e.preventDefault();
+        }
+    });
+
+    // Manejar clic en "¿Olvidaste tu contraseña?"
+    document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+        const forgotUrl = "{{ route('password.forgot') }}";
+        
+        if (email !== '') {
+            window.location.href = forgotUrl + '?email=' + encodeURIComponent(email);
+        } else {
+            window.location.href = forgotUrl;
+        }
+    });
+
+    function validateEmail() {
+        const email = emailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (email === '') {
+            emailError.textContent = 'El correo electrónico es obligatorio';
+            emailError.classList.add('show');
+            emailGroup.classList.add('has-error');
+            return false;
+        } else if (!emailRegex.test(email)) {
+            emailError.textContent = 'Ingresa un correo electrónico válido';
+            emailError.classList.add('show');
+            emailGroup.classList.add('has-error');
+            return false;
+        } else {
+            emailError.classList.remove('show');
+            emailGroup.classList.remove('has-error');
+            return true;
+        }
+    }
+
+    function validatePassword() {
+        const password = passwordInput.value;
+
+        if (password === '') {
+            passwordError.textContent = 'La contraseña es obligatoria';
+            passwordError.classList.add('show');
+            passwordGroup.classList.add('has-error');
+            return false;
+        } else {
+            passwordError.classList.remove('show');
+            passwordGroup.classList.remove('has-error');
+            return true;
+        }
+    }
+});
+</script>
 @endsection
