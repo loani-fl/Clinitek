@@ -169,6 +169,29 @@
         text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
     }
 
+    /* Mensaje de éxito */
+    .success-message {
+        background: rgba(34, 197, 94, 0.15);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 13px;
+        font-weight: 500;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        animation: fadeIn 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .success-message svg {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+        flex-shrink: 0;
+    }
+
     .form-group {
         margin-bottom: 24px;
         position: relative;
@@ -197,6 +220,13 @@
         filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
     }
 
+    /* Input con icono de ojo */
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
     .form-control-modern {
         width: 100%;
         padding: 13px 18px;
@@ -209,6 +239,10 @@
         font-weight: 500;
         backdrop-filter: blur(10px);
         box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control-modern.with-icon {
+        padding-right: 50px;
     }
 
     .form-control-modern::placeholder {
@@ -224,6 +258,40 @@
             0 0 0 4px rgba(102, 126, 234, 0.15),
             inset 0 2px 4px rgba(0, 0, 0, 0.1);
         transform: translateY(-2px);
+    }
+
+    /* Botón del ojito */
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+
+    .toggle-password svg {
+        width: 20px;
+        height: 20px;
+        color: rgba(255, 255, 255, 0.7);
+        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
+        transition: all 0.3s ease;
+    }
+
+    .toggle-password:hover svg {
+        color: rgba(255, 255, 255, 0.95);
+        transform: scale(1.1);
+    }
+
+    .toggle-password:active svg {
+        transform: scale(0.95);
     }
 
     /* Mensajes de error estilo Google */
@@ -359,6 +427,10 @@
             padding: 14px 16px;
             font-size: 14px;
         }
+
+        .form-control-modern.with-icon {
+            padding-right: 50px;
+        }
     }
 
     /* Decoración adicional */
@@ -409,7 +481,18 @@
             <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
         </div>
 
-        <form action="{{ route('login.process') }}" method="POST" id="loginForm" autocomplete="off">
+        {{-- Mensaje de éxito después de restablecer contraseña --}}
+        @if(session('success'))
+        <div class="success-message">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            {{ session('success') }}
+        </div>
+        @endif
+
+        <form action="{{ route('login.process') }}" method="POST" id="loginForm" autocomplete="off" novalidate>
             @csrf
 
             <div class="form-group" id="emailGroup">
@@ -426,7 +509,7 @@
                     id="email"
                     class="form-control-modern" 
                     placeholder="ejemplo@correo.com"
-                    value="{{ old('email') }}"
+                    value="{{ request('email') ?? old('email') }}"
                     autocomplete="off"
                 >
                 <div class="error-message" id="emailError">
@@ -446,14 +529,26 @@
                     </svg>
                     Contraseña
                 </label>
-                <input 
-                    type="password" 
-                    name="password" 
-                    id="password"
-                    class="form-control-modern" 
-                    placeholder="••••••••"
-                    autocomplete="new-password"
-                >
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        name="password" 
+                        id="password"
+                        class="form-control-modern with-icon" 
+                        placeholder="••••••••"
+                        autocomplete="new-password"
+                    >
+                    <button type="button" class="toggle-password" id="togglePassword">
+                        <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <svg id="eyeOffIcon" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                            <line x1="1" y1="1" x2="23" y2="23"/>
+                        </svg>
+                    </button>
+                </div>
                 <div class="error-message" id="passwordError">
                     @error('password')
                         {{ $message }}
@@ -501,6 +596,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordError = document.getElementById('passwordError');
     const emailGroup = document.getElementById('emailGroup');
     const passwordGroup = document.getElementById('passwordGroup');
+    const togglePassword = document.getElementById('togglePassword');
+    const eyeIcon = document.getElementById('eyeIcon');
+    const eyeOffIcon = document.getElementById('eyeOffIcon');
+
+    // Funcionalidad del ojito para mostrar/ocultar contraseña
+    togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        // Cambiar icono
+        if (type === 'text') {
+            eyeIcon.style.display = 'none';
+            eyeOffIcon.style.display = 'block';
+        } else {
+            eyeIcon.style.display = 'block';
+            eyeOffIcon.style.display = 'none';
+        }
+    });
 
     // Mostrar errores del servidor si existen
     @if($errors->has('email'))
@@ -536,19 +649,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!emailValid || !passwordValid) {
             e.preventDefault();
-        }
-    });
-
-    // Manejar clic en "¿Olvidaste tu contraseña?"
-    document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
-        e.preventDefault();
-        const email = emailInput.value.trim();
-        const forgotUrl = "{{ route('password.forgot') }}";
-        
-        if (email !== '') {
-            window.location.href = forgotUrl + '?email=' + encodeURIComponent(email);
-        } else {
-            window.location.href = forgotUrl;
         }
     });
 

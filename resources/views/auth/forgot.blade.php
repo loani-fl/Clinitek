@@ -200,6 +200,13 @@
         filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
     }
 
+    /* Input con icono de ojo */
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
     .form-control-modern {
         width: 100%;
         padding: 13px 18px;
@@ -212,6 +219,10 @@
         font-weight: 500;
         backdrop-filter: blur(10px);
         box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control-modern.with-icon {
+        padding-right: 50px;
     }
 
     .form-control-modern::placeholder {
@@ -227,6 +238,40 @@
             0 0 0 4px rgba(102, 126, 234, 0.15),
             inset 0 2px 4px rgba(0, 0, 0, 0.1);
         transform: translateY(-2px);
+    }
+
+    /* Botón del ojito */
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+
+    .toggle-password svg {
+        width: 20px;
+        height: 20px;
+        color: rgba(255, 255, 255, 0.7);
+        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
+        transition: all 0.3s ease;
+    }
+
+    .toggle-password:hover svg {
+        color: rgba(255, 255, 255, 0.95);
+        transform: scale(1.1);
+    }
+
+    .toggle-password:active svg {
+        transform: scale(0.95);
     }
 
     /* Mensajes de error estilo Google */
@@ -362,6 +407,10 @@
             padding: 14px 16px;
             font-size: 14px;
         }
+
+        .form-control-modern.with-icon {
+            padding-right: 50px;
+        }
     }
 
     /* Decoración adicional */
@@ -412,7 +461,7 @@
             <p class="recovery-subtitle">Ingresa tu correo y nueva contraseña</p>
         </div>
 
-        <form method="POST" action="{{ route('password.reset') }}" id="recoveryForm" autocomplete="off">
+        <form method="POST" action="{{ route('password.reset') }}" id="recoveryForm" autocomplete="off" novalidate>
             @csrf
 
             <div class="form-group" id="emailGroup">
@@ -449,14 +498,26 @@
                     </svg>
                     Nueva contraseña
                 </label>
-                <input 
-                    type="password" 
-                    name="password" 
-                    id="password" 
-                    class="form-control-modern" 
-                    placeholder="••••••••"
-                    autocomplete="new-password"
-                >
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        name="password" 
+                        id="password" 
+                        class="form-control-modern with-icon" 
+                        placeholder="••••••••"
+                        autocomplete="new-password"
+                    >
+                    <button type="button" class="toggle-password" id="togglePassword">
+                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <svg class="eye-off-icon" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                            <line x1="1" y1="1" x2="23" y2="23"/>
+                        </svg>
+                    </button>
+                </div>
                 <div class="error-message" id="passwordError">
                     @error('password')
                         {{ $message }}
@@ -474,14 +535,26 @@
                     </svg>
                     Confirmar contraseña
                 </label>
-                <input 
-                    type="password" 
-                    name="password_confirmation" 
-                    id="password_confirmation" 
-                    class="form-control-modern" 
-                    placeholder="••••••••"
-                    autocomplete="new-password"
-                >
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        name="password_confirmation" 
+                        id="password_confirmation" 
+                        class="form-control-modern with-icon" 
+                        placeholder="••••••••"
+                        autocomplete="new-password"
+                    >
+                    <button type="button" class="toggle-password" id="toggleConfirm">
+                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <svg class="eye-off-icon" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                            <line x1="1" y1="1" x2="23" y2="23"/>
+                        </svg>
+                    </button>
+                </div>
                 <div class="error-message" id="confirmError">Las contraseñas no coinciden</div>
             </div>
 
@@ -514,6 +587,42 @@ document.addEventListener('DOMContentLoaded', function() {
     const emailGroup = document.getElementById('emailGroup');
     const passwordGroup = document.getElementById('passwordGroup');
     const confirmGroup = document.getElementById('confirmGroup');
+    
+    // Botones de toggle para contraseñas
+    const togglePassword = document.getElementById('togglePassword');
+    const toggleConfirm = document.getElementById('toggleConfirm');
+
+    // Funcionalidad del ojito para la nueva contraseña
+    togglePassword.addEventListener('click', function() {
+        const eyeIcon = this.querySelector('.eye-icon');
+        const eyeOffIcon = this.querySelector('.eye-off-icon');
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        if (type === 'text') {
+            eyeIcon.style.display = 'none';
+            eyeOffIcon.style.display = 'block';
+        } else {
+            eyeIcon.style.display = 'block';
+            eyeOffIcon.style.display = 'none';
+        }
+    });
+
+    // Funcionalidad del ojito para confirmar contraseña
+    toggleConfirm.addEventListener('click', function() {
+        const eyeIcon = this.querySelector('.eye-icon');
+        const eyeOffIcon = this.querySelector('.eye-off-icon');
+        const type = confirmInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        confirmInput.setAttribute('type', type);
+        
+        if (type === 'text') {
+            eyeIcon.style.display = 'none';
+            eyeOffIcon.style.display = 'block';
+        } else {
+            eyeIcon.style.display = 'block';
+            eyeOffIcon.style.display = 'none';
+        }
+    });
 
     // Capturar el email de la URL si existe
     const urlParams = new URLSearchParams(window.location.search);
@@ -535,10 +644,7 @@ document.addEventListener('DOMContentLoaded', function() {
     @endif
 
     // Validación en tiempo real para email
-    emailInput.addEventListener('blur', function() {
-        validateEmail();
-    });
-
+    emailInput.addEventListener('blur', validateEmail);
     emailInput.addEventListener('input', function() {
         if (emailError.classList.contains('show')) {
             validateEmail();
@@ -546,10 +652,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Validación en tiempo real para contraseña
-    passwordInput.addEventListener('blur', function() {
-        validatePassword();
-    });
-
+    passwordInput.addEventListener('blur', validatePassword);
     passwordInput.addEventListener('input', function() {
         if (passwordError.classList.contains('show')) {
             validatePassword();
@@ -560,10 +663,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Validación en tiempo real para confirmar contraseña
-    confirmInput.addEventListener('blur', function() {
-        validateConfirm();
-    });
-
+    confirmInput.addEventListener('blur', validateConfirm);
     confirmInput.addEventListener('input', function() {
         if (confirmError.classList.contains('show')) {
             validateConfirm();

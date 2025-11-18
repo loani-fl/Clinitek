@@ -11,8 +11,6 @@ class PasswordController extends Controller
     // Mostrar formulario de recuperación
     public function showForgot()
     {
-        // La vista recibirá automáticamente el parámetro 'email' desde la URL
-        // mediante request('email') que ya pusimos en la vista
         return view('auth.forgot');
     }
 
@@ -44,7 +42,8 @@ class PasswordController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        return redirect()->route('login.form')
+        // Redirigir al login con el email como parámetro
+        return redirect()->route('login.form', ['email' => $request->usuario])
             ->with('success', 'Contraseña actualizada correctamente');
     }
 }
