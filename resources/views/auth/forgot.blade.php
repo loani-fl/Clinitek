@@ -522,7 +522,7 @@
                     @error('password')
                         {{ $message }}
                     @else
-                        La contraseña debe tener al menos 4 caracteres
+                        La contraseña es obligatoria
                     @enderror
                 </div>
             </div>
@@ -710,8 +710,13 @@ document.addEventListener('DOMContentLoaded', function() {
             passwordError.classList.add('show');
             passwordGroup.classList.add('has-error');
             return false;
-        } else if (password.length < 4) {
-            passwordError.textContent = 'La contraseña debe tener al menos 4 caracteres';
+        } else if (password.length < 8) {
+            passwordError.textContent = 'La contraseña debe contener mínimo 8 caracteres';
+            passwordError.classList.add('show');
+            passwordGroup.classList.add('has-error');
+            return false;
+        } else if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password) || !/[@#$%&*!]/.test(password)) {
+            passwordError.textContent = 'Debe contener letras, números y símbolos (@#$%&*!)';
             passwordError.classList.add('show');
             passwordGroup.classList.add('has-error');
             return false;

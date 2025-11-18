@@ -19,13 +19,21 @@ class PasswordController extends Controller
     {
         $request->validate([
             'usuario' => 'required|email',
-            'password' => 'required|confirmed|min:4'
+            'password' => [
+                'required',
+                'confirmed',
+                'min:8',
+                'regex:/[a-zA-Z]/',      // Al menos una letra
+                'regex:/[0-9]/',         // Al menos un número
+                'regex:/[@#$%&*!]/'      // Al menos un símbolo
+            ]
         ], [
             'usuario.required' => 'El correo electrónico es obligatorio',
             'usuario.email' => 'Ingresa un correo electrónico válido',
             'password.required' => 'La contraseña es obligatoria',
             'password.confirmed' => 'Las contraseñas no coinciden',
-            'password.min' => 'La contraseña debe tener al menos 4 caracteres'
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres',
+            'password.regex' => 'La contraseña debe contener letras, números y símbolos (@#$%&*!)'
         ]);
 
         // Buscar usuario por email
