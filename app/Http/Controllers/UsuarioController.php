@@ -130,11 +130,56 @@ class UsuarioController extends Controller
     public function asignarVista($id)
     {
         $user = Usuario::findOrFail($id);
+
+        // Obtener roles y permisos
         $roles = Role::all();
         $permisos = Permission::all();
 
-        return view('usuarios.asignar', compact('user', 'roles', 'permisos'));
+        // AGRUPAR PERMISOS POR SECCIONES
+        $usuarios = $permisos->filter(fn($p) => str_starts_with($p->name, 'usuarios.'));
+        $pacientes = $permisos->filter(fn($p) => str_starts_with($p->name, 'pacientes.'));
+        $medicos = $permisos->filter(fn($p) => str_starts_with($p->name, 'medicos.'));
+        $empleado = $permisos->filter(fn($p) => str_starts_with($p->name, 'empleado.'));
+        $consultas = $permisos->filter(fn($p) => str_starts_with($p->name, 'consultas.'));
+        $controlPrenatal = $permisos->filter(fn($p) => str_starts_with($p->name, 'controlPrenatal.'));
+        $recetas = $permisos->filter(fn($p) => str_starts_with($p->name, 'recetas.'));
+        $rayosX = $permisos->filter(fn($p) => str_starts_with($p->name, 'rayosX.'));
+        $ultrasonidos = $permisos->filter(fn($p) => str_starts_with($p->name, 'ultrasonidos.'));
+        $inventario = $permisos->filter(fn($p) => str_starts_with($p->name, 'inventario.'));
+        $farmacias = $permisos->filter(fn($p) => str_starts_with($p->name, 'farmacias.'));
+        $hospitalizacion = $permisos->filter(fn($p) => str_starts_with($p->name, 'hospitalizacion.'));
+        $diagnosticos = $permisos->filter(fn($p) => str_starts_with($p->name, 'diagnosticos.'));
+        $emergencias = $permisos->filter(fn($p) => str_starts_with($p->name, 'emergencias.'));
+        $puestos = $permisos->filter(fn($p) => str_starts_with($p->name, 'puestos.'));
+        $examenes = $permisos->filter(fn($p) => str_starts_with($p->name, 'examenes.'));
+        $sesiones = $permisos->filter(fn($p) => str_starts_with($p->name, 'sesiones.'));
+        $dashboard = $permisos->filter(fn($p) => str_starts_with($p->name, 'dashboard.'));
+
+        return view('usuarios.asignar', compact(
+            'user',
+            'roles',
+            'permisos',
+            'usuarios',
+            'pacientes',
+            'medicos',
+            'empleado',
+            'consultas',
+            'controlPrenatal',
+            'recetas',
+            'rayosX',
+            'ultrasonidos',
+            'inventario',
+            'farmacias',
+            'hospitalizacion',
+            'diagnosticos',
+            'emergencias',
+            'puestos',
+            'examenes',
+            'sesiones',
+            'dashboard'
+        ));
     }
+
 
     public function asignarUpdate(Request $request, $id)
     {
