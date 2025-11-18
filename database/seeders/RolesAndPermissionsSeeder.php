@@ -17,26 +17,17 @@ class RolesAndPermissionsSeeder extends Seeder
          *  PERMISOS YA EXISTENTES EN TU SISTEMA
          * ============================================================= */
         $permisosBase = [
-            'ver_usuarios',
-            'crear_usuarios',
-            'editar_usuarios',
-            'eliminar_usuarios',
 
+
+            //      Roles
             'ver_roles',
             'crear_roles',
             'editar_roles',
             'eliminar_roles',
 
-            'ver_pacientes',
-            'ver_historial_medico',
 
-            'ver_resultados_propios',
-            'agendar_cita',
         ];
 
-        /* =============================================================
-         *  PERMISOS DE VISTAS — NUEVAS SECCIONES
-         * ============================================================= */
 
         // -------------------------
         //      CONSULTAS
@@ -226,6 +217,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $admin = Role::firstOrCreate(['name' => 'administrador']);
         $medico = Role::firstOrCreate(['name' => 'medico']);
         $paciente = Role::firstOrCreate(['name' => 'paciente']);
+        $empleado = Role::firstOrCreate(['name' => 'empleado']);
 
         /* =============================================================
          *  ASIGNACIÓN DE PERMISOS A ROLES
@@ -236,8 +228,6 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // MÉDICO
         $medico->syncPermissions([
-            'ver_pacientes',
-            'ver_historial_medico',
 
             // Consultas
             'consultas.index',
@@ -274,6 +264,7 @@ class RolesAndPermissionsSeeder extends Seeder
             // Médicos
             'medicos.index',
             'medicos.show',
+             'medicos.create',
 
             // Pacientes
             'pacientes.index',
@@ -282,9 +273,18 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // PACIENTE
         $paciente->syncPermissions([
-            'ver_resultados_propios',
-            'agendar_cita',
-            'dashboard.inicio',
+            'consultas.show',
+            'consultas.create',
+            'pacientes.show',
+            'pacientes.create',
+            'pacientes.edit',
+        ]);
+
+        $empleado->syncPermissions([
+
+            'empleado.show',
+            'empleado.create',
+            'empleado.edit',
         ]);
     }
 }
