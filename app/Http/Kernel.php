@@ -69,6 +69,7 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         // ...
         'check.sesion' => \App\Http\Middleware\CheckSesion::class,
+
     ];
-    
+
 }
