@@ -273,7 +273,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // PACIENTE
         $paciente->syncPermissions([
-            'consular.show',
+            'consulas.show',
             'consultas.create',
             'pacientes.show',
             'pacientes.create',
