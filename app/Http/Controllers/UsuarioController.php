@@ -24,11 +24,6 @@ class UsuarioController extends Controller
             });
         }
 
-        // Filtro por rol
-        if ($request->filled('rol')) {
-            $query->where('rol', $request->rol);
-        }
-
         $usuarios = $query->paginate(2)->withQueryString();
 
         if ($request->ajax()) {
@@ -58,15 +53,12 @@ class UsuarioController extends Controller
         $request->validate([
             'name' => 'required|string|max:50',
             'email' => 'required|email|unique:usuarios,email',
-            'rol' => 'required|in:admin,empleado,medico,paciente',
             'password' => 'required|string|min:8|confirmed',
         ], [
             'name.required' => 'El nombre es obligatorio.',
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.email' => 'Debe ingresar un correo válido.',
             'email.unique' => 'Este correo ya está registrado.',
-            'rol.required' => 'El rol es obligatorio.',
-            'rol.in' => 'El rol debe ser admin, empleado, medico o paciente.',
             'password.required' => 'La contraseña es obligatoria.',
             'password.min' => 'La contraseña debe tener minimo 8 caracteres.',
             'password.confirmed' => 'La confirmación de la contraseña no coincide.',
@@ -75,7 +67,6 @@ class UsuarioController extends Controller
         Usuario::create([
             'name' => $request->name,
             'email' => $request->email,
-            'rol' => $request->rol,
             'password' => Hash::make($request->password)
         ]);
 
@@ -92,22 +83,18 @@ class UsuarioController extends Controller
         $request->validate([
             'name' => 'required|string|max:50',
             'email' => 'required|email|unique:usuarios,email,' . $usuario->id,
-            'rol' => 'required|in:admin,empleado,medico,paciente',
             'password' => 'nullable|string|min:8|confirmed',
         ], [
             'name.required' => 'El nombre es obligatorio.',
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.email' => 'Debe ingresar un correo válido.',
             'email.unique' => 'Este correo ya está registrado.',
-            'rol.required' => 'El rol es obligatorio.',
-            'rol.in' => 'El rol debe ser admin, empleado, medico o paciente.',
             'password.min' => 'La contraseña debe tener minimo 8 caracteres.',
             'password.confirmed' => 'La confirmación de la contraseña no coincide.',
         ]);
 
         $usuario->name = $request->name;
         $usuario->email = $request->email;
-        $usuario->rol = $request->rol;
 
         if ($request->filled('password')) {
             $usuario->password = Hash::make($request->password);
