@@ -67,7 +67,7 @@
         top: 0;
         left: 0;
         overflow: hidden;
-        padding: 40px 20px;
+        padding: 30px 20px; /* Margen arriba y abajo */
         z-index: 99999 !important;
     }
 
@@ -91,7 +91,7 @@
         background: rgba(255, 255, 255, 0.12);
         backdrop-filter: blur(25px);
         border-radius: 24px;
-        padding: 35px 35px;
+        padding: 28px 35px; /* Reducido padding */
         width: 100%;
         max-width: 420px;
         margin-left: 8%;
@@ -118,19 +118,19 @@
 
     .recovery-header {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 22px; /* Reducido */
     }
 
     .recovery-icon {
-        width: 75px;
-        height: 75px;
+        width: 65px; /* Reducido */
+        height: 65px;
         background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
         backdrop-filter: blur(10px);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 18px;
+        margin: 0 auto 14px; /* Reducido */
         box-shadow: 
             0 10px 30px rgba(102, 126, 234, 0.3),
             0 0 0 1px rgba(255, 255, 255, 0.3);
@@ -150,30 +150,30 @@
     }
 
     .recovery-icon svg {
-        width: 38px;
-        height: 38px;
+        width: 34px; /* Reducido */
+        height: 34px;
         color: white;
         filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
     }
 
     .recovery-title {
         color: white;
-        font-size: 26px;
+        font-size: 24px; /* Reducido */
         font-weight: 700;
-        margin: 0 0 8px 0;
+        margin: 0 0 6px 0; /* Reducido */
         letter-spacing: -0.5px;
         text-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
     }
 
     .recovery-subtitle {
         color: rgba(255, 255, 255, 0.85);
-        font-size: 13px;
+        font-size: 12px; /* Reducido */
         font-weight: 400;
         text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
     }
 
     .form-group {
-        margin-bottom: 24px;
+        margin-bottom: 18px; /* Reducido */
         position: relative;
     }
 
@@ -185,17 +185,17 @@
     .form-label {
         color: rgba(255, 255, 255, 0.95);
         font-weight: 600;
-        margin-bottom: 10px;
+        margin-bottom: 8px; /* Reducido */
         display: flex;
         align-items: center;
-        font-size: 13px;
+        font-size: 12px; /* Reducido */
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
 
     .form-label svg {
-        width: 18px;
-        height: 18px;
-        margin-right: 10px;
+        width: 16px; /* Reducido */
+        height: 16px;
+        margin-right: 8px; /* Reducido */
         color: rgba(255, 255, 255, 0.9);
         filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
     }
@@ -209,12 +209,12 @@
 
     .form-control-modern {
         width: 100%;
-        padding: 13px 18px;
+        padding: 11px 16px; /* Reducido */
         background: rgba(255, 255, 255, 0.15);
         border: 1px solid rgba(255, 255, 255, 0.25);
         border-radius: 12px;
         color: white;
-        font-size: 14px;
+        font-size: 13px; /* Reducido */
         transition: all 0.3s ease;
         font-weight: 500;
         backdrop-filter: blur(10px);
@@ -222,7 +222,7 @@
     }
 
     .form-control-modern.with-icon {
-        padding-right: 50px;
+        padding-right: 45px; /* Reducido */
     }
 
     .form-control-modern::placeholder {
@@ -235,21 +235,21 @@
         background: rgba(255, 255, 255, 0.22);
         border-color: rgba(255, 255, 255, 0.45);
         box-shadow: 
-            0 0 0 4px rgba(102, 126, 234, 0.15),
+            0 0 0 3px rgba(102, 126, 234, 0.15),
             inset 0 2px 4px rgba(0, 0, 0, 0.1);
-        transform: translateY(-2px);
+        transform: translateY(-1px);
     }
 
     /* Botón del ojito */
     .toggle-password {
         position: absolute;
-        right: 15px;
+        right: 12px; /* Ajustado */
         top: 50%;
         transform: translateY(-50%);
         background: none;
         border: none;
         cursor: pointer;
-        padding: 5px;
+        padding: 4px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -258,8 +258,8 @@
     }
 
     .toggle-password svg {
-        width: 20px;
-        height: 20px;
+        width: 18px; /* Reducido */
+        height: 18px;
         color: rgba(255, 255, 255, 0.7);
         filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
         transition: all 0.3s ease;
@@ -274,13 +274,13 @@
         transform: scale(0.95);
     }
 
-    /* Mensajes de error estilo Google */
+    /* Mensajes de error */
     .error-message {
         display: none;
         color: #ff6b6b;
-        font-size: 12px;
+        font-size: 11px; /* Reducido */
         font-weight: 500;
-        margin-top: 6px;
+        margin-top: 5px; /* Reducido */
         padding-left: 2px;
         animation: fadeIn 0.3s ease;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -303,23 +303,23 @@
 
     .btn-recovery {
         width: 100%;
-        padding: 14px;
+        padding: 12px; /* Reducido */
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border: none;
         border-radius: 12px;
         color: white;
         font-weight: 700;
-        font-size: 14px;
+        font-size: 13px; /* Reducido */
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 
             0 8px 25px rgba(102, 126, 234, 0.45),
             0 0 0 1px rgba(255, 255, 255, 0.2);
-        margin-top: 12px;
+        margin-top: 8px; /* Reducido */
     }
 
     .btn-recovery:hover:not(:disabled) {
-        transform: translateY(-3px);
+        transform: translateY(-2px);
         box-shadow: 
             0 12px 35px rgba(102, 126, 234, 0.6),
             0 0 0 1px rgba(255, 255, 255, 0.3);
@@ -336,13 +336,13 @@
 
     .back-login {
         text-align: center;
-        margin-top: 20px;
+        margin-top: 16px; /* Reducido */
     }
 
     .back-login a {
         color: rgba(255, 255, 255, 0.9);
         text-decoration: none;
-        font-size: 13px;
+        font-size: 12px; /* Reducido */
         font-weight: 600;
         transition: all 0.3s ease;
         display: inline-flex;
@@ -357,7 +357,7 @@
     }
 
     .back-login svg {
-        margin-right: 6px;
+        margin-right: 5px; /* Reducido */
     }
 
     /* Responsive Design */
@@ -365,6 +365,7 @@
         .recovery-wrapper {
             background-position: center;
             justify-content: center;
+            padding: 25px 20px;
         }
 
         .recovery-wrapper::before {
@@ -374,42 +375,46 @@
 
         .recovery-card {
             margin-left: 0;
-            padding: 40px 30px;
+            padding: 30px 28px;
             max-width: 420px;
-        }
-
-        .recovery-title {
-            font-size: 24px;
-        }
-
-        .recovery-icon {
-            width: 70px;
-            height: 70px;
-        }
-
-        .recovery-icon svg {
-            width: 35px;
-            height: 35px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .recovery-card {
-            padding: 35px 25px;
         }
 
         .recovery-title {
             font-size: 22px;
         }
 
+        .recovery-icon {
+            width: 60px;
+            height: 60px;
+        }
+
+        .recovery-icon svg {
+            width: 32px;
+            height: 32px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .recovery-wrapper {
+            padding: 20px 15px;
+        }
+
+        .recovery-card {
+            padding: 25px 22px;
+        }
+
+        .recovery-title {
+            font-size: 20px;
+        }
+
         .form-control-modern,
         .btn-recovery {
-            padding: 14px 16px;
-            font-size: 14px;
+            padding: 11px 14px;
+            font-size: 13px;
         }
 
         .form-control-modern.with-icon {
-            padding-right: 50px;
+            padding-right: 45px;
         }
     }
 

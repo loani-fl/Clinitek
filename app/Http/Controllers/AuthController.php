@@ -25,7 +25,7 @@ class AuthController extends Controller
             'email.required' => 'El correo electrónico es obligatorio',
             'email.email' => 'Ingresa un correo electrónico válido',
             'password.required' => 'La contraseña es obligatoria',
-            'password.min' => 'La contraseña debe tener al menos 6 caracteres'
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres'
         ]);
 
         // Buscar usuario
