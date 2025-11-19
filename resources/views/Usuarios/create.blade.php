@@ -42,7 +42,7 @@
 
 <div class="custom-card">
 
-    <h2 class="fw-bold text-center mb-4" style="color:#003b70;">Crear usuario</h2>
+    <h2 class="fw-bold text-center mb-4" style="color:#003b70;">Crear Usuario</h2>
 
     <form id="formUsuario" action="{{ route('usuarios.store') }}" method="POST" novalidate>
         @csrf

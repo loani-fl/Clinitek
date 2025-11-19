@@ -75,8 +75,12 @@ class UsuarioController extends Controller
 
     public function edit(Usuario $usuario)
     {
-        return view('usuarios.edit', compact('usuario'));
+        // Crear una copia de los valores originales para restaurar
+        $usuarioOriginal = $usuario->replicate();
+    
+        return view('usuarios.edit', compact('usuario', 'usuarioOriginal'));
     }
+    
 
     public function update(Request $request, Usuario $usuario)
     {
