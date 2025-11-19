@@ -155,7 +155,7 @@
                 <i class="bi bi-house-door"></i> Inicio
             </a>
             <h2>Usuarios</h2>
-            <a href="{{ route('usuarios.create') }}" class="btn btn-primary ms-3"> Nuevo Usuario </a>
+            <a href="{{ route('usuarios.create') }}" class="btn btn-primary ms-3"> Nuevo usuario </a>
 
 
         </div>
@@ -165,12 +165,6 @@
             <input type="text" id="filtroBusqueda" class="form-control" placeholder="Buscar por nombre o email"
                 value="{{ request('search') }}" style="width: 260px;">
 
-            <select id="filtroRol" class="form-control" style="max-width: 180px;">
-                <option value="">Todos los roles</option>
-                <option value="admin" {{ request('rol') == 'admin' ? 'selected' : '' }}>Admin</option>
-                <option value="empleado" {{ request('rol') == 'empleado' ? 'selected' : '' }}>Empleado</option>
-                <option value="medico" {{ request('rol') == 'medico' ? 'selected' : '' }}>Médico</option>
-            </select>
         </div>
 
         {{-- Tabla --}}

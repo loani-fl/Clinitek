@@ -4,7 +4,6 @@
             <th>#</th>
             <th>Nombre</th>
             <th>Email</th>
-            <th>Rol</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -14,7 +13,6 @@
             <td>{{ $usuarios->firstItem() + $loop->index }}</td> {{-- Numeración consecutiva --}}
             <td>{{ $usuario->name }}</td>
             <td>{{ $usuario->email }}</td>
-            <td>{{ ucfirst($usuario->rol) }}</td>
             <td>
                 <div class="d-flex justify-content-center gap-1">
 
