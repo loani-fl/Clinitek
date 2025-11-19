@@ -380,8 +380,8 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login.form');
 Route::post('/login', [AuthController::class, 'login'])->name('login.process');
 
 // Cerrar sesión
-Route::get('/logout', [AuthController::class, 'logout'])->name('logout'); // GET para enlaces o botones
-
+// Cerrar sesión (cambiar de GET a POST)
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Formulario de recuperación
 Route::get('/password/forgot', [PasswordController::class, 'showForgot'])->name('password.forgot');
 

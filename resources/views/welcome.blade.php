@@ -223,17 +223,26 @@
             </div>
         </div>
         <div class="dropdown">
-            <button class="registro-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-grid-3x3-gap-fill"></i> Registros
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="{{ route('puestos.index') }}"><i class="bi bi-briefcase"></i> Gestión de puestos</a></li>
-                <li><a class="dropdown-item" href="{{ route('empleado.index') }}"><i class="bi bi-person-badge"></i> Gestión de empleados</a></li>
-                <li><a class="dropdown-item" href="{{ route('pacientes.index') }}"><i class="bi bi-people"></i> Gestión de pacientes</a></li>
-                <li><a class="dropdown-item" href="{{ route('usuarios.index') }}"><i class="bi bi-person-plus"></i> Gestión de usuarios</a></li>
-                <li><a class="dropdown-item" href="{{ route('roles.index') }}"><i class="bi bi-person-plus"></i> Gestión de roles</a></li>
-            </ul>
-        </div>
+    <button class="registro-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-grid-3x3-gap-fill"></i> Registros
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+        <li><a class="dropdown-item" href="{{ route('puestos.index') }}"><i class="bi bi-briefcase"></i> Gestión de puestos</a></li>
+        <li><a class="dropdown-item" href="{{ route('empleado.index') }}"><i class="bi bi-person-badge"></i> Gestión de empleados</a></li>
+        <li><a class="dropdown-item" href="{{ route('pacientes.index') }}"><i class="bi bi-people"></i> Gestión de pacientes</a></li>
+        <li><a class="dropdown-item" href="{{ route('usuarios.index') }}"><i class="bi bi-person-plus"></i> Gestión de usuarios</a></li>
+        <li><a class="dropdown-item" href="{{ route('roles.index') }}"><i class="bi bi-person-plus"></i> Gestión de roles</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                @csrf
+                <button type="submit" class="dropdown-item text-danger">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </button>
+            </form>
+        </li>
+    </ul>
+</div>
     </div>
 </nav>
 

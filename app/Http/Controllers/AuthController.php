@@ -54,9 +54,10 @@ class AuthController extends Controller
     }
 
     // Cerrar sesión
-    public function logout()
-    {
-        session()->flush();
-        return redirect()->route('login');
-    }
+   // Cerrar sesión
+public function logout()
+{
+    session()->flush();
+    return redirect()->route('login.form'); // ✅ Cambiar de 'login' a 'login.form'
+}
 }
