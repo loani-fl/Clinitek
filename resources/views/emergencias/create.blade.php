@@ -183,7 +183,7 @@ h5.mt-4.mb-3.text-dark.fw-bold {
 
 <div class="custom-card">
     <div class="mb-4 text-center" style="border-bottom: 3px solid #007BFF;">
-        <h2 class="fw-bold text-black mb-0">Registro de Emergencia</h2>
+        <h2 class="fw-bold text-black mb-0">Registro de emergencia</h2>
     </div>
 
     @php
@@ -215,7 +215,7 @@ h5.mt-4.mb-3.text-dark.fw-bold {
             {{-- Buscador de pacientes --}}
             <div class="d-flex align-items-center mb-4" style="gap: 1.25rem;">
                 <label class="fw-bold mb-0" style="white-space: nowrap; font-size: 0.95rem;">
-                    <i class="fas fa-search"></i> BUSCAR PACIENTE
+                    <i class="fas fa-search"></i> Buscar paciente
                 </label>
                 <div style="position: relative; flex-grow: 1; max-width: 250px;">
                     <input 
@@ -797,7 +797,7 @@ function seleccionarPaciente(id) {
         .then(res => res.json())
         .then(data => {
             if(data.success) {
-                document.getElementById('nombres').value = data.paciente.nombres || '';
+                document.getElementById('nombres').value = data.paciente.nombre || '';
                 document.getElementById('apellidos').value = data.paciente.apellidos || '';
                 document.getElementById('identidad').value = data.paciente.identidad || '';
                 
@@ -830,9 +830,7 @@ function seleccionarPaciente(id) {
 
                 document.getElementById('buscarIdentidad').value = data.paciente.identidad;
                 document.getElementById('listaResultados').style.display = 'none';
-                document.getElementById('mensajeBusqueda').innerHTML = '<div class="alert alert-success alert-custom mt-2"><i class="fas fa-check-circle"></i> Datos cargados correctamente</div>';
-
-                setTimeout(() => { document.getElementById('mensajeBusqueda').innerHTML = ''; }, 2000);
+              
             }
         })
         .catch(() => {
