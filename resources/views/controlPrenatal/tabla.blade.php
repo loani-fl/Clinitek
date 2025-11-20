@@ -38,13 +38,6 @@
             @endforeach
         </tbody>
     </table>
-@else
-    <div class="text-center py-4">
-        <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
-        <p class="mt-2">No hay controles prenatales registrados</p>
-        <a href="{{ route('controles-prenatales.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Registrar primer control
-        </a>
-    </div>
+
 @endif
 </div>
