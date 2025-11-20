@@ -160,7 +160,7 @@ public function show($id)
 {
     $orden = Ultrasonido::with(['paciente', 'medico', 'imagenes'])->findOrFail($id);
 
-    // 1. Mapa de claves a nombres legibles
+    // 1. Mapa de claves a nombres legibles - TODOS los ultrasonidos
     $mapaNombres = [
         'higado' => 'Ultrasonido Hígado',
         'vesicula' => 'Ultrasonido Vesícula',
@@ -169,6 +169,26 @@ public function show($id)
         'ovarico' => 'Ultrasonido Ovarios',
         'utero' => 'Ultrasonido Útero',
         'tiroides' => 'Ultrasonido Tiroides',
+        'pelvico_transabdominal' => 'Ultrasonido pélvico transabdominal',
+        'transvaginal' => 'Ultrasonido transvaginal',
+        'sonohisterografia' => 'Sonohisterografía',
+        'doppler_ginecologico' => 'Ultrasonido Doppler ginecológico',
+        'obstetrico_temprano' => 'Ultrasonido obstétrico temprano',
+        'morfologico' => 'Ultrasonido morfológico',
+        'crecimiento_fetal' => 'Ultrasonido de crecimiento fetal',
+        'bienestar_fetal' => 'Ultrasonido de bienestar fetal',
+        'ultrasonido_3d' => 'Ultrasonido 3D',
+        'ultrasonido_4d' => 'Ultrasonido 4D',
+        'ovario_utero' => 'Ultrasonido de ovario y útero',
+        'control_diu' => 'Ultrasonido para control de DIU',
+        'deteccion_endometriosis' => 'Ultrasonido para detección de endometriosis',
+        'mamario' => 'Ultrasonido mamario',
+        'tiroides_adicional' => 'Ultrasonido de tiroides',
+        'pelvis_con_contraste' => 'Ultrasonido de pelvis con contraste',
+        'folicular' => 'Ultrasonido folicular',
+        'placenta' => 'Ultrasonido de placenta',
+        'transrectal' => 'Ultrasonido transrectal',
+        'mama_3d' => 'Ultrasonido de mama 3D',
     ];
 
     // 2. Claves ordenadas para la vista
@@ -185,7 +205,6 @@ public function show($id)
         'imagenesAgrupadas'
     ));
 }
-
 public function analisis($id)
 {
     $orden = Ultrasonido::with([
@@ -203,7 +222,7 @@ public function analisis($id)
     // Solo mostrar médicos de Ginecología
     $medicos = Medico::where('especialidad', 'Ginecología')->get();
 
-    // Mapear claves a nombres legibles
+      // Mapear claves a nombres legibles - TODOS los ultrasonidos
     $mapaNombres = [
         'higado' => 'Ultrasonido Hígado',
         'vesicula' => 'Ultrasonido Vesícula',
@@ -212,6 +231,26 @@ public function analisis($id)
         'ovarico' => 'Ultrasonido Ovarios',
         'utero' => 'Ultrasonido Útero',
         'tiroides' => 'Ultrasonido Tiroides',
+        'pelvico_transabdominal' => 'Ultrasonido pélvico transabdominal',
+        'transvaginal' => 'Ultrasonido transvaginal',
+        'sonohisterografia' => 'Sonohisterografía',
+        'doppler_ginecologico' => 'Ultrasonido Doppler ginecológico',
+        'obstetrico_temprano' => 'Ultrasonido obstétrico temprano',
+        'morfologico' => 'Ultrasonido morfológico',
+        'crecimiento_fetal' => 'Ultrasonido de crecimiento fetal',
+        'bienestar_fetal' => 'Ultrasonido de bienestar fetal',
+        'ultrasonido_3d' => 'Ultrasonido 3D',
+        'ultrasonido_4d' => 'Ultrasonido 4D',
+        'ovario_utero' => 'Ultrasonido de ovario y útero',
+        'control_diu' => 'Ultrasonido para control de DIU',
+        'deteccion_endometriosis' => 'Ultrasonido para detección de endometriosis',
+        'mamario' => 'Ultrasonido mamario',
+        'tiroides_adicional' => 'Ultrasonido de tiroides',
+        'pelvis_con_contraste' => 'Ultrasonido de pelvis con contraste',
+        'folicular' => 'Ultrasonido folicular',
+        'placenta' => 'Ultrasonido de placenta',
+        'transrectal' => 'Ultrasonido transrectal',
+        'mama_3d' => 'Ultrasonido de mama 3D',
     ];
 
     $examenesSeleccionados = collect($orden->examenes ?? [])
@@ -253,16 +292,36 @@ public function guardarAnalisis(Request $request, $id)
     $imagenes = $request->file('imagenes');
     $descripciones = $request->input('descripciones', []);
 
-    // Mapear claves a nombres legibles para mensajes de error
-    $mapaNombres = [
-        'higado' => 'Ultrasonido Hígado',
-        'vesicula' => 'Ultrasonido Vesícula',
-        'bazo' => 'Ultrasonido Bazo',
-        'vejiga' => 'Ultrasonido Vejiga',
-        'ovarico' => 'Ultrasonido Ovarios',
-        'utero' => 'Ultrasonido Útero',
-        'tiroides' => 'Ultrasonido Tiroides',
-    ];
+   // Mapear claves a nombres legibles para mensajes de error - DENTRO del método guardarAnalisis
+$mapaNombres = [
+    'higado' => 'Ultrasonido Hígado',
+    'vesicula' => 'Ultrasonido Vesícula',
+    'bazo' => 'Ultrasonido Bazo',
+    'vejiga' => 'Ultrasonido Vejiga',
+    'ovarico' => 'Ultrasonido Ovarios',
+    'utero' => 'Ultrasonido Útero',
+    'tiroides' => 'Ultrasonido Tiroides',
+    'pelvico_transabdominal' => 'Ultrasonido pélvico transabdominal',
+    'transvaginal' => 'Ultrasonido transvaginal',
+    'sonohisterografia' => 'Sonohisterografía',
+    'doppler_ginecologico' => 'Ultrasonido Doppler ginecológico',
+    'obstetrico_temprano' => 'Ultrasonido obstétrico temprano',
+    'morfologico' => 'Ultrasonido morfológico',
+    'crecimiento_fetal' => 'Ultrasonido de crecimiento fetal',
+    'bienestar_fetal' => 'Ultrasonido de bienestar fetal',
+    'ultrasonido_3d' => 'Ultrasonido 3D',
+    'ultrasonido_4d' => 'Ultrasonido 4D',
+    'ovario_utero' => 'Ultrasonido de ovario y útero',
+    'control_diu' => 'Ultrasonido para control de DIU',
+    'deteccion_endometriosis' => 'Ultrasonido para detección de endometriosis',
+    'mamario' => 'Ultrasonido mamario',
+    'tiroides_adicional' => 'Ultrasonido de tiroides',
+    'pelvis_con_contraste' => 'Ultrasonido de pelvis con contraste',
+    'folicular' => 'Ultrasonido folicular',
+    'placenta' => 'Ultrasonido de placenta',
+    'transrectal' => 'Ultrasonido transrectal',
+    'mama_3d' => 'Ultrasonido de mama 3D',
+];
 
     // Validar cada grupo de exámenes
     foreach ($examenesKeys as $index => $examenKey) {

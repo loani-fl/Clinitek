@@ -454,11 +454,44 @@
 
 <script>
 // Contador global para índices únicos de imágenes por examen
+// Contador global para índices únicos de imágenes por examen
 let imageCounters = {};
 
-// Mostrar mensajes dinámicos con scroll a la página
-function mostrarMensaje(mensaje, tipo='error') {
-    const container = document.getElementById('mensaje-dinamico-container');
+// Mostrar mensaje específico para médico analista
+function mostrarMensajeMedico(mensaje, tipo='error') {
+    const patientBlock = document.querySelector('.patient-block');
+    if(!patientBlock) return;
+    
+    // Buscar el h5 de "Médico analista"
+    const h5Elements = patientBlock.querySelectorAll('h5');
+    let medicoH5 = null;
+    h5Elements.forEach(h5 => {
+        if(h5.textContent.includes('Médico analista')) {
+            medicoH5 = h5;
+        }
+    });
+    
+    if(!medicoH5) return;
+    
+    // Buscar o crear el contenedor de mensajes
+    let container = patientBlock.querySelector('.mensaje-medico-container');
+    if(!container) {
+        container = document.createElement('div');
+        container.className = 'mensaje-medico-container';
+        container.style.width = '100%';
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.alignItems = 'center';
+        container.style.gap = '0.4rem';
+        container.style.marginBottom = '0.8rem';
+        container.style.marginTop = '0.5rem';
+        container.style.position = 'relative';
+        container.style.zIndex = '1';
+        
+        // Insertar después del h5 de Médico analista
+        medicoH5.parentNode.insertBefore(container, medicoH5.nextSibling);
+    }
+    
     container.innerHTML = '';
     const div = document.createElement('div');
     div.className = 'alert-dinamico ' + tipo;
@@ -474,6 +507,7 @@ function mostrarMensaje(mensaje, tipo='error') {
     div.style.fontWeight = '600';
     div.style.fontSize = '0.85rem';
     div.style.whiteSpace = 'pre-line';
+    
     if(tipo === 'error'){ 
         div.style.backgroundColor = '#f8d7da'; 
         div.style.color = '#721c24'; 
@@ -494,7 +528,90 @@ function mostrarMensaje(mensaje, tipo='error') {
     window.scrollTo({ top: rect.top + scrollTop - 100, behavior: 'smooth' });
 
     setTimeout(() => { div.style.opacity = '1'; div.style.transform = 'translateY(0)'; }, 50);
-    setTimeout(() => { div.style.opacity = '0'; setTimeout(() => { if(div.parentNode) container.removeChild(div); }, 400); }, 4000);
+    setTimeout(() => { 
+        div.style.opacity = '0'; 
+        setTimeout(() => { 
+            if(div.parentNode) container.removeChild(div); 
+        }, 400); 
+    }, 4000);
+}
+
+// Mostrar mensajes dinámicos específicos para cada ultrasonido
+function mostrarMensaje(mensaje, tipo='error', examenId=null) {
+    let container;
+    
+    // Si se especifica un examenId, crear el contenedor dentro de ese examen específico
+    if(examenId !== null) {
+        const examenCard = document.querySelector(`.examen-card[data-examen-index="${examenId}"]`);
+        if(!examenCard) return;
+        
+        // Buscar o crear el contenedor de mensajes para este examen específico
+        container = examenCard.querySelector('.mensaje-examen-container');
+        if(!container) {
+            container = document.createElement('div');
+            container.className = 'mensaje-examen-container';
+            container.style.width = '100%';
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.style.alignItems = 'center';
+            container.style.gap = '0.4rem';
+            container.style.marginBottom = '0.8rem';
+            container.style.marginTop = '0.5rem';
+            container.style.position = 'relative';
+            container.style.zIndex = '1';
+            
+            // Insertar después del título del examen
+            const examenNombre = examenCard.querySelector('.examen-nombre');
+            examenNombre.parentNode.insertBefore(container, examenNombre.nextSibling);
+        }
+    } else {
+        // Mensaje general arriba de todo
+        container = document.getElementById('mensaje-dinamico-container');
+        if(!container) return;
+    }
+    
+    container.innerHTML = '';
+    const div = document.createElement('div');
+    div.className = 'alert-dinamico ' + tipo;
+    div.textContent = mensaje;
+    div.style.display = 'inline-block';
+    div.style.textAlign = 'center';
+    div.style.padding = '7px 11px';
+    div.style.borderRadius = '5px';
+    div.style.margin = '8px auto';
+    div.style.maxWidth = 'fit-content';
+    div.style.transition = 'opacity 0.4s, transform 0.4s';
+    div.style.opacity = '0';
+    div.style.fontWeight = '600';
+    div.style.fontSize = '0.85rem';
+    div.style.whiteSpace = 'pre-line';
+    
+    if(tipo === 'error'){ 
+        div.style.backgroundColor = '#f8d7da'; 
+        div.style.color = '#721c24'; 
+        div.style.border = '1px solid #f5c6cb'; 
+    } else if(tipo === 'exito'){ 
+        div.style.backgroundColor = '#d4edda'; 
+        div.style.color = '#155724'; 
+        div.style.border = '1px solid #c3e6cb'; 
+    } else if(tipo === 'info'){ 
+        div.style.backgroundColor = '#d1ecf1'; 
+        div.style.color = '#0c5460'; 
+        div.style.border = '1px solid #bee5eb'; 
+    }
+    container.appendChild(div);
+
+    const rect = div.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    window.scrollTo({ top: rect.top + scrollTop - 100, behavior: 'smooth' });
+
+    setTimeout(() => { div.style.opacity = '1'; div.style.transform = 'translateY(0)'; }, 50);
+    setTimeout(() => { 
+        div.style.opacity = '0'; 
+        setTimeout(() => { 
+            if(div.parentNode) container.removeChild(div); 
+        }, 400); 
+    }, 4000);
 }
 
 // Previsualizar imagen con mensaje de error dentro del bloque
@@ -552,7 +669,7 @@ function addImageBlock(examenId, nombreExamen){
     const blocks = container.querySelectorAll('.image-description-block');
     if(blocks.length >= 3){ 
         document.getElementById('btn-agregar-'+examenId).disabled=true; 
-        mostrarMensaje('Máximo 3 imágenes por ultrasonido.', 'info'); 
+        mostrarMensaje(`Máximo 3 imágenes por ultrasonido de ${nombreExamen}.`, 'info', examenId); 
         return; 
     }
 
@@ -629,7 +746,7 @@ function removeBlock(button, examenId){
 document.getElementById('form-analisis').addEventListener('submit', function(event){
     const medico = this.querySelector('#medico_id');
     if(!medico.value){ 
-        mostrarMensaje('El médico es obligatorio.', 'error'); 
+        mostrarMensajeMedico('El médico es obligatorio.', 'error'); 
         medico.focus();
         event.preventDefault();
         return;
@@ -639,11 +756,12 @@ document.getElementById('form-analisis').addEventListener('submit', function(eve
 
     for(let i=0; i<examenesCards.length; i++){
         const card = examenesCards[i];
+        const examenId = card.getAttribute('data-examen-index');
         const nombreExamen = card.querySelector('.examen-nombre').childNodes[0].textContent.trim();
         const bloques = card.querySelectorAll('.image-description-block');
 
         if(bloques.length === 0){
-            mostrarMensaje(`Se debe realizar al menos un análisis de ${nombreExamen}.`, 'error');
+            mostrarMensaje(`Se debe realizar al menos un análisis de ${nombreExamen}.`, 'error', examenId);
             event.preventDefault();
             return;
         }
@@ -654,7 +772,7 @@ document.getElementById('form-analisis').addEventListener('submit', function(eve
             const textarea = bloque.querySelector('textarea');
 
             if(!fileInput || fileInput.files.length===0){
-                mostrarMensaje(`Falta la imagen de ${nombreExamen}.`, 'error'); 
+                mostrarMensaje(`Falta la imagen de ${nombreExamen}.`, 'error', examenId); 
                 if(fileInput) fileInput.focus();
                 event.preventDefault();
                 return;
@@ -668,7 +786,7 @@ document.getElementById('form-analisis').addEventListener('submit', function(eve
             }
 
             if(!textarea.value.trim()){
-                mostrarMensaje(`Falta la descripción de ${nombreExamen}.`, 'error'); 
+                mostrarMensaje(`Falta la descripción de ${nombreExamen}.`, 'error', examenId); 
                 textarea.focus();
                 event.preventDefault();
                 return;
