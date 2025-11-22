@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use App\Models\Usuario;
+ use Illuminate\Support\Facades\Auth;
 
 class RolePermissionMiddleware
 {
@@ -19,16 +20,14 @@ class RolePermissionMiddleware
      */
     public function handle(Request $request, Closure $next, $roles = null, $permission = null)
     {
-        // Obtener usuario de la sesión
-        $userId = $request->session()->get('usuario_id');
-        if (!$userId) {
-            return redirect()->route('login.form');
-        }
+        
 
-        $user = Usuario::find($userId);
-        if (!$user) {
-            return redirect()->route('login.form');
-        }
+// Obtener usuario autenticado con Laravel
+$user = Auth::user();
+if (!$user) {
+    return redirect()->route('login.form');
+}
+
 
         // Validar roles (puede ser más de uno, separados por "|")
         if ($roles) {

@@ -10,21 +10,18 @@ use Spatie\Permission\Traits\HasRoles;
 class Usuario extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles;
-    use HasRoles;
-
 
     protected $table = 'usuarios';
 
     protected $fillable = [
         'name',
         'email',
-        'rol',
+        'rol',      // Este campo puedes usarlo para referencia, pero Spatie maneja roles en otra tabla
         'password',
     ];
 
     protected $hidden = [
         'password',
-        'remember_token'
+        'remember_token',
     ];
 }
-
