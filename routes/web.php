@@ -151,6 +151,13 @@ Route::middleware(['auth.custom'])->group(function () {
         Route::get('/usuarios/{usuario}/edit', [UsuarioController::class, 'edit'])->name('usuarios.edit');
         Route::put('/usuarios/{usuario}', [UsuarioController::class, 'update'])->name('usuarios.update');
         Route::delete('/usuarios/{usuario}', [UsuarioController::class, 'destroy'])->name('usuarios.destroy');
+        // Mostrar formulario para asignar roles/permisos
+        Route::get('usuarios/{id}/asignar', [UsuarioController::class, 'asignarVista'])
+            ->name('usuarios.asignar');
+
+// Guardar cambios de roles/permisos
+        Route::post('usuarios/{id}/asignar', [UsuarioController::class, 'asignarUpdate'])
+            ->name('usuarios.asignar.update');
     });
 
 });

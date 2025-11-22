@@ -45,9 +45,9 @@
 
 
 
-                <form action="{{ route('usuarios.updateRoles', $user->id) }}" method="POST">
+                <form action="{{ route('usuarios.asignar.update', $user->id) }}" method="POST">
                     @csrf
-                    @method('PUT')
+
 
                     <h5 class="mb-3">Seleccione un Rol:</h5>
 

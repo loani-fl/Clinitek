@@ -27,9 +27,9 @@
 
 
 
-                    <a href="{{ route('usuarios.show', $usuario->id) }}" class="btn btn-ver" title="Ver">
-                        <i class="bi bi-eye"></i>
-                    </a>
+
+
+
                     <a href="{{ route('usuarios.edit', $usuario->id) }}" class="btn btn-editar" title="Editar">
                         <i class="bi bi-pencil"></i>
                     </a>
