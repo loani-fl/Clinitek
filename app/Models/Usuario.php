@@ -10,6 +10,8 @@ use Spatie\Permission\Traits\HasRoles;
 class Usuario extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles;
+    use HasRoles;
+
 
     protected $table = 'usuarios';
 

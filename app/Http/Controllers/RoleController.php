@@ -67,6 +67,7 @@ class RoleController extends Controller
         ));
     }
 
+
     public function store(Request $request)
     {
         $request->validate([
@@ -87,10 +88,10 @@ class RoleController extends Controller
     {
         // Obtener todos los permisos
         $permissions = Permission::all();
-        
+
         // Obtener los permisos actuales del rol
         $rolePermissions = $role->permissions->pluck('id')->toArray();
-        
+
         // Agrupar permisos por secciones
         $usuarios = $permissions->filter(fn($p) => str_starts_with($p->name, 'usuarios.'));
         $ultrasonidos = $permissions->filter(fn($p) => str_starts_with($p->name, 'ultrasonidos.'));

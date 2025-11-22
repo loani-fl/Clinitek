@@ -9,9 +9,9 @@ class AuthCustom
 {
     public function handle(Request $request, Closure $next)
     {
-        // Si NO hay sesión → mandar al login
-        if (!session()->has('usuario_id')) {
-            return redirect()->route('login.form');
+        // Verifica si el usuario tiene sesión
+        if (!$request->session()->has('usuario_id')) {
+            return redirect()->route('login.form'); // Redirige a login si no está logueado
         }
 
         return $next($request);

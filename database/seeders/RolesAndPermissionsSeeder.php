@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-
+use App\Models\Usuario;
 class RolesAndPermissionsSeeder extends Seeder
 {
     public function run()
@@ -216,7 +216,6 @@ class RolesAndPermissionsSeeder extends Seeder
          * ============================================================= */
         $admin = Role::firstOrCreate(['name' => 'administrador']);
         $medico = Role::firstOrCreate(['name' => 'medico']);
-        $paciente = Role::firstOrCreate(['name' => 'paciente']);
         $empleado = Role::firstOrCreate(['name' => 'empleado']);
 
         /* =============================================================
@@ -271,20 +270,19 @@ class RolesAndPermissionsSeeder extends Seeder
             'pacientes.show',
         ]);
 
-        // PACIENTE
-        $paciente->syncPermissions([
-            'consultas.show',
-            'consultas.create',
-            'pacientes.show',
-            'pacientes.create',
-            'pacientes.edit',
-        ]);
-
         $empleado->syncPermissions([
 
             'empleado.show',
             'empleado.create',
             'empleado.edit',
+
         ]);
+
+// ID del usuario administrador
+        $usuario = Usuario::find(2);
+        $usuario->assignRole('administrador');
+
     }
+
+
 }
