@@ -34,15 +34,24 @@
     color: #003b70;
     margin: 2rem 0 1rem 0;
     padding-bottom: 6px;
-    border-bottom: 3px solid #007BFF; /* Franja horizontal */
+    border-bottom: 3px solid #007BFF;
     width: 100%;
 }
 
+.icon-valid {
+    color: green;
+    font-weight: bold;
+}
+
+.icon-invalid {
+    color: red;
+    font-weight: bold;
+}
 </style>
 
 <div class="custom-card">
 
-    <h2 class="fw-bold text-center mb-4" style="color:#003b70;">Crear Usuario</h2>
+    <h2 class="fw-bold text-center mb-4" style="color:#003b70;">Crear usuario</h2>
 
     <form id="formUsuario" action="{{ route('usuarios.store') }}" method="POST" novalidate>
         @csrf
@@ -52,7 +61,7 @@
 
         <div class="row mb-4">
             <div class="col-md-6 mb-3">
-                <label for="name" class="form-label">Nombre completo <span class="text-danger">*</span></label>
+                <label class="form-label">Nombre completo <span class="text-danger">*</span></label>
                 <input type="text"
                        name="name"
                        id="name"
@@ -61,22 +70,19 @@
                        required
                        class="form-control @error('name') is-invalid @enderror"
                        value="{{ old('name') }}">
-                <div class="invalid-feedback">Solo letras y espacios.</div>
                 @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
             <div class="col-md-6 mb-3">
-                <label for="email" class="form-label">Correo electrónico <span class="text-danger">*</span></label>
+                <label class="form-label">Correo electrónico <span class="text-danger">*</span></label>
                 <input type="email"
                        name="email"
                        id="email"
                        maxlength="50"
                        placeholder="ejemplo@correo.com"
-                       pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                        required
                        class="form-control @error('email') is-invalid @enderror"
                        value="{{ old('email') }}">
-                <div class="invalid-feedback" id="emailFeedback">Ingrese un correo válido.</div>
                 @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
@@ -85,21 +91,47 @@
         <p class="section-title">Credenciales</p>
 
         <div class="row mb-4">
+
+            {{-- Contraseña --}}
             <div class="col-md-6 mb-3">
-                <label for="password" class="form-label">Contraseña <span class="text-danger">*</span></label>
-                <input type="password"
-                       name="password"
-                       id="password"
-                       minlength="8"
-                       maxlength="20"
-                       pattern="(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}"
-                       required
-                       class="form-control @error('password') is-invalid @enderror">
+                <label class="form-label">Contraseña <span class="text-danger">*</span></label>
+
+                <div class="input-group">
+                    <input type="password"
+                           name="password"
+                           id="password"
+                           minlength="8"
+                           maxlength="20"
+                           required
+                           class="form-control @error('password') is-invalid @enderror">
+
+                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                        <i class="bi bi-eye-fill"></i>
+                    </button>
+                </div>
+
+                <!-- Lista de requisitos -->
+                <ul id="passwordRules" class="mt-2" style="font-size:14px; list-style:none; padding-left:0;">
+                    <li id="rule-length" class="text-danger">
+                        <span class="icon-invalid">✖</span> Mínimo 8 caracteres
+                    </li>
+                    <li id="rule-uppercase" class="text-danger">
+                        <span class="icon-invalid">✖</span> Al menos una letra mayúscula
+                    </li>
+                    <li id="rule-number" class="text-danger">
+                        <span class="icon-invalid">✖</span> Al menos un número
+                    </li>
+                    <li id="rule-special" class="text-danger">
+                        <span class="icon-invalid">✖</span> Al menos un carácter especial (!.@#$%^&*)
+                    </li>
+                </ul>
+
                 @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
+            {{-- Confirmar contraseña --}}
             <div class="col-md-6 mb-3">
-                <label for="password_confirmation" class="form-label">Confirmar contraseña <span class="text-danger">*</span></label>
+                <label class="form-label">Confirmar contraseña <span class="text-danger">*</span></label>
                 <input type="password"
                        name="password_confirmation"
                        id="password_confirmation"
@@ -109,11 +141,12 @@
                        class="form-control">
                 <div class="invalid-feedback">Las contraseñas no coinciden.</div>
             </div>
+
         </div>
 
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-4">
-            <button type="submit" class="btn btn-primary px-4">
+            <button type="submit" id="btnCrear" class="btn btn-primary px-4">
                 <i class="bi bi-plus-circle"></i> Crear usuario
             </button>
 
@@ -132,41 +165,99 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Botón limpiar
-    document.getElementById('btnLimpiar').addEventListener('click', () => {
-        const form = document.getElementById('formUsuario');
-        form.reset();
-        form.querySelectorAll('.is-valid, .is-invalid').forEach(el => {
-            el.classList.remove('is-valid', 'is-invalid');
-        });
-    });
-
-    // Validación nombre
-    document.getElementById('name').addEventListener('keypress', function(e) {
-        const regex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]$/;
-        if (!regex.test(String.fromCharCode(e.charCode))) e.preventDefault();
-    });
-
-    // Validación email
-    const email = document.getElementById('email');
-    email.addEventListener('input', () => {
-        const pattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
-        email.classList.toggle('is-invalid', !pattern.test(email.value));
-        email.classList.toggle('is-valid', pattern.test(email.value));
-    });
-
-    // Validación contraseñas
     const password = document.getElementById('password');
-    const passwordConfirm = document.getElementById('password_confirmation');
+    const confirmation = document.getElementById('password_confirmation');
 
-    function validarPassword() {
-        if (passwordConfirm.value === "") return passwordConfirm.classList.remove('is-valid', 'is-invalid');
-        passwordConfirm.classList.toggle('is-valid', password.value === passwordConfirm.value);
-        passwordConfirm.classList.toggle('is-invalid', password.value !== passwordConfirm.value);
+    const reglas = {
+        length: false,
+        uppercase: false,
+        number: false,
+        special: false
+    };
+
+    // Limpiar formulario
+    document.getElementById('btnLimpiar').addEventListener('click', () => {
+        document.getElementById('formUsuario').reset();
+        document.querySelectorAll('.is-valid, .is-invalid')
+                .forEach(el => el.classList.remove('is-valid', 'is-invalid'));
+        resetReglas();
+    });
+
+    function resetReglas() {
+        Object.keys(reglas).forEach(r => reglas[r] = false);
+        ['rule-length','rule-uppercase','rule-number','rule-special'].forEach(id => {
+            const li = document.getElementById(id);
+            li.classList.remove('text-success');
+            li.classList.add('text-danger');
+            li.querySelector('span').textContent = '✖';
+            li.querySelector('span').classList.add('icon-invalid');
+            li.querySelector('span').classList.remove('icon-valid');
+        });
     }
 
-    password.addEventListener('input', validarPassword);
-    passwordConfirm.addEventListener('input', validarPassword);
+    // Validación de contraseña
+    password.addEventListener('input', () => {
+        const value = password.value;
+
+        reglas.length   = value.length >= 8;
+        reglas.uppercase = /[A-Z]/.test(value);
+        reglas.number    = /[0-9]/.test(value);
+        reglas.special   = /[!@#$%^&*]/.test(value);
+
+        actualizarRegla('rule-length', reglas.length);
+        actualizarRegla('rule-uppercase', reglas.uppercase);
+        actualizarRegla('rule-number', reglas.number);
+        actualizarRegla('rule-special', reglas.special);
+
+        validarConfirmacion();
+    });
+
+    function actualizarRegla(id, estado) {
+        const li = document.getElementById(id);
+        const icon = li.querySelector('span');
+
+        if (estado) {
+            li.classList.remove('text-danger');
+            li.classList.add('text-success');
+            icon.textContent = "✔";
+            icon.classList.remove('icon-invalid');
+            icon.classList.add('icon-valid');
+        } else {
+            li.classList.add('text-danger');
+            li.classList.remove('text-success');
+            icon.textContent = "✖";
+            icon.classList.add('icon-invalid');
+            icon.classList.remove('icon-valid');
+        }
+    }
+
+    // Confirmación de contraseña
+    confirmation.addEventListener('input', validarConfirmacion);
+
+    function validarConfirmacion() {
+        if (!confirmation.value) {
+            confirmation.classList.remove('is-valid', 'is-invalid');
+            return;
+        }
+        if (confirmation.value === password.value) {
+            confirmation.classList.add('is-valid');
+            confirmation.classList.remove('is-invalid');
+        } else {
+            confirmation.classList.add('is-invalid');
+            confirmation.classList.remove('is-valid');
+        }
+    }
+
+    // Mostrar/ocultar contraseña
+    document.getElementById('togglePassword').addEventListener('click', () => {
+        const type = password.type === "password" ? "text" : "password";
+        password.type = type;
+        confirmation.type = type;
+
+        const icon = document.querySelector('#togglePassword i');
+        icon.classList.toggle('bi-eye-fill');
+        icon.classList.toggle('bi-eye-slash-fill');
+    });
 
 });
 </script>

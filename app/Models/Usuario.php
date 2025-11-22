@@ -16,7 +16,6 @@ class Usuario extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'rol',      // Este campo puedes usarlo para referencia, pero Spatie maneja roles en otra tabla
         'password',
     ];
 
