@@ -4,6 +4,7 @@ namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
+
 class Kernel extends HttpKernel
 {
     /**
@@ -67,17 +68,11 @@ class Kernel extends HttpKernel
          'auth.custom' => \App\Http\Middleware\AuthCustom::class,
     ];
     protected $routeMiddleware = [
-        // ...
         'check.sesion' => \App\Http\Middleware\CheckSesion::class,
         'auth.custom' => \App\Http\Middleware\AuthCustom::class,
+        'role.permission' => \App\Http\Middleware\RolePermissionMiddleware::class, // tu middleware personalizado
 
-    // otros middlewares...
-    'role.permission' => \App\Http\Middleware\RolePermissionMiddleware::class,
-];
-
-
-
-
+    ];
 
 
 }

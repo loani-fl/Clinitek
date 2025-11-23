@@ -84,61 +84,34 @@
 
             {{-- PREPARAR COLECCIÓN DE PERMISOS --}}
             @php
-                // Soportar tanto $permissions como $permisos según cómo lo pase el controlador
-                $allPermissions = null;
-                if (isset($permissions) && $permissions) {
-                    $allPermissions = collect($permissions);
-                } elseif (isset($permisos) && $permisos) {
-                    $allPermissions = collect($permisos);
-                } else {
-                    $allPermissions = collect();
-                }
-
-                // Si el controlador ya pasó las secciones (ej. $usuarios, $pacientes...), preferimos usarlas
-                $useSectionsFromController = false;
-                $controllerSections = [];
-                if (isset($usuarios)) { $useSectionsFromController = true; $controllerSections['Usuarios'] = $usuarios; }
-                if (isset($pacientes)) { $useSectionsFromController = true; $controllerSections['Pacientes'] = $pacientes; }
-                if (isset($medicos)) { $useSectionsFromController = true; $controllerSections['Médicos'] = $medicos; }
-                if (isset($empleado)) { $useSectionsFromController = true; $controllerSections['Empleados'] = $empleado; }
-                if (isset($consultas)) { $useSectionsFromController = true; $controllerSections['Consultas'] = $consultas; }
-                if (isset($controlPrenatal)) { $useSectionsFromController = true; $controllerSections['Control Prenatal'] = $controlPrenatal; }
-                if (isset($recetas)) { $useSectionsFromController = true; $controllerSections['Recetas'] = $recetas; }
-                if (isset($rayosX)) { $useSectionsFromController = true; $controllerSections['Rayos X'] = $rayosX; }
-                if (isset($ultrasonidos)) { $useSectionsFromController = true; $controllerSections['Ultrasonidos'] = $ultrasonidos; }
-                if (isset($inventario)) { $useSectionsFromController = true; $controllerSections['Inventario'] = $inventario; }
-                if (isset($farmacias)) { $useSectionsFromController = true; $controllerSections['Farmacias'] = $farmacias; }
-                if (isset($hospitalizacion)) { $useSectionsFromController = true; $controllerSections['Hospitalización'] = $hospitalizacion; }
-                if (isset($diagnosticos)) { $useSectionsFromController = true; $controllerSections['Diagnósticos'] = $diagnosticos; }
-                if (isset($emergencias)) { $useSectionsFromController = true; $controllerSections['Emergencias'] = $emergencias; }
-                if (isset($puestos)) { $useSectionsFromController = true; $controllerSections['Puestos'] = $puestos; }
-                if (isset($examenes)) { $useSectionsFromController = true; $controllerSections['Exámenes'] = $examenes; }
-                if (isset($sesiones)) { $useSectionsFromController = true; $controllerSections['Sesiones'] = $sesiones; }
-                if (isset($dashboard)) { $useSectionsFromController = true; $controllerSections['Dashboard'] = $dashboard; }
-
-                // Si no pasaron secciones desde el controlador, crear secciones automáticas por prefijo
-                if (!$useSectionsFromController) {
-                    $controllerSections = [
-                        'Usuarios' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'usuarios.')),
-                        'Pacientes' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'pacientes.')),
-                        'Médicos' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'medicos.')),
-                        'Empleados' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'empleado.')),
-                        'Consultas' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'consultas.')),
-                        'Control Prenatal' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'controlPrenatal.')),
-                        'Recetas' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'recetas.')),
-                        'Rayos X' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'rayosX.')),
-                        'Ultrasonidos' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'ultrasonidos.')),
-                        'Inventario' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'inventario.')),
-                        'Farmacias' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'farmacias.')),
-                        'Hospitalización' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'hospitalizacion.')),
-                        'Diagnósticos' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'diagnosticos.')),
-                        'Emergencias' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'emergencias.')),
-                        'Puestos' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'puestos.')),
-                        'Exámenes' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'examenes.')),
-                        'Sesiones' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'sesiones.')),
-                        'Dashboard' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'dashboard.')),
-                    ];
-                }
+                $allPermissions = collect($permissions ?? $permisos ?? []);
+                $controllerSections = [
+                    'Usuarios' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'usuarios.')),
+                    'Pacientes' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'pacientes.')),
+                    'Médicos' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'medicos.')),
+                    'Empleados' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'empleado.')),
+                    'Consultas' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'consultas.')),
+                    'Control Prenatal' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'controlPrenatal.')),
+                    'Recetas' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'recetas.')),
+                    'Rayos X' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'rayosX.')),
+                    'Ultrasonidos' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'ultrasonidos.')),
+                    'Inventario' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'inventario.')),
+                    'Farmacias' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'farmacias.')),
+                    'Hospitalización' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'hospitalizacion.')),
+                    'Diagnósticos' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'diagnosticos.')),
+                    'Emergencias' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'emergencias.')),
+                    'Puestos' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'puestos.')),
+                    'Exámenes' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'examenes.')),
+                    'Sesiones' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'sesiones.')),
+                    'Dashboard' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'dashboard.')),
+                ];
+                $accionesBonitas = [
+                    'Index' => 'Listar',
+                    'Show' => 'Ver',
+                    'Create' => 'Crear',
+                    'Edit' => 'Editar',
+                    'Delete' => 'Eliminar',
+                ];
             @endphp
 
             <div class="row mb-3">
@@ -149,10 +122,10 @@
                     </div>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-md-12">
                     <h5 class="section-title">Permisos del Rol</h5>
-
                     <div class="row">
                         @foreach($controllerSections as $sectionName => $permList)
                             @if($permList && $permList->count() > 0)
@@ -160,15 +133,20 @@
                                     <h6 class="fw-bold text-primary">{{ $sectionName }}</h6>
 
                                     @foreach($permList as $perm)
+                                        @php
+                                            $partes = explode('.', $perm->name);
+                                            $modulo = ucfirst($partes[0] ?? '');
+                                            $accion = ucfirst($partes[1] ?? '');
+                                            $accion = $accionesBonitas[$accion] ?? $accion;
+                                        @endphp
                                         <div class="form-check mb-1">
                                             <input class="form-check-input"
                                                    type="checkbox"
                                                    name="permissions[]"
                                                    value="{{ $perm->name }}"
                                                    id="perm_{{ \Illuminate\Support\Str::slug($perm->name) }}">
-
                                             <label class="form-check-label" for="perm_{{ \Illuminate\Support\Str::slug($perm->name) }}">
-                                                {{ ucfirst(str_replace(['.', '_'], [' ', ' '], $perm->name)) }}
+                                                {{ $accion }} {{ $modulo }}
                                             </label>
                                         </div>
                                     @endforeach
@@ -183,7 +161,6 @@
                 <button type="submit" class="btn btn-primary px-4">
                     <i class="bi bi-plus-circle"></i> Crear Rol
                 </button>
-
                 <a href="{{ route('roles.index') }}" class="btn btn-success px-4">
                     <i class="bi bi-arrow-left"></i> Regresar
                 </a>

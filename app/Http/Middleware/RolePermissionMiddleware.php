@@ -4,8 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use App\Models\Usuario;
- use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Auth;
 
 class RolePermissionMiddleware
 {
@@ -18,36 +17,36 @@ class RolePermissionMiddleware
      * @param  string|null  $permission
      * @return mixed
      */
-    public function handle(Request $request, Closure $next, $roles = null, $permission = null)
+    public function handle(Request $request, Closure $next, $permission = null)
     {
-        
+        $user = Auth::user();
 
-// Obtener usuario autenticado con Laravel
-$user = Auth::user();
-if (!$user) {
-    return redirect()->route('login.form');
-}
+        if (!$user) {
+            return redirect()->route('login.form');
+        }
 
+        // Administrador global
+        if ($user->hasRole('administrador')) {
+            return $next($request);
+        }
 
-        // Validar roles (puede ser más de uno, separados por "|")
-        if ($roles) {
-            $rolesArray = explode('|', $roles);
-            $hasRole = false;
-            foreach ($rolesArray as $role) {
-                if ($user->hasRole($role)) {
-                    $hasRole = true;
+        // Validar permisos
+        if ($permission) {
+            $permissionsArray = explode('|', $permission);
+            $hasPermission = false;
+
+            foreach ($permissionsArray as $perm) {
+                if ($user->can($perm)) {
+                    $hasPermission = true;
                     break;
                 }
             }
 
-            if (!$hasRole) {
-                abort(403, 'No tienes el rol requerido');
+            if (!$hasPermission) {
+                // Redirigir a login con mensaje
+                return redirect()->route('login.form')
+                    ->with('error', 'No tienes permiso para acceder a esta sección');
             }
-        }
-
-        // Validar permisos si se pasa alguno
-        if ($permission && !$user->can($permission)) {
-            abort(403, 'No tienes permiso para acceder a esta sección');
         }
 
         return $next($request);
