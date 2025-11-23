@@ -14,50 +14,64 @@ class AuthController extends Controller
     {
         return view('auth.login');
     }
-public function login(Request $request)
-{
-    // Validación
+
+    public function login(Request $request)
+    {
+      
+        // Validación con límites de caracteres
     $request->validate([
-        'email' => 'required|email',
-        'password' => 'required|min:6'
+        'email' => [
+            'required',
+            'string',
+            'max:70'   // máximo 100 caracteres
+        ],
+        'password' => [
+            'required',
+            'string',
+            'min:8',    // mínimo 8 caracteres
+            'max:100'   // máximo 128 caracteres
+        ],
     ], [
-        'email.required' => 'El correo electrónico es obligatorio',
-        'email.email' => 'Ingresa un correo electrónico válido',
-        'password.required' => 'La contraseña es obligatoria',
-        'password.min' => 'La contraseña debe tener al menos 6 caracteres'
-    ]);
+            'email.required' => 'El correo o usuario es obligatorio',
+            'password.required' => 'La contraseña es obligatoria',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres'
+        ]);
 
-    $usuario = Usuario::where('email', $request->email)->first();
+        $login = $request->input('email'); // Puede ser correo o nombre
 
-    if (!$usuario || !Hash::check($request->password, $usuario->password)) {
-        return back()
-            ->withInput($request->only('email'))
-            ->withErrors(['email' => 'Correo o contraseña incorrectos']);
+        // Detectar si es correo válido
+        if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+            // Es correo
+            $usuario = Usuario::where('email', $login)->first();
+        } else {
+            // Es nombre de usuario
+            $usuario = Usuario::where('name', $login)->first();
+        }
+
+        // Verificar usuario y contraseña
+        if (!$usuario || !Hash::check($request->password, $usuario->password)) {
+            return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['email' => 'Correo/usuario o contraseña incorrectos']);
+        }
+
+        // Loguear usuario
+        Auth::login($usuario);
+        session(['usuario_id' => $usuario->id]);
+
+        // Redirigir según rol
+        if ($usuario->hasRole('administrador')) {
+            return redirect()->route('usuarios.index');
+        } elseif ($usuario->hasRole('medico')) {
+            return redirect()->route('medicos.index');
+        } elseif ($usuario->hasRole('usuario')) {
+            return redirect()->route('inicio');
+        } elseif ($usuario->hasRole('empleado')) {
+            return redirect()->route('empleados.index');
+        } else {
+            return redirect()->route('inicio');
+        }
     }
-
-    // Loguear usuario con auth de Laravel
-    Auth::login($usuario);
-
-    // Guardar el ID en la sesión para el middleware
-    session(['usuario_id' => $usuario->id]);
-
-    // Redirigir según rol
-  // Redirigir según rol
-if ($usuario->hasRole('administrador')) {
-    return redirect()->route('usuarios.index'); // ya existe
-} elseif ($usuario->hasRole('medico')) {
-    return redirect()->route('medicos.index'); // ya existe
-} elseif ($usuario->hasRole('usuario')) {
-    return redirect()->route('inicio'); // usuarios normales
-} elseif ($usuario->hasRole('empleado')) {
-    return redirect()->route('empleados.index'); // ruta para empleados
-} else {
-    // Si el usuario tiene algún otro rol no previsto, lo llevamos a inicio o ruta por defecto
-    return redirect()->route('inicio');
-}
-
-}
-
 
     // Cerrar sesión
     public function logout()

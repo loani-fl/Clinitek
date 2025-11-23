@@ -522,23 +522,26 @@
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                         <polyline points="22,6 12,13 2,6"/>
                     </svg>
-                    Correo electrónico
+                    Correo electrónico o usuario
                 </label>
-                <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    class="form-control-modern"
-                    placeholder="ejemplo@correo.com"
-                    value="{{ request('email') ?? old('email') }}"
-                    autocomplete="off"
-                >
+               <input
+    type="text"
+    name="email"
+    id="email"
+    class="form-control-modern"
+    placeholder="Correo o usuario"
+    value="{{ request('email') ?? old('email') }}"
+    autocomplete="off"
+     maxlength="70"
+>
+
                 <div class="error-message" id="emailError">
                     @error('email')
                         {{ $message }}
-                    @else
-                        Ingresa un correo electrónico válido
-                    @enderror
+                  @else
+    Ingresa un correo o usuario válido
+@enderror
+
                 </div>
             </div>
 
@@ -558,6 +561,7 @@
                         class="form-control-modern with-icon"
                         placeholder="••••••••"
                         autocomplete="new-password"
+                         maxlength="100"
                     >
                     <button type="button" class="toggle-password" id="togglePassword">
                         <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -672,27 +676,21 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
         }
     });
+function validateEmail() {
+    const email = emailInput.value.trim();
 
-    function validateEmail() {
-        const email = emailInput.value.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (email === '') {
-            emailError.textContent = 'El correo electrónico es obligatorio';
-            emailError.classList.add('show');
-            emailGroup.classList.add('has-error');
-            return false;
-        } else if (!emailRegex.test(email)) {
-            emailError.textContent = 'Ingresa un correo electrónico válido';
-            emailError.classList.add('show');
-            emailGroup.classList.add('has-error');
-            return false;
-        } else {
-            emailError.classList.remove('show');
-            emailGroup.classList.remove('has-error');
-            return true;
-        }
+    if (email === '') {
+        emailError.textContent = 'El correo o usuario es obligatorio';
+        emailError.classList.add('show');
+        emailGroup.classList.add('has-error');
+        return false;
+    } else {
+        emailError.classList.remove('show');
+        emailGroup.classList.remove('has-error');
+        return true;
     }
+}
+
 
     function validatePassword() {
         const password = passwordInput.value;
