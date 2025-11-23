@@ -77,10 +77,10 @@ class UsuarioController extends Controller
     {
         // Crear una copia de los valores originales para restaurar
         $usuarioOriginal = $usuario->replicate();
-    
+
         return view('usuarios.edit', compact('usuario', 'usuarioOriginal'));
     }
-    
+
 
     public function update(Request $request, Usuario $usuario)
     {
@@ -171,19 +171,12 @@ class UsuarioController extends Controller
         ));
     }
 
-
     public function asignarUpdate(Request $request, $id)
     {
         $user = Usuario::findOrFail($id);
+        $user->syncRoles($request->input('role')); // un solo rol
 
-        $roles = $request->input('roles', []);
-        $permisos = $request->input('permisos', []);
-
-        $user->syncRoles($roles);
-        $user->syncPermissions($permisos);
-
-        return redirect()->route('usuarios.index')->with('success', 'Roles y permisos actualizados correctamente.');
+        return redirect()->route('usuarios.index')->with('success', 'Rol actualizado correctamente.');
     }
-
 
 }

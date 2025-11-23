@@ -24,4 +24,6 @@ class Usuario extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    protected $guard_name = 'web';
 }
