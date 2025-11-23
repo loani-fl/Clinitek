@@ -75,8 +75,8 @@
         left: 0;
         width: 55%;
         height: 100%;
-        background: linear-gradient(to right, 
-            rgba(0, 0, 0, 0.75) 0%, 
+        background: linear-gradient(to right,
+            rgba(0, 0, 0, 0.75) 0%,
             rgba(0, 0, 0, 0.55) 40%,
             rgba(0, 0, 0, 0.25) 70%,
             transparent 100%
@@ -92,7 +92,7 @@
         width: 100%;
         max-width: 400px;
         margin-left: 8%;
-        box-shadow: 
+        box-shadow:
             0 25px 70px rgba(0, 0, 0, 0.4),
             0 0 0 1px rgba(255, 255, 255, 0.15),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -128,7 +128,7 @@
         align-items: center;
         justify-content: center;
         margin: 0 auto 18px;
-        box-shadow: 
+        box-shadow:
             0 10px 30px rgba(102, 126, 234, 0.3),
             0 0 0 1px rgba(255, 255, 255, 0.3);
         animation: pulse 2s ease-in-out infinite;
@@ -136,11 +136,11 @@
     }
 
     @keyframes pulse {
-        0%, 100% { 
+        0%, 100% {
             transform: scale(1);
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
         }
-        50% { 
+        50% {
             transform: scale(1.05);
             box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
         }
@@ -254,7 +254,7 @@
         outline: none;
         background: rgba(255, 255, 255, 0.22);
         border-color: rgba(255, 255, 255, 0.45);
-        box-shadow: 
+        box-shadow:
             0 0 0 4px rgba(102, 126, 234, 0.15),
             inset 0 2px 4px rgba(0, 0, 0, 0.1);
         transform: translateY(-2px);
@@ -332,7 +332,7 @@
         font-size: 14px;
         cursor: pointer;
         transition: all 0.3s ease;
-        box-shadow: 
+        box-shadow:
             0 8px 25px rgba(102, 126, 234, 0.45),
             0 0 0 1px rgba(255, 255, 255, 0.2);
         margin-top: 12px;
@@ -340,7 +340,7 @@
 
     .btn-login:hover:not(:disabled) {
         transform: translateY(-3px);
-        box-shadow: 
+        box-shadow:
             0 12px 35px rgba(102, 126, 234, 0.6),
             0 0 0 1px rgba(255, 255, 255, 0.3);
     }
@@ -441,7 +441,7 @@
         left: 0;
         right: 0;
         height: 3px;
-        background: linear-gradient(90deg, 
+        background: linear-gradient(90deg,
             transparent,
             rgba(102, 126, 234, 0.8),
             rgba(118, 75, 162, 0.8),
@@ -481,6 +481,27 @@
             <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
         </div>
 
+        {{-- Mensaje de error de permisos --}}
+        @if(session('error'))
+            <div id="alert-permission" class="alert alert-warning alert-dismissible fade show text-center" role="alert" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 400px; box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 0.5rem;">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <strong>¡Alerta!</strong> {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <script>
+                // Desaparece automáticamente después de 3 segundos
+                setTimeout(function() {
+                    let alertEl = document.getElementById('alert-permission');
+                    if (alertEl) {
+                        alertEl.classList.remove('show');
+                        alertEl.classList.add('hide');
+                        setTimeout(() => alertEl.remove(), 500);
+                    }
+                }, 3000);
+            </script>
+        @endif
+
         {{-- Mensaje de éxito después de restablecer contraseña --}}
         @if(session('success'))
         <div class="success-message">
@@ -503,11 +524,11 @@
                     </svg>
                     Correo electrónico
                 </label>
-                <input 
-                    type="email" 
-                    name="email" 
+                <input
+                    type="email"
+                    name="email"
                     id="email"
-                    class="form-control-modern" 
+                    class="form-control-modern"
                     placeholder="ejemplo@correo.com"
                     value="{{ request('email') ?? old('email') }}"
                     autocomplete="off"
@@ -530,11 +551,11 @@
                     Contraseña
                 </label>
                 <div class="input-wrapper">
-                    <input 
-                        type="password" 
-                        name="password" 
+                    <input
+                        type="password"
+                        name="password"
                         id="password"
-                        class="form-control-modern with-icon" 
+                        class="form-control-modern with-icon"
                         placeholder="••••••••"
                         autocomplete="new-password"
                     >
@@ -580,7 +601,7 @@
 function goToForgotPassword() {
     const email = document.getElementById('email').value.trim();
     const forgotUrl = "{{ route('password.forgot') }}";
-    
+
     if (email) {
         window.location.href = forgotUrl + '?email=' + encodeURIComponent(email);
     } else {
@@ -604,7 +625,7 @@ document.addEventListener('DOMContentLoaded', function() {
     togglePassword.addEventListener('click', function() {
         const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
         passwordInput.setAttribute('type', type);
-        
+
         // Cambiar icono
         if (type === 'text') {
             eyeIcon.style.display = 'none';

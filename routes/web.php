@@ -60,82 +60,114 @@ Route::middleware(['auth.custom'])->group(function () {
         return view('welcome');
     })->name('inicio');
 
-    // PUestos
-    Route::resource('puestos', PuestoController::class);
+    // Puestos
+    Route::resource('puestos', PuestoController::class)
+        ->middleware('role.permission:ver puestos');
 
     // Empleados
-    Route::resource('empleado', EmpleadosController::class);
+    Route::resource('empleado', EmpleadosController::class)
+        ->middleware('role.permission:ver empleados');
 
     // Médicos
-    Route::resource('medicos', MedicoController::class)->except(['destroy']);
-    Route::patch('/medicos/{medico}/estado', [MedicoController::class, 'toggleEstado'])->name('medicos.toggleEstado');
-    Route::get('/medicos/buscar', [MedicoController::class, 'buscar'])->name('medicos.buscar');
+    Route::resource('medicos', MedicoController::class)->except(['destroy'])
+        ->middleware('role.permission:ver medicos');
+    Route::patch('/medicos/{medico}/estado', [MedicoController::class, 'toggleEstado'])
+        ->name('medicos.toggleEstado')->middleware('role.permission:editar medicos');
+    Route::get('/medicos/buscar', [MedicoController::class, 'buscar'])
+        ->name('medicos.buscar')->middleware('role.permission:ver medicos');
 
     // Pacientes
-    Route::resource('pacientes', PacienteController::class);
-    Route::get('/pacientes/buscar', [PacienteController::class, 'buscar'])->name('pacientes.buscar');
-    Route::get('/pacientes/datos/{id}', [PacienteController::class, 'obtenerDatos'])->name('pacientes.datos');
+    Route::resource('pacientes', PacienteController::class)
+        ->middleware('role.permission:ver pacientes');
+    Route::get('/pacientes/buscar', [PacienteController::class, 'buscar'])
+        ->name('pacientes.buscar')->middleware('role.permission:ver pacientes');
+    Route::get('/pacientes/datos/{id}', [PacienteController::class, 'obtenerDatos'])
+        ->name('pacientes.datos')->middleware('role.permission:ver pacientes');
 
     // Consultas
-    Route::resource('consultas', ConsultaController::class);
-    Route::get('/consultas/horas-ocupadas', [ConsultahoraController::class, 'horasOcupadas'])->name('horas.ocupadas');
+    Route::resource('consultas', ConsultaController::class)
+        ->middleware('role.permission:ver consultas');
+    Route::get('/consultas/horas-ocupadas', [ConsultahoraController::class, 'horasOcupadas'])
+        ->name('horas.ocupadas')->middleware('role.permission:ver consultas');
 
     // Diagnósticos
-    Route::resource('diagnosticos', DiagnosticoController::class);
+    Route::resource('diagnosticos', DiagnosticoController::class)
+        ->middleware('role.permission:ver diagnosticos');
 
     // Exámenes
-    Route::get('/examenes/create/{paciente}/{consulta}', [ExamenController::class, 'create'])->name('examenes.create');
-    Route::post('/examenes/store/{paciente}/{diagnostico}', [ExamenController::class, 'store'])->name('examenes.store');
-    Route::get('/examenes/{diagnostico}', [ExamenController::class, 'show'])->name('examenes.show');
+    Route::get('/examenes/create/{paciente}/{consulta}', [ExamenController::class, 'create'])
+        ->name('examenes.create')->middleware('role.permission:crear examenes');
+    Route::post('/examenes/store/{paciente}/{diagnostico}', [ExamenController::class, 'store'])
+        ->name('examenes.store')->middleware('role.permission:crear examenes');
+    Route::get('/examenes/{diagnostico}', [ExamenController::class, 'show'])
+        ->name('examenes.show')->middleware('role.permission:ver examenes');
 
     // Rayos X
     Route::prefix('rayosx')->name('rayosx.')->group(function() {
-        Route::get('/', [OrdenRayosXController::class, 'index'])->name('index');
-        Route::get('/create', [OrdenRayosXController::class, 'create'])->name('create');
-        Route::post('/store', [OrdenRayosXController::class, 'store'])->name('store');
-        Route::get('/{orden}', [OrdenRayosXController::class, 'show'])->name('show');
-        Route::patch('/{orden}/realizar', [OrdenRayosXController::class, 'marcarRealizado'])->name('marcarRealizado');
-        Route::get('/{orden}/analisis', [OrdenRayosXController::class, 'analisis'])->name('analisis');
-        Route::post('/{orden}/analisis', [OrdenRayosXController::class, 'storeAnalisis'])->name('storeAnalisis');
+        Route::get('/', [OrdenRayosXController::class, 'index'])->name('index')
+            ->middleware('role.permission:ver rayosx');
+        Route::get('/create', [OrdenRayosXController::class, 'create'])->name('create')
+            ->middleware('role.permission:crear rayosx');
+        Route::post('/store', [OrdenRayosXController::class, 'store'])->name('store')
+            ->middleware('role.permission:crear rayosx');
+        Route::get('/{orden}', [OrdenRayosXController::class, 'show'])->name('show')
+            ->middleware('role.permission:ver rayosx');
+        Route::patch('/{orden}/realizar', [OrdenRayosXController::class, 'marcarRealizado'])
+            ->name('marcarRealizado')->middleware('role.permission:editar rayosx');
+        Route::get('/{orden}/analisis', [OrdenRayosXController::class, 'analisis'])->name('analisis')
+            ->middleware('role.permission:ver rayosx');
+        Route::post('/{orden}/analisis', [OrdenRayosXController::class, 'storeAnalisis'])->name('storeAnalisis')
+            ->middleware('role.permission:editar rayosx');
     });
 
     // Farmacias
-    Route::resource('farmacias', FarmaciaController::class);
+    Route::resource('farmacias', FarmaciaController::class)
+        ->middleware('role.permission:ver farmacias');
 
     // Facturas
-    Route::get('/factura/{factura}', [FacturaController::class, 'show'])->name('factura.show');
+    Route::get('/factura/{factura}', [FacturaController::class, 'show'])
+        ->name('factura.show')->middleware('role.permission:ver facturas');
 
     // Emergencias
-    Route::resource('emergencias', EmergenciaController::class);
+    Route::resource('emergencias', EmergenciaController::class)
+        ->middleware('role.permission:ver emergencias');
 
     // Hospitalizaciones
-    Route::resource('hospitalizaciones', HospitalizacionController::class)->except(['create']);
-    Route::get('hospitalizaciones/create/{emergencia_id?}', [HospitalizacionController::class, 'create'])->name('hospitalizaciones.create');
+    Route::resource('hospitalizaciones', HospitalizacionController::class)->except(['create'])
+        ->middleware('role.permission:ver hospitalizaciones');
+    Route::get('hospitalizaciones/create/{emergencia_id?}', [HospitalizacionController::class, 'create'])
+        ->name('hospitalizaciones.create')->middleware('role.permission:crear hospitalizaciones');
 
     // Sesiones psicológicas
-    Route::resource('sesiones', SesionPsicologicaController::class);
+    Route::resource('sesiones', SesionPsicologicaController::class)
+        ->middleware('role.permission:ver sesiones');
 
     // Inventario
-    Route::resource('inventario', InventarioController::class);
+    Route::resource('inventario', InventarioController::class)
+        ->middleware('role.permission:ver inventario');
 
     // Control prenatal
-    Route::resource('controles-prenatales', ControlPrenatalController::class);
+    Route::resource('controles-prenatales', ControlPrenatalController::class)
+        ->middleware('role.permission:ver controles prenatales');
 
     // Ultrasonidos
     Route::prefix('ultrasonidos')->name('ultrasonidos.')->group(function() {
-        Route::get('/', [UltrasonidoOrderController::class, 'index'])->name('index');
-        Route::get('/create', [UltrasonidoOrderController::class, 'create'])->name('create');
-        Route::post('/', [UltrasonidoOrderController::class, 'store'])->name('store');
-        Route::get('/{ultrasonido}', [UltrasonidoOrderController::class, 'show'])->name('show');
-        Route::get('/analisis/{id}', [UltrasonidoOrderController::class, 'analisis'])->name('analisis');
-        Route::post('/analisis/{id}', [UltrasonidoOrderController::class, 'storeAnalisis'])->name('storeAnalisis');
+        Route::get('/', [UltrasonidoOrderController::class, 'index'])->name('index')
+            ->middleware('role.permission:ver ultrasonidos');
+        Route::get('/create', [UltrasonidoOrderController::class, 'create'])->name('create')
+            ->middleware('role.permission:crear ultrasonidos');
+        Route::post('/', [UltrasonidoOrderController::class, 'store'])->name('store')
+            ->middleware('role.permission:crear ultrasonidos');
+        Route::get('/{ultrasonido}', [UltrasonidoOrderController::class, 'show'])->name('show')
+            ->middleware('role.permission:ver ultrasonidos');
+        Route::get('/analisis/{id}', [UltrasonidoOrderController::class, 'analisis'])->name('analisis')
+            ->middleware('role.permission:ver ultrasonidos');
+        Route::post('/analisis/{id}', [UltrasonidoOrderController::class, 'storeAnalisis'])->name('storeAnalisis')
+            ->middleware('role.permission:editar ultrasonidos');
+    });
 
-
-        });
-
-    // Rutas de administrador (usuarios y roles) - FUERA de ultrasonidos
-    Route::prefix('admin')->middleware('role.permission:administrador|admin')->group(function () {
-
+    // Rutas de administrador (usuarios y roles)
+    Route::prefix('admin')->middleware('role.permission:administrador')->group(function () {
         // Roles
         Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
         Route::get('/roles/create', [RoleController::class, 'create'])->name('roles.create');
@@ -151,13 +183,8 @@ Route::middleware(['auth.custom'])->group(function () {
         Route::get('/usuarios/{usuario}/edit', [UsuarioController::class, 'edit'])->name('usuarios.edit');
         Route::put('/usuarios/{usuario}', [UsuarioController::class, 'update'])->name('usuarios.update');
         Route::delete('/usuarios/{usuario}', [UsuarioController::class, 'destroy'])->name('usuarios.destroy');
-        // Mostrar formulario para asignar roles/permisos
-        Route::get('usuarios/{id}/asignar', [UsuarioController::class, 'asignarVista'])
-            ->name('usuarios.asignar');
-
-// Guardar cambios de roles/permisos
-        Route::post('usuarios/{id}/asignar', [UsuarioController::class, 'asignarUpdate'])
-            ->name('usuarios.asignar.update');
+        Route::get('usuarios/{id}/asignar', [UsuarioController::class, 'asignarVista'])->name('usuarios.asignar');
+        Route::post('usuarios/{id}/asignar', [UsuarioController::class, 'asignarUpdate'])->name('usuarios.asignar.update');
     });
 
 });

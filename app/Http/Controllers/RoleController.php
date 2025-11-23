@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\User;
+use Illuminate\Support\Facades\Artisan;
 
 class RoleController extends Controller
 {
@@ -75,14 +76,19 @@ class RoleController extends Controller
             'permissions' => 'array'
         ]);
 
+
+        // Crear el nuevo rol
         $role = Role::create(['name' => $request->name]);
 
-        if ($request->has('permissions')) {
-            $role->syncPermissions($request->permissions);
-        }
+        // Sincronizar permisos seleccionados
+        $role->syncPermissions($request->permissions ?? []);
+
+        // Limpiar caché de permisos para que los cambios tengan efecto inmediato
+        \Artisan::call('permission:cache-reset');
 
         return redirect()->route('roles.index')->with('success', 'Rol creado correctamente.');
     }
+
 
     public function edit(Role $role)
     {
@@ -146,13 +152,19 @@ class RoleController extends Controller
             'permissions' => 'array'
         ]);
 
+        // Actualizar el nombre del rol
         $role->name = $request->name;
         $role->save();
 
+        // Sincronizar permisos seleccionados (o eliminar todos si no hay)
         $role->syncPermissions($request->permissions ?? []);
+
+        // Limpiar caché de permisos para que los cambios tengan efecto inmediato
+        \Artisan::call('permission:cache-reset');
 
         return redirect()->route('roles.index')->with('success', 'Rol actualizado correctamente.');
     }
+
 
     public function destroy(Role $role)
     {

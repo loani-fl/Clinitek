@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use App\Models\Usuario;
+
 class RolesAndPermissionsSeeder extends Seeder
 {
     public function run()
@@ -13,176 +13,76 @@ class RolesAndPermissionsSeeder extends Seeder
         // Limpiar caché de permisos
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        /* =============================================================
-         *  PERMISOS YA EXISTENTES EN TU SISTEMA
-         * ============================================================= */
-        $permisosBase = [
+        // -------------------------
+        // PERMISOS
+        // -------------------------
 
+        // Roles
+        $roles = ['ver roles', 'crear roles', 'editar roles', 'eliminar roles'];
 
-            //      Roles
-            'ver_roles',
-            'crear_roles',
-            'editar_roles',
-            'eliminar_roles',
+        // Consultas
+        $consultas = ['ver consultas', 'crear consultas', 'editar consultas', 'ver consultas'];
 
+        // Control prenatal
+        $controlPrenatal = ['ver controles prenatales', 'crear controles prenatales', 'editar controles prenatales'];
 
-        ];
+        // Dashboard
+        $dashboard = ['dashboard inicio'];
+
+        // Diagnósticos
+        $diagnosticos = ['ver diagnosticos', 'crear diagnosticos', 'editar diagnosticos'];
+
+        // Emergencias
+        $emergencias = ['ver emergencias', 'crear emergencias', 'editar emergencias'];
+
+        // Empleados
+        $empleado = ['ver empleados', 'crear empleados', 'editar empleados'];
+
+        // Exámenes
+        $examenes = ['ver examenes', 'crear examenes', 'editar examenes'];
+
+        // Factura
+        $factura = ['ver facturas'];
+
+        // Farmacias
+        $farmacias = ['ver farmacias', 'crear farmacias', 'editar farmacias'];
+
+        // Hospitalización
+        $hospitalizacion = ['ver hospitalizaciones', 'crear hospitalizaciones', 'imprimir hospitalizaciones'];
+
+        // Inventario
+        $inventario = ['ver inventario', 'crear inventario', 'editar inventario'];
+
+        // Médicos
+        $medicos = ['ver medicos', 'crear medicos', 'editar medicos'];
+
+        // Pacientes
+        $pacientes = ['ver pacientes', 'crear pacientes', 'editar pacientes'];
+
+        // Puestos
+        $puestos = ['ver puestos', 'crear puestos', 'editar puestos'];
+
+        // Rayos X
+        $rayosX = ['ver rayosx', 'crear rayosx', 'editar rayosx', 'analisis rayosx'];
+
+        // Recetas
+        $recetas = ['ver recetas', 'crear recetas', 'editar recetas'];
+
+        // Sesiones
+        $sesiones = ['ver sesiones', 'crear sesiones', 'editar sesiones'];
+
+        // Ultrasonidos
+        $ultrasonidos = ['ver ultrasonidos', 'crear ultrasonidos', 'editar ultrasonidos', 'analisis ultrasonidos'];
+
+        // Usuarios
+        $usuarios = ['ver usuarios', 'crear usuarios', 'editar usuarios', 'eliminar usuarios', 'asignar usuarios'];
 
 
         // -------------------------
-        //      CONSULTAS
+        // UNIR TODOS LOS PERMISOS
         // -------------------------
-        $consultas = [
-            'consultas.index',
-            'consultas.create',
-            'consultas.edit',
-            'consultas.show',
-        ];
-
-        // -------------------------
-        //   CONTROL PRENATAL
-        // -------------------------
-        $controlPrenatal = [
-            'controlPrenatal.index',
-            'controlPrenatal.create',
-            'controlPrenatal.show',
-        ];
-
-        // -------------------------
-        //       DASHBOARD
-        // -------------------------
-        $dashboard = [
-            'dashboard.inicio',
-        ];
-
-        // -------------------------
-        //    DIAGNÓSTICOS
-        // -------------------------
-        $diagnosticos = [
-            'diagnosticos.create',
-            'diagnosticos.edit',
-            'diagnosticos.show',
-        ];
-
-        // -------------------------
-        //     EMERGENCIAS
-        // -------------------------
-        $emergencias = [
-            'emergencias.index',
-            'emergencias.create',
-            'emergencias.show',
-        ];
-
-        // --- EMPLEADO ---
-        $empleado = [
-            'empleado.index',
-            'empleado.create',
-            'empleado.edit',
-            'empleado.show',
-        ];
-
-        // --- EXÁMENES ---
-        $examenes = [
-            'examenes.create',
-            'examenes.show',
-        ];
-
-        // --- FACTURA ---
-        $factura = [
-            'factura.show',
-        ];
-
-        // --- FARMACIAS ---
-        $farmacias = [
-            'farmacias.index',
-            'farmacias.create',
-            'farmacias.edit',
-            'farmacias.show',
-        ];
-
-        // --- HOSPITALIZACIÓN ---
-        $hospitalizacion = [
-            'hospitalizacion.create',
-            'hospitalizacion.imprimir',
-        ];
-
-            // INVENTARIO
-            $inventario = [
-                'inventario.index',
-                'inventario.create',
-                'inventario.edit',
-                'inventario.show',
-            ];
-
-        // MÉDICOS
-        $medicos = [
-            'medicos.index',
-            'medicos.create',
-            'medicos.edit',
-            'medicos.show',
-        ];
-
-        // PACIENTES
-        $pacientes = [
-            'pacientes.index',
-            'pacientes.create',
-            'pacientes.edit',
-            'pacientes.show',
-        ];
-
-        // --- PUESTOS ---
-        $puestos = [
-            'puestos.index',
-            'puestos.create',
-            'puestos.edit',
-            'puestos.show',
-        ];
-
-// --- RAYOS X ---
-        $rayosX = [
-            'rayosX.analisis',
-            'rayosX.create',
-            'rayosX.index',
-            'rayosX.show',
-        ];
-
-// --- RECETAS ---
-        $recetas = [
-            'recetas.create',
-            'recetas.no-disponible',
-            'recetas.show',
-        ];
-
-// --- SESIONES ---
-        $sesiones = [
-            'sesiones.index',
-            'sesiones.create',
-            'sesiones.show',
-        ];
-        // --- ULTRASONIDOS ---
-        $ultrasonidos = [
-            'ultrasonidos.analisis',
-            'ultrasonidos.create',
-            'ultrasonidos.index',
-            'ultrasonidos.show',
-        ];
-
-// --- USUARIOS ---
-        $usuarios = [
-            'usuarios.asignar',
-            'usuarios.create',
-            'usuarios.index',
-            'usuarios.edit',
-            'usuarios.show',
-            'usuarios.eliminar',
-        ];
-
-
-        /* =============================================================
-         *  UNIR TODO PARA CREAR PERMISOS AUTOMÁTICAMENTE
-         * ============================================================= */
         $todosLosPermisos = array_merge(
-            $permisosBase,
+            $roles,
             $consultas,
             $controlPrenatal,
             $dashboard,
@@ -202,87 +102,21 @@ class RolesAndPermissionsSeeder extends Seeder
             $sesiones,
             $ultrasonidos,
             $usuarios
+        );
 
-
-
-    );
-
+        // Crear permisos
         foreach ($todosLosPermisos as $permiso) {
             Permission::firstOrCreate(['name' => $permiso]);
         }
 
-        /* =============================================================
-         *  ROLES
-         * ============================================================= */
+        // -------------------------
+        // ROLES
+        // -------------------------
         $admin = Role::firstOrCreate(['name' => 'administrador']);
-        $medico = Role::firstOrCreate(['name' => 'medico']);
-        $empleado = Role::firstOrCreate(['name' => 'empleado']);
-
-        /* =============================================================
-         *  ASIGNACIÓN DE PERMISOS A ROLES
-         * ============================================================= */
-
-        // ADMIN — TODO
         $admin->syncPermissions($todosLosPermisos);
 
-        // MÉDICO
-        $medico->syncPermissions([
-
-            // Consultas
-            'consultas.index',
-            'consultas.create',
-            'consultas.edit',
-            'consultas.show',
-
-            // Control Prenatal
-            'controlPrenatal.index',
-            'controlPrenatal.create',
-            'controlPrenatal.show',
-
-            // Diagnósticos
-            'diagnosticos.create',
-            'diagnosticos.edit',
-            'diagnosticos.show',
-
-            // Emergencias
-            'emergencias.index',
-            'emergencias.create',
-            'emergencias.show',
-
-            // Exámenes
-            'examenes.create',
-            'examenes.show',
-
-            // Hospitalización
-            'hospitalizacion.create',
-            'hospitalizacion.imprimir',
-
-            // Dashboard
-            'dashboard.inicio',
-
-            // Médicos
-            'medicos.index',
-            'medicos.show',
-             'medicos.create',
-
-            // Pacientes
-            'pacientes.index',
-            'pacientes.show',
-        ]);
-
-        $empleado->syncPermissions([
-
-            'empleado.show',
-            'empleado.create',
-            'empleado.edit',
-
-        ]);
-
-// ID del usuario administrador
-        $usuario = Usuario::find(2);
-        $usuario->assignRole('administrador');
+        // Rol de recepción, solo acceso a pacientes
 
     }
-
-
 }
+
