@@ -25,5 +25,5 @@ class Usuario extends Authenticatable
         'remember_token',
     ];
 
-    protected $guard_name = 'web';
+
 }
