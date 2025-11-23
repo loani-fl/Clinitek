@@ -48,41 +48,36 @@
             Crear Nuevo Rol
         </h2>
 
-        {{-- Mensajes --}}
+        {{-- Mensajes de éxito --}}
         @if(session('success'))
             <div class="alert alert-success text-center">
                 {{ session('success') }}
             </div>
         @endif
 
-        {{-- Errores de validación --}}
-        @if($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
         <form action="{{ route('roles.store') }}" method="POST">
             @csrf
 
+            {{-- Nombre del rol --}}
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label fw-bold">Nombre del Rol:</label>
-                    <input type="text" name="name" class="form-control" placeholder="Ej: administrador" value="{{ old('name') }}" required>
-                </div>
+                    <input type="text"
+                           name="name"
+                           class="form-control @error('name') is-invalid @enderror"
+                           placeholder="Ej: administrador"
+                           value="{{ old('name') }}"
+                           required>
 
-                <div class="col-md-6 d-flex align-items-end justify-content-end">
-                    <a href="{{ route('roles.index') }}" class="btn btn-success">
-                        <i class="bi bi-arrow-left"></i> Regresar
-                    </a>
+                    @error('name')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                    @enderror
                 </div>
             </div>
 
-            {{-- PREPARAR COLECCIÓN DE PERMISOS --}}
+            {{-- Preparar permisos --}}
             @php
                 $allPermissions = collect($permissions ?? $permisos ?? []);
                 $controllerSections = [
@@ -114,6 +109,7 @@
                 ];
             @endphp
 
+            {{-- Checkbox de seleccionar todos --}}
             <div class="row mb-3">
                 <div class="col-md-12">
                     <div class="form-check mb-3">
@@ -123,6 +119,7 @@
                 </div>
             </div>
 
+            {{-- Sección de permisos --}}
             <div class="row">
                 <div class="col-md-12">
                     <h5 class="section-title">Permisos del Rol</h5>
@@ -144,7 +141,8 @@
                                                    type="checkbox"
                                                    name="permissions[]"
                                                    value="{{ $perm->name }}"
-                                                   id="perm_{{ \Illuminate\Support\Str::slug($perm->name) }}">
+                                                   id="perm_{{ \Illuminate\Support\Str::slug($perm->name) }}"
+                                                {{ (is_array(old('permissions')) && in_array($perm->name, old('permissions'))) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="perm_{{ \Illuminate\Support\Str::slug($perm->name) }}">
                                                 {{ $accion }} {{ $modulo }}
                                             </label>
@@ -154,9 +152,17 @@
                             @endif
                         @endforeach
                     </div>
+
+                    {{-- Mensaje de error para permisos --}}
+                    @error('permissions')
+                    <div class="text-danger mt-1">
+                        {{ $message }}
+                    </div>
+                    @enderror
                 </div>
             </div>
 
+            {{-- Botones --}}
             <div class="d-flex justify-content-center gap-4 mt-3">
                 <button type="submit" class="btn btn-primary px-4">
                     <i class="bi bi-plus-circle"></i> Crear Rol
@@ -167,5 +173,13 @@
             </div>
         </form>
     </div>
+
+    <script>
+        // Seleccionar todos los permisos
+        document.getElementById('selectAllPermisos').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('input[name="permissions[]"]');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+    </script>
 
 @endsection

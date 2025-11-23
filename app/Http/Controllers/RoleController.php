@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use App\Models\User;
+use App\Models\Usuario;
 use Illuminate\Support\Facades\Artisan;
 
 class RoleController extends Controller
@@ -72,21 +72,31 @@ class RoleController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|unique:roles,name',
-            'permissions' => 'array'
+
+                'name' => 'required|unique:roles,name',
+                'permissions' => 'required|array',
+            ], [
+                'name.required' => 'El nombre es obligatorio.',
+                'name.unique' => 'El nombre ya existe.',
+                'permissions.required' => 'Debe seleccionar al menos un permiso.',
+
+            ]);
+
+        $role = Role::create([
+            'name' => $request->name,
+            'guard_name' => 'web', // ¡asegúrate de que coincida con tus permisos!
         ]);
 
-
-        // Crear el nuevo rol
-        $role = Role::create(['name' => $request->name]);
-
-        // Sincronizar permisos seleccionados
+// Sincronizar permisos seleccionados
         $role->syncPermissions($request->permissions ?? []);
 
-        // Limpiar caché de permisos para que los cambios tengan efecto inmediato
+// Limpiar cache de permisos
         \Artisan::call('permission:cache-reset');
 
+
+
         return redirect()->route('roles.index')->with('success', 'Rol creado correctamente.');
+
     }
 
 
@@ -152,9 +162,10 @@ class RoleController extends Controller
             'permissions' => 'array'
         ]);
 
-        // Actualizar el nombre del rol
-        $role->name = $request->name;
-        $role->save();
+        $role->update([
+            'name' => $request->name,
+            'guard_name' => 'web', // mantener coherencia con permisos
+        ]);
 
         // Sincronizar permisos seleccionados (o eliminar todos si no hay)
         $role->syncPermissions($request->permissions ?? []);
