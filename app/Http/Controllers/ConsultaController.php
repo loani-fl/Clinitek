@@ -56,7 +56,7 @@ public function index()
         return view('consultas.create', compact('pacientes', 'medicos'));
     }
 
-   public function store(Request $request)
+public function store(Request $request)
 {
     $horaInput = trim($request->input('hora'));
     $esInmediata = $horaInput === 'inmediata';
@@ -78,16 +78,11 @@ public function index()
             },
         ],
         'medico_id' => ['required', 'exists:medicos,id'],
-        'motivo' => [
-            'required', 'string', 'max:250',
-            'regex:/^[\pL\pN\s.,;:()¡!¿?"“”\'\-]+$/u'
-        ],
-        'sintomas' => [
-            'required', 'string', 'max:250',
-            'regex:/^[\pL\pN\s.,;:()¡!¿?"“”\'\-]+$/u'
-        ],
+        'motivo' => ['required', 'string', 'max:250', 'regex:/^[\pL\pN\s.,;:()¡!¿?"“”\'\-]+$/u'],
+        'sintomas' => ['required', 'string', 'max:250', 'regex:/^[\pL\pN\s.,;:()¡!¿?"“”\'\-]+$/u'],
     ];
 
+    // Si es inmediata, el total a pagar es obligatorio
     if ($esInmediata) {
         $rules['total_pagar'] = ['required', 'numeric', 'min:0'];
     }
@@ -107,16 +102,11 @@ public function index()
 
     $validated = $request->validate($rules, $messages);
 
-    // 🔹 Convertir hora a formato 24h si no es inmediata
-    $hora24 = null;
-    if (!$esInmediata) {
-        try {
-            $hora24 = Carbon::createFromFormat('g:i A', $horaInput)->format('H:i:s');
-        } catch (\Exception $e) {
-            return back()->withErrors(['hora' => 'El formato de la hora no es válido.'])->withInput();
-        }
+    // 🔹 Convertir hora a formato 24h
+    $hora24 = $esInmediata ? now()->format('H:i:s') : Carbon::createFromFormat('g:i A', $horaInput)->format('H:i:s');
 
-        // 🔹 Validar que el médico no tenga otra consulta a esa hora
+    // 🔹 Validar conflicto de horario solo si NO es inmediata
+    if (!$esInmediata) {
         $existe = Consulta::where('medico_id', $validated['medico_id'])
             ->where('fecha', $validated['fecha'])
             ->where('hora', $hora24)
@@ -134,7 +124,7 @@ public function index()
     $consulta = Consulta::create([
         'paciente_id' => $validated['paciente_id'],
         'fecha' => $validated['fecha'],
-        'hora' => $esInmediata ? null : $hora24,
+        'hora' => $hora24,
         'especialidad' => $especialidad,
         'medico_id' => $validated['medico_id'],
         'motivo' => $validated['motivo'],
@@ -154,79 +144,15 @@ public function index()
         'monto' => $esInmediata ? $validated['total_pagar'] : 0,
     ]);
 
-    // 🔹 Redirigir al show del pago
-    return redirect()->route('pagos.show', $pago->id)
-                     ->with('success', 'Consulta y pago registrados correctamente.');
+    // 🔹 Crear la factura usando la consulta guardada
+    $paciente = Paciente::find($validated['paciente_id']);
+    $factura = \App\Models\Factura::crearDesdeConsulta($consulta, $paciente, $medico);
+
+    // 🔹 Redirigir al show de la factura
+    return redirect()->route('factura.show', $factura->id)
+                     ->with('success', 'Consulta registrada y factura generada correctamente.');
 }
 
-    // Mostrar el formulario para editar consulta
-    public function edit($id)
-{
-    $consulta = Consulta::findOrFail($id);
-    $pacienteSeleccionado = $consulta->paciente;
-    $pacientes = Paciente::orderBy('nombre')->get();
-    $medicos = Medico::orderBy('nombre')->get();
-
-    $horas = [];
-    $minutos = 8 * 60;
-    $fin = (16 * 60) + 30;
-
-    while ($minutos <= $fin) {
-        $h = floor($minutos / 60);
-        $m = $minutos % 60;
-        $periodo = $h >= 12 ? 'PM' : 'AM';
-        $hora12 = ($h % 12 === 0 ? 12 : $h % 12);
-        $minutoStr = str_pad($m, 2, '0', STR_PAD_LEFT);
-        $horas[] = "{$hora12}:{$minutoStr} {$periodo}";
-        $minutos += 30;
-    }
-
-    $horasOcupadas = Consulta::where('medico_id', $consulta->medico_id)
-        ->where('fecha', $consulta->fecha)
-        ->where('id', '!=', $consulta->id)
-        ->pluck('hora')
-        ->toArray();
-
-    $inmediataOcupada = Consulta::where('medico_id', $consulta->medico_id)
-        ->where('fecha', $consulta->fecha)
-        ->where('hora', 'inmediata')
-        ->where('id', '!=', $consulta->id)
-        ->exists();
-
-    try {
-        $horaFormato12 = $consulta->hora
-            ? Carbon::createFromFormat('H:i:s', $consulta->hora)->format('g:i A')
-            : 'inmediata';
-    } catch (\Exception $e) {
-        $horaFormato12 = 'inmediata';
-    }
-
-    // calculamos la hora más ocupada para este médico y fecha
-    $horaMasOcupada = DB::table('consultas')
-        ->select('hora', DB::raw('COUNT(*) as total'))
-        ->where('medico_id', $consulta->medico_id)
-        ->where('fecha', $consulta->fecha)
-        ->where('hora', '!=', 'inmediata')
-        ->groupBy('hora')
-        ->orderByDesc('total')
-        ->value('hora');
-
-    $horaMasOcupada12h = null;
-    if ($horaMasOcupada) {
-        $horaMasOcupada12h = Carbon::createFromFormat('H:i:s', $horaMasOcupada)->format('g:i A');
-    }
-
-    return view('consultas.edit', compact(
-        'consulta',
-        'pacientes',
-        'medicos',
-        'horas',
-        'horasOcupadas',
-        'horaFormato12',
-        'inmediataOcupada',
-        'horaMasOcupada12h'
-    ));
-}
 
 public function update(Request $request, $id)
 {
