@@ -44,18 +44,16 @@
 
     <div class="custom-card">
 
-        <h2 class="text-center fw-bold section-title mb-4">
-            Crear Nuevo Rol
-        </h2>
+        <h2 class="text-center fw-bold section-title mb-4">Crear Nuevo Rol</h2>
 
         {{-- Mensajes de éxito --}}
         @if(session('success'))
-            <div class="alert alert-success text-center">
-                {{ session('success') }}
-            </div>
+            <div class="alert alert-success text-center">{{ session('success') }}</div>
         @endif
 
-        <form action="{{ route('roles.store') }}" method="POST">
+
+
+        <form action="{{ route('roles.store') }}" method="POST" novalidate>
             @csrf
 
             {{-- Nombre del rol --}}
@@ -67,12 +65,11 @@
                            class="form-control @error('name') is-invalid @enderror"
                            placeholder="Ej: administrador"
                            value="{{ old('name') }}"
-                           required>
-
+                           maxlength="50"
+                           required
+                           oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ\s]/g,'')">
                     @error('name')
-                    <div class="invalid-feedback">
-                        {{ $message }}
-                    </div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
@@ -84,7 +81,7 @@
                     'Usuarios' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'usuarios.')),
                     'Pacientes' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'pacientes.')),
                     'Médicos' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'medicos.')),
-                    'Empleados' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'empleado.')),
+                    'Empleados' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'empleados.')),
                     'Consultas' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'consultas.')),
                     'Control Prenatal' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'controlPrenatal.')),
                     'Recetas' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'recetas.')),
@@ -120,6 +117,7 @@
             </div>
 
             {{-- Sección de permisos --}}
+            {{-- Sección de permisos --}}
             <div class="row">
                 <div class="col-md-12">
                     <h5 class="section-title">Permisos del Rol</h5>
@@ -127,8 +125,17 @@
                         @foreach($controllerSections as $sectionName => $permList)
                             @if($permList && $permList->count() > 0)
                                 <div class="col-md-6 mb-4">
-                                    <h6 class="fw-bold text-primary">{{ $sectionName }}</h6>
+                                    {{-- Checkbox de sección --}}
+                                    <div class="d-flex align-items-center mb-2">
+                                        <input type="checkbox"
+                                               class="form-check-input section-checkbox me-2"
+                                               id="section_{{ \Illuminate\Support\Str::slug($sectionName) }}">
+                                        <label class="fw-bold text-primary mb-0" for="section_{{ \Illuminate\Support\Str::slug($sectionName) }}">
+                                            {{ $sectionName }}
+                                        </label>
+                                    </div>
 
+                                    {{-- Permisos individuales --}}
                                     @foreach($permList as $perm)
                                         @php
                                             $partes = explode('.', $perm->name);
@@ -137,7 +144,7 @@
                                             $accion = $accionesBonitas[$accion] ?? $accion;
                                         @endphp
                                         <div class="form-check mb-1">
-                                            <input class="form-check-input"
+                                            <input class="form-check-input section-permission-{{ \Illuminate\Support\Str::slug($sectionName) }}"
                                                    type="checkbox"
                                                    name="permissions[]"
                                                    value="{{ $perm->name }}"
@@ -152,34 +159,108 @@
                             @endif
                         @endforeach
                     </div>
+                </div>
+            </div>
 
-                    {{-- Mensaje de error para permisos --}}
+
+            {{-- Mensaje de error para permisos --}}
                     @error('permissions')
-                    <div class="text-danger mt-1">
-                        {{ $message }}
-                    </div>
+                    <div class="text-danger mt-1">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
 
             {{-- Botones --}}
-            <div class="d-flex justify-content-center gap-4 mt-3">
-                <button type="submit" class="btn btn-primary px-4">
-                    <i class="bi bi-plus-circle"></i> Crear Rol
-                </button>
-                <a href="{{ route('roles.index') }}" class="btn btn-success px-4">
-                    <i class="bi bi-arrow-left"></i> Regresar
-                </a>
-            </div>
-        </form>
+    <div class="d-flex justify-content-center gap-4 mt-3">
+        <button type="submit" class="btn btn-primary px-4">
+            <i class="bi bi-plus-circle"></i> Crear Rol
+        </button>
+
+        <button type="button" id="btnLimpiar" class="btn btn-warning px-4">
+            <i class="bi bi-x-circle"></i> Limpiar
+        </button>
+
+        <a href="{{ route('roles.index') }}" class="btn btn-success px-4">
+            <i class="bi bi-arrow-left"></i> Regresar
+        </a>
     </div>
 
-    <script>
-        // Seleccionar todos los permisos
-        document.getElementById('selectAllPermisos').addEventListener('change', function() {
-            const checkboxes = document.querySelectorAll('input[name="permissions[]"]');
-            checkboxes.forEach(cb => cb.checked = this.checked);
-        });
-    </script>
+    </form>
+    </div>
+
+    {{-- Script para seleccionar todos los permisos --}}
+    @push('scripts')
+        <script>
+            document.getElementById('selectAllPermisos').addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('input[name="permissions[]"]');
+                checkboxes.forEach(cb => cb.checked = this.checked);
+            });
+        </script>
+    @endpush
+    @push('scripts')
+        <script>
+            // Seleccionar todos los permisos generales
+            document.getElementById('selectAllPermisos').addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('input[name="permissions[]"]');
+                checkboxes.forEach(cb => cb.checked = this.checked);
+
+                // También actualizar los checkboxes de sección
+                const sections = document.querySelectorAll('.section-checkbox');
+                sections.forEach(sec => sec.checked = this.checked);
+            });
+
+            // Seleccionar todos los permisos por sección
+            document.querySelectorAll('.section-checkbox').forEach(section => {
+                section.addEventListener('change', function() {
+                    const slug = this.id.replace('section_', '');
+                    const permisos = document.querySelectorAll('.section-permission-' + slug);
+                    permisos.forEach(cb => cb.checked = this.checked);
+                });
+            });
+        </script>
+    @endpush
+    @push('scripts')
+        <script>
+            // Seleccionar todos los permisos global
+            document.getElementById('selectAllPermisos').addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('input[name="permissions[]"]');
+                checkboxes.forEach(cb => cb.checked = this.checked);
+
+                const sections = document.querySelectorAll('.section-checkbox');
+                sections.forEach(sec => sec.checked = this.checked);
+            });
+
+            // Seleccionar permisos por sección
+            document.querySelectorAll('.section-checkbox').forEach(section => {
+                section.addEventListener('change', function() {
+                    const slug = this.id.replace('section_', '');
+                    const permisos = document.querySelectorAll('.section-permission-' + slug);
+                    permisos.forEach(cb => cb.checked = this.checked);
+                });
+            });
+
+            // Botón Limpiar
+            document.getElementById('btnLimpiar').addEventListener('click', function() {
+                // Limpiar input nombre
+                const inputName = document.querySelector('input[name="name"]');
+                inputName.value = '';
+                inputName.classList.remove('is-invalid');
+
+                // Limpiar mensajes de error
+                const errores = document.querySelectorAll('.invalid-feedback, .text-danger, .alert-danger ul');
+                errores.forEach(e => e.remove());
+
+                // Desmarcar checkbox global
+                const selectAll = document.getElementById('selectAllPermisos');
+                selectAll.checked = false;
+
+                // Desmarcar checkboxes de secciones
+                document.querySelectorAll('.section-checkbox').forEach(cb => cb.checked = false);
+
+                // Desmarcar checkboxes individuales de permisos
+                document.querySelectorAll('input[name="permissions[]"]').forEach(cb => cb.checked = false);
+            });
+        </script>
+    @endpush
 
 @endsection

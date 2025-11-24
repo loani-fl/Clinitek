@@ -12,6 +12,8 @@ class Usuario extends Authenticatable
     use HasFactory, Notifiable, HasRoles;
 
     protected $table = 'usuarios';
+    protected $guard_name = 'web';
+
 
     protected $fillable = [
         'name',

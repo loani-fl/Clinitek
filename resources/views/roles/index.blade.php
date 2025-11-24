@@ -87,21 +87,21 @@
         flex: 1 1 150px;
         min-width: 120px;
     }
-    
+
     /* Estilos de tabla idénticos a consultas */
     .table {
         font-size: 0.9rem;
     }
-    
+
     thead tr {
         background-color: #007BFF;
         color: white;
     }
-    
+
     tbody tr:hover {
         background-color: #e9f2ff;
     }
-    
+
     .table th, .table td {
         padding: 0.4rem 0.75rem;
         vertical-align: middle;
@@ -170,9 +170,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-sm btn-outline-warning">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
+
                                     <form action="{{ route('roles.destroy', $role->id) }}" method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')

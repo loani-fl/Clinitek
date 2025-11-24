@@ -17,7 +17,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-      
+
         // Validación con límites de caracteres
     $request->validate([
         'email' => [

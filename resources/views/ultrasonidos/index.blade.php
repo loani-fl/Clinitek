@@ -166,7 +166,7 @@
             <div class="d-flex filter-container">
                 <div>
                     <label class="filtro-label" for="filtroBusqueda">Paciente</label>
-                    <input type="text" id="filtroBusqueda" class="form-control filtro-input" autocomplete="off">
+                    <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por nombre" autocomplete="off">
                 </div>
 
                 <div>

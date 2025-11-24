@@ -68,35 +68,39 @@ class RoleController extends Controller
         ));
     }
 
-
     public function store(Request $request)
     {
         $request->validate([
-
-                'name' => 'required|unique:roles,name',
-                'permissions' => 'required|array',
-            ], [
-                'name.required' => 'El nombre es obligatorio.',
-                'name.unique' => 'El nombre ya existe.',
-                'permissions.required' => 'Debe seleccionar al menos un permiso.',
-
-            ]);
-
-        $role = Role::create([
-            'name' => $request->name,
-            'guard_name' => 'web', // ¡asegúrate de que coincida con tus permisos!
+            'name' => [
+                'required',
+                'string',
+                'max:50',
+                'regex:/^[\pL\s]+$/u', // solo letras y espacios
+                'unique:roles,name',
+            ],
+            'permissions' => 'required|array',
+        ], [
+            'name.required' => 'El nombre es obligatorio.',
+            'name.string' => 'El nombre debe ser un texto válido.',
+            'name.max' => 'El nombre no puede tener más de 50 caracteres.',
+            'name.regex' => 'El nombre solo puede contener letras y espacios, sin números ni caracteres especiales.',
+            'name.unique' => 'El nombre ya existe.',
+            'permissions.required' => 'Debe seleccionar al menos un permiso.',
         ]);
 
-// Sincronizar permisos seleccionados
+        // Crear el rol
+        $role = Role::create([
+            'name' => $request->name,
+            'guard_name' => 'web',
+        ]);
+
+        // Sincronizar permisos seleccionados
         $role->syncPermissions($request->permissions ?? []);
 
-// Limpiar cache de permisos
+        // Limpiar cache de permisos
         \Artisan::call('permission:cache-reset');
 
-
-
         return redirect()->route('roles.index')->with('success', 'Rol creado correctamente.');
-
     }
 
 
