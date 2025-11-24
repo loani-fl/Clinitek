@@ -81,7 +81,10 @@
                     'Usuarios' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'usuarios.')),
                     'Pacientes' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'pacientes.')),
                     'Médicos' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'medicos.')),
-                    'Empleados' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'empleados.')),
+                 'Empleados' => $allPermissions->filter(function($p) {
+    return str_starts_with($p->name, 'empleado.') || str_starts_with($p->name, 'empleados.');
+}),
+
                     'Consultas' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'consultas.')),
                     'Control Prenatal' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'controlPrenatal.')),
                     'Recetas' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'recetas.')),
