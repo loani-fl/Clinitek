@@ -7,29 +7,28 @@
         margin: 0;
         padding: 0;
         overflow-x: hidden;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* Barra fija arriba */
     .header {
         background-color: #007BFF;
         position: fixed;
         top: 0; left: 0; right: 0;
         z-index: 1100;
         padding: 0.5rem 1rem;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
-    /* Contenedor principal centrado con margen top para no tapar navbar */
     .content-wrapper {
-        margin-top: 60px;
-        max-width: 900px;
+        margin-top: 70px;
+        max-width: 1200px;
         margin-left: auto;
         margin-right: auto;
-        padding: 1rem;
-        position: relative;
+        padding: 2rem;
     }
 
-    /* Logo translúcido de fondo */
     .custom-card::before {
         content: "";
         position: absolute;
@@ -47,53 +46,48 @@
         z-index: 0;
     }
 
-    /* Tarjeta blanca con sombra y bordes redondeados */
     .custom-card {
         background-color: #fff;
         border-radius: 1.5rem;
-        padding: 1.5rem;
-        overflow: hidden;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        padding: 2rem;
+        box-shadow: 0 12px 30px 5px rgba(0, 0, 0, 0.18);
+        width: 100%;
+        max-width: 1200px;
         position: relative;
         z-index: 1;
     }
 
-    /* Encabezado de la tarjeta */
     .card-header {
-        background-color: transparent !important;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         border-bottom: 3px solid #007BFF;
-        padding-bottom: 0.5rem;
         margin-bottom: 1rem;
-        text-align: center;
-        position: relative;
+        background-color: transparent !important;
+        padding-bottom: 0.5rem;
     }
 
-    /* Botón inicio en la esquina superior derecha dentro del header */
-    .btn-inicio {
-        position: absolute;
-        top: 50%;
-        right: 1rem;
-        transform: translateY(-50%);
-        font-size: 0.9rem;
+    .card-header h2 {
+        margin: 0 auto;
+        color: #000;
+        font-weight: bold;
+        font-size: 2.25rem;
     }
 
-    /* Contenedor del filtro */
-    .d-flex.filter-container {
+    .filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
         justify-content: flex-start;
         align-items: center;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-        margin-bottom: 1rem;
     }
 
-    /* Input filtro tamaño igual */
-    .filtro-input {
+    .filter-row input, .filter-row select {
         font-size: 0.85rem;
-        max-width: 300px;
-        flex-grow: 1;
+        flex: 1 1 200px;
     }
 
-    /* Tabla con estilo igual */
     .table {
         font-size: 0.9rem;
     }
@@ -108,25 +102,8 @@
     }
 
     .table th, .table td {
-        padding: 0.4rem 0.75rem;
+        padding: 0.5rem 0.75rem;
         vertical-align: middle;
-    }
-
-    table th:nth-child(1), table td:nth-child(1) {
-        width: 40px;
-        text-align: center;
-    }
-
-    table th:nth-child(2), table td:nth-child(2),
-    table th:nth-child(3), table td:nth-child(3),
-    table th:nth-child(4), table td:nth-child(4) {
-        width: 150px;
-    }
-
-    table th:nth-child(5), table td:nth-child(5) {
-        width: 120px;
-        text-align: center;
-        white-space: nowrap;
     }
 
     .pagination-container {
@@ -135,24 +112,29 @@
         display: flex;
         justify-content: center;
     }
+
+    #mensajeResultados {
+        font-weight: 600;
+        color: #000;
+        margin-top: 0.5rem;
+        min-height: 1.2em;
+        text-align: center;
+    }
 </style>
 
-{{-- Barra superior fija --}}
-<div class="header d-flex justify-content-between align-items-center px-3 py-2" style="background-color: #007BFF;">
+<div class="header">
     <div class="d-flex align-items-center">
         <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto;">
         <div class="fw-bold text-white ms-2" style="font-size: 1.5rem;">Clinitek</div>
     </div>
 
-    {{-- Menú desplegable estilo Bootstrap --}}
     <div class="dropdown">
         <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
             ☰
         </button>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-            <li><a class="dropdown-item" href="{{ route('puestos.create') }}">Crear puesto</a></li>
-            <li><a class="dropdown-item" href="{{ route('empleado.create') }}">Registrar empleado</a></li>
-            <li><a class="dropdown-item" href="{{ route('medicos.create') }}">Registrar médico</a></li>
+            <li><a class="dropdown-item" href="{{ route('pacientes.create') }}">Registrar paciente</a></li>
+            <li><a class="dropdown-item" href="{{ route('consultas.index') }}">Registrar consulta</a></li>
         </ul>
     </div>
 </div>
@@ -161,29 +143,27 @@
     <div class="card custom-card shadow-sm">
 
         <div class="card-header">
-            <h5 class="mb-0 text-dark text-center" style="font-size: 2.25rem; font-weight: bold;">Lista de pacientes</h5>
-        </div>
-
-        {{-- Mensaje de éxito --}}
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
-              <strong>{{ session('success') }}</strong>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-            </div>
-        @endif
-
-        {{-- Filtro y botón Inicio --}}
-        <div class="p-3">
-            <div class="d-flex justify-content-center align-items-center gap-2 mb-3 flex-wrap">
-                <input type="text" id="filtroBusqueda" class="form-control filtro-input" placeholder="Buscar por nombre, apellido o identidad...">
-            </div>
-
-            <a href="{{ route('inicio') }}" class="btn btn-light btn-inicio">
+            <a href="{{ route('inicio') }}" class="btn btn-light">
                 <i class="bi bi-house-door"></i> Inicio
+            </a>
+            <h2>Lista de pacientes</h2>
+            <a href="{{ route('pacientes.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Registrar paciente
             </a>
         </div>
 
-        {{-- Tabla de pacientes --}}
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        <div class="filter-row">
+    <input type="text" id="inputFiltro" class="form-control" placeholder="Buscar por nombre, apellido o identidad" style="max-width: 300px;" value="{{ request('filtro') }}">
+</div>
+
+
         <div class="table-responsive">
             <table class="table table-bordered table-striped align-middle mb-0">
                 <thead>
@@ -197,103 +177,68 @@
                     </tr>
                 </thead>
                 <tbody id="tablaPacientes">
-                    @forelse ($pacientes as $index => $paciente)
-                    <tr>
-                        <td>{{ $pacientes->firstItem() + $index }}</td>
-                        <td>{{ $paciente->nombre }}</td>
-                        <td>{{ $paciente->apellidos }}</td>
-                        <td>{{ $paciente->identidad }}</td>
-                        <td>
-                            <span class="badge
-                              {{ $paciente->genero === 'Masculino' ? 'bg-primary' :
-                                 ($paciente->genero === 'Femenino' ? 'bg-warning text-dark' : 'bg-info') }}">
-                              {{ $paciente->genero ?? 'No especificado' }}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="d-flex gap-2 justify-content-center">
-                                <a href="{{ route('pacientes.show', $paciente->id) }}" class="btn btn-sm btn-outline-info me-2" title="Ver detalles">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <a href="{{ route('pacientes.edit', $paciente->id) }}" class="btn btn-sm btn-outline-warning" title="Editar paciente">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
+                    @forelse($pacientes as $index => $paciente)
+                        <tr>
+                            <td>{{ $pacientes->firstItem() + $index }}</td>
+                            <td>{{ $paciente->nombre }}</td>
+                            <td>{{ $paciente->apellidos }}</td>
+                            <td>{{ $paciente->identidad }}</td>
+                            <td>{{ $paciente->genero ?? 'No especificado' }}</td>
+                            <td>
+                                <a href="{{ route('pacientes.show', $paciente->id) }}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                                <a href="{{ route('pacientes.edit', $paciente->id) }}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil-square"></i></a>
+                            </td>
+                        </tr>
                     @empty
-                    <tr>
-                        <td colspan="6" class="text-center">No hay pacientes registrados.</td>
-                    </tr>
+                        <tr>
+                            <td colspan="6" class="text-center">No hay pacientes registrados.</td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-        <div id="mensajeResultados" class="text-center mt-3" style="min-height: 1.2em;"></div>
+        <div id="mensajeResultados">
+            Se encontraron {{ $pacientes->total() }} resultado{{ $pacientes->total() != 1 ? 's' : '' }}.
+        </div>
 
-        @if ($pacientes->hasPages())
+        @if($pacientes->hasPages())
             <div class="pagination-container">
                 {{ $pacientes->links('pagination::bootstrap-4') }}
             </div>
         @endif
+
     </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-@php
-    $totalPacientes = method_exists($pacientes, 'total') ? $pacientes->total() : $pacientes->count();
-@endphp
-
 <script>
 $(document).ready(function () {
-    const noResultadosRow = $('<tr class="no-resultados"><td colspan="6" class="text-center">No hay pacientes que coincidan con la búsqueda.</td></tr>');
-    noResultadosRow.hide();
-    $('#tablaPacientes').append(noResultadosRow);
-
-    function actualizarMensaje(totalVisible, filtroVacio) {
-        if (filtroVacio) {
-            $('#mensajeResultados').html('');
-        } else if (totalVisible === 0) {
-            $('#mensajeResultados').html('No hay pacientes que coincidan con la búsqueda.');
-        } else {
-            $('#mensajeResultados').html(`<strong>Se encontraron ${totalVisible} resultado${totalVisible > 1 ? 's' : ''}.</strong>`);
-        }
+    function actualizarMensaje(total) {
+        $('#mensajeResultados').html(total === 0 ? 'No se encontraron resultados.' : `Se encontraron ${total} resultado${total > 1 ? 's' : ''}.`);
     }
 
     function filtrarTabla() {
-        let valor = $('#filtroBusqueda').val().toLowerCase();
+        let filtro = $('#inputFiltro').val().toLowerCase();
         let totalVisible = 0;
-
-        $('#tablaPacientes tr').not('.no-resultados').each(function () {
-            let textoFila = $(this).text().toLowerCase();
-            if (textoFila.indexOf(valor) > -1) {
+        $('#tablaPacientes tr').each(function () {
+            let texto = $(this).text().toLowerCase();
+            if (texto.indexOf(filtro) > -1) {
                 $(this).show();
                 totalVisible++;
             } else {
                 $(this).hide();
             }
         });
+        actualizarMensaje(totalVisible);
 
-        if (totalVisible === 0) {
-            noResultadosRow.show();
-        } else {
-            noResultadosRow.hide();
-        }
-
-        actualizarMensaje(totalVisible, valor === '');
-
-        // Reenumerar visibles
         let indice = 1;
-        $('#tablaPacientes tr:visible').not('.no-resultados').each(function () {
+        $('#tablaPacientes tr:visible').each(function () {
             $(this).find('td:first').text(indice++);
         });
     }
 
-    $('#filtroBusqueda').on('keyup', filtrarTabla);
-
-    $('#mensajeResultados').text('');
+    $('#inputFiltro').on('keyup', filtrarTabla);
 });
 </script>
 @endsection
