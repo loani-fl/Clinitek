@@ -490,7 +490,6 @@
             </div>
 
             <script>
-                // Desaparece automáticamente después de 3 segundos
                 setTimeout(function() {
                     let alertEl = document.getElementById('alert-permission');
                     if (alertEl) {
@@ -513,39 +512,34 @@
         </div>
         @endif
 
-        <form action="{{ route('login.process') }}" method="POST" id="loginForm" autocomplete="off" novalidate>
+        <form action="{{ route('login.process') }}" method="POST" id="loginForm" autocomplete="off">
             @csrf
 
-            <div class="form-group" id="emailGroup">
+            <div class="form-group @error('email') has-error @enderror" id="emailGroup">
                 <label class="form-label">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                         <polyline points="22,6 12,13 2,6"/>
                     </svg>
-                   El usuario o correo electrónico es obligatorio
+                    Usuario o correo electrónico
                 </label>
-               <input
-    type="text"
-    name="email"
-    id="email"
-    class="form-control-modern"
-    placeholder="Usuario o correo"
-    value="{{ request('email') ?? old('email') }}"
-    autocomplete="off"
-     maxlength="70"
->
-
-                <div class="error-message" id="emailError">
+                <input
+                    type="text"
+                    name="email"
+                    id="email"
+                    class="form-control-modern"
+                    placeholder="Usuario o correo"
+                    value="{{ $errors->any() ? old('email') : '' }}"
+                    autocomplete="off"
+                >
+                <div class="error-message @error('email') show @enderror" id="emailError">
                     @error('email')
                         {{ $message }}
-                  @else
-    Ingresa un correo o usuario válido
-@enderror
-
+                    @enderror
                 </div>
             </div>
 
-            <div class="form-group" id="passwordGroup">
+            <div class="form-group @error('password') has-error @enderror" id="passwordGroup">
                 <label class="form-label">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -561,7 +555,6 @@
                         class="form-control-modern with-icon"
                         placeholder="••••••••"
                         autocomplete="new-password"
-                         maxlength="100"
                     >
                     <button type="button" class="toggle-password" id="togglePassword">
                         <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -574,11 +567,9 @@
                         </svg>
                     </button>
                 </div>
-                <div class="error-message" id="passwordError">
+                <div class="error-message @error('password') show @enderror" id="passwordError">
                     @error('password')
                         {{ $message }}
-                    @else
-                        La contraseña es obligatoria
                     @enderror
                 </div>
             </div>
@@ -614,23 +605,47 @@ function goToForgotPassword() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('loginForm');
+    const loginForm = document.getElementById('loginForm');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const emailError = document.getElementById('emailError');
     const passwordError = document.getElementById('passwordError');
     const emailGroup = document.getElementById('emailGroup');
     const passwordGroup = document.getElementById('passwordGroup');
+    const submitBtn = document.getElementById('submitBtn');
     const togglePassword = document.getElementById('togglePassword');
     const eyeIcon = document.getElementById('eyeIcon');
     const eyeOffIcon = document.getElementById('eyeOffIcon');
+
+    // ===== NUEVO: LIMPIAR FORMULARIO AL RECARGAR O VOLVER =====
+    const hasServerErrors = {{ $errors->any() ? 'true' : 'false' }};
+    const isBackButton = (window.performance && window.performance.navigation.type === 2);
+    
+    if (!hasServerErrors || isBackButton) {
+        emailInput.value = '';
+        passwordInput.value = '';
+        emailError.classList.remove('show');
+        passwordError.classList.remove('show');
+        emailError.textContent = '';
+        passwordError.textContent = '';
+        emailGroup.classList.remove('has-error');
+        passwordGroup.classList.remove('has-error');
+        if (loginForm) loginForm.reset();
+    }
+    
+    setTimeout(function() {
+        if (!hasServerErrors || isBackButton) {
+            emailInput.value = '';
+            passwordInput.value = '';
+        }
+    }, 50);
+    // ===== FIN: LIMPIAR FORMULARIO =====
 
     // Funcionalidad del ojito para mostrar/ocultar contraseña
     togglePassword.addEventListener('click', function() {
         const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
         passwordInput.setAttribute('type', type);
 
-        // Cambiar icono
         if (type === 'text') {
             eyeIcon.style.display = 'none';
             eyeOffIcon.style.display = 'block';
@@ -640,71 +655,108 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Limpiar errores cuando el usuario empieza a escribir
+    emailInput.addEventListener('input', function() {
+        if (this.value.trim() !== '') {
+            emailError.classList.remove('show');
+            emailError.textContent = '';
+            emailGroup.classList.remove('has-error');
+        }
+    });
+
+    passwordInput.addEventListener('input', function() {
+        if (this.value.trim() !== '') {
+            passwordError.classList.remove('show');
+            passwordError.textContent = '';
+            passwordGroup.classList.remove('has-error');
+        }
+    });
+
+    // Validación al enviar el formulario
+    loginForm.addEventListener('submit', function(e) {
+        let isValid = true;
+
+        const emailValue = emailInput.value.trim();
+        if (emailValue === '') {
+            e.preventDefault();
+            emailError.textContent = 'El usuario o correo electrónico es obligatorio.';
+            emailError.classList.add('show');
+            emailGroup.classList.add('has-error');
+            isValid = false;
+        } else {
+            emailError.classList.remove('show');
+            emailError.textContent = '';
+            emailGroup.classList.remove('has-error');
+        }
+
+        const passwordValue = passwordInput.value.trim();
+        if (passwordValue === '') {
+            e.preventDefault();
+            passwordError.textContent = 'La contraseña es obligatoria.';
+            passwordError.classList.add('show');
+            passwordGroup.classList.add('has-error');
+            isValid = false;
+        } else if (passwordValue.length < 6) {
+            e.preventDefault();
+            passwordError.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+            passwordError.classList.add('show');
+            passwordGroup.classList.add('has-error');
+            isValid = false;
+        } else {
+            passwordError.classList.remove('show');
+            passwordError.textContent = '';
+            passwordGroup.classList.remove('has-error');
+        }
+
+        if (!isValid) {
+            if (emailValue === '') {
+                emailInput.focus();
+            } else if (passwordValue === '' || passwordValue.length < 6) {
+                passwordInput.focus();
+            }
+        }
+    });
+
     // Mostrar errores del servidor si existen
     @if($errors->has('email'))
+        emailError.textContent = `{{ $errors->first('email') }}`;
         emailError.classList.add('show');
         emailGroup.classList.add('has-error');
     @endif
 
     @if($errors->has('password'))
+        passwordError.textContent = `{{ $errors->first('password') }}`;
         passwordError.classList.add('show');
         passwordGroup.classList.add('has-error');
     @endif
+});
 
-    // Validación en tiempo real para email
-    emailInput.addEventListener('blur', validateEmail);
-    emailInput.addEventListener('input', function() {
-        if (emailError.classList.contains('show')) {
-            validateEmail();
+// ===== NUEVO: DETECTAR BOTÓN VOLVER DEL NAVEGADOR =====
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginForm = document.getElementById('loginForm');
+        
+        if (emailInput) emailInput.value = '';
+        if (passwordInput) passwordInput.value = '';
+        if (loginForm) loginForm.reset();
+        
+        const emailError = document.getElementById('emailError');
+        const passwordError = document.getElementById('passwordError');
+        const emailGroup = document.getElementById('emailGroup');
+        const passwordGroup = document.getElementById('passwordGroup');
+        
+        if (emailError) {
+            emailError.classList.remove('show');
+            emailError.textContent = '';
         }
-    });
-
-    // Validación en tiempo real para contraseña
-    passwordInput.addEventListener('blur', validatePassword);
-    passwordInput.addEventListener('input', function() {
-        if (passwordError.classList.contains('show')) {
-            validatePassword();
-        }
-    });
-
-    // Validación al enviar el formulario
-    form.addEventListener('submit', function(e) {
-        const emailValid = validateEmail();
-        const passwordValid = validatePassword();
-
-        if (!emailValid || !passwordValid) {
-            e.preventDefault();
-        }
-    });
-function validateEmail() {
-    const email = emailInput.value.trim();
-
-    if (email === '') {
-        emailError.textContent = 'El usuario o correo electrónico es obligatorio';
-        emailError.classList.add('show');
-        emailGroup.classList.add('has-error');
-        return false;
-    } else {
-        emailError.classList.remove('show');
-        emailGroup.classList.remove('has-error');
-        return true;
-    }
-}
-
-
-    function validatePassword() {
-        const password = passwordInput.value;
-
-        if (password === '') {
-            passwordError.textContent = 'La contraseña es obligatoria';
-            passwordError.classList.add('show');
-            passwordGroup.classList.add('has-error');
-            return false;
-        } else {
+        if (passwordError) {
             passwordError.classList.remove('show');
-            passwordGroup.classList.remove('has-error');
-            return true;
+            passwordError.textContent = '';
         }
+        if (emailGroup) emailGroup.classList.remove('has-error');
+        if (passwordGroup) passwordGroup.classList.remove('has-error');
     }
 });
 </script>
