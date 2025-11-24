@@ -522,14 +522,14 @@
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                         <polyline points="22,6 12,13 2,6"/>
                     </svg>
-                    Correo electrónico o usuario
+                   El usuario o correo electrónico es obligatorio
                 </label>
                <input
     type="text"
     name="email"
     id="email"
     class="form-control-modern"
-    placeholder="Correo o usuario"
+    placeholder="Usuario o correo"
     value="{{ request('email') ?? old('email') }}"
     autocomplete="off"
      maxlength="70"
@@ -680,7 +680,7 @@ function validateEmail() {
     const email = emailInput.value.trim();
 
     if (email === '') {
-        emailError.textContent = 'El correo o usuario es obligatorio';
+        emailError.textContent = 'El usuario o correo electrónico es obligatorio';
         emailError.classList.add('show');
         emailGroup.classList.add('has-error');
         return false;

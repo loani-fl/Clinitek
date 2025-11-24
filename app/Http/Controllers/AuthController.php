@@ -17,27 +17,28 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-
         // Validación con límites de caracteres
-    $request->validate([
-        'email' => [
-            'required',
-            'string',
-            'max:70'   // máximo 100 caracteres
-        ],
-        'password' => [
-            'required',
-            'string',
-            'min:8',    // mínimo 8 caracteres
-            'max:100'   // máximo 128 caracteres
-        ],
-    ], [
-            'email.required' => 'El correo o usuario es obligatorio',
+        $request->validate([
+            'email' => [
+                'required',
+                'string',
+                'max:70'
+            ],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'max:100'
+            ],
+        ], [
+            'email.required' => 'El usuario o correo electrónico es obligatorio',
+            'email.max' => 'El usuario o correo electrónico no puede exceder 70 caracteres',
             'password.required' => 'La contraseña es obligatoria',
-            'password.min' => 'La contraseña debe tener al menos 8 caracteres'
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres',
+            'password.max' => 'La contraseña no puede exceder 100 caracteres'
         ]);
 
-        $login = $request->input('email'); // Puede ser correo o nombre
+        $login = $request->input('email');
 
         // Detectar si es correo válido
         if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
@@ -48,11 +49,18 @@ class AuthController extends Controller
             $usuario = Usuario::where('name', $login)->first();
         }
 
-        // Verificar usuario y contraseña
-        if (!$usuario || !Hash::check($request->password, $usuario->password)) {
+        // Verificar si el usuario existe
+        if (!$usuario) {
             return back()
                 ->withInput($request->only('email'))
-                ->withErrors(['email' => 'Correo/usuario o contraseña incorrectos']);
+                ->withErrors(['email' => 'El correo o usuario no está registrado']);
+        }
+
+        // Verificar contraseña
+        if (!Hash::check($request->password, $usuario->password)) {
+            return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['password' => 'La contraseña es incorrecta']);
         }
 
         // Loguear usuario

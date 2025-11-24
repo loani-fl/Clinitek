@@ -465,35 +465,36 @@
             <h3 class="recovery-title">Recuperar contraseña</h3>
             <p class="recovery-subtitle">Ingresa tu correo y nueva contraseña</p>
         </div>
-
-        <form method="POST" action="{{ route('password.reset') }}" id="recoveryForm" autocomplete="off" novalidate>
-            @csrf
-
-            <div class="form-group" id="emailGroup">
-                <label class="form-label">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                        <polyline points="22,6 12,13 2,6"/>
-                    </svg>
-                    Correo electrónico
-                </label>
-                <input 
-                    type="email" 
-                    name="usuario" 
-                    id="usuario" 
-                    class="form-control-modern" 
-                    placeholder="ejemplo@correo.com"
-                    value="{{ request('email') ?? old('usuario') }}"
-                    autocomplete="off"
-                >
-                <div class="error-message" id="emailError">
-                    @error('usuario')
-                        {{ $message }}
-                    @else
-                        Ingresa un correo electrónico válido
-                    @enderror
-                </div>
-            </div>
+<form id="recoveryForm" method="POST" action="{{ route('password.reset') }}" novalidate>
+    @csrf
+    
+    <div class="form-group" id="emailGroup">
+        <label class="form-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+            </svg>
+             Usuario o correo electrónico
+        </label>
+        <div class="input-wrapper">
+            <input 
+                type="text" 
+                name="usuario" 
+                id="usuario" 
+                class="form-control-modern" 
+                placeholder="Usuario o correo"
+                value="{{ old('usuario', request('email')) }}"
+                maxlength="70"
+            >
+        </div>
+        <div class="error-message" id="emailError">
+            @error('usuario')
+                {{ $message }}
+            @else
+                El usuario o correo electrónico es obligatorio
+            @enderror
+        </div>
+    </div>
 
             <div class="form-group" id="passwordGroup">
                 <label class="form-label">
@@ -511,6 +512,7 @@
                         class="form-control-modern with-icon" 
                         placeholder="••••••••"
                         autocomplete="new-password"
+                        maxlength="100"
                     >
                     <button type="button" class="toggle-password" id="togglePassword">
                         <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -548,6 +550,7 @@
                         class="form-control-modern with-icon" 
                         placeholder="••••••••"
                         autocomplete="new-password"
+                        maxlength="100"
                     >
                     <button type="button" class="toggle-password" id="toggleConfirm">
                         <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -648,32 +651,23 @@ document.addEventListener('DOMContentLoaded', function() {
         passwordGroup.classList.add('has-error');
     @endif
 
-    // Validación en tiempo real para email
+    // Validación en tiempo real para correo/usuario
+    emailInput.addEventListener('input', validateEmail);
     emailInput.addEventListener('blur', validateEmail);
-    emailInput.addEventListener('input', function() {
-        if (emailError.classList.contains('show')) {
-            validateEmail();
-        }
-    });
 
     // Validación en tiempo real para contraseña
-    passwordInput.addEventListener('blur', validatePassword);
     passwordInput.addEventListener('input', function() {
-        if (passwordError.classList.contains('show')) {
-            validatePassword();
-        }
+        validatePassword();
+        // Si hay algo en confirmar, revalidar también
         if (confirmInput.value !== '') {
             validateConfirm();
         }
     });
+    passwordInput.addEventListener('blur', validatePassword);
 
     // Validación en tiempo real para confirmar contraseña
+    confirmInput.addEventListener('input', validateConfirm);
     confirmInput.addEventListener('blur', validateConfirm);
-    confirmInput.addEventListener('input', function() {
-        if (confirmError.classList.contains('show')) {
-            validateConfirm();
-        }
-    });
 
     // Validación al enviar el formulario
     form.addEventListener('submit', function(e) {
@@ -687,20 +681,20 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function validateEmail() {
-        const email = emailInput.value.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const login = emailInput.value.trim();
 
-        if (email === '') {
-            emailError.textContent = 'El correo electrónico es obligatorio';
+        if (login === '') {
+            emailError.textContent = 'El usuario o correo electrónico es obligatorio';
             emailError.classList.add('show');
             emailGroup.classList.add('has-error');
             return false;
-        } else if (!emailRegex.test(email)) {
-            emailError.textContent = 'Ingresa un correo electrónico válido';
+        } else if (login.length > 70) {
+            emailError.textContent = 'Máximo 70 caracteres';
             emailError.classList.add('show');
             emailGroup.classList.add('has-error');
             return false;
         } else {
+            // ✅ Quitar errores cuando esté correcto
             emailError.classList.remove('show');
             emailGroup.classList.remove('has-error');
             return true;
@@ -726,6 +720,7 @@ document.addEventListener('DOMContentLoaded', function() {
             passwordGroup.classList.add('has-error');
             return false;
         } else {
+            // ✅ Quitar errores cuando esté correcto
             passwordError.classList.remove('show');
             passwordGroup.classList.remove('has-error');
             return true;
@@ -747,6 +742,7 @@ document.addEventListener('DOMContentLoaded', function() {
             confirmGroup.classList.add('has-error');
             return false;
         } else {
+            // ✅ Quitar errores cuando esté correcto
             confirmError.classList.remove('show');
             confirmGroup.classList.remove('has-error');
             return true;
