@@ -39,26 +39,89 @@
         .logo-text h1 { color: white; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: 1px; }
         .logo-text p { color: rgba(255, 255, 255, 0.9); font-size: 0.85rem; margin: 0; }
 
-        .logo-image {
-            height: 65px;
-            width: auto;
-            max-width: 200px;
-            object-fit: contain;
-            display: block;
+        /* Sección de navegación derecha */
+        .nav-right-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .logo-text h1 {
-            color: white;
-            font-size: 1.8rem;
+        /* Badge de usuario compacto */
+        .user-profile-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px 6px 6px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
+            border-radius: 50px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+        }
+
+        .user-profile-badge:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.12) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-color: rgba(255, 255, 255, 0.35);
+        }
+
+        .user-profile-badge:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             font-weight: 700;
-            margin: 0;
-            letter-spacing: 1px;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
         }
 
-        .logo-text p {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 0.85rem;
-            margin: 0;
+        .user-profile-badge:hover .user-avatar {
+            transform: scale(1.08);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .user-name {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @keyframes fadeInSlideRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .user-profile-badge {
+            animation: fadeInSlideRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* Dropdown mejorado */
@@ -197,6 +260,11 @@
                 gap: 1rem;
             }
 
+            .nav-right-section {
+                width: 100%;
+                justify-content: center;
+            }
+
             .hero-title {
                 font-size: 2rem;
             }
@@ -222,27 +290,43 @@
                 <p>Sistema de Gestión Médica</p>
             </div>
         </div>
-        <div class="dropdown">
-    <button class="registro-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="bi bi-grid-3x3-gap-fill"></i> Registros
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end">
-        <li><a class="dropdown-item" href="{{ route('puestos.index') }}"><i class="bi bi-briefcase"></i> Gestión de puestos</a></li>
-        <li><a class="dropdown-item" href="{{ route('empleado.index') }}"><i class="bi bi-person-badge"></i> Gestión de empleados</a></li>
-        <li><a class="dropdown-item" href="{{ route('pacientes.index') }}"><i class="bi bi-people"></i> Gestión de pacientes</a></li>
-        <li><a class="dropdown-item" href="{{ route('usuarios.index') }}"><i class="bi bi-person-plus"></i> Gestión de usuarios</a></li>
-        <li><a class="dropdown-item" href="{{ route('roles.index') }}"><i class="bi bi-person-plus"></i> Gestión de roles</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li>
-            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
-                @csrf
-                <button type="submit" class="dropdown-item text-danger">
-                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+        
+        <div class="nav-right-section">
+            <!-- Badge de usuario -->
+            @if(auth()->check())
+            <div class="user-profile-badge">
+                <div class="user-avatar">
+                    {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->email, 0, 1)) }}
+                </div>
+                <span class="user-name">
+                    {{ auth()->user()->name ?? auth()->user()->email }}
+                </span>
+            </div>
+            @endif
+
+            <!-- Dropdown de registros -->
+            <div class="dropdown">
+                <button class="registro-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-grid-3x3-gap-fill"></i> Registros
                 </button>
-            </form>
-        </li>
-    </ul>
-</div>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{{ route('puestos.index') }}"><i class="bi bi-briefcase"></i> Gestión de puestos</a></li>
+                    <li><a class="dropdown-item" href="{{ route('empleado.index') }}"><i class="bi bi-person-badge"></i> Gestión de empleados</a></li>
+                    <li><a class="dropdown-item" href="{{ route('pacientes.index') }}"><i class="bi bi-people"></i> Gestión de pacientes</a></li>
+                    <li><a class="dropdown-item" href="{{ route('usuarios.index') }}"><i class="bi bi-person-plus"></i> Gestión de usuarios</a></li>
+                    <li><a class="dropdown-item" href="{{ route('roles.index') }}"><i class="bi bi-person-plus"></i> Gestión de roles</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 </nav>
 
@@ -271,7 +355,7 @@
             </a>
         </div>
 
-        <!-- Segunda fila - 4 columnas -->
+        <!-- Segunda fila -->
         <div class="services-grid">
             <a href="{{ route('farmacias.index') }}" style="text-decoration: none; color: inherit;">
                 <article class="service-card"><div class="icon-circle"><i class="bi bi-bag-heart service-icon"></i></div><h3 class="service-title">Farmacia</h3><p class="service-desc">Medicamentos y productos farmacéuticos de alta calidad.</p></article>
@@ -285,9 +369,7 @@
             <a href="{{ route('inventario.index') }}" style="text-decoration: none; color: inherit;">
                 <article class="service-card"><div class="icon-circle"><i class="bi bi-clipboard-data-fill service-icon"></i></div><h3 class="service-title">Inventario</h3><p class="service-desc">Control completo del inventario y suministros médicos.</p></article>
             </a>
-
-            <a href="{{ route('controles-prenatales.index') }}"
- style="text-decoration: none; color: inherit;">
+            <a href="{{ route('controles-prenatales.index') }}" style="text-decoration: none; color: inherit;">
                 <article class="service-card">
                     <div class="icon-circle">
                         <i class="bi bi-heart-pulse-fill service-icon"></i>
