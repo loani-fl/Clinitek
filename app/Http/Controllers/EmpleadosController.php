@@ -28,163 +28,229 @@ class EmpleadosController extends Controller
 }
 
 
-    public function store(Request $request)
-    {
-        $hoy = Carbon::today();
-        $hace18 = $hoy->copy()->subYears(18);
-        $hace65 = $hoy->copy()->subYears(65);
-        $anio = now()->year;
-        $fechaLimite = now()->subYears(18);
-        $departamentosValidos = ['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18'];
+  public function store(Request $request)
+{
+    $hoy = Carbon::today();
+    $hace18 = $hoy->copy()->subYears(18);
+    $hace65 = $hoy->copy()->subYears(65);
+    $anio = now()->year;
+    $fechaLimite = now()->subYears(18);
 
-        $rules = [
-            'nombres' => ['required', 'string', 'max:50', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'],
-            'apellidos' => ['required', 'string', 'max:50', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'],
-           'identidad' => [
-        'required',
-        'digits:13',
-        'unique:listaempleados,identidad',
-        function ($attribute, $value, $fail) {
-            $departamentosMunicipios = [
-                '01' => 8, '02' => 10, '03' => 21, '04' => 23, '05' => 12,
-                '06' => 16, '07' => 19, '08' => 28, '09' => 9, '10' => 17,
-                '11' => 4, '12' => 19, '13' => 28, '14' => 16, '15' => 23,
-                '16' => 28, '17' => 9, '18' => 11,
-            ];
+    $rules = [
+        'nombres' => ['required', 'string', 'max:50', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'],
+        'apellidos' => ['required', 'string', 'max:50', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'],
+        'identidad' => [
+            'required',
+            'digits:13',
+            'unique:listaempleados,identidad',
+            function ($attribute, $value, $fail) {
+                $departamentosMunicipios = [
+                    '01' => 8, '02' => 10, '03' => 21, '04' => 23, '05' => 12,
+                    '06' => 16, '07' => 19, '08' => 28, '09' => 9, '10' => 17,
+                    '11' => 4, '12' => 19, '13' => 28, '14' => 16, '15' => 23,
+                    '16' => 28, '17' => 9, '18' => 11,
+                ];
 
-            // Validar departamento
-            $codigoDepartamento = substr($value, 0, 2);
-            if (!array_key_exists($codigoDepartamento, $departamentosMunicipios)) {
-                return $fail('El código del departamento en la identidad no es válido.');
+                // Validar departamento
+                $codigoDepartamento = substr($value, 0, 2);
+                if (!array_key_exists($codigoDepartamento, $departamentosMunicipios)) {
+                    return $fail('El código del departamento en la identidad no es válido.');
+                }
+
+                // Validar municipio
+                $codigoMunicipio = (int) substr($value, 2, 2);
+                $maxMunicipios = $departamentosMunicipios[$codigoDepartamento];
+                if ($codigoMunicipio < 1 || $codigoMunicipio > $maxMunicipios) {
+                    return $fail('El código de municipio en la identidad no es válido.');
+                }
+
+                // Validar año
+                $anioNacimiento = substr($value, 4, 4);
+                $anioActual = date('Y');
+                if ($anioNacimiento < 1900 || $anioNacimiento > $anioActual) {
+                    return $fail('El año de nacimiento en la identidad no es válido.');
+                }
+
+                // Validar edad
+                $edad = $anioActual - $anioNacimiento;
+                if ($edad < 18 || $edad > 65) {
+                    return $fail("La edad calculada a partir de la identidad no es válida (debe estar entre 18 y 65 años; edad actual: $edad).");
+                }
             }
+        ],
+        'telefono' => ['required', 'digits:8', 'regex:/^[2389][0-9]{7}$/', 'unique:listaempleados,telefono'],
+        'correo' => ['required', 'string', 'max:30', 'email', 'unique:listaempleados,correo'],
+        'fecha_ingreso' => [
+            'required',
+            'date',
+            function ($attribute, $value, $fail) {
+                $fecha = Carbon::parse($value);
+                $anio = now()->year;
 
-            // Validar municipio
-            $codigoMunicipio = (int) substr($value, 2, 2);
-            $maxMunicipios = $departamentosMunicipios[$codigoDepartamento];
-            if ($codigoMunicipio < 1 || $codigoMunicipio > $maxMunicipios) {
-                return $fail('El código de municipio en la identidad no es válido.');
-            }
+                // Min: hoy
+                $min = now()->startOfDay();
 
-            // Validar año
-            $anioNacimiento = substr($value, 4, 4);
-            $anioActual = date('Y');
-            if ($anioNacimiento < 1900 || $anioNacimiento > $anioActual) {
-                return $fail('El año de nacimiento en la identidad no es válido.');
-            }
+                // Max: 30 de enero del próximo año
+                $max = Carbon::createFromDate($anio + 1, 1, 30)->endOfDay();
 
-            // Validar edad
-            $edad = $anioActual - $anioNacimiento;
-            if ($edad < 18 || $edad > 65) {
-                return $fail("La edad calculada a partir de la identidad no es válida (debe estar entre 18 y 65 años; edad actual: $edad).");
-            }
-        }
-    ],
+                if ($fecha->lt($min) || $fecha->gt($max)) {
+                    $fail("La fecha de ingreso debe estar entre hoy (" . $min->toDateString() . ") y el 30 de enero de " . ($anio + 1) . ".");
+                }
+            },
+        ],
+        'fecha_nacimiento' => [
+            'required', 'date',
+            function ($attribute, $value, $fail) use ($hace18, $hace65) {
+                $fecha = Carbon::parse($value);
+                if ($fecha->gt($hace18)) {
+                    $fail('Debes tener al menos 18 años.');
+                }
+                if ($fecha->lt($hace65)) {
+                    $fail('No debes tener más de 65 años.');
+                }
+            },
+        ],
+        'direccion' => ['required', 'string', 'max:250', 'regex:/^[\pL\pN\s#\/\-\(\)]+$/u'],
+        'observaciones' => ['required', 'string', 'max:350', 'regex:/^[\pL\pN\s]+$/u'],
+        'genero' => 'required|in:Masculino,Femenino,Otro',
+        'estado_civil' => 'nullable|in:Soltero,Casado,Divorciado,Viudo',
+        'puesto_id' => 'required|exists:puestos,id',
+        'salario' => 'required|numeric|between:0,99999.99',
+        'area' => 'required|string|max:50',
+        'turno_asignado' => 'required|string|max:50',
+        'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ];
 
+    $messages = [
+        // Mensajes generales
+        'required' => 'El campo :attribute es obligatorio.',
+        'string' => 'El campo :attribute debe ser texto.',
+        'max' => 'El campo :attribute no puede tener más de :max caracteres.',
+        'digits' => 'El campo :attribute debe tener exactamente :digits dígitos.',
+        'email' => 'El campo :attribute debe ser un correo electrónico válido.',
+        'unique' => 'El :attribute ya está registrado en el sistema.',
+        'date' => 'El campo :attribute debe ser una fecha válida.',
+        'in' => 'El valor seleccionado para :attribute no es válido.',
+        'numeric' => 'El campo :attribute debe ser un número.',
+        'between' => 'El campo :attribute debe estar entre :min y :max.',
+        'exists' => 'El :attribute seleccionado no existe.',
+        
+        // Mensajes específicos para nombres y apellidos
+        'nombres.required' => 'El campo nombres es obligatorio.',
+        'nombres.regex' => 'El campo nombres solo puede contener letras y espacios.',
+        'nombres.max' => 'El campo nombres no puede exceder los 50 caracteres.',
+        'apellidos.required' => 'El campo apellidos es obligatorio.',
+        'apellidos.regex' => 'El campo apellidos solo puede contener letras y espacios.',
+        'apellidos.max' => 'El campo apellidos no puede exceder los 50 caracteres.',
+        
+        // Mensajes específicos para identidad
+        'identidad.required' => 'El campo identidad es obligatorio.',
+        'identidad.digits' => 'La identidad debe tener exactamente 13 dígitos.',
+        'identidad.unique' => 'Esta identidad ya está registrada en el sistema.',
+        
+        // Mensajes específicos para teléfono
+        'telefono.required' => 'El campo teléfono es obligatorio.',
+        'telefono.digits' => 'El teléfono debe tener exactamente 8 dígitos.',
+        'telefono.regex' => 'El teléfono debe comenzar con 2, 3, 8 o 9.',
+        'telefono.unique' => 'Este teléfono ya está registrado en el sistema.',
+        
+        // Mensajes específicos para correo
+        'correo.required' => 'El campo correo electrónico es obligatorio.',
+        'correo.email' => 'Debe ingresar un correo electrónico válido.',
+        'correo.max' => 'El correo no puede exceder los 30 caracteres.',
+        'correo.unique' => 'Este correo ya está registrado en el sistema.',
+        
+        // Mensajes específicos para fechas
+        'fecha_ingreso.required' => 'La fecha de ingreso es obligatoria.',
+        'fecha_ingreso.date' => 'La fecha de ingreso debe ser una fecha válida.',
+        'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
+        'fecha_nacimiento.date' => 'La fecha de nacimiento debe ser una fecha válida.',
+        
+        // Mensajes específicos para dirección
+        'direccion.required' => 'El campo dirección es obligatorio.',
+        'direccion.max' => 'La dirección no puede exceder los 250 caracteres.',
+        'direccion.regex' => 'La dirección contiene caracteres no permitidos.',
+        
+        // Mensajes específicos para observaciones
+        'observaciones.required' => 'El campo observaciones es obligatorio.',
+        'observaciones.max' => 'Las observaciones no pueden exceder los 350 caracteres.',
+        'observaciones.regex' => 'Las observaciones solo pueden contener letras, números y espacios.',
+        
+        // Mensajes específicos para género
+        'genero.required' => 'El campo género es obligatorio.',
+        'genero.in' => 'El género seleccionado no es válido.',
+        
+        // Mensajes específicos para estado civil
+        'estado_civil.in' => 'El estado civil seleccionado no es válido.',
+        
+        // Mensajes específicos para puesto
+        'puesto_id.required' => 'Debe seleccionar un puesto.',
+        'puesto_id.exists' => 'El puesto seleccionado no existe.',
+        
+        // Mensajes específicos para salario
+        'salario.required' => 'El campo salario es obligatorio.',
+        'salario.numeric' => 'El salario debe ser un número válido.',
+        'salario.between' => 'El salario debe estar entre 0 y 99,999.99.',
+        
+        // Mensajes específicos para área
+        'area.required' => 'El campo área es obligatorio.',
+        'area.max' => 'El área no puede exceder los 50 caracteres.',
+        
+        // Mensajes específicos para turno
+        'turno_asignado.required' => 'El campo turno asignado es obligatorio.',
+        'turno_asignado.max' => 'El turno asignado no puede exceder los 50 caracteres.',
+        
+        // Mensajes específicos para foto
+        'foto.image' => 'El archivo debe ser una imagen.',
+        'foto.mimes' => 'La foto debe estar en formato JPG, JPEG, PNG o GIF.',
+        'foto.max' => 'La foto no debe pesar más de 2 MB.',
+    ];
 
-            'telefono' => ['required', 'digits:8', 'regex:/^[2389][0-9]{7}$/', 'unique:listaempleados,telefono'],
-            'correo' => ['required', 'string', 'max:30', 'email', 'unique:listaempleados,correo'],
-       'fecha_ingreso' => [
-    'required',
-    'date',
-    function ($attribute, $value, $fail) {
-        $fecha = Carbon::parse($value);
-        $anio = now()->year;
+    $attributes = [
+        'nombres' => 'nombres',
+        'apellidos' => 'apellidos',
+        'identidad' => 'identidad',
+        'telefono' => 'teléfono',
+        'direccion' => 'dirección',
+        'correo' => 'correo electrónico',
+        'fecha_ingreso' => 'fecha de ingreso',
+        'fecha_nacimiento' => 'fecha de nacimiento',
+        'genero' => 'género',
+        'estado_civil' => 'estado civil',
+        'puesto_id' => 'puesto',
+        'salario' => 'salario',
+        'observaciones' => 'observaciones',
+        'area' => 'área',
+        'turno_asignado' => 'turno asignado',
+        'foto' => 'foto',
+    ];
 
-        // Min: hoy
-        $min = now()->startOfDay();
+    // 1. Validar los datos
+    $validated = $request->validate($rules, $messages, $attributes);
 
-        // Max: 30 de enero del próximo año
-        $max = Carbon::createFromDate($anio + 1, 1, 30)->endOfDay();
+    // 2. Buscar el puesto y asignar el área
+    $puesto = Puesto::findOrFail($validated['puesto_id']);
+    $validated['area'] = $puesto->area;
 
-        if ($fecha->lt($min) || $fecha->gt($max)) {
-            $fail("La fecha de ingreso debe estar entre hoy (" . $min->toDateString() . ") y el 30 de enero de " . ($anio + 1) . ".");
-        }
-    },
-],
-
-
-            'fecha_nacimiento' => [
-                'required', 'date',
-                function ($attribute, $value, $fail) use ($hace18, $hace65) {
-                    $fecha = Carbon::parse($value);
-                    if ($fecha->gt($hace18)) {
-                        $fail('Debes tener al menos 18 años.');
-                    }
-                    if ($fecha->lt($hace65)) {
-                        $fail('No debes tener más de 65 años.');
-                    }
-                },
-            ],
-            'direccion' => ['required', 'string', 'max:250', 'regex:/^[\pL\pN\s#\/\-\(\)]+$/u'],
-            'observaciones' => ['required', 'string', 'max:350', 'regex:/^[\pL\pN\s]+$/u'],
-            'genero' => 'required|in:Masculino,Femenino,Otro',
-            'estado_civil' => 'nullable|in:Soltero,Casado,Divorciado,Viudo',
-            'puesto_id' => 'required|exists:puestos,id',
-            'salario' => 'required|numeric|between:0,99999.99',
-            'area' => 'required|string|max:50',
-            'turno_asignado' => 'required|string|max:50',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ];
-
-        $messages = [
-            'required' => ':attribute es obligatorio.',
-            'max' => ':attribute no puede tener más de :max caracteres.',
-            'digits' => ':attribute debe tener exactamente :digits dígitos.',
-            'email' => ':attribute debe ser un correo electrónico válido.',
-            'unique' => ':attribute ya está registrado.',
-            'date' => ':attribute debe ser una fecha válida.',
-            'in' => 'El valor seleccionado para :attribute no es válido.',
-            'numeric' => ':attribute debe ser un número.',
-            'between' => ':attribute debe ser un número válido con hasta 2 decimales.',
-            'foto.image' => 'La imagen debe ser una imagen válida.',
-            'foto.mimes' => 'La imagen debe ser en formato JPG, JPEG, PNG o GIF.',
-            'foto.max' => 'La imagen no debe pesar más de 2 MB.',
-        ];
-
-        $attributes = [
-            'nombres' => 'Nombres',
-            'apellidos' => 'Apellidos',
-            'identidad' => 'Identidad',
-            'telefono' => 'Teléfono',
-            'direccion' => 'Dirección',
-            'correo' => 'Correo electrónico',
-            'fecha_ingreso' => 'Fecha de ingreso',
-            'fecha_nacimiento' => 'Fecha de nacimiento',
-            'genero' => 'Género',
-            'estado_civil' => 'Estado civil',
-            'puesto_id' => 'Puesto',
-            'salario' => 'Sueldo',
-            'observaciones' => 'Observaciones',
-            'area' => 'Área',
-            'turno_asignado' => 'Turno asignado',
-        ];
-
-        // 1. Validar los datos
-        $validated = $request->validate($rules, $messages, $attributes);
-
-        // 2. Buscar el puesto y asignar el área
-        $puesto = Puesto::findOrFail($validated['puesto_id']);
-        $validated['area'] = $puesto->area;
-
-        // 3. Manejar foto si existe
-        if ($request->hasFile('foto')) {
-            $fotoPath = $request->file('foto')->store('fotos_empleados', 'public');
-            $validated['foto'] = $fotoPath; // guarda solo fotos_empleados/archivo.jpg
-        }
-
-        $validated['estado'] = 'activo';
-
-        // 4. Crear el empleado
-        $empleado = Empleado::create($validated);
-
-        if ($empleado) {
-            return redirect()->route('empleado.index')
-                ->with('success', 'Empleado registrado correctamente.')
-                ->with('clearLocalStorage', true);
-        } else {
-            return back()->withErrors('No se pudo registrar el empleado.');
-        }
+    // 3. Manejar foto si existe
+    if ($request->hasFile('foto')) {
+        $fotoPath = $request->file('foto')->store('fotos_empleados', 'public');
+        $validated['foto'] = $fotoPath;
     }
+
+    $validated['estado'] = 'activo';
+
+    // 4. Crear el empleado
+    $empleado = Empleado::create($validated);
+
+    if ($empleado) {
+        return redirect()->route('empleado.index')
+            ->with('success', 'Empleado registrado correctamente.')
+            ->with('clearLocalStorage', true);
+    } else {
+        return back()->withErrors('No se pudo registrar el empleado.');
+    }
+}
     public function index(Request $request)
     {
         $query = Empleado::with('puesto');
