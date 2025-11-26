@@ -286,7 +286,7 @@ class EmpleadosController extends Controller
             ]);
         }
     
-        return view('empleado.index', compact('empleados'));
+        return view('empleados.index', compact('empleados'));
     }
     
     

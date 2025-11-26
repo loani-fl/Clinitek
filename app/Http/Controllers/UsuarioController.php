@@ -53,37 +53,47 @@ class UsuarioController extends Controller
     }
     
     public function store(Request $request)
-    {
-        $request->validate([
-            'persona_id' => 'required|integer',
-            'rol_id' => 'required|exists:roles,id',
-            'password' => 'required|string|min:8|confirmed',
-        ], [
-            'persona_id.required' => 'Debes seleccionar un empleado o médico.',
-            'rol_id.required' => 'Debes seleccionar un rol.',
-            'password.required' => 'La contraseña es obligatoria.',
-            'password.min' => 'La contraseña debe tener mínimo 8 caracteres.',
-            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
-        ]);
-    
-        // Buscar persona (empleado o médico)
-        $persona = \App\Models\Empleado::find($request->persona_id) ?? \App\Models\Medico::find($request->persona_id);
-        if (!$persona) {
-            return back()->withErrors(['persona_id' => 'No se encontró la persona seleccionada.'])->withInput();
-        }
-    
-        $usuario = \App\Models\Usuario::create([
-            'name' => $persona->nombre ?? $persona->name ?? $persona->nombres,
-            'email' => $persona->correo ?? $persona->email,
-            'password' => Hash::make($request->password)
-        ]);
-    
-        // Asignar rol
-        $rol = \Spatie\Permission\Models\Role::find($request->rol_id);
-        $usuario->assignRole($rol);
-    
-        return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente con rol asignado.');
+{
+    // Buscar persona (empleado o médico)
+    $persona = Empleado::find($request->persona_id) ?? Medico::find($request->persona_id);
+    if (!$persona) {
+        return back()->withErrors(['persona_id' => 'No se encontró la persona seleccionada.'])->withInput();
     }
+
+    $correo = $persona->correo ?? $persona->email ?? $request->correo_usuario;
+
+    // Validar todo
+    $request->merge(['correo_usuario' => $correo]); // reemplaza el input con el correo real
+    $request->validate([
+        'persona_id' => 'required|integer',
+        'rol_id' => 'required|exists:roles,id',
+        'correo_usuario' => 'required|email|unique:usuarios,email',
+        'password' => 'required|string|min:8|confirmed',
+    ], [
+        'persona_id.required' => 'Debes seleccionar un empleado o médico.',
+        'rol_id.required' => 'Debes seleccionar un rol.',
+        'correo_usuario.required' => 'El correo electrónico es obligatorio.',
+        'correo_usuario.email' => 'El correo debe ser válido.',
+        'correo_usuario.unique' => 'El correo electrónico ya está registrado.',
+        'password.required' => 'La contraseña es obligatoria.',
+        'password.min' => 'La contraseña debe tener mínimo 8 caracteres.',
+        'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+    ]);
+
+    // Crear usuario
+    $usuario = Usuario::create([
+        'name' => $persona->nombre ?? $persona->nombres ?? $persona->name,
+        'email' => $correo,
+        'password' => Hash::make($request->password)
+    ]);
+
+    // Asignar rol
+    $rol = Role::find($request->rol_id);
+    $usuario->assignRole($rol);
+
+    return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente con rol asignado.');
+}
+
     
 
     public function edit(Usuario $usuario)

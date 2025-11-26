@@ -70,7 +70,7 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('role.permission:puestos.*');
 
     // Empleados
-    Route::resource('empleado', EmpleadosController::class)
+    Route::resource('empleados', EmpleadosController::class)
         ->middleware('role.permission:empleados.*');
 
     // Médicos
