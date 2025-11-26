@@ -2,21 +2,10 @@
 
 @section('content')
 <style>
-    /* Ocultar TODOS los elementos del layout excepto el contenido de login */
-    .header,
-    header,
-    nav,
-    .navbar,
-    footer,
-    .fixed-top,
-    .dropdown,
-    .btn-outline-light,
-    [class*="navbar"],
-    [class*="nav-"],
-    [class*="dropdown"],
-    [id*="navbar"],
-    [id*="nav"],
-    [id*="dropdown"] {
+    /* Ocultar TODOS los elementos del layout */
+    .header, header, nav, .navbar, footer, .fixed-top, .dropdown, .btn-outline-light,
+    [class*="navbar"], [class*="nav-"], [class*="dropdown"],
+    [id*="navbar"], [id*="nav"], [id*="dropdown"] {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
@@ -90,7 +79,7 @@
         border-radius: 24px;
         padding: 35px 35px;
         width: 100%;
-        max-width: 400px;
+        max-width: 420px;
         margin-left: 8%;
         box-shadow:
             0 25px 70px rgba(0, 0, 0, 0.4),
@@ -169,29 +158,6 @@
         text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
     }
 
-    /* Mensaje de éxito */
-    .success-message {
-        background: rgba(34, 197, 94, 0.15);
-        border: 1px solid rgba(34, 197, 94, 0.3);
-        border-radius: 12px;
-        padding: 12px 16px;
-        margin-bottom: 20px;
-        color: rgba(255, 255, 255, 0.95);
-        font-size: 13px;
-        font-weight: 500;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        animation: fadeIn 0.3s ease;
-        display: flex;
-        align-items: center;
-    }
-
-    .success-message svg {
-        width: 16px;
-        height: 16px;
-        margin-right: 8px;
-        flex-shrink: 0;
-    }
-
     .form-group {
         margin-bottom: 24px;
         position: relative;
@@ -220,13 +186,6 @@
         filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
     }
 
-    /* Input con icono de ojo */
-    .input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-
     .form-control-modern {
         width: 100%;
         padding: 13px 18px;
@@ -239,10 +198,6 @@
         font-weight: 500;
         backdrop-filter: blur(10px);
         box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .form-control-modern.with-icon {
-        padding-right: 50px;
     }
 
     .form-control-modern::placeholder {
@@ -260,41 +215,6 @@
         transform: translateY(-2px);
     }
 
-    /* Botón del ojito */
-    .toggle-password {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 5px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        z-index: 10;
-    }
-
-    .toggle-password svg {
-        width: 20px;
-        height: 20px;
-        color: rgba(255, 255, 255, 0.7);
-        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
-        transition: all 0.3s ease;
-    }
-
-    .toggle-password:hover svg {
-        color: rgba(255, 255, 255, 0.95);
-        transform: scale(1.1);
-    }
-
-    .toggle-password:active svg {
-        transform: scale(0.95);
-    }
-
-    /* Mensajes de error estilo Google */
     .error-message {
         display: none;
         color: #ff6b6b;
@@ -336,6 +256,9 @@
             0 8px 25px rgba(102, 126, 234, 0.45),
             0 0 0 1px rgba(255, 255, 255, 0.2);
         margin-top: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .btn-login:hover:not(:disabled) {
@@ -354,12 +277,18 @@
         cursor: not-allowed;
     }
 
-    .forgot-password {
+    .btn-login svg {
+        width: 18px;
+        height: 18px;
+        margin-right: 8px;
+    }
+
+    .back-to-login {
         text-align: center;
         margin-top: 20px;
     }
 
-    .forgot-password a {
+    .back-to-login a {
         color: rgba(255, 255, 255, 0.9);
         text-decoration: none;
         font-size: 13px;
@@ -370,13 +299,13 @@
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
 
-    .forgot-password a:hover {
+    .back-to-login a:hover {
         color: white;
         text-decoration: underline;
         transform: translateY(-1px);
     }
 
-    .forgot-password svg {
+    .back-to-login svg {
         margin-right: 6px;
     }
 
@@ -427,10 +356,6 @@
             padding: 14px 16px;
             font-size: 14px;
         }
-
-        .form-control-modern.with-icon {
-            padding-right: 50px;
-        }
     }
 
     /* Decoración adicional */
@@ -473,49 +398,19 @@
         <div class="login-header">
             <div class="login-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                 </svg>
             </div>
-            <h3 class="login-title">Bienvenido a clinitek</h3>
-            <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
+            <h3 class="login-title">Actualizar Contraseña</h3>
+            <p class="login-subtitle">Ingresa tus datos para actualizar tu contraseña</p>
         </div>
 
-        {{-- Mensaje de error de permisos --}}
-        @if(session('error'))
-            <div id="alert-permission" class="alert alert-warning alert-dismissible fade show text-center" role="alert" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 400px; box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 0.5rem;">
-                <i class="bi bi-exclamation-triangle-fill"></i>
-                <strong>¡Alerta!</strong> {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-
-            <script>
-                setTimeout(function() {
-                    let alertEl = document.getElementById('alert-permission');
-                    if (alertEl) {
-                        alertEl.classList.remove('show');
-                        alertEl.classList.add('hide');
-                        setTimeout(() => alertEl.remove(), 500);
-                    }
-                }, 3000);
-            </script>
-        @endif
-
-        {{-- Mensaje de éxito después de restablecer contraseña --}}
-        @if(session('success'))
-        <div class="success-message">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-            {{ session('success') }}
-        </div>
-        @endif
-
-        <form action="{{ route('login.process') }}" method="POST" id="loginForm" autocomplete="off">
+        <form action="{{ route('password.email') }}" method="POST" id="forgotForm" autocomplete="off">
             @csrf
 
-            <div class="form-group @error('email') has-error @enderror" id="emailGroup">
+            <!-- Campo de nombre de usuario -->
+            <div class="form-group @error('username') has-error @enderror" id="usernameGroup">
                 <label class="form-label">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -525,12 +420,39 @@
                 </label>
                 <input
                     type="text"
+                    name="username"
+                    id="username"
+                    class="form-control-modern"
+                   
+                    value="{{ old('username') }}"
+                    autocomplete="off"
+                    required
+                >
+                <div class="error-message @error('username') show @enderror" id="usernameError">
+                    @error('username')
+                        {{ $message }}
+                    @enderror
+                </div>
+            </div>
+
+            <!-- Campo de correo del .env -->
+            <div class="form-group @error('email') has-error @enderror" id="emailGroup">
+                <label class="form-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    Correo de actualizacion
+                </label>
+                <input
+                    type="email"
                     name="email"
                     id="email"
                     class="form-control-modern"
                    
-                    value="{{ $errors->any() ? old('email') : '' }}"
+                    value="{{ old('email', $email ?? '') }}"
                     autocomplete="off"
+                    required
                 >
                 <div class="error-message @error('email') show @enderror" id="emailError">
                     @error('email')
@@ -539,53 +461,20 @@
                 </div>
             </div>
 
-            <div class="form-group @error('password') has-error @enderror" id="passwordGroup">
-                <label class="form-label">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                    </svg>
-                    Contraseña
-                </label>
-                <div class="input-wrapper">
-                    <input
-                        type="password"
-                        name="password"
-                        id="password"
-                        class="form-control-modern with-icon"
-                       
-                        autocomplete="new-password"
-                    >
-                    <button type="button" class="toggle-password" id="togglePassword">
-                        <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                            <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                        <svg id="eyeOffIcon" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                            <line x1="1" y1="1" x2="23" y2="23"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="error-message @error('password') show @enderror" id="passwordError">
-                    @error('password')
-                        {{ $message }}
-                    @enderror
-                </div>
-            </div>
-
             <button type="submit" class="btn-login" id="submitBtn">
-                Ingresar
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                Enviar enlace
             </button>
 
-            <div class="forgot-password">
-                <a href="{{ route('password.forgot') }}">
+            <div class="back-to-login">
+                <a href="{{ route('login.form') }}">
                     <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="16" x2="12" y2="12"/>
-                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
-                    ¿Olvidaste tu contraseña?
+                    Volver al login
                 </a>
             </div>
         </form>
@@ -594,57 +483,23 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const loginForm = document.getElementById('loginForm');
+    const forgotForm = document.getElementById('forgotForm');
+    const usernameInput = document.getElementById('username');
     const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
+    const usernameError = document.getElementById('usernameError');
     const emailError = document.getElementById('emailError');
-    const passwordError = document.getElementById('passwordError');
+    const usernameGroup = document.getElementById('usernameGroup');
     const emailGroup = document.getElementById('emailGroup');
-    const passwordGroup = document.getElementById('passwordGroup');
-    const submitBtn = document.getElementById('submitBtn');
-    const togglePassword = document.getElementById('togglePassword');
-    const eyeIcon = document.getElementById('eyeIcon');
-    const eyeOffIcon = document.getElementById('eyeOffIcon');
 
-    // ===== LIMPIAR FORMULARIO AL RECARGAR O VOLVER =====
-    const hasServerErrors = {{ $errors->any() ? 'true' : 'false' }};
-    const isBackButton = (window.performance && window.performance.navigation.type === 2);
-    
-    if (!hasServerErrors || isBackButton) {
-        emailInput.value = '';
-        passwordInput.value = '';
-        emailError.classList.remove('show');
-        passwordError.classList.remove('show');
-        emailError.textContent = '';
-        passwordError.textContent = '';
-        emailGroup.classList.remove('has-error');
-        passwordGroup.classList.remove('has-error');
-        if (loginForm) loginForm.reset();
-    }
-    
-    setTimeout(function() {
-        if (!hasServerErrors || isBackButton) {
-            emailInput.value = '';
-            passwordInput.value = '';
-        }
-    }, 50);
-    // ===== FIN: LIMPIAR FORMULARIO =====
-
-    // Funcionalidad del ojito para mostrar/ocultar contraseña
-    togglePassword.addEventListener('click', function() {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-
-        if (type === 'text') {
-            eyeIcon.style.display = 'none';
-            eyeOffIcon.style.display = 'block';
-        } else {
-            eyeIcon.style.display = 'block';
-            eyeOffIcon.style.display = 'none';
+    // Limpiar errores cuando el usuario escribe
+    usernameInput.addEventListener('input', function() {
+        if (this.value.trim() !== '') {
+            usernameError.classList.remove('show');
+            usernameError.textContent = '';
+            usernameGroup.classList.remove('has-error');
         }
     });
 
-    // Limpiar errores cuando el usuario empieza a escribir
     emailInput.addEventListener('input', function() {
         if (this.value.trim() !== '') {
             emailError.classList.remove('show');
@@ -653,100 +508,57 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    passwordInput.addEventListener('input', function() {
-        if (this.value.trim() !== '') {
-            passwordError.classList.remove('show');
-            passwordError.textContent = '';
-            passwordGroup.classList.remove('has-error');
-        }
-    });
-
-    // Validación al enviar el formulario
-    loginForm.addEventListener('submit', function(e) {
+    // Validación al enviar
+    forgotForm.addEventListener('submit', function(e) {
         let isValid = true;
+
+        const usernameValue = usernameInput.value.trim();
+        if (usernameValue === '') {
+            e.preventDefault();
+            usernameError.textContent = 'El usuario es obligatorio.';
+            usernameError.classList.add('show');
+            usernameGroup.classList.add('has-error');
+            isValid = false;
+        }
 
         const emailValue = emailInput.value.trim();
         if (emailValue === '') {
             e.preventDefault();
-            emailError.textContent = 'El nombre de usuario es obligatorio.';
+            emailError.textContent = 'El correo electrónico es obligatorio.';
             emailError.classList.add('show');
             emailGroup.classList.add('has-error');
             isValid = false;
         } else {
-            emailError.classList.remove('show');
-            emailError.textContent = '';
-            emailGroup.classList.remove('has-error');
-        }
-
-        const passwordValue = passwordInput.value.trim();
-        if (passwordValue === '') {
-            e.preventDefault();
-            passwordError.textContent = 'La contraseña es obligatoria.';
-            passwordError.classList.add('show');
-            passwordGroup.classList.add('has-error');
-            isValid = false;
-        } else if (passwordValue.length < 6) {
-            e.preventDefault();
-            passwordError.textContent = 'La contraseña debe tener al menos 6 caracteres.';
-            passwordError.classList.add('show');
-            passwordGroup.classList.add('has-error');
-            isValid = false;
-        } else {
-            passwordError.classList.remove('show');
-            passwordError.textContent = '';
-            passwordGroup.classList.remove('has-error');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailValue)) {
+                e.preventDefault();
+                emailError.textContent = 'Ingresa un correo electrónico válido.';
+                emailError.classList.add('show');
+                emailGroup.classList.add('has-error');
+                isValid = false;
+            }
         }
 
         if (!isValid) {
-            if (emailValue === '') {
+            if (usernameValue === '') {
+                usernameInput.focus();
+            } else if (emailValue === '') {
                 emailInput.focus();
-            } else if (passwordValue === '' || passwordValue.length < 6) {
-                passwordInput.focus();
             }
         }
     });
 
-    // Mostrar errores del servidor si existen
+    @if($errors->has('username'))
+        usernameError.textContent = `{{ $errors->first('username') }}`;
+        usernameError.classList.add('show');
+        usernameGroup.classList.add('has-error');
+    @endif
+
     @if($errors->has('email'))
         emailError.textContent = `{{ $errors->first('email') }}`;
         emailError.classList.add('show');
         emailGroup.classList.add('has-error');
     @endif
-
-    @if($errors->has('password'))
-        passwordError.textContent = `{{ $errors->first('password') }}`;
-        passwordError.classList.add('show');
-        passwordGroup.classList.add('has-error');
-    @endif
-});
-
-// ===== DETECTAR BOTÓN VOLVER DEL NAVEGADOR =====
-window.addEventListener('pageshow', function(event) {
-    if (event.persisted) {
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const loginForm = document.getElementById('loginForm');
-        
-        if (emailInput) emailInput.value = '';
-        if (passwordInput) passwordInput.value = '';
-        if (loginForm) loginForm.reset();
-        
-        const emailError = document.getElementById('emailError');
-        const passwordError = document.getElementById('passwordError');
-        const emailGroup = document.getElementById('emailGroup');
-        const passwordGroup = document.getElementById('passwordGroup');
-        
-        if (emailError) {
-            emailError.classList.remove('show');
-            emailError.textContent = '';
-        }
-        if (passwordError) {
-            passwordError.classList.remove('show');
-            passwordError.textContent = '';
-        }
-        if (emailGroup) emailGroup.classList.remove('has-error');
-        if (passwordGroup) passwordGroup.classList.remove('has-error');
-    }
 });
 </script>
 @endsection
