@@ -4,32 +4,21 @@
             <th>#</th>
             <th>Nombre</th>
             <th>Email</th>
+            <th>Rol</th>
             <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
         @forelse($usuarios as $usuario)
         <tr>
-            <td>{{ $usuarios->firstItem() + $loop->index }}</td> {{-- Numeración consecutiva --}}
+            <td>{{ $usuarios->firstItem() + $loop->index }}</td>
             <td>{{ $usuario->name }}</td>
             <td>{{ $usuario->email }}</td>
             <td>
+                {{ $usuario->roles->pluck('name')->join(', ') }}
+            </td>
+            <td>
                 <div class="d-flex justify-content-center gap-1">
-
-
-                    {{-- 🔐 BOTÓN ASIGNAR ROL --}}
-                    <a href="{{ route('usuarios.asignar', $usuario->id) }}"
-                       class="btn btn-warning"
-                       style="width:36px; height:36px; display:flex; justify-content:center; align-items:center;"
-                       title="Asignar Rol">
-                        <i class="bi bi-shield-lock"></i>
-                    </a>
-
-
-
-
-
-
                     <a href="{{ route('usuarios.edit', $usuario->id) }}" class="btn btn-editar" title="Editar">
                         <i class="bi bi-pencil"></i>
                     </a>
@@ -50,6 +39,8 @@
         @endforelse
     </tbody>
 </table>
+
+
 
 <style>
 .btn-ver, .btn-editar, .btn-eliminar {

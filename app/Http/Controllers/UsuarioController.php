@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+
+use Spatie\Permission\Models\Role;
 use App\Models\Usuario;
 use App\Models\Empleado;
 use App\Models\Medico;
@@ -12,33 +14,37 @@ class UsuarioController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Usuario::orderBy('id', 'desc');
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            });
-        }
-
-        $usuarios = $query->paginate(10)->withQueryString();
-
+        $query = $request->input('search');
+        $rolId = $request->input('rol');
+    
+        $usuarios = Usuario::with('roles')
+            ->when($query, function($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                  ->orWhere('email', 'like', "%{$query}%");
+            })
+            ->when($rolId, function($q) use ($rolId) {
+                $q->whereHas('roles', function($qr) use ($rolId) {
+                    $qr->where('id', $rolId);
+                });
+            })
+            ->paginate(10)
+            ->appends($request->all());
+    
+        $roles = Role::all();
+    
         if ($request->ajax()) {
-            $html = view('Usuarios.partials.tabla', compact('usuarios'))->render();
-            $pagination = view('Usuarios.partials.custom-pagination', compact('usuarios'))->render();
-
             return response()->json([
-                'html' => $html,
-                'pagination' => $pagination,
+                'html' => view('Usuarios.partials.tabla', compact('usuarios'))->render(),
+                'pagination' => view('Usuarios.partials.custom-pagination', compact('usuarios'))->render(),
+                'total' => $usuarios->total(),
                 'from' => $usuarios->firstItem(),
                 'to' => $usuarios->lastItem(),
-                'total' => $usuarios->total(),
             ]);
         }
-
-        return view('Usuarios.index', compact('usuarios'));
+    
+        return view('Usuarios.index', compact('usuarios','roles'));
     }
+    
 
     public function create()
     {
