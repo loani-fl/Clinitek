@@ -29,14 +29,14 @@ class RoleController extends Controller
         // Si es una petición AJAX, retornar JSON
         if ($request->ajax()) {
             $html = '';
-            
+
             if ($roles->count() > 0) {
                 foreach ($roles as $index => $role) {
                     $numero = ($roles->currentPage() - 1) * $roles->perPage() + $index + 1;
                     $editUrl = route('roles.edit', $role->id);
                     $deleteUrl = route('roles.destroy', $role->id);
                     $csrf = csrf_token();
-                    
+
                     $deleteButton = '';
                     if ($role->users->count() == 0) {
                         $deleteButton = '
@@ -55,7 +55,7 @@ class RoleController extends Controller
                             </button>
                         ';
                     }
-                    
+
                     $html .= '
                         <tr>
                             <td>' . $numero . '</td>
@@ -86,7 +86,7 @@ class RoleController extends Controller
                     </tr>
                 ';
             }
-            
+
             return response()->json([
                 'html' => $html,
                 'pagination' => $roles->links()->render(),
@@ -183,15 +183,17 @@ class RoleController extends Controller
     }
 
 
-    public function edit(Role $role)
+
+
+
+    public function edit($id)
     {
+        $role = Role::findOrFail($id);
+
         // Obtener todos los permisos
         $permissions = Permission::all();
 
-        // Obtener los permisos actuales del rol
-        $rolePermissions = $role->permissions->pluck('id')->toArray();
-
-        // Agrupar permisos por secciones
+        // Agrupar permisos por secciones (igual que en create)
         $usuarios = $permissions->filter(fn($p) => str_starts_with($p->name, 'usuarios.'));
         $ultrasonidos = $permissions->filter(fn($p) => str_starts_with($p->name, 'ultrasonidos.'));
         $rayosX = $permissions->filter(fn($p) => str_starts_with($p->name, 'rayosX.'));
@@ -215,7 +217,6 @@ class RoleController extends Controller
         return view('roles.edit', compact(
             'role',
             'permissions',
-            'rolePermissions',
             'usuarios',
             'ultrasonidos',
             'rayosX',
@@ -238,29 +239,40 @@ class RoleController extends Controller
         ));
     }
 
-    public function update(Request $request, Role $role)
+    public function update(Request $request, $id)
     {
+        $role = Role::findOrFail($id);
+
         $request->validate([
-            'name' => 'required|unique:roles,name,' . $role->id,
-            'permissions' => 'array'
+            'name' => [
+                'required',
+                'string',
+                'max:50',
+                'regex:/^[\pL\s]+$/u',
+                'unique:roles,name,' . $role->id,
+            ],
+            'permissions' => 'required|array',
+        ], [
+            'name.required' => 'El nombre es obligatorio.',
+            'name.string' => 'El nombre debe ser un texto válido.',
+            'name.max' => 'El nombre no puede tener más de 50 caracteres.',
+            'name.regex' => 'El nombre solo puede contener letras y espacios, sin números ni caracteres especiales.',
+            'name.unique' => 'El nombre ya existe.',
+            'permissions.required' => 'Debe seleccionar al menos un permiso.',
         ]);
 
-        $role->update([
-            'name' => $request->name,
-            'guard_name' => 'web', // mantener coherencia con permisos
-        ]);
+        $role->name = $request->name;
+        $role->save();
 
-        // Sincronizar permisos seleccionados (o eliminar todos si no hay)
-        $role->syncPermissions($request->permissions ?? []);
-
-        // Limpiar caché de permisos para que los cambios tengan efecto inmediato
-        Artisan::call('permission:cache-reset');
+        // Sincronizar permisos
+        $role->syncPermissions($request->permissions);
 
         return redirect()->route('roles.index')->with('success', 'Rol actualizado correctamente.');
     }
 
 
-    public function destroy(Role $role)
+
+public function destroy(Role $role)
     {
         // Verificar si el rol tiene usuarios asignados
         if ($role->users()->count() > 0) {
