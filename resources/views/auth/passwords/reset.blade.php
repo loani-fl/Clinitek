@@ -51,26 +51,48 @@
     }
 
     .login-wrapper {
-        height: 100vh;
+        min-height: 100vh;
         width: 100vw;
         display: flex;
         align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #667eea 100%);
+        justify-content: flex-start;
+        background-image: url('{{ asset('images/inicio.avif') }}');
+        background-size: cover;
+        background-position: center right;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
         position: fixed;
         top: 0;
         left: 0;
-        overflow: hidden;
+        overflow-y: auto;
+        overflow-x: hidden;
         padding: 40px 20px;
+    }
+
+    .login-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 55%;
+        height: 100%;
+        background: linear-gradient(to right,
+            rgba(0, 0, 0, 0.75) 0%,
+            rgba(0, 0, 0, 0.55) 40%,
+            rgba(0, 0, 0, 0.25) 70%,
+            transparent 100%
+        );
+        z-index: 0;
     }
 
     .login-card {
         background: rgba(255, 255, 255, 0.12);
         backdrop-filter: blur(25px);
         border-radius: 24px;
-        padding: 40px 35px;
+        padding: 28px 30px;
         width: 100%;
-        max-width: 450px;
+        max-width: 420px;
+        margin: 0 0 0 8%;
         box-shadow:
             0 25px 70px rgba(0, 0, 0, 0.4),
             0 0 0 1px rgba(255, 255, 255, 0.15),
@@ -84,29 +106,29 @@
     @keyframes slideIn {
         from {
             opacity: 0;
-            transform: translateY(-40px);
+            transform: translateX(-50px);
         }
         to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateX(0);
         }
     }
 
     .login-header {
         text-align: center;
-        margin-bottom: 25px;
+        margin-bottom: 20px;
     }
 
     .login-icon {
-        width: 85px;
-        height: 85px;
+        width: 65px;
+        height: 65px;
         background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
         backdrop-filter: blur(10px);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 20px;
+        margin: 0 auto 15px;
         box-shadow:
             0 10px 30px rgba(102, 126, 234, 0.3),
             0 0 0 1px rgba(255, 255, 255, 0.3);
@@ -126,35 +148,35 @@
     }
 
     .login-icon svg {
-        width: 42px;
-        height: 42px;
+        width: 32px;
+        height: 32px;
         color: white;
         filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
     }
 
     .login-title {
         color: white;
-        font-size: 30px;
+        font-size: 24px;
         font-weight: 700;
-        margin: 0 0 10px 0;
+        margin: 0 0 6px 0;
         letter-spacing: -0.5px;
         text-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
     }
 
     .login-subtitle {
         color: rgba(255, 255, 255, 0.85);
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 400;
         text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
     }
 
     .email-display {
         background: rgba(255, 255, 255, 0.1);
-        padding: 12px 18px;
+        padding: 10px 16px;
         border-radius: 12px;
         color: rgba(255, 255, 255, 0.95);
-        font-size: 14px;
-        margin-bottom: 15px;
+        font-size: 13px;
+        margin-bottom: 10px;
         border: 1px solid rgba(255, 255, 255, 0.2);
         text-align: center;
         font-weight: 500;
@@ -163,11 +185,11 @@
 
     .username-display {
         background: rgba(102, 126, 234, 0.15);
-        padding: 12px 18px;
+        padding: 10px 16px;
         border-radius: 12px;
         color: rgba(255, 255, 255, 0.95);
-        font-size: 13px;
-        margin-bottom: 25px;
+        font-size: 12px;
+        margin-bottom: 18px;
         border: 1px solid rgba(102, 126, 234, 0.3);
         text-align: center;
         font-weight: 500;
@@ -180,7 +202,7 @@
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 16px;
         position: relative;
     }
 
@@ -192,10 +214,19 @@
     .form-label {
         color: rgba(255, 255, 255, 0.95);
         font-weight: 600;
-        margin-bottom: 10px;
-        display: block;
-        font-size: 13px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        font-size: 12px;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-label svg {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+        color: rgba(255, 255, 255, 0.9);
+        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
     }
 
     .input-wrapper {
@@ -206,12 +237,12 @@
 
     .form-control-modern {
         width: 100%;
-        padding: 14px 18px;
+        padding: 12px 16px;
         background: rgba(255, 255, 255, 0.15);
         border: 1px solid rgba(255, 255, 255, 0.25);
         border-radius: 12px;
         color: white;
-        font-size: 14px;
+        font-size: 13px;
         transition: all 0.3s ease;
         font-weight: 500;
         backdrop-filter: blur(10px);
@@ -219,7 +250,7 @@
     }
 
     .form-control-modern.with-icon {
-        padding-right: 50px;
+        padding-right: 45px;
     }
 
     .form-control-modern::placeholder {
@@ -239,7 +270,7 @@
 
     .toggle-password {
         position: absolute;
-        right: 15px;
+        right: 12px;
         top: 50%;
         transform: translateY(-50%);
         background: none;
@@ -254,8 +285,8 @@
     }
 
     .toggle-password svg {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         color: rgba(255, 255, 255, 0.7);
         filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
         transition: all 0.3s ease;
@@ -273,9 +304,9 @@
     .error-message {
         display: none;
         color: #ff6b6b;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 500;
-        margin-top: 6px;
+        margin-top: 5px;
         padding-left: 2px;
         animation: fadeIn 0.3s ease;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -298,25 +329,25 @@
 
     .btn-login {
         width: 100%;
-        padding: 14px;
-        background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+        padding: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border: none;
         border-radius: 12px;
         color: white;
         font-weight: 700;
-        font-size: 14px;
+        font-size: 13px;
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow:
-            0 8px 25px rgba(0, 212, 255, 0.45),
+            0 8px 25px rgba(102, 126, 234, 0.45),
             0 0 0 1px rgba(255, 255, 255, 0.2);
-        margin-top: 15px;
+        margin-top: 10px;
     }
 
     .btn-login:hover:not(:disabled) {
         transform: translateY(-3px);
         box-shadow:
-            0 12px 35px rgba(0, 212, 255, 0.6),
+            0 12px 35px rgba(102, 126, 234, 0.6),
             0 0 0 1px rgba(255, 255, 255, 0.3);
     }
 
@@ -331,13 +362,13 @@
 
     .back-to-login {
         text-align: center;
-        margin-top: 20px;
+        margin-top: 16px;
     }
 
     .back-to-login a {
         color: rgba(255, 255, 255, 0.9);
         text-decoration: none;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 600;
         transition: all 0.3s ease;
         display: inline-flex;
@@ -351,21 +382,62 @@
         transform: translateY(-1px);
     }
 
+    .back-to-login svg {
+        margin-right: 6px;
+    }
+
     /* Responsive Design */
     @media (max-width: 768px) {
+        .login-wrapper {
+            background-position: center;
+            justify-content: center;
+            padding: 30px 20px;
+        }
+
+        .login-wrapper::before {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.75);
+        }
+
         .login-card {
-            padding: 40px 30px;
-            max-width: 420px;
+            margin: 0;
+            padding: 30px 25px;
+            max-width: 380px;
+        }
+
+        .login-title {
+            font-size: 22px;
+        }
+
+        .login-icon {
+            width: 60px;
+            height: 60px;
+        }
+
+        .login-icon svg {
+            width: 30px;
+            height: 30px;
         }
     }
 
     @media (max-width: 480px) {
         .login-card {
-            padding: 35px 25px;
+            padding: 28px 22px;
+            max-width: 350px;
         }
 
         .login-title {
-            font-size: 26px;
+            font-size: 20px;
+        }
+
+        .form-control-modern,
+        .btn-login {
+            padding: 11px 14px;
+            font-size: 13px;
+        }
+
+        .form-control-modern.with-icon {
+            padding-right: 45px;
         }
     }
 
@@ -385,6 +457,23 @@
         );
         border-radius: 28px 28px 0 0;
     }
+
+    .login-card::after {
+        content: '';
+        position: absolute;
+        top: -100px;
+        right: -100px;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.1), transparent 70%);
+        pointer-events: none;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(-20px, -20px) scale(1.1); }
+    }
 </style>
 
 <div class="login-wrapper">
@@ -392,8 +481,8 @@
         <div class="login-header">
             <div class="login-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                 </svg>
             </div>
             <h3 class="login-title">Restablecer contraseña</h3>
@@ -417,14 +506,20 @@
             <input type="hidden" name="username" value="{{ $username }}">
 
             <div class="form-group @error('password') has-error @enderror" id="passwordGroup">
-                <label class="form-label">Nueva contraseña</label>
+                <label class="form-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    Nueva contraseña
+                </label>
                 <div class="input-wrapper">
                     <input
                         type="password"
                         name="password"
                         id="password"
                         class="form-control-modern with-icon"
-                       
+                        placeholder="Mínimo 6 caracteres"
                         autocomplete="new-password"
                         required
                     >
@@ -447,14 +542,20 @@
             </div>
 
             <div class="form-group @error('password_confirmation') has-error @enderror" id="confirmGroup">
-                <label class="form-label">Confirmar contraseña</label>
+                <label class="form-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    Confirmar contraseña
+                </label>
                 <div class="input-wrapper">
                     <input
                         type="password"
                         name="password_confirmation"
                         id="password_confirmation"
                         class="form-control-modern with-icon"
-                       
+                        placeholder="Repite tu contraseña"
                         autocomplete="new-password"
                         required
                     >
@@ -481,7 +582,12 @@
             </button>
 
             <div class="back-to-login">
-                <a href="{{ route('login.form') }}">Volver al login</a>
+                <a href="{{ route('login.form') }}">
+                    <svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Volver al login
+                </a>
             </div>
         </form>
     </div>

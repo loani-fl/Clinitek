@@ -180,16 +180,65 @@
         font-size: 13px;
         font-weight: 500;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        animation: fadeIn 0.3s ease;
+        animation: slideDown 0.5s ease-out;
         display: flex;
         align-items: center;
     }
 
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .success-message svg {
-        width: 16px;
-        height: 16px;
-        margin-right: 8px;
+        width: 18px;
+        height: 18px;
+        margin-right: 10px;
         flex-shrink: 0;
+        color: rgba(34, 197, 94, 1);
+        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
+    }
+
+    /* Alerta de error (warning) - Posición fija */
+    .alert-permission {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        border-radius: 12px;
+        background: rgba(245, 158, 11, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        padding: 12px 16px;
+        color: white;
+        font-size: 13px;
+        animation: slideDown 0.5s ease-out;
+    }
+
+    .alert-permission.hide {
+        animation: slideUp 0.5s ease-out;
+        opacity: 0;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+        }
     }
 
     .form-group {
@@ -431,6 +480,11 @@
         .form-control-modern.with-icon {
             padding-right: 50px;
         }
+
+        .success-message {
+            font-size: 12px;
+            padding: 10px 14px;
+        }
     }
 
     /* Decoración adicional */
@@ -481,19 +535,16 @@
             <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
         </div>
 
-        {{-- Mensaje de error de permisos --}}
+        {{-- Mensaje de error de permisos (posición fija fuera de la card) --}}
         @if(session('error'))
-            <div id="alert-permission" class="alert alert-warning alert-dismissible fade show text-center" role="alert" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 400px; box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 0.5rem;">
-                <i class="bi bi-exclamation-triangle-fill"></i>
+            <div id="alert-permission" class="alert-permission">
                 <strong>¡Alerta!</strong> {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
             <script>
                 setTimeout(function() {
                     let alertEl = document.getElementById('alert-permission');
                     if (alertEl) {
-                        alertEl.classList.remove('show');
                         alertEl.classList.add('hide');
                         setTimeout(() => alertEl.remove(), 500);
                     }
@@ -528,7 +579,6 @@
                     name="email"
                     id="email"
                     class="form-control-modern"
-                   
                     value="{{ $errors->any() ? old('email') : '' }}"
                     autocomplete="off"
                 >
@@ -553,7 +603,6 @@
                         name="password"
                         id="password"
                         class="form-control-modern with-icon"
-                       
                         autocomplete="new-password"
                     >
                     <button type="button" class="toggle-password" id="togglePassword">

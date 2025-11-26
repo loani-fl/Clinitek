@@ -160,7 +160,7 @@ class AuthController extends Controller
                 'username' => $usuario->name
             ], function($message) use ($request) {
                 $message->to($request->email);
-                $message->subject('Recuperación de Contraseña - Grupo Centinela');
+                $message->subject('Recuperación de Contraseña - Clinitek');
             });
             
             return redirect()->route('login.form')->with('success', 

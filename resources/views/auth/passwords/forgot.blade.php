@@ -40,7 +40,7 @@
     }
 
     .login-wrapper {
-        height: 100vh;
+        min-height: 100vh;
         width: 100vw;
         display: flex;
         align-items: center;
@@ -53,7 +53,8 @@
         position: fixed;
         top: 0;
         left: 0;
-        overflow: hidden;
+        overflow-y: auto;
+        overflow-x: hidden;
         padding: 40px 20px;
     }
 
@@ -77,10 +78,10 @@
         background: rgba(255, 255, 255, 0.12);
         backdrop-filter: blur(25px);
         border-radius: 24px;
-        padding: 35px 35px;
+        padding: 28px 30px;
         width: 100%;
         max-width: 420px;
-        margin-left: 8%;
+        margin: 0 0 0 8%;
         box-shadow:
             0 25px 70px rgba(0, 0, 0, 0.4),
             0 0 0 1px rgba(255, 255, 255, 0.15),
@@ -104,19 +105,19 @@
 
     .login-header {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
     }
 
     .login-icon {
-        width: 75px;
-        height: 75px;
+        width: 65px;
+        height: 65px;
         background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
         backdrop-filter: blur(10px);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 18px;
+        margin: 0 auto 15px;
         box-shadow:
             0 10px 30px rgba(102, 126, 234, 0.3),
             0 0 0 1px rgba(255, 255, 255, 0.3);
@@ -136,30 +137,30 @@
     }
 
     .login-icon svg {
-        width: 38px;
-        height: 38px;
+        width: 32px;
+        height: 32px;
         color: white;
         filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
     }
 
     .login-title {
         color: white;
-        font-size: 28px;
+        font-size: 24px;
         font-weight: 700;
-        margin: 0 0 8px 0;
+        margin: 0 0 6px 0;
         letter-spacing: -0.5px;
         text-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
     }
 
     .login-subtitle {
         color: rgba(255, 255, 255, 0.85);
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 400;
         text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
     }
 
     .form-group {
-        margin-bottom: 24px;
+        margin-bottom: 16px;
         position: relative;
     }
 
@@ -171,29 +172,29 @@
     .form-label {
         color: rgba(255, 255, 255, 0.95);
         font-weight: 600;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         display: flex;
         align-items: center;
-        font-size: 13px;
+        font-size: 12px;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
 
     .form-label svg {
-        width: 18px;
-        height: 18px;
-        margin-right: 10px;
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
         color: rgba(255, 255, 255, 0.9);
         filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
     }
 
     .form-control-modern {
         width: 100%;
-        padding: 13px 18px;
+        padding: 12px 16px;
         background: rgba(255, 255, 255, 0.15);
         border: 1px solid rgba(255, 255, 255, 0.25);
         border-radius: 12px;
         color: white;
-        font-size: 14px;
+        font-size: 13px;
         transition: all 0.3s ease;
         font-weight: 500;
         backdrop-filter: blur(10px);
@@ -218,9 +219,9 @@
     .error-message {
         display: none;
         color: #ff6b6b;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 500;
-        margin-top: 6px;
+        margin-top: 5px;
         padding-left: 2px;
         animation: fadeIn 0.3s ease;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -243,19 +244,19 @@
 
     .btn-login {
         width: 100%;
-        padding: 14px;
+        padding: 12px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border: none;
         border-radius: 12px;
         color: white;
         font-weight: 700;
-        font-size: 14px;
+        font-size: 13px;
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow:
             0 8px 25px rgba(102, 126, 234, 0.45),
             0 0 0 1px rgba(255, 255, 255, 0.2);
-        margin-top: 12px;
+        margin-top: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -278,20 +279,20 @@
     }
 
     .btn-login svg {
-        width: 18px;
-        height: 18px;
-        margin-right: 8px;
+        width: 16px;
+        height: 16px;
+        margin-right: 7px;
     }
 
     .back-to-login {
         text-align: center;
-        margin-top: 20px;
+        margin-top: 16px;
     }
 
     .back-to-login a {
         color: rgba(255, 255, 255, 0.9);
         text-decoration: none;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 600;
         transition: all 0.3s ease;
         display: inline-flex;
@@ -314,6 +315,7 @@
         .login-wrapper {
             background-position: center;
             justify-content: center;
+            padding: 30px 20px;
         }
 
         .login-wrapper::before {
@@ -322,39 +324,40 @@
         }
 
         .login-card {
-            margin-left: 0;
-            padding: 40px 30px;
-            max-width: 420px;
+            margin: 0;
+            padding: 30px 25px;
+            max-width: 380px;
         }
 
         .login-title {
-            font-size: 28px;
+            font-size: 22px;
         }
 
         .login-icon {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
         }
 
         .login-icon svg {
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
         }
     }
 
     @media (max-width: 480px) {
         .login-card {
-            padding: 35px 25px;
+            padding: 28px 22px;
+            max-width: 350px;
         }
 
         .login-title {
-            font-size: 24px;
+            font-size: 20px;
         }
 
         .form-control-modern,
         .btn-login {
-            padding: 14px 16px;
-            font-size: 14px;
+            padding: 11px 14px;
+            font-size: 13px;
         }
     }
 
@@ -423,7 +426,6 @@
                     name="username"
                     id="username"
                     class="form-control-modern"
-                   
                     value="{{ old('username') }}"
                     autocomplete="off"
                     required
@@ -449,7 +451,6 @@
                     name="email"
                     id="email"
                     class="form-control-modern"
-                   
                     value="{{ old('email', $email ?? '') }}"
                     autocomplete="off"
                     required
@@ -471,7 +472,7 @@
 
             <div class="back-to-login">
                 <a href="{{ route('login.form') }}">
-                    <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
                     Volver al login

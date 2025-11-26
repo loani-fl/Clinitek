@@ -346,14 +346,14 @@ margin-bottom: 20px;
             
             <div class="signature">
                 <p>Saludos cordiales,</p>
-                <p><strong>Tu clinica electronica clinitek</strong></p>
+                <p><strong>Clinitek</strong></p>
             </div>
         </div>
         
         <!-- Footer -->
         <div class="email-footer">
             <div class="company-name">Clinica electronica</div>
-            <div class="copyright">© {{ date('Y') }} Grupo Centinela. Todos los derechos reservados.</div>
+            <div class="copyright">© {{ date('Y') }} Clinitek. Todos los derechos reservados.</div>
             
             <div class="manual-link-section">
                 <div class="manual-link-title">Si el botón no funciona, copia y pega este enlace:</div>
