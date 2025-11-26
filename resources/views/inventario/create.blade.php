@@ -62,7 +62,7 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
         </div>
     @endif
 
-    <form action="{{ route('inventario.store') }}" method="POST" novalidate>
+    <form action="{{ route('inventario.store') }}" method="POST" novalidate id="formInventario">
         @csrf
 
         <!-- Fila 1 -->
@@ -154,101 +154,85 @@ input.is-invalid, textarea.is-invalid, select.is-invalid {
         </div>
 
         <!-- Botones -->
-<div class="d-flex justify-content-center gap-3 mt-4 mb-4">
-    <button type="submit" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Registrar
-    </button>
-    <button type="button" id="btnLimpiar" class="btn btn-warning">
-        <i class="bi bi-trash"></i> Limpiar
-    </button>
-    <a href="{{ route('inventario.index') }}" class="btn btn-success">
-        <i class="bi bi-arrow-left"></i> Regresar
-    </a>
-</div>
-
-
+        <div class="d-flex justify-content-center gap-3 mt-4 mb-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Registrar
+            </button>
+            <button type="button" id="btnLimpiar" class="btn btn-warning">
+                <i class="bi bi-trash"></i> Limpiar
+            </button>
+            <a href="{{ route('inventario.index') }}" class="btn btn-success">
+                <i class="bi bi-arrow-left"></i> Regresar
+            </a>
+        </div>
     </form>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('formInventario');
     const categoria = document.getElementById('categoria');
     const codigo = document.getElementById('codigo');
-    const form = document.querySelector('form');
     const fechaIngreso = document.getElementById('fecha_ingreso');
 
-    // === Limitar fecha de ingreso ===
+    // Fecha ingreso
     const today = new Date();
     const maxDate = today.toISOString().split('T')[0];
     const minDate = new Date();
     minDate.setMonth(minDate.getMonth() - 2);
-    const minDateStr = minDate.toISOString().split('T')[0];
-
     fechaIngreso.max = maxDate;
-    fechaIngreso.min = minDateStr;
+    fechaIngreso.min = minDate.toISOString().split('T')[0];
 
     // Generar código automáticamente
-    categoria.addEventListener('change', function() {
-        const categoriaSeleccionada = this.value;
-        if (categoriaSeleccionada) {
+    const generarCodigo = () => {
+        if(categoria.value) {
             fetch('{{ route("inventario.generarCodigo") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({ categoria: categoriaSeleccionada })
+                body: JSON.stringify({ categoria: categoria.value })
             })
             .then(res => res.json())
-            .then(data => {
-                codigo.value = data.codigo || '';
-            })
+            .then(data => codigo.value = data.codigo || '')
             .catch(() => codigo.value = '');
         } else {
             codigo.value = '';
         }
-    });
+    }
+    categoria.addEventListener('change', generarCodigo);
 
-    // Validaciones numéricas
-    const cantidad = document.getElementById('cantidad');
-    cantidad.addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 5);
-        if (this.value.startsWith('0')) this.value = this.value.replace(/^0+/, '');
-        if (this.value !== '' && parseInt(this.value) < 1) this.value = '';
+    // Validaciones de cantidad y precio
+    document.getElementById('cantidad').addEventListener('input', function(){
+        this.value = this.value.replace(/[^0-9]/g,'').slice(0,5);
+        if(this.value.startsWith('0')) this.value = this.value.replace(/^0+/,'');
+        if(this.value && parseInt(this.value)<1) this.value='';
     });
-
-    const precio = document.getElementById('precio_unitario');
-    precio.addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9.]/g, '');
+    document.getElementById('precio_unitario').addEventListener('input', function(){
+        this.value = this.value.replace(/[^0-9.]/g,'');
         const parts = this.value.split('.');
-        parts[0] = parts[0].slice(0, 5);
-        if (parts[1]) parts[1] = parts[1].slice(0, 2);
+        parts[0] = parts[0].slice(0,5);
+        if(parts[1]) parts[1] = parts[1].slice(0,2);
         this.value = parts.join('.');
-        if (parseFloat(this.value) <= 0) this.value = '';
+        if(parseFloat(this.value)<=0) this.value='';
     });
 
-    // Solo letras para el campo nombre
-    const nombre = document.getElementById('nombre');
-    nombre.addEventListener('input', function() {
-        this.value = this.value
-            .replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '')
-            .replace(/\s{2,}/g, ' ')
-            .trimStart();
+    // Solo letras para nombre
+    document.getElementById('nombre').addEventListener('input', function(){
+        this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g,'')
+                               .replace(/\s{2,}/g,' ')
+                               .trimStart();
     });
 
-    // Botón limpiar
-    const btnLimpiar = document.getElementById('btnLimpiar');
-    btnLimpiar.addEventListener('click', () => {
-        form.querySelectorAll('input, textarea, select').forEach(input => {
-            if (input.id !== 'fecha_ingreso') {
-                if (input.tagName === 'SELECT') input.selectedIndex = 0;
-                else input.value = '';
-                input.classList.remove('is-invalid');
-            }
-        });
-        form.querySelectorAll('.invalid-feedback').forEach(msg => msg.style.display = 'none');
-        if (codigo) codigo.value = '';
-        fechaIngreso.value = maxDate; // Reinicia la fecha actual
+    // Limpiar formulario
+    document.getElementById('btnLimpiar').addEventListener('click', () => {
+        form.querySelectorAll('input, textarea').forEach(c => c.value='');
+        form.querySelectorAll('select').forEach(c => c.selectedIndex=0);
+        form.querySelectorAll('.is-invalid').forEach(c => c.classList.remove('is-invalid'));
+        document.querySelectorAll('.invalid-feedback').forEach(m => m.style.display='none');
+        fechaIngreso.value = maxDate;
+        codigo.value = '';
     });
 });
 </script>

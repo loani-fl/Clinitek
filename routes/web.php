@@ -146,6 +146,12 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('inventario', InventarioController::class)
         ->middleware('role.permission:inventario.*');
 
+    
+    Route::post('/inventario/generar-codigo', [InventarioController::class, 'generarCodigo'])
+        ->name('inventario.generarCodigo')
+        ->middleware('role.permission:inventario.*');
+    
+
     // Control prenatal
     Route::resource('controles-prenatales', ControlPrenatalController::class)
         ->middleware('role.permission:controles_prenatales.*');
@@ -186,5 +192,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('usuarios/{id}/asignar', [UsuarioController::class, 'asignarVista'])->name('usuarios.asignar');
         Route::post('usuarios/{id}/asignar', [UsuarioController::class, 'asignarUpdate'])->name('usuarios.asignar.update');
     });
+
+    //buscar empleados y medicos
+
+    Route::get('/personas/search', [UsuarioController::class, 'searchPersonas'])->name('personas.search');
+
 
 });
