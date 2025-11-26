@@ -39,9 +39,14 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login.form');
 Route::post('/login', [AuthController::class, 'login'])->name('login.process');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Recuperación de contraseña
-Route::get('/password/forgot', [PasswordController::class, 'showForgot'])->name('password.forgot');
-Route::post('/password/forgot', [PasswordController::class, 'reset'])->name('password.reset');
+// NUEVAS RUTAS DE RECUPERACIÓN DE CONTRASEÑA
+Route::get('/password/forgot', [AuthController::class, 'showForgotPassword'])->name('password.forgot');
+Route::post('/password/email', [AuthController::class, 'sendResetLink'])->name('password.email');
+Route::get('/password/reset/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
+
+Route::post('/password/reset', [AuthController::class, 'resetPassword'])->name('password.update');
+
+
 
 // Redirigir "/" al login
 Route::get('/', function () {

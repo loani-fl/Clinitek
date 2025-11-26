@@ -2,7 +2,7 @@
 
 @section('content')
 <style>
-    /* Ocultar TODOS los elementos del layout excepto el contenido de login */
+    /* Ocultar TODOS los elementos del layout excepto el contenido */
     .header,
     header,
     nav,
@@ -55,12 +55,8 @@
         width: 100vw;
         display: flex;
         align-items: center;
-        justify-content: flex-start;
-        background-image: url('{{ asset('images/inicio.avif') }}');
-        background-size: cover;
-        background-position: center right;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
+        justify-content: center;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #667eea 100%);
         position: fixed;
         top: 0;
         left: 0;
@@ -68,30 +64,13 @@
         padding: 40px 20px;
     }
 
-    .login-wrapper::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 55%;
-        height: 100%;
-        background: linear-gradient(to right,
-            rgba(0, 0, 0, 0.75) 0%,
-            rgba(0, 0, 0, 0.55) 40%,
-            rgba(0, 0, 0, 0.25) 70%,
-            transparent 100%
-        );
-        z-index: 0;
-    }
-
     .login-card {
         background: rgba(255, 255, 255, 0.12);
         backdrop-filter: blur(25px);
         border-radius: 24px;
-        padding: 35px 35px;
+        padding: 40px 35px;
         width: 100%;
-        max-width: 400px;
-        margin-left: 8%;
+        max-width: 450px;
         box-shadow:
             0 25px 70px rgba(0, 0, 0, 0.4),
             0 0 0 1px rgba(255, 255, 255, 0.15),
@@ -105,29 +84,29 @@
     @keyframes slideIn {
         from {
             opacity: 0;
-            transform: translateX(-50px);
+            transform: translateY(-40px);
         }
         to {
             opacity: 1;
-            transform: translateX(0);
+            transform: translateY(0);
         }
     }
 
     .login-header {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
     }
 
     .login-icon {
-        width: 75px;
-        height: 75px;
+        width: 85px;
+        height: 85px;
         background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
         backdrop-filter: blur(10px);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 18px;
+        margin: 0 auto 20px;
         box-shadow:
             0 10px 30px rgba(102, 126, 234, 0.3),
             0 0 0 1px rgba(255, 255, 255, 0.3);
@@ -147,17 +126,17 @@
     }
 
     .login-icon svg {
-        width: 38px;
-        height: 38px;
+        width: 42px;
+        height: 42px;
         color: white;
         filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
     }
 
     .login-title {
         color: white;
-        font-size: 28px;
+        font-size: 30px;
         font-weight: 700;
-        margin: 0 0 8px 0;
+        margin: 0 0 10px 0;
         letter-spacing: -0.5px;
         text-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
     }
@@ -169,31 +148,39 @@
         text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
     }
 
-    /* Mensaje de éxito */
-    .success-message {
-        background: rgba(34, 197, 94, 0.15);
-        border: 1px solid rgba(34, 197, 94, 0.3);
+    .email-display {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 12px 18px;
         border-radius: 12px;
-        padding: 12px 16px;
-        margin-bottom: 20px;
         color: rgba(255, 255, 255, 0.95);
-        font-size: 13px;
+        font-size: 14px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        text-align: center;
         font-weight: 500;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        animation: fadeIn 0.3s ease;
-        display: flex;
-        align-items: center;
     }
 
-    .success-message svg {
-        width: 16px;
-        height: 16px;
-        margin-right: 8px;
-        flex-shrink: 0;
+    .username-display {
+        background: rgba(102, 126, 234, 0.15);
+        padding: 12px 18px;
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 13px;
+        margin-bottom: 25px;
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        text-align: center;
+        font-weight: 500;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .username-display strong {
+        color: rgba(255, 255, 255, 1);
+        font-weight: 700;
     }
 
     .form-group {
-        margin-bottom: 24px;
+        margin-bottom: 20px;
         position: relative;
     }
 
@@ -206,21 +193,11 @@
         color: rgba(255, 255, 255, 0.95);
         font-weight: 600;
         margin-bottom: 10px;
-        display: flex;
-        align-items: center;
+        display: block;
         font-size: 13px;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
 
-    .form-label svg {
-        width: 18px;
-        height: 18px;
-        margin-right: 10px;
-        color: rgba(255, 255, 255, 0.9);
-        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
-    }
-
-    /* Input con icono de ojo */
     .input-wrapper {
         position: relative;
         display: flex;
@@ -229,7 +206,7 @@
 
     .form-control-modern {
         width: 100%;
-        padding: 13px 18px;
+        padding: 14px 18px;
         background: rgba(255, 255, 255, 0.15);
         border: 1px solid rgba(255, 255, 255, 0.25);
         border-radius: 12px;
@@ -260,7 +237,6 @@
         transform: translateY(-2px);
     }
 
-    /* Botón del ojito */
     .toggle-password {
         position: absolute;
         right: 15px;
@@ -294,7 +270,6 @@
         transform: scale(0.95);
     }
 
-    /* Mensajes de error estilo Google */
     .error-message {
         display: none;
         color: #ff6b6b;
@@ -324,7 +299,7 @@
     .btn-login {
         width: 100%;
         padding: 14px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
         border: none;
         border-radius: 12px;
         color: white;
@@ -333,15 +308,15 @@
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow:
-            0 8px 25px rgba(102, 126, 234, 0.45),
+            0 8px 25px rgba(0, 212, 255, 0.45),
             0 0 0 1px rgba(255, 255, 255, 0.2);
-        margin-top: 12px;
+        margin-top: 15px;
     }
 
     .btn-login:hover:not(:disabled) {
         transform: translateY(-3px);
         box-shadow:
-            0 12px 35px rgba(102, 126, 234, 0.6),
+            0 12px 35px rgba(0, 212, 255, 0.6),
             0 0 0 1px rgba(255, 255, 255, 0.3);
     }
 
@@ -354,12 +329,12 @@
         cursor: not-allowed;
     }
 
-    .forgot-password {
+    .back-to-login {
         text-align: center;
         margin-top: 20px;
     }
 
-    .forgot-password a {
+    .back-to-login a {
         color: rgba(255, 255, 255, 0.9);
         text-decoration: none;
         font-size: 13px;
@@ -370,46 +345,17 @@
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
 
-    .forgot-password a:hover {
+    .back-to-login a:hover {
         color: white;
         text-decoration: underline;
         transform: translateY(-1px);
     }
 
-    .forgot-password svg {
-        margin-right: 6px;
-    }
-
     /* Responsive Design */
     @media (max-width: 768px) {
-        .login-wrapper {
-            background-position: center;
-            justify-content: center;
-        }
-
-        .login-wrapper::before {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.75);
-        }
-
         .login-card {
-            margin-left: 0;
             padding: 40px 30px;
             max-width: 420px;
-        }
-
-        .login-title {
-            font-size: 28px;
-        }
-
-        .login-icon {
-            width: 80px;
-            height: 80px;
-        }
-
-        .login-icon svg {
-            width: 40px;
-            height: 40px;
         }
     }
 
@@ -419,17 +365,7 @@
         }
 
         .login-title {
-            font-size: 24px;
-        }
-
-        .form-control-modern,
-        .btn-login {
-            padding: 14px 16px;
-            font-size: 14px;
-        }
-
-        .form-control-modern.with-icon {
-            padding-right: 50px;
+            font-size: 26px;
         }
     }
 
@@ -449,23 +385,6 @@
         );
         border-radius: 28px 28px 0 0;
     }
-
-    .login-card::after {
-        content: '';
-        position: absolute;
-        top: -100px;
-        right: -100px;
-        width: 200px;
-        height: 200px;
-        background: radial-gradient(circle, rgba(102, 126, 234, 0.1), transparent 70%);
-        pointer-events: none;
-        animation: float 6s ease-in-out infinite;
-    }
-
-    @keyframes float {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        50% { transform: translate(-20px, -20px) scale(1.1); }
-    }
 </style>
 
 <div class="login-wrapper">
@@ -473,80 +392,32 @@
         <div class="login-header">
             <div class="login-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
             </div>
-            <h3 class="login-title">Bienvenido a clinitek</h3>
-            <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
+            <h3 class="login-title">Restablecer contraseña</h3>
+            <p class="login-subtitle">Introduce tu nueva contraseña</p>
         </div>
 
-        {{-- Mensaje de error de permisos --}}
-        @if(session('error'))
-            <div id="alert-permission" class="alert alert-warning alert-dismissible fade show text-center" role="alert" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 400px; box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 0.5rem;">
-                <i class="bi bi-exclamation-triangle-fill"></i>
-                <strong>¡Alerta!</strong> {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+        <div class="email-display">
+            {{ $email }}
+        </div>
 
-            <script>
-                setTimeout(function() {
-                    let alertEl = document.getElementById('alert-permission');
-                    if (alertEl) {
-                        alertEl.classList.remove('show');
-                        alertEl.classList.add('hide');
-                        setTimeout(() => alertEl.remove(), 500);
-                    }
-                }, 3000);
-            </script>
-        @endif
-
-        {{-- Mensaje de éxito después de restablecer contraseña --}}
-        @if(session('success'))
-        <div class="success-message">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-            {{ session('success') }}
+        @if(isset($username) && $username)
+        <div class="username-display">
+            <strong>Tu nombre de usuario es:</strong> {{ $username }}
         </div>
         @endif
 
-        <form action="{{ route('login.process') }}" method="POST" id="loginForm" autocomplete="off">
+        <form action="{{ route('password.update') }}" method="POST" id="resetForm" autocomplete="off">
             @csrf
-
-            <div class="form-group @error('email') has-error @enderror" id="emailGroup">
-                <label class="form-label">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                    Usuario
-                </label>
-                <input
-                    type="text"
-                    name="email"
-                    id="email"
-                    class="form-control-modern"
-                   
-                    value="{{ $errors->any() ? old('email') : '' }}"
-                    autocomplete="off"
-                >
-                <div class="error-message @error('email') show @enderror" id="emailError">
-                    @error('email')
-                        {{ $message }}
-                    @enderror
-                </div>
-            </div>
+            <input type="hidden" name="token" value="{{ $token }}">
+            <input type="hidden" name="email" value="{{ $email }}">
+            <input type="hidden" name="username" value="{{ $username }}">
 
             <div class="form-group @error('password') has-error @enderror" id="passwordGroup">
-                <label class="form-label">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                    </svg>
-                    Contraseña
-                </label>
+                <label class="form-label">Nueva contraseña</label>
                 <div class="input-wrapper">
                     <input
                         type="password"
@@ -555,6 +426,7 @@
                         class="form-control-modern with-icon"
                        
                         autocomplete="new-password"
+                        required
                     >
                     <button type="button" class="toggle-password" id="togglePassword">
                         <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -574,19 +446,42 @@
                 </div>
             </div>
 
+            <div class="form-group @error('password_confirmation') has-error @enderror" id="confirmGroup">
+                <label class="form-label">Confirmar contraseña</label>
+                <div class="input-wrapper">
+                    <input
+                        type="password"
+                        name="password_confirmation"
+                        id="password_confirmation"
+                        class="form-control-modern with-icon"
+                       
+                        autocomplete="new-password"
+                        required
+                    >
+                    <button type="button" class="toggle-password" id="toggleConfirm">
+                        <svg id="eyeIcon2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <svg id="eyeOffIcon2" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                            <line x1="1" y1="1" x2="23" y2="23"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="error-message @error('password_confirmation') show @enderror" id="confirmError">
+                    @error('password_confirmation')
+                        {{ $message }}
+                    @enderror
+                </div>
+            </div>
+
             <button type="submit" class="btn-login" id="submitBtn">
-                Ingresar
+                Restablecer
             </button>
 
-            <div class="forgot-password">
-                <a href="{{ route('password.forgot') }}">
-                    <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="16" x2="12" y2="12"/>
-                        <line x1="12" y1="8" x2="12.01" y2="8"/>
-                    </svg>
-                    ¿Olvidaste tu contraseña?
-                </a>
+            <div class="back-to-login">
+                <a href="{{ route('login.form') }}">Volver al login</a>
             </div>
         </form>
     </div>
@@ -594,47 +489,24 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const loginForm = document.getElementById('loginForm');
-    const emailInput = document.getElementById('email');
+    const resetForm = document.getElementById('resetForm');
     const passwordInput = document.getElementById('password');
-    const emailError = document.getElementById('emailError');
+    const confirmInput = document.getElementById('password_confirmation');
     const passwordError = document.getElementById('passwordError');
-    const emailGroup = document.getElementById('emailGroup');
+    const confirmError = document.getElementById('confirmError');
     const passwordGroup = document.getElementById('passwordGroup');
+    const confirmGroup = document.getElementById('confirmGroup');
     const submitBtn = document.getElementById('submitBtn');
+
+    // Toggle password visibility - Contraseña
     const togglePassword = document.getElementById('togglePassword');
     const eyeIcon = document.getElementById('eyeIcon');
     const eyeOffIcon = document.getElementById('eyeOffIcon');
 
-    // ===== LIMPIAR FORMULARIO AL RECARGAR O VOLVER =====
-    const hasServerErrors = {{ $errors->any() ? 'true' : 'false' }};
-    const isBackButton = (window.performance && window.performance.navigation.type === 2);
-    
-    if (!hasServerErrors || isBackButton) {
-        emailInput.value = '';
-        passwordInput.value = '';
-        emailError.classList.remove('show');
-        passwordError.classList.remove('show');
-        emailError.textContent = '';
-        passwordError.textContent = '';
-        emailGroup.classList.remove('has-error');
-        passwordGroup.classList.remove('has-error');
-        if (loginForm) loginForm.reset();
-    }
-    
-    setTimeout(function() {
-        if (!hasServerErrors || isBackButton) {
-            emailInput.value = '';
-            passwordInput.value = '';
-        }
-    }, 50);
-    // ===== FIN: LIMPIAR FORMULARIO =====
-
-    // Funcionalidad del ojito para mostrar/ocultar contraseña
     togglePassword.addEventListener('click', function() {
         const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
         passwordInput.setAttribute('type', type);
-
+        
         if (type === 'text') {
             eyeIcon.style.display = 'none';
             eyeOffIcon.style.display = 'block';
@@ -644,15 +516,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Limpiar errores cuando el usuario empieza a escribir
-    emailInput.addEventListener('input', function() {
-        if (this.value.trim() !== '') {
-            emailError.classList.remove('show');
-            emailError.textContent = '';
-            emailGroup.classList.remove('has-error');
+    // Toggle password visibility - Confirmar
+    const toggleConfirm = document.getElementById('toggleConfirm');
+    const eyeIcon2 = document.getElementById('eyeIcon2');
+    const eyeOffIcon2 = document.getElementById('eyeOffIcon2');
+
+    toggleConfirm.addEventListener('click', function() {
+        const type = confirmInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        confirmInput.setAttribute('type', type);
+        
+        if (type === 'text') {
+            eyeIcon2.style.display = 'none';
+            eyeOffIcon2.style.display = 'block';
+        } else {
+            eyeIcon2.style.display = 'block';
+            eyeOffIcon2.style.display = 'none';
         }
     });
 
+    // Limpiar errores cuando el usuario empieza a escribir
     passwordInput.addEventListener('input', function() {
         if (this.value.trim() !== '') {
             passwordError.classList.remove('show');
@@ -661,22 +543,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Validación al enviar el formulario
-    loginForm.addEventListener('submit', function(e) {
-        let isValid = true;
-
-        const emailValue = emailInput.value.trim();
-        if (emailValue === '') {
-            e.preventDefault();
-            emailError.textContent = 'El nombre de usuario es obligatorio.';
-            emailError.classList.add('show');
-            emailGroup.classList.add('has-error');
-            isValid = false;
-        } else {
-            emailError.classList.remove('show');
-            emailError.textContent = '';
-            emailGroup.classList.remove('has-error');
+    confirmInput.addEventListener('input', function() {
+        if (this.value.trim() !== '') {
+            confirmError.classList.remove('show');
+            confirmError.textContent = '';
+            confirmGroup.classList.remove('has-error');
         }
+    });
+
+    // Validación al enviar el formulario
+    resetForm.addEventListener('submit', function(e) {
+        let isValid = true;
 
         const passwordValue = passwordInput.value.trim();
         if (passwordValue === '') {
@@ -697,56 +574,46 @@ document.addEventListener('DOMContentLoaded', function() {
             passwordGroup.classList.remove('has-error');
         }
 
+        const confirmValue = confirmInput.value.trim();
+        if (confirmValue === '') {
+            e.preventDefault();
+            confirmError.textContent = 'Debes confirmar tu contraseña.';
+            confirmError.classList.add('show');
+            confirmGroup.classList.add('has-error');
+            isValid = false;
+        } else if (passwordValue !== confirmValue) {
+            e.preventDefault();
+            confirmError.textContent = 'Las contraseñas no coinciden.';
+            confirmError.classList.add('show');
+            confirmGroup.classList.add('has-error');
+            isValid = false;
+        } else {
+            confirmError.classList.remove('show');
+            confirmError.textContent = '';
+            confirmGroup.classList.remove('has-error');
+        }
+
         if (!isValid) {
-            if (emailValue === '') {
-                emailInput.focus();
-            } else if (passwordValue === '' || passwordValue.length < 6) {
+            if (passwordValue === '' || passwordValue.length < 6) {
                 passwordInput.focus();
+            } else if (confirmValue === '' || passwordValue !== confirmValue) {
+                confirmInput.focus();
             }
         }
     });
 
     // Mostrar errores del servidor si existen
-    @if($errors->has('email'))
-        emailError.textContent = `{{ $errors->first('email') }}`;
-        emailError.classList.add('show');
-        emailGroup.classList.add('has-error');
-    @endif
-
     @if($errors->has('password'))
         passwordError.textContent = `{{ $errors->first('password') }}`;
         passwordError.classList.add('show');
         passwordGroup.classList.add('has-error');
     @endif
-});
 
-// ===== DETECTAR BOTÓN VOLVER DEL NAVEGADOR =====
-window.addEventListener('pageshow', function(event) {
-    if (event.persisted) {
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const loginForm = document.getElementById('loginForm');
-        
-        if (emailInput) emailInput.value = '';
-        if (passwordInput) passwordInput.value = '';
-        if (loginForm) loginForm.reset();
-        
-        const emailError = document.getElementById('emailError');
-        const passwordError = document.getElementById('passwordError');
-        const emailGroup = document.getElementById('emailGroup');
-        const passwordGroup = document.getElementById('passwordGroup');
-        
-        if (emailError) {
-            emailError.classList.remove('show');
-            emailError.textContent = '';
-        }
-        if (passwordError) {
-            passwordError.classList.remove('show');
-            passwordError.textContent = '';
-        }
-        if (emailGroup) emailGroup.classList.remove('has-error');
-        if (passwordGroup) passwordGroup.classList.remove('has-error');
-    }
+    @if($errors->has('password_confirmation'))
+        confirmError.textContent = `{{ $errors->first('password_confirmation') }}`;
+        confirmError.classList.add('show');
+        confirmGroup.classList.add('has-error');
+    @endif
 });
 </script>
 @endsection
