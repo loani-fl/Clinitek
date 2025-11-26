@@ -10,13 +10,92 @@ use Illuminate\Support\Facades\Artisan;
 
 class RoleController extends Controller
 {
-    public function index()
-{
-    $roles = Role::with('permissions', 'users')->get();
+    public function index(Request $request)
+    {
+        $busqueda = $request->get('busqueda');
 
-    return view('roles.index', compact('roles'));
-}
+        // Iniciar la consulta excluyendo el rol "administrador"
+        $query = Role::with('permissions', 'users')
+            ->where('name', '!=', 'administrador');
 
+        // Si hay búsqueda, filtrar por nombre
+        if ($busqueda) {
+            $query->where('name', 'like', '%' . $busqueda . '%');
+        }
+
+        // Aplicar paginación
+        $roles = $query->paginate(5);
+
+        // Si es una petición AJAX, retornar JSON
+        if ($request->ajax()) {
+            $html = '';
+            
+            if ($roles->count() > 0) {
+                foreach ($roles as $index => $role) {
+                    $numero = ($roles->currentPage() - 1) * $roles->perPage() + $index + 1;
+                    $editUrl = route('roles.edit', $role->id);
+                    $deleteUrl = route('roles.destroy', $role->id);
+                    $csrf = csrf_token();
+                    
+                    $deleteButton = '';
+                    if ($role->users->count() == 0) {
+                        $deleteButton = '
+                            <form action="' . $deleteUrl . '" method="POST" style="display:inline;">
+                                <input type="hidden" name="_token" value="' . $csrf . '">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm(\'¿Estás seguro de eliminar este rol?\');" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        ';
+                    } else {
+                        $deleteButton = '
+                            <button type="button" class="btn btn-sm btn-outline-secondary" disabled title="No se puede eliminar: tiene usuarios asignados">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        ';
+                    }
+                    
+                    $html .= '
+                        <tr>
+                            <td>' . $numero . '</td>
+                            <td>' . htmlspecialchars($role->name) . '</td>
+                            <td>
+                                <span class="badge bg-success">
+                                    ' . $role->permissions->count() . ' permisos
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">
+                                    ' . $role->users->count() . ' usuarios
+                                </span>
+                            </td>
+                            <td>
+                                <a href="' . $editUrl . '" class="btn btn-sm btn-outline-warning" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                ' . $deleteButton . '
+                            </td>
+                        </tr>
+                    ';
+                }
+            } else {
+                $html = '
+                    <tr>
+                        <td colspan="5" class="text-center fst-italic text-muted">No hay roles registrados</td>
+                    </tr>
+                ';
+            }
+            
+            return response()->json([
+                'html' => $html,
+                'pagination' => $roles->links()->render(),
+                'total' => $roles->total()
+            ]);
+        }
+
+        return view('roles.index', compact('roles'));
+    }
 
     public function create()
     {
@@ -98,7 +177,7 @@ class RoleController extends Controller
         $role->syncPermissions($request->permissions ?? []);
 
         // Limpiar cache de permisos
-        \Artisan::call('permission:cache-reset');
+        Artisan::call('permission:cache-reset');
 
         return redirect()->route('roles.index')->with('success', 'Rol creado correctamente.');
     }
@@ -175,7 +254,7 @@ class RoleController extends Controller
         $role->syncPermissions($request->permissions ?? []);
 
         // Limpiar caché de permisos para que los cambios tengan efecto inmediato
-        \Artisan::call('permission:cache-reset');
+        Artisan::call('permission:cache-reset');
 
         return redirect()->route('roles.index')->with('success', 'Rol actualizado correctamente.');
     }
@@ -183,6 +262,11 @@ class RoleController extends Controller
 
     public function destroy(Role $role)
     {
+        // Verificar si el rol tiene usuarios asignados
+        if ($role->users()->count() > 0) {
+            return redirect()->route('roles.index')->with('error', 'No se puede eliminar el rol porque tiene usuarios asignados.');
+        }
+
         $role->delete();
         return redirect()->route('roles.index')->with('success', 'Rol eliminado correctamente.');
     }
