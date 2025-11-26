@@ -298,7 +298,7 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
                     <li><a class="dropdown-item" href="{{ route('puestos.index') }}">Crear puesto</a></li>
-                    <li><a class="dropdown-item" href="{{ route('empleado.index') }}">Registrar empleado</a></li>
+                    <li><a class="dropdown-item" href="{{ route('empleados.index') }}">Registrar empleado</a></li>
                     <li><a class="dropdown-item" href="{{ route('medicos.index') }}">Registrar médico</a></li>
                     <li><a class="dropdown-item" href="{{ route('consultas.index') }}">Registrar consulta</a></li>
                     <li><a class="dropdown-item" href="{{ route('pacientes.index') }}">Registrar paciente</a></li>

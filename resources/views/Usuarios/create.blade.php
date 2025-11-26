@@ -53,12 +53,17 @@
 
 #personaSeleccionada div { flex: 1 1 200px; }
 
+#searchPersona {
+    max-width: 400px;
+    width: 100%;
+}
+
 #personaSeleccionada p { margin: 0.2rem 0; font-size: 15px; }
 
 .icon-valid { color: green; font-weight: bold; }
 .icon-invalid { color: red; font-weight: bold; }
 
-#results { max-height: 200px; overflow-y: auto; z-index: 1000; }
+#results { max-height: 120px; overflow-y: auto; z-index: 1000; }
 
 .form-select, .form-control {
     background-color: #f1f9ff;
@@ -89,25 +94,62 @@
         <div class="row mb-4">
             <div class="col-md-12 mb-3 position-relative">
                 <label class="form-label">Buscar persona <span class="text-danger">*</span></label>
-                <input type="text" id="searchPersona" class="form-control" placeholder="Escribe el nombre o apellido...">
+                <input type="text" id="searchPersona" class="form-control" placeholder="Escribe el nombre o apellido..." 
+                       value="{{ old('nombre') ? old('nombre').' '.old('apellido') : '' }}">
                 <div id="results" class="list-group position-absolute w-100"></div>
-                <input type="hidden" name="persona_id" id="persona_id">
-                <input type="hidden" name="nombre" id="nombre">
-                <input type="hidden" name="apellido" id="apellido">
-                <input type="hidden" name="correo" id="correo">
+
+                <input type="hidden" name="persona_id" id="persona_id" value="{{ old('persona_id') }}">
+                <input type="hidden" name="nombre" id="nombre" value="{{ old('nombre') }}">
+                <input type="hidden" name="apellido" id="apellido" value="{{ old('apellido') }}">
+                <input type="hidden" name="correo" id="correo" value="{{ old('correo') }}">
+
                 @error('persona_id') <div class="text-danger mt-1">{{ $message }}</div> @enderror
 
-                <div id="personaSeleccionada" style="display:none;">
-                    <div><p><strong>Nombre:</strong> <span id="displayNombre"></span></p></div>
-                    <div><p><strong>Apellido:</strong> <span id="displayApellido"></span></p></div>
-                    <div><p><strong>Correo:</strong> <span id="displayCorreo"></span></p></div>
+                <div id="personaSeleccionada" style="display: {{ old('persona_id') ? 'flex' : 'none' }};">
+                    <div><p><strong>Nombre:</strong> <span id="displayNombre">{{ old('nombre') }}</span></p></div>
+                    <div><p><strong>Apellido:</strong> <span id="displayApellido">{{ old('apellido') }}</span></p></div>
+                    <div><p><strong>Correo:</strong> <span id="displayCorreo">{{ old('correo') }}</span></p></div>
                 </div>
             </div>
         </div>
 
-        <!-- SELECCIÓN DE ROL -->
-        <div class="row mb-4" id="divRol" style="display:none;">
-            <div class="col-md-6 mb-3">
+        <!-- DATOS DE INICIO DE SESIÓN Y ROL -->
+        <p class="section-title">Credenciales de inicio de sesión</p>
+        <div class="row mb-4">
+
+            <!-- Usuario -->
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Usuario <span class="text-danger">*</span></label>
+                <input type="text" 
+                       name="usuario" 
+                       id="usuario" 
+                       class="form-control" 
+                       placeholder="Nombre de usuario"
+                       maxlength="50"
+                       required>
+                <div class="invalid-feedback">Debe ingresar un usuario.</div>
+                <div class="valid-feedback">Usuario válido</div>
+            </div>
+
+            <!-- Correo -->
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Correo <span class="text-danger">*</span></label>
+                <input type="email" 
+                       name="correo_usuario" 
+                       id="correo_usuario" 
+                       class="form-control @error('correo_usuario') is-invalid @enderror" 
+                       placeholder="ejemplo: usuario@gmail.com"
+                       maxlength="50"
+                       value="{{ old('correo_usuario') }}"
+                       required>
+                <div class="invalid-feedback">
+                    @error('correo_usuario') {{ $message }} @else Debe ingresar un correo válido. @enderror
+                </div>
+                <div class="valid-feedback">Correo válido</div>
+            </div>
+
+            <!-- Rol -->
+            <div class="col-md-4 mb-3" id="divRol">
                 <label class="form-label">Asignar rol <span class="text-danger">*</span></label>
                 <select name="rol_id" id="rol_id" class="form-select" required>
                     <option value="">-- Seleccione un rol --</option>
@@ -117,15 +159,12 @@
                 </select>
                 @error('rol_id') <div class="text-danger mt-1">{{ $message }}</div> @enderror
             </div>
-        </div>
 
-        <!-- DATOS DE INICIO DE SESIÓN -->
-        <p class="section-title">Datos de inicio de sesión</p>
-        <div class="row mb-4">
+            <!-- Contraseña -->
             <div class="col-md-6 mb-3">
                 <label class="form-label">Contraseña <span class="text-danger">*</span></label>
                 <div class="input-group">
-                    <input type="password" name="password" id="password" minlength="8" maxlength="20" required class="form-control @error('password') is-invalid @enderror">
+                    <input type="password" name="password" id="password" minlength="8" maxlength="20" required class="form-control">
                     <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                         <i class="bi bi-eye-fill"></i>
                     </button>
@@ -138,32 +177,16 @@
                 </ul>
             </div>
 
+            <!-- Confirmación contraseña -->
             <div class="col-md-6 mb-3">
                 <label class="form-label">Confirmar contraseña <span class="text-danger">*</span></label>
                 <input type="password" name="password_confirmation" id="password_confirmation" minlength="8" maxlength="20" required class="form-control">
                 <div class="invalid-feedback">Las contraseñas no coinciden.</div>
             </div>
+
         </div>
 
-        <!-- PREGUNTAS DE AUTENTICACIÓN -->
-        <p class="section-title">Preguntas de autenticación</p>
-        <div class="row mb-4">
-            @for ($i = 1; $i <= 3; $i++)
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Pregunta {{ $i }} <span class="text-danger">*</span></label>
-                <select name="pregunta{{ $i }}" class="form-select pregunta" required>
-                    <option value="">-- Seleccione una pregunta --</option>
-                    <option value="nombre_mascota">¿Cuál es el nombre de tu primera mascota?</option>
-                    <option value="ciudad_nacimiento">¿En qué ciudad naciste?</option>
-                    <option value="pelicula_favorita">¿Cuál es tu película favorita?</option>
-                </select>
-                <input type="text" name="respuesta{{ $i }}" class="form-control mt-1 respuesta" placeholder="Respuesta" maxlength="50" required>
-                <div class="invalid-feedback">Debe seleccionar una pregunta y escribir una respuesta.</div>
-            </div>
-            @endfor
-        </div>
-
-        <!-- BOTONES -->
+        <!-- Botones -->
         <div class="d-flex justify-content-center gap-3 mt-4">
             <button type="submit" class="btn btn-primary px-4"><i class="bi bi-plus-circle"></i> Crear usuario</button>
             <button type="button" id="btnLimpiar" class="btn btn-warning px-4"><i class="bi bi-trash"></i> Limpiar</button>
@@ -188,11 +211,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const displayNombre = document.getElementById('displayNombre');
     const displayApellido = document.getElementById('displayApellido');
     const displayCorreo = document.getElementById('displayCorreo');
-    const divRol = document.getElementById('divRol');
     const form = document.getElementById('formUsuario');
-    const preguntas = document.querySelectorAll('.pregunta');
-    const respuestas = document.querySelectorAll('.respuesta');
+
+    const usuarioInput = document.getElementById('usuario');
+    const correoUsuarioInput = document.getElementById('correo_usuario');
     const btnLimpiar = document.getElementById('btnLimpiar');
+
+    // Validación usuario en tiempo real
+    usuarioInput.addEventListener('input', () => {
+        if(usuarioInput.value.trim() === "") {
+            usuarioInput.classList.remove('is-valid','is-invalid');
+        } else {
+            usuarioInput.classList.add('is-valid');
+            usuarioInput.classList.remove('is-invalid');
+        }
+    });
+
+    // Validación correo en tiempo real
+    correoUsuarioInput.addEventListener('input', () => {
+        const regexCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if(correoUsuarioInput.value.trim() === "") {
+            correoUsuarioInput.classList.remove('is-valid','is-invalid');
+        } else if(regexCorreo.test(correoUsuarioInput.value.trim())) {
+            correoUsuarioInput.classList.add('is-valid');
+            correoUsuarioInput.classList.remove('is-invalid');
+        } else {
+            correoUsuarioInput.classList.add('is-invalid');
+            correoUsuarioInput.classList.remove('is-valid');
+        }
+    });
 
     // Validación contraseña
     password.addEventListener('input', () => {
@@ -226,41 +273,18 @@ document.addEventListener('DOMContentLoaded', () => {
         icon.classList.toggle('bi-eye-fill'); icon.classList.toggle('bi-eye-slash-fill');
     });
 
-    // Bloquear preguntas repetidas
-    function actualizarPreguntas() {
-        const valores = Array.from(preguntas).map(p => p.value);
-        preguntas.forEach(p => {
-            const actual = p.value;
-            Array.from(p.options).forEach(opt => {
-                opt.disabled = false;
-                if(opt.value !== "" && valores.includes(opt.value) && opt.value !== actual){
-                    opt.disabled = true;
-                }
-            });
-        });
-    }
-
-    preguntas.forEach((p, i) => {
-        p.addEventListener('change', () => {
-            if(p.value) p.classList.remove('is-invalid'); p.classList.add('is-valid');
-            if(respuestas[i].value.trim()) respuestas[i].classList.add('is-valid');
-            actualizarPreguntas();
-        });
-    });
-
-    // Respuestas: solo letras y espacios, máximo 50 caracteres
-    respuestas.forEach(r => {
-        r.addEventListener('input', () => {
-            r.value = r.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]/g,'').slice(0,50);
-            if(r.value.trim() !== "") r.classList.add('is-valid');
-        });
-    });
-
     // Validación al enviar
     form.addEventListener('submit', (e)=>{
         let valid = true;
 
-        // Validar persona seleccionada
+        if(!usuarioInput.value.trim()) { usuarioInput.classList.add('is-invalid'); valid = false; }
+        else { usuarioInput.classList.remove('is-invalid'); usuarioInput.classList.add('is-valid'); }
+
+        const regexCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if(!correoUsuarioInput.value.trim() || !regexCorreo.test(correoUsuarioInput.value.trim())){
+            correoUsuarioInput.classList.add('is-invalid'); valid = false;
+        } else { correoUsuarioInput.classList.remove('is-invalid'); correoUsuarioInput.classList.add('is-valid'); }
+
         if(!personaIdInput.value){
             valid = false;
             searchInput.classList.add('is-invalid');
@@ -273,11 +297,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             searchInput.classList.remove('is-invalid');
-            const err = document.getElementById('errorPersona');
-            if(err) err.remove();
+            const err = document.getElementById('errorPersona'); if(err) err.remove();
         }
 
-        // Validar rol seleccionado
         const rolSelect = document.getElementById('rol_id');
         if(!rolSelect.value){
             valid = false;
@@ -291,48 +313,43 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             rolSelect.classList.remove('is-invalid');
-            const errRol = document.getElementById('errorRol');
-            if(errRol) errRol.remove();
+            const errRol = document.getElementById('errorRol'); if(errRol) errRol.remove();
         }
-
-        // Validación preguntas
-        preguntas.forEach((p, i) => {
-            const r = respuestas[i];
-            if(!p.value) { p.classList.add('is-invalid'); valid=false; }
-            if(!r.value.trim()) { r.classList.add('is-invalid'); valid=false; }
-        });
 
         if(!valid) e.preventDefault();
     });
 
-    // Limpiar
+    // Limpiar TODO
     btnLimpiar.addEventListener('click', () => {
         form.reset();
-        personaIdInput.value=''; nombreInput.value=''; apellidoInput.value=''; correoInput.value='';
-        displayDiv.style.display='none'; displayNombre.textContent=''; displayApellido.textContent=''; displayCorreo.textContent='';
-        divRol.style.display='none';
-        resultsDiv.innerHTML='';
-        document.querySelectorAll('.is-valid,.is-invalid').forEach(el=>el.classList.remove('is-valid','is-invalid'));
+        searchInput.value = '';
+        personaIdInput.value = '';
+        nombreInput.value = '';
+        apellidoInput.value = '';
+        correoInput.value = '';
+        displayDiv.style.display = 'none';
+        displayNombre.textContent = '';
+        displayApellido.textContent = '';
+        displayCorreo.textContent = '';
+        resultsDiv.innerHTML = '';
+        form.querySelectorAll('input, select, textarea').forEach(el => el.classList.remove('is-valid','is-invalid'));
         ['rule-length','rule-uppercase','rule-number','rule-special'].forEach(id => {
-            const li=document.getElementById(id);
+            const li = document.getElementById(id);
             li.classList.replace('text-success','text-danger');
-            li.querySelector('span').textContent="✖";
+            li.querySelector('span').textContent = "✖";
         });
-        actualizarPreguntas();
-        const err = document.getElementById('errorPersona');
-        if(err) err.remove();
-        const errRol = document.getElementById('errorRol');
-        if(errRol) errRol.remove();
+        const errPersona = document.getElementById('errorPersona'); if(errPersona) errPersona.remove();
+        const errRol = document.getElementById('errorRol'); if(errRol) errRol.remove();
     });
 
     // Autocomplete persona
     searchInput.addEventListener('input', function() {
         searchInput.classList.remove('is-invalid');
-        const err = document.getElementById('errorPersona');
-        if(err) err.remove();
+        const err = document.getElementById('errorPersona'); if(err) err.remove();
 
         const query = this.value.trim();
         if(query.length < 1){ resultsDiv.innerHTML=''; return; }
+
         fetch(`/personas/search?q=${encodeURIComponent(query)}`)
             .then(resp=>resp.json())
             .then(data=>{
@@ -351,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             personaIdInput.value=p.id;
                             nombreInput.value=p.nombre; apellidoInput.value=p.apellido; correoInput.value=p.correo;
                             displayNombre.textContent=p.nombre; displayApellido.textContent=p.apellido; displayCorreo.textContent=p.correo;
-                            displayDiv.style.display='flex'; divRol.style.display='block';
+                            displayDiv.style.display='flex';
                             searchInput.value=p.nombre_completo; resultsDiv.innerHTML='';
                         });
                         resultsDiv.appendChild(item);
@@ -363,9 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 
-    document.addEventListener('click', e=>{
-        if(!resultsDiv.contains(e.target) && e.target!==searchInput) resultsDiv.innerHTML='';
-    });
+    document.addEventListener('click', e=>{ if(!resultsDiv.contains(e.target) && e.target!==searchInput) resultsDiv.innerHTML=''; });
 });
 </script>
 
