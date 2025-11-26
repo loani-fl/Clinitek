@@ -156,15 +156,17 @@
             </a>
             <h2>Usuarios</h2>
             <a href="{{ route('usuarios.create') }}" class="btn btn-primary ms-3"> Nuevo usuario </a>
-
-
         </div>
 
         {{-- Filtros --}}
         <div class="d-flex filter-container mb-3" style="gap:0.5rem; flex-wrap: nowrap; align-items: center;">
-            <input type="text" id="filtroBusqueda" class="form-control" placeholder="Buscar por nombre o email"
-                value="{{ request('search') }}" style="width: 260px;">
-
+            <input type="text" id="filtroBusqueda" class="form-control" placeholder="Buscar por nombre o email" style="width:260px;">
+            <select id="filtroRol" class="form-select" style="width:200px;">
+                <option value="">-- Todos los roles --</option>
+                @foreach($roles as $rol)
+                    <option value="{{ $rol->id }}">{{ $rol->name }}</option>
+                @endforeach
+            </select>
         </div>
 
         {{-- Tabla --}}
@@ -172,14 +174,12 @@
             @include('Usuarios.partials.tabla', ['usuarios' => $usuarios])
         </div>
 
-        {{-- Mensaje de resultados --}}
-        <div id="mensajeResultados">
+        <div id="mensajeResultados" class="mt-2">
             @if($usuarios->total() > 0)
                 Mostrando del {{ $usuarios->firstItem() }} al {{ $usuarios->lastItem() }} de {{ $usuarios->total() }} resultados
             @endif
         </div>
 
-        {{-- Paginación --}}
         <div id="paginacion-container" class="mt-3">
             @include('Usuarios.partials.custom-pagination', ['usuarios' => $usuarios])
         </div>
@@ -210,17 +210,14 @@ $(document).ready(function () {
         });
     }
 
-    // Filtro de texto
     $('#filtroBusqueda').on('input', function() {
         actualizarTabla(1);
     });
 
-    // Filtro por rol
     $('#filtroRol').on('change', function() {
         actualizarTabla(1);
     });
 
-    // Paginación dinámica
     $(document).on('click', '.custom-pagination a', function(e){
         e.preventDefault();
         const page = $(this).data('page');

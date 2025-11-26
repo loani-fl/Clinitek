@@ -14,7 +14,6 @@ class Usuario extends Authenticatable
     protected $table = 'usuarios';
     protected $guard_name = 'web';
 
-
     protected $fillable = [
         'name',
         'email',
@@ -26,5 +25,9 @@ class Usuario extends Authenticatable
         'remember_token',
     ];
 
-
+    // Relación para obtener el primer rol asignado (opcional si solo asignas un rol)
+    public function rol()
+    {
+        return $this->belongsTo(\Spatie\Permission\Models\Role::class, 'rol_id');
+    }
 }
