@@ -77,6 +77,16 @@
         z-index: 1200;
         margin-top: 1rem;
     }
+    .alert-danger-custom {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.25rem;
+        position: relative;
+        z-index: 1200;
+        margin-top: 1rem;
+    }
     .filter-row {
         display: flex;
         flex-wrap: wrap;
@@ -105,6 +115,11 @@
     .table th, .table td {
         padding: 0.4rem 0.75rem;
         vertical-align: middle;
+    }
+
+    .pagination-container {
+        display: flex;
+        justify-content: center;
     }
 </style>
 
@@ -137,6 +152,13 @@
             </div>
         @endif
 
+        @if(session('error'))
+            <div id="mensaje-error" class="alert alert-danger alert-dismissible fade show alert-danger-custom">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
         <div class="card-body">
             <div class="d-flex justify-content-start align-items-center gap-2 mb-3">
                 <label class="mb-0">Buscar:</label>
@@ -155,51 +177,16 @@
                         </tr>
                     </thead>
                     <tbody id="tabla-roles">
-                        @forelse($roles as $index => $role)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td>{{ $role->name }}</td>
-                                <td>
-                                    <span class="badge bg-success">
-                                        {{ $role->permissions->count() }} permisos
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-info">
-                                        {{ $role->users->count() }} usuarios
-                                    </span>
-                                </td>
-                                <td>
-
-                                    <form action="{{ route('roles.destroy', $role->id) }}" method="POST" style="display:inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Estás seguro de eliminar este rol?');">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="text-center fst-italic text-muted">No hay roles registrados</td>
-                            </tr>
-                        @endforelse
-
-                        <tr id="sin-resultados" style="display: none;">
-                            <td colspan="5" class="text-center fst-italic text-muted">No hay resultados que mostrar</td>
-                        </tr>
+                        <!-- El contenido se cargará dinámicamente -->
                     </tbody>
                 </table>
             </div>
 
-            <div id="contador-resultados" class="mt-2 text-center fw-bold"></div>
+            <div id="resultado-busqueda" class="mt-2 text-center fw-bold text-info" style="display: none;"></div>
 
-            @if(isset($roles) && method_exists($roles, 'links'))
-            <div class="mt-4 pagination-container">
-                {{ $roles->links() }}
+            <div class="mt-4 pagination-container" id="pagination-container">
+                <!-- La paginación se cargará dinámicamente -->
             </div>
-            @endif
 
         </div>
     </div>
@@ -208,57 +195,66 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const busquedaInput = document.getElementById('busqueda');
-    const tabla = document.getElementById('tabla-roles');
-    const contadorResultados = document.getElementById('contador-resultados');
-    const filasOriginales = Array.from(tabla.querySelectorAll('tr:not(#sin-resultados)'));
-    const filaSinResultados = document.getElementById('sin-resultados');
+    const tablaRoles = document.getElementById('tabla-roles');
+    const paginationContainer = document.getElementById('pagination-container');
+    const resultadoBusqueda = document.getElementById('resultado-busqueda');
+    let timeout = null;
 
-    function actualizarContador(cantidad) {
-        const textoBusquedaVacio = busquedaInput.value.trim() === "";
+    // Cargar datos iniciales
+    cargarRoles();
 
-        if (cantidad > 0 && !textoBusquedaVacio) {
-            contadorResultados.style.display = 'block';
-            contadorResultados.textContent = `${cantidad} resultado${cantidad !== 1 ? 's' : ''} encontrado${cantidad !== 1 ? 's' : ''}`;
-        } else {
-            contadorResultados.style.display = 'none';
-            contadorResultados.textContent = '';
-        }
-    }
+    // Búsqueda en tiempo real
+    busquedaInput.addEventListener('keyup', function () {
+        clearTimeout(timeout);
+        
+        timeout = setTimeout(function () {
+            cargarRoles(1, busquedaInput.value.trim());
+        }, 300); // Espera 300ms
+    });
 
-    function filtrarTabla() {
-        const textoBusqueda = busquedaInput.value.toLowerCase().trim();
-
-        tabla.innerHTML = '';
-        let cantidadVisible = 0;
-
-        filasOriginales.forEach(fila => {
-            const celdas = fila.querySelectorAll('td');
-            if (celdas.length === 0) return;
-
-            const nombreRol = celdas[1]?.innerText.toLowerCase().trim() || '';
-
-            const coincide = textoBusqueda === '' || nombreRol.includes(textoBusqueda);
-
-            if (coincide) {
-                cantidadVisible++;
-                celdas[0].textContent = cantidadVisible;
-                tabla.appendChild(fila);
+    function cargarRoles(page = 1, busqueda = '') {
+        const url = `{{ route('roles.index') }}?page=${page}&busqueda=${encodeURIComponent(busqueda)}`;
+        
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
             }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Actualizar tabla
+            tablaRoles.innerHTML = data.html;
+            
+            // Actualizar paginación
+            paginationContainer.innerHTML = data.pagination;
+            
+            // Mostrar resultado de búsqueda
+            if (busqueda) {
+                resultadoBusqueda.style.display = 'block';
+                resultadoBusqueda.textContent = `${data.total} resultado${data.total !== 1 ? 's' : ''} encontrado${data.total !== 1 ? 's' : ''}`;
+            } else {
+                resultadoBusqueda.style.display = 'none';
+            }
+
+            // Agregar eventos a los enlaces de paginación
+            agregarEventosPaginacion(busqueda);
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
-
-        if (cantidadVisible === 0) {
-            filaSinResultados.style.display = '';
-            tabla.appendChild(filaSinResultados);
-        } else {
-            filaSinResultados.style.display = 'none';
-        }
-
-        actualizarContador(cantidadVisible);
     }
 
-    busquedaInput.addEventListener('keyup', filtrarTabla);
-
-    filtrarTabla();
+    function agregarEventosPaginacion(busqueda) {
+        const links = paginationContainer.querySelectorAll('a.page-link');
+        links.forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                const url = new URL(this.href);
+                const page = url.searchParams.get('page') || 1;
+                cargarRoles(page, busqueda);
+            });
+        });
+    }
 });
 </script>
 @endsection

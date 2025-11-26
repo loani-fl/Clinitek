@@ -2,6 +2,7 @@
 
 @section('content')
 
+    ```
     <style>
         .custom-card {
             max-width: 1100px;
@@ -44,15 +45,16 @@
 
     <div class="custom-card">
 
-        <h2 class="text-center fw-bold section-title mb-4">Crear nuevo rol</h2>
+        <h2 class="text-center fw-bold section-title mb-4">Editar rol</h2>
 
         {{-- Mensajes de éxito --}}
         @if(session('success'))
             <div class="alert alert-success text-center">{{ session('success') }}</div>
         @endif
 
-        <form action="{{ route('roles.store') }}" method="POST" novalidate>
+        <form action="{{ route('roles.update', $role->id) }}" method="POST" novalidate>
             @csrf
+            @method('PUT')
 
             {{-- Nombre del rol --}}
             <div class="row mb-3">
@@ -62,7 +64,7 @@
                            name="name"
                            class="form-control @error('name') is-invalid @enderror"
                            placeholder="Ej: administrador"
-                           value="{{ old('name') }}"
+                           value="{{ old('name', $role->name) }}"
                            maxlength="50"
                            required
                            oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ\s]/g,'')">
@@ -74,6 +76,7 @@
 
             @php
                 $allPermissions = collect($permissions ?? $permisos ?? []);
+                $rolePermissions = $role->permissions->pluck('name')->toArray();
                 $controllerSections = [
                     'Usuarios' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'usuarios.')),
                     'Pacientes' => $allPermissions->filter(fn($p) => str_starts_with($p->name, 'pacientes.')),
@@ -111,10 +114,15 @@
                                 <div class="col-md-6 mb-4">
                                     {{-- Checkbox de sección --}}
                                     <div class="d-flex align-items-center mb-2">
+                                        @php
+                                            $slug = \Illuminate\Support\Str::slug($sectionName);
+                                            $sectionChecked = $permList->pluck('name')->intersect($rolePermissions)->count() > 0;
+                                        @endphp
                                         <input type="checkbox"
                                                class="form-check-input section-checkbox me-2"
-                                               id="section_{{ \Illuminate\Support\Str::slug($sectionName) }}">
-                                        <label class="fw-bold text-primary mb-0" for="section_{{ \Illuminate\Support\Str::slug($sectionName) }}">
+                                               id="section_{{ $slug }}"
+                                            {{ $sectionChecked ? 'checked' : '' }}>
+                                        <label class="fw-bold text-primary mb-0" for="section_{{ $slug }}">
                                             {{ $sectionName }}
                                         </label>
                                     </div>
@@ -126,18 +134,18 @@
                                             $modulo = ucfirst($partes[0] ?? '');
                                             $accionOriginal = ucfirst($partes[1] ?? '');
                                             $accion = $accionesBonitas[$accionOriginal] ?? $accionOriginal;
-                                            $slug = \Illuminate\Support\Str::slug($sectionName);
+                                            $checked = in_array($perm->name, $rolePermissions);
                                         @endphp
 
                                         {{-- Saltar INDEX (Listar) --}}
                                         @if(strtolower($partes[1]) === 'index')
-                                            {{-- INDEX se activa automáticamente al marcar la sección --}}
                                             <input type="checkbox"
                                                    name="permissions[]"
                                                    value="{{ $perm->name }}"
                                                    id="perm_index_{{ $slug }}"
                                                    class="index-permission section-permission-{{ $slug }}"
-                                                   hidden>
+                                                   hidden
+                                                {{ $checked ? 'checked' : '' }}>
                                             @continue
                                         @endif
 
@@ -147,7 +155,8 @@
                                                    type="checkbox"
                                                    name="permissions[]"
                                                    value="{{ $perm->name }}"
-                                                   id="perm_{{ \Illuminate\Support\Str::slug($perm->name) }}">
+                                                   id="perm_{{ \Illuminate\Support\Str::slug($perm->name) }}"
+                                                {{ $checked ? 'checked' : '' }}>
                                             <label class="form-check-label" for="perm_{{ \Illuminate\Support\Str::slug($perm->name) }}">
                                                 {{ $accion }} {{ $modulo }}
                                             </label>
@@ -165,15 +174,19 @@
             <div class="text-danger mt-1">{{ $message }}</div>
             @enderror
 
+            @php
+                // Variables originales considerando old() por validación fallida
+                $originalName = old('name', $role->name);
+                $originalPermissions = old('permissions', $role->permissions->pluck('name')->toArray());
+            @endphp
+
             {{-- Botones --}}
             <div class="d-flex justify-content-center gap-4 mt-3">
                 <button type="submit" class="btn btn-primary px-4">
-                    <i class="bi bi-plus-circle"></i> Crear rol
+                    <i class="bi bi-save"></i> Actualizar rol
                 </button>
 
-                <button type="button" id="btnLimpiar" class="btn btn-warning px-4">
-                    <i class="bi bi-x-circle"></i> Limpiar
-                </button>
+                <button type="button" id="btnRestablecer" class="btn btn-warning px-4"> <i class="bi bi-arrow-counterclockwise"></i> Restablecer </button>
 
                 <a href="{{ route('roles.index') }}" class="btn btn-success px-4">
                     <i class="bi bi-arrow-left"></i> Regresar
@@ -186,59 +199,82 @@
     @push('scripts')
         <script>
             document.addEventListener("DOMContentLoaded", function () {
-                // 1️⃣ Deshabilitar todos los checkboxes individuales al inicio
-                document.querySelectorAll('input[name="permissions[]"]').forEach(cb => {
-                    cb.disabled = true;
-                    cb.checked = false;
-                });
-
-                // 2️⃣ Manejar cada sección
+                // 1️⃣ Configuración inicial de checkboxes según rol
                 document.querySelectorAll('.section-checkbox').forEach(section => {
+                    const slug = section.id.replace('section_', '');
+                    const permisos = document.querySelectorAll('.section-permission-' + slug);
+                    const indexCheckbox = document.querySelector('.index-permission.section-permission-' + slug);
+
+                    if(section.checked){
+                        permisos.forEach(cb => cb.disabled = false);
+                    } else {
+                        permisos.forEach(cb => cb.disabled = true);
+                        permisos.forEach(cb => cb.checked = false);
+                        if(indexCheckbox) indexCheckbox.checked = false;
+                    }
+
+                    // Manejar cambios dinámicos
                     section.addEventListener('change', function () {
-                        const slug = this.id.replace('section_', '');
-                        const permisos = document.querySelectorAll('.section-permission-' + slug);
-                        const indexCheckbox = document.querySelector('.index-permission.section-permission-' + slug);
-
                         if (this.checked) {
-                            // Activar solo Index automáticamente
                             if (indexCheckbox) indexCheckbox.checked = true;
-
-                            // Habilitar los demás checkboxes
-                            permisos.forEach(cb => {
-                                cb.disabled = false;
-                                cb.checked = false; // ❌ no marcar automáticamente
-                            });
+                            permisos.forEach(cb => cb.disabled = false);
                         } else {
-                            // Deshabilitar y desmarcar todo
-                            permisos.forEach(cb => {
-                                cb.disabled = true;
-                                cb.checked = false;
-                            });
+                            permisos.forEach(cb => { cb.disabled = true; cb.checked = false; });
                             if (indexCheckbox) indexCheckbox.checked = false;
                         }
                     });
                 });
 
-                // 3️⃣ Deshabilitar Select All global
-                const selectAll = document.getElementById('selectAllPermisos');
-                if(selectAll) selectAll.disabled = true;
 
-                // 4️⃣ Botón Limpiar
-                document.getElementById('btnLimpiar').addEventListener('click', function() {
-                    // Limpiar nombre
-                    const inputName = document.querySelector('input[name="name"]');
-                    inputName.value = '';
-                    inputName.classList.remove('is-invalid');
 
-                    // Desmarcar todo
-                    document.querySelectorAll('.section-checkbox').forEach(cb => cb.checked = false);
-                    document.querySelectorAll('input[name="permissions[]"]').forEach(cb => {
-                        cb.checked = false;
-                        cb.disabled = true;
+            });
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+
+                // --- Guardamos los valores originales al cargar la página ---
+                const originalName = @json($originalName);
+                const originalPermissions = @json($originalPermissions);
+
+                // --- Función para aplicar los permisos originales ---
+                function aplicarPermisosOriginales() {
+                    // Restaurar nombre
+                    const nameInput = document.querySelector('input[name="name"]');
+                    nameInput.value = originalName;
+
+                    // Restaurar checkboxes
+                    document.querySelectorAll('.section-checkbox').forEach(section => {
+                        const slug = section.id.replace('section_', '');
+                        const permisos = document.querySelectorAll('.section-permission-' + slug);
+                        const indexCheckbox = document.querySelector('.index-permission.section-permission-' + slug);
+
+                        // Determinar si la sección debe estar marcada
+                        const sectionChecked = Array.from(permisos).some(cb => originalPermissions.includes(cb.value));
+                        section.checked = sectionChecked;
+
+                        // INDEX oculto
+                        if(indexCheckbox) indexCheckbox.checked = sectionChecked;
+
+                        // Marcar permisos individuales según originalPermissions
+                        permisos.forEach(cb => {
+                            cb.checked = originalPermissions.includes(cb.value);
+                            cb.disabled = !section.checked;
+                        });
                     });
+                }
+
+                // --- Botón Restablecer ---
+                document.getElementById('btnRestablecer').addEventListener('click', function () {
+                    aplicarPermisosOriginales();
                 });
+
+                // Aplicar al cargar por si hay old() después de error de validación
+                aplicarPermisosOriginales();
+
             });
         </script>
     @endpush
+    ```
 
 @endsection
+

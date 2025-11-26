@@ -115,7 +115,69 @@ class RolesAndPermissionsSeeder extends Seeder
         $admin = Role::firstOrCreate(['name' => 'administrador']);
         $admin->syncPermissions($todosLosPermisos);
 
+<<<<<<< Updated upstream
         // Rol de recepción, solo acceso a pacientes
+=======
+        // MÉDICO
+        $medico->syncPermissions([
+
+            // Consultas
+            'consultas.index',
+            'consultas.create',
+            'consultas.edit',
+            'consultas.show',
+
+            // Control Prenatal
+            'controlPrenatal.index',
+            'controlPrenatal.create',
+            'controlPrenatal.show',
+
+            // Diagnósticos
+            'diagnosticos.create',
+            'diagnosticos.edit',
+            'diagnosticos.show',
+
+            // Emergencias
+            'emergencias.index',
+            'emergencias.create',
+            'emergencias.show',
+
+            // Exámenes
+            'examenes.create',
+            'examenes.show',
+
+            // Hospitalización
+            'hospitalizacion.create',
+            'hospitalizacion.imprimir',
+
+            // Dashboard
+            'dashboard.inicio',
+
+            // Médicos
+            'medicos.index',
+            'medicos.show',
+             'medicos.create',
+
+            // Pacientes
+            'pacientes.index',
+            'pacientes.show',
+        ]);
+
+        $empleado->syncPermissions([
+
+            'empleado.show',
+            'empleado.create',
+            'empleado.edit',
+
+        ]);
+
+// ID del usuario administrador
+        $usuario = Usuario::first();
+
+            if ($usuario) {
+                $usuario->assignRole('administrador');
+            }
+>>>>>>> Stashed changes
 
     }
 }
