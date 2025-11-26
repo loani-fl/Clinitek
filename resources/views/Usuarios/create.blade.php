@@ -90,28 +90,39 @@
         @csrf
 
         <!-- DATOS PERSONALES -->
-        <p class="section-title">Datos personales</p>
-        <div class="row mb-4">
-            <div class="col-md-12 mb-3 position-relative">
-                <label class="form-label">Buscar persona <span class="text-danger">*</span></label>
-                <input type="text" id="searchPersona" class="form-control" placeholder="Escribe el nombre o apellido..." 
-                       value="{{ old('nombre') ? old('nombre').' '.old('apellido') : '' }}">
-                <div id="results" class="list-group position-absolute w-100"></div>
+<p class="section-title">Datos personales</p>
+<div class="row mb-4">
+    <div class="col-md-12 mb-3 position-relative">
+        <label class="form-label">Buscar persona <span class="text-danger">*</span></label>
+        <input type="text" id="searchPersona" class="form-control" placeholder="Escribe el nombre o apellido..." 
+               value="{{ old('nombre') ? old('nombre').' '.old('apellido') : '' }}">
+        <div id="results" class="list-group position-absolute w-100"></div>
 
-                <input type="hidden" name="persona_id" id="persona_id" value="{{ old('persona_id') }}">
-                <input type="hidden" name="nombre" id="nombre" value="{{ old('nombre') }}">
-                <input type="hidden" name="apellido" id="apellido" value="{{ old('apellido') }}">
-                <input type="hidden" name="correo" id="correo" value="{{ old('correo') }}">
+        <input type="hidden" name="persona_id" id="persona_id" value="{{ old('persona_id') }}">
+        <input type="hidden" name="nombre" id="nombre" value="{{ old('nombre') }}">
+        <input type="hidden" name="apellido" id="apellido" value="{{ old('apellido') }}">
+        <input type="hidden" name="correo" id="correo" value="{{ old('correo') }}">
 
-                @error('persona_id') <div class="text-danger mt-1">{{ $message }}</div> @enderror
+        <!-- NUEVOS CAMPOS -->
+        <input type="hidden" name="telefono" id="telefono" value="{{ old('telefono') }}">
+        <input type="hidden" name="identidad" id="identidad" value="{{ old('identidad') }}">
+        <input type="hidden" name="genero" id="genero" value="{{ old('genero') }}">
 
-                <div id="personaSeleccionada" style="display: {{ old('persona_id') ? 'flex' : 'none' }};">
-                    <div><p><strong>Nombre:</strong> <span id="displayNombre">{{ old('nombre') }}</span></p></div>
-                    <div><p><strong>Apellido:</strong> <span id="displayApellido">{{ old('apellido') }}</span></p></div>
-                    <div><p><strong>Correo:</strong> <span id="displayCorreo">{{ old('correo') }}</span></p></div>
-                </div>
-            </div>
+        @error('persona_id') <div class="text-danger mt-1">{{ $message }}</div> @enderror
+
+        <div id="personaSeleccionada" style="display: {{ old('persona_id') ? 'flex' : 'none' }};">
+            <div><p><strong>Nombre:</strong> <span id="displayNombre">{{ old('nombre') }}</span></p></div>
+            <div><p><strong>Apellido:</strong> <span id="displayApellido">{{ old('apellido') }}</span></p></div>
+            <div><p><strong>Correo:</strong> <span id="displayCorreo">{{ old('correo') }}</span></p></div>
+
+            <!-- NUEVOS DATOS -->
+            <div><p><strong>Teléfono:</strong> <span id="displayTelefono">{{ old('telefono') }}</span></p></div>
+            <div><p><strong>Identidad:</strong> <span id="displayIdentidad">{{ old('identidad') }}</span></p></div>
+            <div><p><strong>Género:</strong> <span id="displayGenero">{{ old('genero') }}</span></p></div>
         </div>
+    </div>
+</div>
+
 
         <!-- DATOS DE INICIO DE SESIÓN Y ROL -->
         <p class="section-title">Credenciales de inicio de sesión</p>
@@ -207,6 +218,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const nombreInput = document.getElementById('nombre');
     const apellidoInput = document.getElementById('apellido');
     const correoInput = document.getElementById('correo');
+    const telefonoInput = document.getElementById('telefono');
+    const identidadInput = document.getElementById('identidad');
+    const generoInput = document.getElementById('genero');
+
+    const displayTelefono = document.getElementById('displayTelefono');
+    const displayIdentidad = document.getElementById('displayIdentidad');
+    const displayGenero = document.getElementById('displayGenero');
     const displayDiv = document.getElementById('personaSeleccionada');
     const displayNombre = document.getElementById('displayNombre');
     const displayApellido = document.getElementById('displayApellido');
@@ -368,6 +386,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             personaIdInput.value=p.id;
                             nombreInput.value=p.nombre; apellidoInput.value=p.apellido; correoInput.value=p.correo;
                             displayNombre.textContent=p.nombre; displayApellido.textContent=p.apellido; displayCorreo.textContent=p.correo;
+                            telefonoInput.value = p.telefono;
+                            identidadInput.value = p.identidad;
+                            generoInput.value = p.genero;
+
+                            displayTelefono.textContent = p.telefono;
+                            displayIdentidad.textContent = p.identidad;
+                            displayGenero.textContent = p.genero;
                             displayDiv.style.display='flex';
                             searchInput.value=p.nombre_completo; resultsDiv.innerHTML='';
                         });

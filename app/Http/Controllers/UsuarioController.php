@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use App\Models\Usuario;
 use App\Models\Empleado;
 use App\Models\Medico;
@@ -44,57 +44,57 @@ class UsuarioController extends Controller
     
         return view('Usuarios.index', compact('usuarios','roles'));
     }
-    
 
     public function create()
     {
-        $roles = \Spatie\Permission\Models\Role::all(); // Traemos los roles existentes
+        $roles = Role::all(); 
         return view('usuarios.create', compact('roles'));
     }
-    
+
     public function store(Request $request)
-{
-    // Buscar persona (empleado o médico)
-    $persona = Empleado::find($request->persona_id) ?? Medico::find($request->persona_id);
-    if (!$persona) {
-        return back()->withErrors(['persona_id' => 'No se encontró la persona seleccionada.'])->withInput();
+    {
+        // Buscar empleado o médico
+        $persona = Empleado::find($request->persona_id) ?? Medico::find($request->persona_id);
+
+        if (!$persona) {
+            return back()->withErrors(['persona_id' => 'No se encontró la persona seleccionada.'])->withInput();
+        }
+
+        $correo = $persona->correo ?? $persona->email ?? $request->correo_usuario;
+
+        // Agregar el correo real antes de validar
+        $request->merge(['correo_usuario' => $correo]);
+
+        // Validación
+        $request->validate([
+            'persona_id' => 'required|integer',
+            'rol_id' => 'required|exists:roles,id',
+            'correo_usuario' => 'required|email|unique:usuarios,email',
+            'password' => 'required|string|min:8|confirmed',
+        ], [
+            'persona_id.required' => 'Debes seleccionar un empleado o médico.',
+            'rol_id.required' => 'Debes seleccionar un rol.',
+            'correo_usuario.required' => 'El correo electrónico es obligatorio.',
+            'correo_usuario.email' => 'El correo debe ser válido.',
+            'correo_usuario.unique' => 'El correo electrónico ya está registrado.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.min' => 'La contraseña debe tener mínimo 8 caracteres.',
+            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+        ]);
+
+        // Crear usuario
+        $usuario = Usuario::create([
+            'name' => $persona->nombre ?? $persona->nombres ?? $persona->name,
+            'email' => $correo,
+            'password' => Hash::make($request->password)
+        ]);
+
+        // Asignar rol
+        $rol = Role::find($request->rol_id);
+        $usuario->assignRole($rol);
+
+        return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente con rol asignado.');
     }
-
-    $correo = $persona->correo ?? $persona->email ?? $request->correo_usuario;
-
-    // Validar todo
-    $request->merge(['correo_usuario' => $correo]); // reemplaza el input con el correo real
-    $request->validate([
-        'persona_id' => 'required|integer',
-        'rol_id' => 'required|exists:roles,id',
-        'correo_usuario' => 'required|email|unique:usuarios,email',
-        'password' => 'required|string|min:8|confirmed',
-    ], [
-        'persona_id.required' => 'Debes seleccionar un empleado o médico.',
-        'rol_id.required' => 'Debes seleccionar un rol.',
-        'correo_usuario.required' => 'El correo electrónico es obligatorio.',
-        'correo_usuario.email' => 'El correo debe ser válido.',
-        'correo_usuario.unique' => 'El correo electrónico ya está registrado.',
-        'password.required' => 'La contraseña es obligatoria.',
-        'password.min' => 'La contraseña debe tener mínimo 8 caracteres.',
-        'password.confirmed' => 'La confirmación de la contraseña no coincide.',
-    ]);
-
-    // Crear usuario
-    $usuario = Usuario::create([
-        'name' => $persona->nombre ?? $persona->nombres ?? $persona->name,
-        'email' => $correo,
-        'password' => Hash::make($request->password)
-    ]);
-
-    // Asignar rol
-    $rol = Role::find($request->rol_id);
-    $usuario->assignRole($rol);
-
-    return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente con rol asignado.');
-}
-
-    
 
     public function edit(Usuario $usuario)
     {
@@ -125,61 +125,89 @@ class UsuarioController extends Controller
         return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado correctamente.');
     }
 
-// Método AJAX para buscar empleados y médicos
+    
+   // Búsqueda de empleados y médicos
 public function searchPersonas(Request $request)
 {
-    $query = $request->q ?? '';
-    $query = trim($query);
+    $query = trim(strtolower($request->q ?? ''));
 
+    // Si la búsqueda está vacía, devolver vacío
     if(strlen($query) < 1){
         return response()->json([]);
     }
 
-    $query = strtolower($query);
-
-    // Buscar empleados
-    $empleados = \App\Models\Empleado::where(function($q) use ($query){
+    /* =======================
+       BUSCAR EMPLEADOS
+    ======================== */
+    $empleados = Empleado::where(function($q) use ($query){
         $q->whereRaw('LOWER(nombres) LIKE ?', ["%{$query}%"])
           ->orWhereRaw('LOWER(apellidos) LIKE ?', ["%{$query}%"])
-          ->orWhereRaw('LOWER(correo) LIKE ?', ["%{$query}%"]);
+          ->orWhereRaw('LOWER(correo) LIKE ?', ["%{$query}%"])
+          ->orWhereRaw('LOWER(identidad) LIKE ?', ["%{$query}%"]);
     })->get();
 
-    // Buscar médicos
-    $medicos = \App\Models\Medico::where(function($q) use ($query){
+    /* =======================
+       BUSCAR MÉDICOS
+    ======================== */
+    $medicos = Medico::where(function($q) use ($query){
         $q->whereRaw('LOWER(nombre) LIKE ?', ["%{$query}%"])
           ->orWhereRaw('LOWER(apellidos) LIKE ?', ["%{$query}%"])
-          ->orWhereRaw('LOWER(correo) LIKE ?', ["%{$query}%"]);
+          ->orWhereRaw('LOWER(correo) LIKE ?', ["%{$query}%"])
+          ->orWhereRaw('LOWER(numero_identidad) LIKE ?', ["%{$query}%"])
+          ->orWhereRaw('LOWER(especialidad) LIKE ?', ["%{$query}%"]);
     })->get();
 
-    // Combinar resultados
-    $personas = $empleados->map(fn($e) => [
-        'id' => $e->id,
-        'nombre' => $e->nombres,
-        'apellido' => $e->apellidos,
-        'correo' => $e->correo,
-        'nombre_completo' => $e->nombres . ' ' . $e->apellidos,
-    ])->merge(
-        $medicos->map(fn($m) => [
+    /* =======================
+       UNIR RESULTADOS
+    ======================== */
+    $personas = collect();
+
+    // FORMATO EMPLEADOS
+    foreach($empleados as $e){
+        $personas->push([
+            'id' => $e->id,
+            'tipo' => 'empleado',
+            'nombre' => $e->nombres,
+            'apellido' => $e->apellidos,
+            'correo' => $e->correo,
+            'telefono' => $e->telefono,
+            'identidad' => $e->identidad,
+            'genero' => $e->genero,
+            'direccion' => $e->direccion ?? null,
+            'fecha_nacimiento' => $e->fecha_nacimiento ?? null,
+            'fecha_ingreso' => $e->fecha_ingreso ?? null,
+            'nombre_completo' => $e->nombres . ' ' . $e->apellidos,
+        ]);
+    }
+
+    // FORMATO MÉDICOS
+    foreach($medicos as $m){
+        $personas->push([
             'id' => $m->id,
+            'tipo' => 'medico',
             'nombre' => $m->nombre,
             'apellido' => $m->apellidos,
             'correo' => $m->correo,
+            'telefono' => $m->telefono,
+            'identidad' => $m->numero_identidad,
+            'genero' => $m->genero,
+            'direccion' => $m->direccion,
+            'especialidad' => $m->especialidad,
+            'fecha_nacimiento' => $m->fecha_nacimiento,
+            'fecha_ingreso' => $m->fecha_ingreso,
+            'salario' => $m->salario,
+            'observaciones' => $m->observaciones,
             'nombre_completo' => $m->nombre . ' ' . $m->apellidos,
-        ])
-    );
+        ]);
+    }
 
-    // Filtrar coincidencias exactas de la query
-    $personas = $personas->filter(fn($p) => 
-        stripos($p['nombre'], $query) !== false ||
-        stripos($p['apellido'], $query) !== false
-    )->values();
-
-    return response()->json($personas);
+    return response()->json($personas->values());
 }
 
-    // --------------------
-    // Métodos de asignación de roles/permisos
-    // --------------------
+
+    // ----------------------------------------
+    // Roles y permisos
+    // ----------------------------------------
     public function asignarVista($id)
     {
         $user = Usuario::findOrFail($id);
@@ -234,7 +262,7 @@ public function searchPersonas(Request $request)
     public function asignarUpdate(Request $request, $id)
     {
         $user = Usuario::findOrFail($id);
-        $user->syncRoles($request->input('role')); // un solo rol
+        $user->syncRoles($request->input('role'));
 
         return redirect()->route('usuarios.index')->with('success', 'Rol actualizado correctamente.');
     }
