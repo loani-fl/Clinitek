@@ -30,7 +30,7 @@
                 <div class="text-center mb-4">
                     <div class="position-relative d-inline-block">
                         @if(auth()->user()->photo)
-                            <img src="{{ asset('storage/' . auth()->user()->photo) }}" 
+                            <img src="{{ asset(auth()->user()->photo) }}?v={{ time() }}" 
                                  alt="Foto de perfil" 
                                  class="profile-photo-display" 
                                  id="profilePhotoPreview">
@@ -263,14 +263,17 @@
         font-size: 1.1rem;
     }
 
-    .info-value {
-        font-size: 0.9rem;
-        color: #212529;
-        font-weight: 500;
-        text-align: right;
-        word-break: break-word;
-        max-width: 55%;
-    }
+  .info-value {
+    font-size: 0.9rem;
+    color: #212529;
+    font-weight: 500;
+    text-align: right;
+    white-space: nowrap; /* Evita que el texto se rompa */
+    overflow: hidden;    /* Oculta exceso si es muy largo */
+    text-overflow: ellipsis; /* Muestra "..." si no cabe */
+    max-width: 100%;     /* Ocupa todo el espacio disponible */
+}
+
 
     .info-divider {
         height: 1px;

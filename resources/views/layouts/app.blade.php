@@ -357,7 +357,7 @@
                 <button class="user-profile-trigger" type="button" onclick="toggleProfileDropdown(event)">
                     @auth
                         @if(auth()->user()->photo)
-                            <img src="{{ asset('storage/' . auth()->user()->photo) }}" 
+                            <img src="{{ asset(auth()->user()->photo) }}?v={{ time() }}" 
                                  alt="Perfil" 
                                  class="user-avatar-header">
                         @else
@@ -378,7 +378,7 @@
                     @auth
                         <div class="profile-dropdown-header">
                             @if(auth()->user()->photo)
-                                <img src="{{ asset('storage/' . auth()->user()->photo) }}" 
+                                <img src="{{ asset(auth()->user()->photo) }}?v={{ time() }}" 
                                      alt="Perfil" 
                                      class="profile-dropdown-avatar">
                             @else
@@ -408,15 +408,14 @@
                                 </button>
                             </form>
                         </div>
-                  @else
-    <div class="profile-dropdown-actions">
-        <a href="{{ route('login.form') }}" class="profile-dropdown-link">
-            <i class="bi bi-box-arrow-in-right"></i>
-            Iniciar sesión
-        </a>
-    </div>
-@endauth
-
+                    @else
+                        <div class="profile-dropdown-actions">
+                            <a href="{{ route('login.form') }}" class="profile-dropdown-link">
+                                <i class="bi bi-box-arrow-in-right"></i>
+                                Iniciar sesión
+                            </a>
+                        </div>
+                    @endauth
                 </div>
             </div>
 

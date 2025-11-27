@@ -384,29 +384,31 @@
             {{-- Perfil de usuario estilo Google con nombre --}}
             <div class="user-profile-dropdown">
                 <button class="user-profile-trigger" type="button" onclick="toggleProfileDropdown(event)">
-                    @if(auth()->user()->photo)
-                        <img src="{{ asset('storage/' . auth()->user()->photo) }}" 
-                             alt="Perfil" 
-                             class="user-avatar-header">
-                    @else
-                        <div class="user-avatar-header">
-                            {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->email, 0, 1)) }}
-                        </div>
-                    @endif
+                   @if(auth()->user()->photo)
+    <img src="{{ asset(auth()->user()->photo) }}?v={{ time() }}" 
+         alt="Perfil" 
+         class="user-avatar-header">
+@else
+    <div class="user-avatar-header">
+        {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->email, 0, 1)) }}
+    </div>
+@endif
+
                     <span class="user-name-header">{{ auth()->user()->name ?? auth()->user()->email }}</span>
                 </button>
 
                 <div class="profile-dropdown-menu" id="profileDropdown">
                     <div class="profile-dropdown-header">
-                        @if(auth()->user()->photo)
-                            <img src="{{ asset('storage/' . auth()->user()->photo) }}" 
-                                 alt="Perfil" 
-                                 class="profile-dropdown-avatar">
-                        @else
-                            <div class="profile-dropdown-avatar">
-                                {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->email, 0, 2)) }}
-                            </div>
-                        @endif
+                       @if(auth()->user()->photo)
+    <img src="{{ asset(auth()->user()->photo) }}?v={{ time() }}" 
+         alt="Perfil" 
+         class="profile-dropdown-avatar">
+@else
+    <div class="profile-dropdown-avatar">
+        {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->email, 0, 2)) }}
+    </div>
+@endif
+
                         <div class="profile-dropdown-name">
                             {{ auth()->user()->name ?? 'Usuario' }}
                         </div>
