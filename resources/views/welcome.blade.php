@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CLINITEK - Página Principal</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <style>
@@ -46,105 +47,186 @@
             gap: 1rem;
         }
 
-        /* Badge de usuario compacto */
-        .user-profile-badge {
+        /* PERFIL ESTILO GOOGLE CON NOMBRE */
+        .user-profile-dropdown {
+            position: relative;
+        }
+
+        .user-profile-trigger {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 6px 14px 6px 6px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
-            border-radius: 50px;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            text-decoration: none;
+            transition: opacity 0.2s;
+            outline: none;
         }
 
-        .user-profile-badge:hover {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.12) 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            border-color: rgba(255, 255, 255, 0.35);
+        .user-profile-trigger:focus {
+            outline: none;
         }
 
-        .user-profile-badge:active {
-            transform: translateY(0);
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        .user-profile-trigger:hover {
+            opacity: 0.9;
         }
 
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
+        .user-avatar-header {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            color: white;
             font-weight: 700;
-            font-size: 0.9rem;
-            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1rem;
             text-transform: uppercase;
+            flex-shrink: 0;
         }
 
-        .user-profile-badge:hover .user-avatar {
-            transform: scale(1.08);
-            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4);
-            border-color: rgba(255, 255, 255, 0.5);
+        .user-profile-trigger:hover .user-avatar-header {
+            border-color: rgba(255, 255, 255, 0.8);
+            transform: scale(1.05);
         }
 
-        .user-name {
-            color: #ffffff;
+        .user-name-header {
+            color: white;
             font-weight: 600;
-            font-size: 0.875rem;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-            letter-spacing: 0.3px;
+            font-size: 0.95rem;
             white-space: nowrap;
-            max-width: 150px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
-        @keyframes fadeInSlideRight {
+        /* Dropdown Personalizado */
+        .profile-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            min-width: 320px;
+            padding: 16px;
+            display: none;
+            z-index: 1050;
+            animation: dropdownSlideIn 0.2s ease-out;
+        }
+
+        .profile-dropdown-menu.show {
+            display: block;
+        }
+
+        @keyframes dropdownSlideIn {
             from {
                 opacity: 0;
-                transform: translateX(20px);
+                transform: translateY(-10px);
             }
             to {
                 opacity: 1;
-                transform: translateX(0);
+                transform: translateY(0);
             }
         }
 
-        .user-profile-badge {
-            animation: fadeInSlideRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        .profile-dropdown-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
         }
 
-        /* Botón de cerrar sesión */
-        .logout-btn {
-            background: rgba(220, 53, 69, 0.9);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            font-weight: 600;
-            padding: 0.6rem 1.5rem;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+        .profile-dropdown-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 12px;
+            border: 3px solid #007BFF;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 2rem;
+            text-transform: uppercase;
+        }
+
+        .profile-dropdown-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #202124;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .profile-dropdown-email {
+            font-size: 0.875rem;
+            color: #5f6368;
+            text-align: center;
+        }
+
+        .profile-dropdown-actions {
+            padding-top: 12px;
+        }
+
+        .profile-dropdown-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            color: #5f6368;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
             cursor: pointer;
         }
 
-        .logout-btn:hover {
-            background: rgba(200, 35, 51, 1);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        .profile-dropdown-link:hover {
+            background-color: #f1f3f4;
+            color: #202124;
+        }
+
+        .profile-dropdown-link i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .profile-dropdown-divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 8px 0;
+        }
+
+        .profile-dropdown-link.logout {
+            color: #d93025;
+        }
+
+        .profile-dropdown-link.logout:hover {
+            background-color: #fce8e6;
+            color: #d93025;
+        }
+
+        /* Botón menú hamburguesa */
+        .btn-outline-light {
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            font-size: 1.2rem;
+            padding: 0.4rem 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-light:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.8);
+            color: white;
         }
 
         /* Hero section */
@@ -235,7 +317,24 @@
         @media (max-width: 1200px) {
             .services-grid { grid-template-columns: repeat(2, 1fr); }
         }
+        
         @media (max-width: 768px) {
+            .user-name {
+                display: none;
+            }
+
+            .menu-text {
+                display: none;
+            }
+
+            .btn-menu {
+                padding: 0.6rem;
+            }
+
+            .user-profile-badge {
+                padding: 6px;
+            }
+
             .navbar-content {
                 flex-direction: column;
                 gap: 1rem;
@@ -258,6 +357,14 @@
                 padding: 2rem 1.5rem;
             }
         }
+
+        @media (max-width: 576px) {
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -273,25 +380,81 @@
         </div>
         
         <div class="nav-right-section">
-            <!-- Badge de usuario -->
             @if(auth()->check())
-            <div class="user-profile-badge">
-                <div class="user-avatar">
-                    {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->email, 0, 1)) }}
+            {{-- Perfil de usuario estilo Google con nombre --}}
+            <div class="user-profile-dropdown">
+                <button class="user-profile-trigger" type="button" onclick="toggleProfileDropdown(event)">
+                    @if(auth()->user()->photo)
+                        <img src="{{ asset('storage/' . auth()->user()->photo) }}" 
+                             alt="Perfil" 
+                             class="user-avatar-header">
+                    @else
+                        <div class="user-avatar-header">
+                            {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->email, 0, 1)) }}
+                        </div>
+                    @endif
+                    <span class="user-name-header">{{ auth()->user()->name ?? auth()->user()->email }}</span>
+                </button>
+
+                <div class="profile-dropdown-menu" id="profileDropdown">
+                    <div class="profile-dropdown-header">
+                        @if(auth()->user()->photo)
+                            <img src="{{ asset('storage/' . auth()->user()->photo) }}" 
+                                 alt="Perfil" 
+                                 class="profile-dropdown-avatar">
+                        @else
+                            <div class="profile-dropdown-avatar">
+                                {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->email, 0, 2)) }}
+                            </div>
+                        @endif
+                        <div class="profile-dropdown-name">
+                            {{ auth()->user()->name ?? 'Usuario' }}
+                        </div>
+                        <div class="profile-dropdown-email">
+                            {{ auth()->user()->email }}
+                        </div>
+                    </div>
+
+                    <div class="profile-dropdown-actions">
+                        <a href="{{ route('profile.edit') }}" class="profile-dropdown-link">
+                            <i class="bi bi-person-circle"></i>
+                            Mi perfil
+                        </a>
+                        <div class="profile-dropdown-divider"></div>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="profile-dropdown-link logout" style="width: 100%; border: none; background: none; text-align: left;">
+                                <i class="bi bi-box-arrow-right"></i>
+                                Cerrar sesión
+                            </button>
+                        </form>
+                    </div>
                 </div>
-                <span class="user-name">
-                    {{ auth()->user()->name ?? auth()->user()->email }}
-                </span>
+            </div>
+
+            {{-- Menú hamburguesa --}}
+            <div class="dropdown">
+                <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                    ☰
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton2">
+                    <li>
+                        <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                            <i class="bi bi-person-circle"></i> Ver Perfil
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                            </button>
+                        </form>
+                    </li>
+                </ul>
             </div>
             @endif
-
-            <!-- Botón de cerrar sesión -->
-            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
-                @csrf
-                <button type="submit" class="logout-btn">
-                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
-                </button>
-            </form>
         </div>
     </div>
 </nav>
@@ -444,7 +607,7 @@
                     </div>
                     <h3 class="service-title">Ginecología</h3>
                     <p class="service-desc">Control prenatal y atención especializada para la mujer.</p>
-                    </article>
+                </article>
             </a>
         </div>
     </div>
@@ -465,5 +628,28 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleProfileDropdown(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const dropdown = document.getElementById('profileDropdown');
+        dropdown.classList.toggle('show');
+    }
+
+    // Cerrar dropdown al hacer clic fuera
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('profileDropdown');
+        const trigger = document.querySelector('.user-profile-trigger');
+        
+        if (dropdown && trigger && !dropdown.contains(event.target) && !trigger.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+
+    // Prevenir que el dropdown se cierre al hacer clic dentro de él
+    document.getElementById('profileDropdown')?.addEventListener('click', function(event) {
+        event.stopPropagation();
+    });
+</script>
 </body>
 </html>

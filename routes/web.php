@@ -27,6 +27,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -202,5 +203,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/personas/search', [UsuarioController::class, 'searchPersonas'])->name('personas.search');
 
+Route::middleware(['auth'])->group(function () {
+    // Perfil de usuario
+    Route::get('/profile', [App\Http\Controllers\UserController::class, 'profile'])->name('profile.edit');
+    Route::put('/profile', [App\Http\Controllers\UserController::class, 'updateProfile'])->name('profile.update');
+    Route::delete('/profile/photo', [App\Http\Controllers\UserController::class, 'removePhoto'])->name('profile.remove-photo');
+});
 
 });

@@ -1,192 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Listado de empleados</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@extends('layouts.app')
 
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            background-color: #e8f4fc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+@section('title', 'Listado de empleados')
 
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .header {
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            background-color: #007BFF;
-        }
-
-        .header .fw-bold {
-            font-size: 1.75rem;
-            color: #0d6efd;
-        }
-
-        .header .btn {
-            color: black;
-            border-width: 2px;
-        }
-
-        .contenedor-principal {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: start;
-            padding: 0 3rem;
-            margin: 0;
-            width: 100vw;
-            padding-top: 70px;
-        }
-
-        .custom-card {
-            flex-grow: 1;
-            background-color: #ffffff;
-            border-color: #91cfff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            max-width: 1000px;
-            width: 100%;
-            padding: 1.5rem;
-            position: relative;
-        }
-
-        .card-header {
-            background-color: transparent !important;
-            border: none;
-        }
-
-        .card-header h5 {
-            color: #0d6efd;
-            font-weight: bold;
-        }
-
-        .table-responsive {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 0 1rem 1rem 1rem;
-        }
-
-        thead tr {
-            background-color: #cce5ff;
-            color: #003e7e;
-        }
-
-        tbody tr:hover {
-            background-color: #e9f2ff;
-        }
-
-        table tbody tr {
-            height: 50px;
-        }
-
-        label {
-            font-size: 0.85rem;
-        }
-
-        input, select, textarea {
-            font-size: 0.85rem !important;
-        }
-
-        .btn-white-border {
-            background-color: white !important;
-            border-width: 2px;
-            box-shadow: none !important;
-        }
-
-        .estado-activo i {
-            color: #00c851 !important;
-        }
-
-        .estado-inactivo i {
-            color: #ff3547 !important;
-        }
-
-        footer {
-            position: fixed;
-            bottom: 0;
-            width: 100vw;
-            height: 50px;
-            background-color: #f8f9fa;
-            padding: 10px 0;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #6c757d;
-            z-index: 999;
-            border-top: 1px solid #dee2e6;
-        }
-
-        .custom-card::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 800px;
-            height: 800px;
-            background-image: url('/images/logo2.jpg');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            opacity: 0.15;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        #mensajeResultados {
-            font-weight: 600;
-            color: #000000;
-            margin-top: 0.5rem;
-            min-height: 1.2em;
-            text-align: center;
-        }
-
-        .header a:hover {
-            text-decoration: underline;
-            color: #dceeff;
-        }
-        
-    </style>
-</head>
-<body>
-
-{{-- Barra de navegación superior fija con menú desplegable --}}
-    <div class="header d-flex justify-content-between align-items-center px-3 py-2 fixed-top" style="background-color: #007BFF;">
-        <div class="d-flex align-items-center">
-            <img src="{{ asset('images/barra.png') }}" alt="Logo Clinitek" style="height: 40px; width: auto;">
-            <div class="fw-bold text-white ms-2" style="font-size: 1.5rem;">Clinitek</div>
-        </div>
-
-        <div class="dropdown">
-            <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                ☰
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                <li><a class="dropdown-item" href="{{ route('puestos.index') }}">Crear puesto</a></li>
-                <li><a class="dropdown-item" href="{{ route('empleados.index') }}">Registrar empleado</a></li>
-                <li><a class="dropdown-item" href="{{ route('medicos.index') }}">Registrar médico</a></li>
-                <li><a class="dropdown-item" href="{{ route('consultas.index') }}">Registrar consulta</a></li>
-                <li><a class="dropdown-item" href="{{ route('pacientes.index') }}">Registrar paciente</a></li>
-                <li><a class="dropdown-item" href="{{ route('pacientes.index') }}">Registrar Farmacia</a></li>
-            </ul>
-        </div>
-    </div>
-
-<!-- Contenedor principal -->
+@section('content')
 <div class="contenedor-principal">
     <div class="card custom-card shadow-sm border rounded-4 mx-auto w-100" style="margin-top: 30px;">
         <div class="card-header py-2" style="background-color: #fff; border-bottom: 4px solid #0d6efd;">
@@ -213,8 +29,6 @@
                 
             </div>
         </div>
-
-
 
         <!-- Formulario filtro sin submit normal -->
         <div class="px-3 py-2 mt-4">
@@ -244,15 +58,114 @@
         </div>
     </div>
 </div>
+@endsection
 
-<!-- Footer -->
-<footer>
-    © 2025 Clínitek. Todos los derechos reservados.
-</footer>
+@push('styles')
+<style>
+    .contenedor-principal {
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+        align-items: start;
+        padding: 0 3rem;
+        margin: 0;
+        width: 100%;
+        padding-top: 20px;
+    }
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    .custom-card {
+        flex-grow: 1;
+        background-color: #ffffff;
+        border-color: #91cfff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        max-width: 1000px;
+        width: 100%;
+        padding: 1.5rem;
+        position: relative;
+    }
 
+    .card-header {
+        background-color: transparent !important;
+        border: none;
+    }
+
+    .card-header h5 {
+        color: #0d6efd;
+        font-weight: bold;
+    }
+
+    .table-responsive {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 0 1rem 1rem 1rem;
+    }
+
+    thead tr {
+        background-color: #cce5ff;
+        color: #003e7e;
+    }
+
+    tbody tr:hover {
+        background-color: #e9f2ff;
+    }
+
+    table tbody tr {
+        height: 50px;
+    }
+
+    label {
+        font-size: 0.85rem;
+    }
+
+    input, select, textarea {
+        font-size: 0.85rem !important;
+    }
+
+    .btn-white-border {
+        background-color: white !important;
+        border-width: 2px;
+        box-shadow: none !important;
+    }
+
+    .estado-activo i {
+        color: #00c851 !important;
+    }
+
+    .estado-inactivo i {
+        color: #ff3547 !important;
+    }
+
+    .custom-card::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 800px;
+        height: 800px;
+        background-image: url('/images/logo2.jpg');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.15;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    #mensajeResultados {
+        font-weight: 600;
+        color: #000000;
+        margin-top: 0.5rem;
+        min-height: 1.2em;
+        text-align: center;
+    }
+</style>
+@endpush
+
+@push('scripts')
 <script>
 $(document).ready(function () {
     function actualizarMensaje(total, all, query) {
@@ -308,10 +221,6 @@ $(document).ready(function () {
         let estado = $('#selectEstado').val();
         cargarDatos(page, filtro, estado);
     });
-
-    // No hace falta recargar al inicio porque ya se carga con Blade
 });
 </script>
-
-</body>
-</html>
+@endpush
