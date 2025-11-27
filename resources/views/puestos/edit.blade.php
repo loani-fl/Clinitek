@@ -166,7 +166,7 @@
 
     <div class="nav-buttons">
         <a href="{{ route('puestos.create') }}">Crear puesto</a>
-        <a href="{{ route('empleado.create') }}">Registrar empleado</a>
+        <a href="{{ route('empleados.create') }}">Registrar empleado</a>
         <a href="{{ route('medicos.create') }}">Registrar médico</a>
     </div>
 </div>

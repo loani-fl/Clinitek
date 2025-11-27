@@ -138,7 +138,7 @@
     </div>
     <div class="d-flex gap-3 flex-wrap">
         <a href="{{ route('puestos.create') }}" class="nav-link text-white">Crear puesto</a>
-        <a href="{{ route('empleado.create') }}" class="nav-link text-white">Registrar empleado</a>
+        <a href="{{ route('empleados.create') }}" class="nav-link text-white">Registrar empleado</a>
         <a href="{{ route('medicos.create') }}" class="nav-link text-white">Registrar médico</a>
     </div>
 </div>

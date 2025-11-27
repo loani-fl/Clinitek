@@ -201,7 +201,7 @@
         <span class="fw-bold text-white" style="font-size: 1.5rem;">Clinitek</span>
     </div>
     <div class="d-flex gap-3 flex-wrap">
-        <a href="{{ route('empleado.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
+        <a href="{{ route('empleados.create') }}" class="text-decoration-none text-white fw-semibold">Registrar empleado</a>
         <a href="{{ route('medicos.create') }}" class="text-decoration-none text-white fw-semibold">Registrar médico</a>
     </div>
 </div>
