@@ -177,7 +177,7 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
                 <li><a class="dropdown-item" href="{{ route('puestos.index') }}">Crear puesto</a></li>
-                <li><a class="dropdown-item" href="{{ route('empleado.index') }}">Registrar empleado</a></li>
+                <li><a class="dropdown-item" href="{{ route('empleados.index') }}">Registrar empleado</a></li>
                 <li><a class="dropdown-item" href="{{ route('medicos.index') }}">Registrar médico</a></li>
                 <li><a class="dropdown-item" href="{{ route('consultas.index') }}">Registrar consulta</a></li>
                 <li><a class="dropdown-item" href="{{ route('pacientes.index') }}">Registrar paciente</a></li>
@@ -206,7 +206,7 @@
                 
                 {{-- Botón Registrar a la derecha --}}
                 <div>
-                    <a href="{{ route('empleado.create') }}" class="btn btn-primary">
+                    <a href="{{ route('empleados.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-circle"></i> Registrar empleado
                     </a>
                 </div>
@@ -267,7 +267,7 @@ $(document).ready(function () {
 
     function cargarDatos(page = 1, filtro = '', estado = '') {
         $.ajax({
-            url: "{{ route('empleado.index') }}",
+            url: "{{ route('empleados.index') }}",
             type: 'GET',
             data: { page, filtro, estado },
             success: function(data) {

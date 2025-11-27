@@ -61,7 +61,7 @@ $fechaIngresoValue = old('fecha_ingreso', isset($empleado->fecha_ingreso) ? Carb
         </div>
 
         <div class="card-body px-4 py-3">
-        <form action="{{ route('empleado.update', $empleado->id) }}" method="POST" enctype="multipart/form-data" novalidate>
+        <form action="{{ route('empleados.update', $empleado->id) }}" method="POST" enctype="multipart/form-data" novalidate>
                 @csrf
                 @method('PUT')
 
@@ -241,7 +241,7 @@ $fechaIngresoValue = old('fecha_ingreso', isset($empleado->fecha_ingreso) ? Carb
                 </button>
 
 
-                <a href="{{ route('empleado.index') }}" class="btn btn-success btn-sm px-4 shadow-sm ms-2">
+                <a href="{{ route('empleados.index') }}" class="btn btn-success btn-sm px-4 shadow-sm ms-2">
                     <i class="bi bi-arrow-left"></i> Regresar
                 </a>
             </div>

@@ -71,7 +71,7 @@
         <h2 class="fw-bold text-black mb-0">Registrar nuevo empleado</h2>
     </div>
 
-    <form action="{{ route('empleado.store') }}" method="POST" novalidate>
+    <form action="{{ route('empleados.store') }}" method="POST" novalidate>
         @csrf
 
         <!-- Fila 1 -->
@@ -221,7 +221,7 @@
             <button type="button" id="btnLimpiar" class="btn btn-warning">
                 <i class="bi bi-trash"></i> Limpiar
             </button>
-            <a href="{{ route('empleado.index') }}" class="btn btn-success">
+            <a href="{{ route('empleados.index') }}" class="btn btn-success">
                 <i class="bi bi-arrow-left"></i> Regresar
             </a>
         </div>

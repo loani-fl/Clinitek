@@ -113,7 +113,7 @@
         </div>
 
         <div class="text-center pb-4">
-            <a href="{{ route('empleado.index') }}" 
+            <a href="{{ route('empleados.index') }}" 
                class="btn btn-success btn-sm px-4 shadow-sm d-inline-flex align-items-center gap-2" 
                style="font-size: 0.85rem;">
                 <i class="bi bi-arrow-left"></i> Regresar
