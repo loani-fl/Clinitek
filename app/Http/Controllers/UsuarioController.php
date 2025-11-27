@@ -98,21 +98,29 @@ class UsuarioController extends Controller
 
     public function edit(Usuario $usuario)
     {
-        return view('usuarios.edit', compact('usuario'));
+        $roles = Role::all();
+        return view('usuarios.edit', compact('usuario', 'roles'));
     }
 
     public function update(Request $request, Usuario $usuario)
     {
         $request->validate([
+            'rol_id' => 'required|exists:roles,id',
             'password' => 'nullable|string|min:8|confirmed',
         ], [
+            'rol_id.required' => 'Debes seleccionar un rol.',
             'password.min' => 'La contraseña debe tener mínimo 8 caracteres.',
             'password.confirmed' => 'La confirmación de la contraseña no coincide.',
         ]);
 
+        // Actualizar contraseña solo si se proporcionó
         if ($request->filled('password')) {
             $usuario->password = Hash::make($request->password);
         }
+
+        // Actualizar rol
+        $rol = Role::find($request->rol_id);
+        $usuario->syncRoles([$rol]);
 
         $usuario->save();
 
