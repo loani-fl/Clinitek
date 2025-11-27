@@ -124,9 +124,9 @@
             animation: fadeInSlideRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Dropdown mejorado */
-        .registro-btn {
-            background: rgba(255, 255, 255, 0.2);
+        /* Botón de cerrar sesión */
+        .logout-btn {
+            background: rgba(220, 53, 69, 0.9);
             border: 2px solid rgba(255, 255, 255, 0.3);
             color: white;
             font-weight: 600;
@@ -137,34 +137,15 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            cursor: pointer;
         }
 
-        .registro-btn:hover, .registro-btn:focus {
-            background: rgba(255, 255, 255, 0.3);
+        .logout-btn:hover {
+            background: rgba(200, 35, 51, 1);
             border-color: rgba(255, 255, 255, 0.5);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
         }
-
-        .dropdown-menu {
-            border: none;
-            box-shadow: 0 10px 30px rgba(0, 74, 173, 0.3);
-            border-radius: 12px;
-            padding: 0.5rem;
-            min-width: 250px;
-            margin-top: 0.5rem;
-        }
-
-        .dropdown-item {
-            padding: 0.8rem 1rem;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            color: #003366;
-            font-weight: 500;
-        }
-
-        .dropdown-item:hover { background: #e6f0ff; color: #004aad; transform: translateX(5px); }
-        .dropdown-item i { margin-right: 0.5rem; color: #004aad; }
 
         /* Hero section */
         .hero-section { max-width: 1400px; margin: 2rem auto 1.5rem; padding: 0 2rem; text-align: center; }
@@ -248,11 +229,11 @@
         .service-card:nth-child(2) { animation-delay: 0.2s; }
         .service-card:nth-child(3) { animation-delay: 0.3s; }
         .service-card:nth-child(4) { animation-delay: 0.4s; }
+        .service-card:nth-child(5) { animation-delay: 0.5s; }
 
         /* Responsive */
         @media (max-width: 1200px) {
             .services-grid { grid-template-columns: repeat(2, 1fr); }
-            .services-grid.second-row { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 768px) {
             .navbar-content {
@@ -304,28 +285,13 @@
             </div>
             @endif
 
-            <!-- Dropdown de registros -->
-            <div class="dropdown">
-                <button class="registro-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-grid-3x3-gap-fill"></i> Registros
+            <!-- Botón de cerrar sesión -->
+            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                @csrf
+                <button type="submit" class="logout-btn">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="{{ route('puestos.index') }}"><i class="bi bi-briefcase"></i> Gestión de puestos</a></li>
-                    <li><a class="dropdown-item" href="{{ route('empleados.index') }}"><i class="bi bi-person-badge"></i> Gestión de empleados</a></li>
-                    <li><a class="dropdown-item" href="{{ route('pacientes.index') }}"><i class="bi bi-people"></i> Gestión de pacientes</a></li>
-                    <li><a class="dropdown-item" href="{{ route('usuarios.index') }}"><i class="bi bi-person-plus"></i> Gestión de usuarios</a></li>
-                    <li><a class="dropdown-item" href="{{ route('roles.index') }}"><i class="bi bi-person-plus"></i> Gestión de roles</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
-                            @csrf
-                            <button type="submit" class="dropdown-item text-danger">
-                                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
-                            </button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
+            </form>
         </div>
     </div>
 </nav>
@@ -339,35 +305,137 @@
 <!-- Servicios -->
 <div class="services-container">
     <div class="services-wrapper">
-        <!-- Primera fila -->
+        <!-- Primera fila - GESTIÓN ADMINISTRATIVA -->
         <div class="services-grid">
-            <a href="{{ route('emergencias.index') }}" style="text-decoration: none; color: inherit;">
-                <article class="service-card"><span class="badge-24h">24/7</span><div class="icon-circle"><i class="bi bi-hospital service-icon"></i></div><h3 class="service-title">Emergencia</h3><p class="service-desc">Atención inmediata y profesional las 24 horas para situaciones críticas.</p></article>
+            <a href="{{ route('puestos.index') }}" style="text-decoration: none; color: inherit;">
+                <article class="service-card">
+                    <div class="icon-circle">
+                        <i class="bi bi-briefcase service-icon"></i>
+                    </div>
+                    <h3 class="service-title">Gestión de Puestos</h3>
+                    <p class="service-desc">Administración de puestos y cargos del personal médico.</p>
+                </article>
             </a>
-            <a href="{{ route('medicos.index') }}" style="text-decoration: none; color: inherit;">
-                <article class="service-card"><div class="icon-circle"><i class="bi bi-heart-pulse service-icon"></i></div><h3 class="service-title">Medicina Especializada</h3><p class="service-desc">Especialidades médicas para todas tus necesidades de salud.</p></article>
+            <a href="{{ route('empleados.index') }}" style="text-decoration: none; color: inherit;">
+                <article class="service-card">
+                    <div class="icon-circle">
+                        <i class="bi bi-person-badge service-icon"></i>
+                    </div>
+                    <h3 class="service-title">Gestión de Empleados</h3>
+                    <p class="service-desc">Control y administración del personal de la clínica.</p>
+                </article>
             </a>
-            <a href="{{ route('consultas.index') }}" style="text-decoration: none; color: inherit;">
-                <article class="service-card"><div class="icon-circle"><i class="bi bi-journal-medical service-icon"></i></div><h3 class="service-title">Consultas Médicas</h3><p class="service-desc">Consultas personalizadas para diagnóstico y tratamiento.</p></article>
+            <a href="{{ route('pacientes.index') }}" style="text-decoration: none; color: inherit;">
+                <article class="service-card">
+                    <div class="icon-circle">
+                        <i class="bi bi-people service-icon"></i>
+                    </div>
+                    <h3 class="service-title">Gestión de Pacientes</h3>
+                    <p class="service-desc">Registro y seguimiento de historiales médicos de pacientes.</p>
+                </article>
             </a>
-            <a href="{{ route('sesiones.index') }}" style="text-decoration: none; color: inherit;">
-                <article class="service-card"><div class="icon-circle"><i class="bi bi-chat-heart-fill service-icon"></i></div><h3 class="service-title">Psicología</h3><p class="service-desc">Sesiones con expertos y exámenes psicométricos confiables.</p></article>
+            <a href="{{ route('usuarios.index') }}" style="text-decoration: none; color: inherit;">
+                <article class="service-card">
+                    <div class="icon-circle">
+                        <i class="bi bi-person-plus service-icon"></i>
+                    </div>
+                    <h3 class="service-title">Gestión de Usuarios</h3>
+                    <p class="service-desc">Administración de usuarios y accesos al sistema.</p>
+                </article>
             </a>
         </div>
 
-        <!-- Segunda fila -->
+        <!-- Segunda fila - continuación gestión + emergencia -->
         <div class="services-grid">
+            <a href="{{ route('roles.index') }}" style="text-decoration: none; color: inherit;">
+                <article class="service-card">
+                    <div class="icon-circle">
+                        <i class="bi bi-shield-lock service-icon"></i>
+                    </div>
+                    <h3 class="service-title">Gestión de Roles</h3>
+                    <p class="service-desc">Control de roles y permisos de usuarios en el sistema.</p>
+                </article>
+            </a>
+            <a href="{{ route('emergencias.index') }}" style="text-decoration: none; color: inherit;">
+                <article class="service-card">
+                    <span class="badge-24h">24/7</span>
+                    <div class="icon-circle">
+                        <i class="bi bi-hospital service-icon"></i>
+                    </div>
+                    <h3 class="service-title">Emergencia</h3>
+                    <p class="service-desc">Atención inmediata y profesional las 24 horas para situaciones críticas.</p>
+                </article>
+            </a>
+            <a href="{{ route('medicos.index') }}" style="text-decoration: none; color: inherit;">
+                <article class="service-card">
+                    <div class="icon-circle">
+                        <i class="bi bi-heart-pulse service-icon"></i>
+                    </div>
+                    <h3 class="service-title">Medicina Especializada</h3>
+                    <p class="service-desc">Especialidades médicas para todas tus necesidades de salud.</p>
+                </article>
+            </a>
+            <a href="{{ route('consultas.index') }}" style="text-decoration: none; color: inherit;">
+                <article class="service-card">
+                    <div class="icon-circle">
+                        <i class="bi bi-journal-medical service-icon"></i>
+                    </div>
+                    <h3 class="service-title">Consultas Médicas</h3>
+                    <p class="service-desc">Consultas personalizadas para diagnóstico y tratamiento.</p>
+                </article>
+            </a>
+        </div>
+
+        <!-- Tercera fila -->
+        <div class="services-grid">
+            <a href="{{ route('sesiones.index') }}" style="text-decoration: none; color: inherit;">
+                <article class="service-card">
+                    <div class="icon-circle">
+                        <i class="bi bi-chat-heart-fill service-icon"></i>
+                    </div>
+                    <h3 class="service-title">Psicología</h3>
+                    <p class="service-desc">Sesiones con expertos y exámenes psicométricos confiables.</p>
+                </article>
+            </a>
             <a href="{{ route('farmacias.index') }}" style="text-decoration: none; color: inherit;">
-                <article class="service-card"><div class="icon-circle"><i class="bi bi-bag-heart service-icon"></i></div><h3 class="service-title">Farmacia</h3><p class="service-desc">Medicamentos y productos farmacéuticos de alta calidad.</p></article>
+                <article class="service-card">
+                    <div class="icon-circle">
+                        <i class="bi bi-bag-heart service-icon"></i>
+                    </div>
+                    <h3 class="service-title">Farmacia</h3>
+                    <p class="service-desc">Medicamentos y productos farmacéuticos de alta calidad.</p>
+                </article>
             </a>
             <a href="{{ route('rayosx.index') }}" style="text-decoration: none; color: inherit;">
-                <article class="service-card"><div class="icon-circle"><i class="bi bi-x-diamond service-icon"></i></div><h3 class="service-title">Rayos X</h3><p class="service-desc">Imágenes diagnósticas con equipos modernos y precisos.</p></article>
+                <article class="service-card">
+                    <div class="icon-circle">
+                        <i class="bi bi-x-diamond service-icon"></i>
+                    </div>
+                    <h3 class="service-title">Rayos X</h3>
+                    <p class="service-desc">Imágenes diagnósticas con equipos modernos y precisos.</p>
+                </article>
             </a>
             <a href="{{ route('ultrasonidos.index') }}" style="text-decoration: none; color: inherit;">
-                <article class="service-card"><div class="icon-circle"><i class="bi bi-easel3 service-icon"></i></div><h3 class="service-title">Ultrasonidos</h3><p class="service-desc">Estudios de ultrasonido confiables y detallados para diagnóstico médico.</p></article>
+                <article class="service-card">
+                    <div class="icon-circle">
+                        <i class="bi bi-easel3 service-icon"></i>
+                    </div>
+                    <h3 class="service-title">Ultrasonidos</h3>
+                    <p class="service-desc">Estudios de ultrasonido confiables y detallados para diagnóstico médico.</p>
+                </article>
             </a>
+        </div>
+
+        <!-- Cuarta fila -->
+        <div class="services-grid">
             <a href="{{ route('inventario.index') }}" style="text-decoration: none; color: inherit;">
-                <article class="service-card"><div class="icon-circle"><i class="bi bi-clipboard-data-fill service-icon"></i></div><h3 class="service-title">Inventario</h3><p class="service-desc">Control completo del inventario y suministros médicos.</p></article>
+                <article class="service-card">
+                    <div class="icon-circle">
+                        <i class="bi bi-clipboard-data-fill service-icon"></i>
+                    </div>
+                    <h3 class="service-title">Inventario</h3>
+                    <p class="service-desc">Control completo del inventario y suministros médicos.</p>
+                </article>
             </a>
             <a href="{{ route('controles-prenatales.index') }}" style="text-decoration: none; color: inherit;">
                 <article class="service-card">
@@ -375,10 +443,8 @@
                         <i class="bi bi-heart-pulse-fill service-icon"></i>
                     </div>
                     <h3 class="service-title">Ginecología</h3>
-                    <p class="service-desc">
-                        Control prenatal y atención especializada para la mujer.
-                    </p>
-                </article>
+                    <p class="service-desc">Control prenatal y atención especializada para la mujer.</p>
+                    </article>
             </a>
         </div>
     </div>
