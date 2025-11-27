@@ -244,7 +244,7 @@ class EmpleadosController extends Controller
     $empleado = Empleado::create($validated);
 
     if ($empleado) {
-        return redirect()->route('empleado.index')
+        return redirect()->route('empleados.index')
             ->with('success', 'Empleado registrado correctamente.')
             ->with('clearLocalStorage', true);
     } else {
@@ -286,7 +286,7 @@ class EmpleadosController extends Controller
             ]);
         }
     
-        return view('empleados.index', compact('empleados'));
+        return view('empleado.index', compact('empleados'));
     }
     
     
@@ -492,7 +492,7 @@ class EmpleadosController extends Controller
 
     $empleado->update($validated);
 
-    return redirect()->route('empleado.index')->with('success', 'Empleado actualizado correctamente.');
+    return redirect()->route('empleados.index')->with('success', 'Empleado actualizado correctamente.');
 }
 
     public function edit($id)

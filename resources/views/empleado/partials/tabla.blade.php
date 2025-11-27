@@ -25,10 +25,10 @@
                 </td>
                 <td>
                     <div class="d-flex gap-2 justify-content-center">
-                        <a href="{{ route('empleado.show', $empleado->id) }}" class="btn btn-white-border btn-outline-info btn-sm" title="Ver">
+                        <a href="{{ route('empleados.show', $empleado->id) }}" class="btn btn-white-border btn-outline-info btn-sm" title="Ver">
                             <i class="bi bi-eye"></i>
                         </a>
-                        <a href="{{ route('empleado.edit', $empleado->id) }}" class="btn btn-white-border btn-outline-warning btn-sm" title="Editar">
+                        <a href="{{ route('empleados.edit', $empleado->id) }}" class="btn btn-white-border btn-outline-warning btn-sm" title="Editar">
                             <i class="bi bi-pencil"></i>
                         </a>
                     </div>
