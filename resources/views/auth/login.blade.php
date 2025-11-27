@@ -84,6 +84,7 @@
         z-index: 0;
     }
 
+    /* CARD CON ALTURA FIJA */
     .login-card {
         background: rgba(255, 255, 255, 0.12);
         backdrop-filter: blur(25px);
@@ -91,6 +92,7 @@
         padding: 35px 35px;
         width: 100%;
         max-width: 400px;
+        min-height: 560px; /* ⭐ ALTURA REDUCIDA */
         margin-left: 8%;
         box-shadow:
             0 25px 70px rgba(0, 0, 0, 0.4),
@@ -100,6 +102,8 @@
         z-index: 1;
         animation: slideIn 0.6s ease-out;
         border: 1px solid rgba(255, 255, 255, 0.18);
+        display: flex;
+        flex-direction: column;
     }
 
     @keyframes slideIn {
@@ -116,6 +120,7 @@
     .login-header {
         text-align: center;
         margin-bottom: 30px;
+        flex-shrink: 0; /* No se comprime */
     }
 
     .login-icon {
@@ -169,20 +174,28 @@
         text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
     }
 
-    /* Mensaje de éxito */
+    /* ⭐ CONTENEDOR CON ALTURA FIJA PARA EL MENSAJE */
+    .success-message-container {
+        min-height: 0; /* Sin altura reservada */
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+
+    /* Mensaje de éxito - MÁS COMPACTO */
     .success-message {
         background: rgba(34, 197, 94, 0.15);
         border: 1px solid rgba(34, 197, 94, 0.3);
-        border-radius: 12px;
-        padding: 12px 16px;
-        margin-bottom: 20px;
+        border-radius: 10px;
+        padding: 8px 12px; /* ⭐ Padding reducido */
         color: rgba(255, 255, 255, 0.95);
-        font-size: 13px;
+        font-size: 11px; /* ⭐ Texto más pequeño */
+        line-height: 1.3; /* ⭐ Línea más compacta */
         font-weight: 500;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         animation: slideDown 0.5s ease-out;
         display: flex;
         align-items: center;
+        margin-bottom: 16px; /* ⭐ Margen inferior */
     }
 
     @keyframes slideDown {
@@ -197,9 +210,9 @@
     }
 
     .success-message svg {
-        width: 18px;
-        height: 18px;
-        margin-right: 10px;
+        width: 14px; /* ⭐ Icono más pequeño */
+        height: 14px;
+        margin-right: 8px;
         flex-shrink: 0;
         color: rgba(34, 197, 94, 1);
         filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
@@ -244,6 +257,7 @@
     .form-group {
         margin-bottom: 24px;
         position: relative;
+        flex-shrink: 0; /* No se comprime */
     }
 
     .form-group.has-error .form-control-modern {
@@ -385,6 +399,7 @@
             0 8px 25px rgba(102, 126, 234, 0.45),
             0 0 0 1px rgba(255, 255, 255, 0.2);
         margin-top: 12px;
+        flex-shrink: 0;
     }
 
     .btn-login:hover:not(:disabled) {
@@ -406,6 +421,7 @@
     .forgot-password {
         text-align: center;
         margin-top: 20px;
+        flex-shrink: 0;
     }
 
     .forgot-password a {
@@ -445,6 +461,7 @@
             margin-left: 0;
             padding: 40px 30px;
             max-width: 420px;
+            min-height: 560px; /* ⭐ Altura ajustada */
         }
 
         .login-title {
@@ -465,6 +482,7 @@
     @media (max-width: 480px) {
         .login-card {
             padding: 35px 25px;
+            min-height: 540px; /* ⭐ Altura ajustada */
         }
 
         .login-title {
@@ -482,8 +500,12 @@
         }
 
         .success-message {
-            font-size: 12px;
-            padding: 10px 14px;
+            font-size: 11px; /* ⭐ Mantener tamaño pequeño */
+            padding: 8px 12px;
+        }
+
+        .success-message-container {
+            min-height: 0;
         }
     }
 
@@ -552,16 +574,18 @@
             </script>
         @endif
 
-        {{-- Mensaje de éxito después de restablecer contraseña --}}
-        @if(session('success'))
-        <div class="success-message">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-            {{ session('success') }}
+        {{-- ⭐ CONTENEDOR CON ALTURA FIJA PARA EL MENSAJE --}}
+        <div class="success-message-container">
+            @if(session('success'))
+            <div class="success-message">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                {{ session('success') }}
+            </div>
+            @endif
         </div>
-        @endif
 
         <form action="{{ route('login.process') }}" method="POST" id="loginForm" autocomplete="off">
             @csrf

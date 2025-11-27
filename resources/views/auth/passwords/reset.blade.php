@@ -521,7 +521,6 @@
                         class="form-control-modern with-icon"
                         placeholder="Letras, números, símbolos y mayúsculas"
                         autocomplete="new-password"
-                        required
                     >
                     <button type="button" class="toggle-password" id="togglePassword">
                         <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -557,7 +556,6 @@
                         class="form-control-modern with-icon"
                         placeholder="Repite tu contraseña"
                         autocomplete="new-password"
-                        required
                     >
                     <button type="button" class="toggle-password" id="toggleConfirm">
                         <svg id="eyeIcon2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
