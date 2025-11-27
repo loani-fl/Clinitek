@@ -408,14 +408,15 @@
                                 </button>
                             </form>
                         </div>
-                    @else
-                        <div class="profile-dropdown-actions">
-                            <a href="{{ route('login') }}" class="profile-dropdown-link">
-                                <i class="bi bi-box-arrow-in-right"></i>
-                                Iniciar sesión
-                            </a>
-                        </div>
-                    @endauth
+                  @else
+    <div class="profile-dropdown-actions">
+        <a href="{{ route('login.form') }}" class="profile-dropdown-link">
+            <i class="bi bi-box-arrow-in-right"></i>
+            Iniciar sesión
+        </a>
+    </div>
+@endauth
+
                 </div>
             </div>
 
