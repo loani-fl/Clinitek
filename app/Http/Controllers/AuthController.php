@@ -64,7 +64,7 @@ class AuthController extends Controller
             return back()
                 ->withInput($request->only('email'))
                 ->withErrors([
-                    'email' => 'El nombre de usuario no está registrado o es incorrecto.',
+                    'email' => 'El nombre de usuario es incorrecto o no esta registrado.',
                     'password' => 'La contraseña es incorrecta.'
                 ]);
         }
@@ -217,15 +217,41 @@ class AuthController extends Controller
      */
     public function resetPassword(Request $request)
     {
+        // Validación personalizada de contraseña
+        $password = $request->input('password');
+        $passwordErrors = [];
+        
+        if (strlen($password) < 8) {
+            $passwordErrors[] = 'mínimo 8 caracteres';
+        }
+        if (!preg_match('/[A-Z]/', $password)) {
+            $passwordErrors[] = 'al menos una letra mayúscula';
+        }
+        if (!preg_match('/[0-9]/', $password)) {
+            $passwordErrors[] = 'al menos un número';
+        }
+        if (!preg_match('/[!.@#$%^&*]/', $password)) {
+            $passwordErrors[] = 'al menos un carácter especial (!.@#$%^&*)';
+        }
+        
+        if (!empty($passwordErrors)) {
+            return back()->withErrors([
+                'password' => 'La contraseña debe contener: ' . implode(', ', $passwordErrors) . '.'
+            ])->withInput();
+        }
+        
+        // Validar confirmación de contraseña
+        if ($password !== $request->input('password_confirmation')) {
+            return back()->withErrors([
+                'password_confirmation' => 'Las contraseñas no coinciden.'
+            ])->withInput();
+        }
+        
         $request->validate([
             'email' => 'required|email',
             'username' => 'required',
-            'password' => 'required|min:6|confirmed',
             'token' => 'required'
         ], [
-            'password.required' => 'La contraseña es obligatoria.',
-            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
-            'password.confirmed' => 'Las contraseñas no coinciden.',
             'username.required' => 'El nombre de usuario es obligatorio.'
         ]);
         

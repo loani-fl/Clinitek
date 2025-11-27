@@ -519,7 +519,7 @@
                         name="password"
                         id="password"
                         class="form-control-modern with-icon"
-                        placeholder="Mínimo 6 caracteres"
+                        placeholder="Letras, números, símbolos y mayúsculas"
                         autocomplete="new-password"
                         required
                     >
@@ -662,15 +662,37 @@ document.addEventListener('DOMContentLoaded', function() {
         let isValid = true;
 
         const passwordValue = passwordInput.value.trim();
+        const passwordErrors = [];
+
+        // Validar longitud mínima
+        if (passwordValue.length < 8) {
+            passwordErrors.push('mínimo 8 caracteres');
+        }
+
+        // Validar mayúscula
+        if (!/[A-Z]/.test(passwordValue)) {
+            passwordErrors.push('al menos una letra mayúscula');
+        }
+
+        // Validar número
+        if (!/[0-9]/.test(passwordValue)) {
+            passwordErrors.push('al menos un número');
+        }
+
+        // Validar carácter especial
+        if (!/[!.@#$%^&*]/.test(passwordValue)) {
+            passwordErrors.push('al menos un carácter especial (!.@#$%^&*)');
+        }
+
         if (passwordValue === '') {
             e.preventDefault();
             passwordError.textContent = 'La contraseña es obligatoria.';
             passwordError.classList.add('show');
             passwordGroup.classList.add('has-error');
             isValid = false;
-        } else if (passwordValue.length < 6) {
+        } else if (passwordErrors.length > 0) {
             e.preventDefault();
-            passwordError.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+            passwordError.textContent = 'La contraseña debe contener: ' + passwordErrors.join(', ') + '.';
             passwordError.classList.add('show');
             passwordGroup.classList.add('has-error');
             isValid = false;
@@ -700,7 +722,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (!isValid) {
-            if (passwordValue === '' || passwordValue.length < 6) {
+            if (passwordValue === '' || passwordErrors.length > 0) {
                 passwordInput.focus();
             } else if (confirmValue === '' || passwordValue !== confirmValue) {
                 confirmInput.focus();
