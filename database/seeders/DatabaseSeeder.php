@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             MedicamentosSeeder::class,
             RolesAndPermissionsSeeder::class,
+                AdminUserSeeder::class,
         ]);
            // No hay seeders registrados
     }
