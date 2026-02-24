@@ -85,7 +85,7 @@ class AuthController extends Controller
         
         // Redirigir según rol
         if ($usuario->hasRole('administrador')) {
-            return redirect()->route('usuarios.index');
+            return redirect()->route('inicio');
         } elseif ($usuario->hasRole('medico')) {
             return redirect()->route('medicos.index');
         } elseif ($usuario->hasRole('usuario')) {

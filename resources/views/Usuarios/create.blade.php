@@ -93,7 +93,7 @@
 <p class="section-title">Datos personales</p>
 <div class="row mb-4">
     <div class="col-md-12 mb-3 position-relative">
-        <label class="form-label">Buscar persona <span class="text-danger">*</span></label>
+        <label class="form-label">Buscar empleado o medico <span class="text-danger">*</span></label>
         <input type="text" id="searchPersona" class="form-control" placeholder="Escribe el nombre o apellido..." 
                value="{{ old('nombre') ? old('nombre').' '.old('apellido') : '' }}">
         <div id="results" class="list-group position-absolute w-100"></div>
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
         reglas.length = value.length >= 8;
         reglas.uppercase = /[A-Z]/.test(value);
         reglas.number = /[0-9]/.test(value);
-        reglas.special = /[!@#$%^&*]/.test(value);
+        reglas.special = /[!.@#$%^&*]/.test(value);
 
         ['rule-length','rule-uppercase','rule-number','rule-special'].forEach(id => {
             const li = document.getElementById(id);
